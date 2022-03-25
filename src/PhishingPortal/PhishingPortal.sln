@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal", "PhishingPortal\PhishingPortal.csproj", "{54056732-4CED-4E91-9B07-B2124AF233A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal", "PhishingPortal\PhishingPortal.csproj", "{54056732-4CED-4E91-9B07-B2124AF233A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.Core", "PhishingPortal.Core\PhishingPortal.Core.csproj", "{F445C71B-3C4D-4F0A-8C43-D4D6D41B76E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Core", "PhishingPortal.Core\PhishingPortal.Core.csproj", "{F445C71B-3C4D-4F0A-8C43-D4D6D41B76E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phishing.Domain", "Phishing.Domain\Phishing.Domain.csproj", "{8C1B76F8-0180-4ED9-A55B-F79D4A6CBAD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Dto", "Phishing.Domain\PhishingPortal.Dto.csproj", "{8C1B76F8-0180-4ED9-A55B-F79D4A6CBAD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

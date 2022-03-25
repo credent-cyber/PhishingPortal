@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhishingPortal.Domain
+namespace PhishingPortal.Dto
 {
-    public class WhatsappTemplate
+    public class WhatsappTemplate : Auditable
     {
-        public int Id { get; set; }
         public string Content { get; set; }
         public bool IsActive { get; set; }
-
     }
 }

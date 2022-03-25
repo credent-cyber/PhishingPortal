@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhishingPortal.Domain
+namespace PhishingPortal.Dto
 {
-    public class EmailCampaign
+    public class EmailCampaign : BaseEntity
     {
-        public int Id { get; set; }
         public int EmailTemplateId { get; set; }
-        public string UrlLink { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

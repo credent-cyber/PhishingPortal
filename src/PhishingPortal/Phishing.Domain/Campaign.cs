@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhishingPortal.Domain
+namespace PhishingPortal.Dto
 {
-    public class Campaign
+    public class Campaign : BaseEntity
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
         public DateTime ScheduleDateTime { get; set; }
