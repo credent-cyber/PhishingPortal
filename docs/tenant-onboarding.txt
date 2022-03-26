@@ -1,0 +1,15 @@
+- create a new tenant entry in the central database
+- create a new database for teanant
+- publish default teamplates and metadata on the new tenant database
+- provision a default admin user in the tenant database.
+
+
+Major tenant creation configurtions - 
+
+1. Services activated
+2. Smtp configurations, email service provider configurations
+3. SMS gateway configurations
+4. Whatsapp gateway configurations
+6. Corresponding templates
+7. Metadata to be embedded on to the notification body
+
