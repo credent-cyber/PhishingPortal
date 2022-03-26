@@ -7,7 +7,7 @@ namespace PhishingPortal.Dto
 {
     public class RecipientGroupMapping
     {
-        public int EmployeeId { get; set; }
+        public int RecipientId { get; set; }
         public int GroupId { get; set; }
     }
 }

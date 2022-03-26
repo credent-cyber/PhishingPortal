@@ -14,6 +14,7 @@ namespace PhishingPortal.Dto
         public string SentBy { get; set; }
         public string ReturnUrl { get; set; }
         public bool IsHit { get; set; }
+        public string Status { get; set; }
     }
 
 }
