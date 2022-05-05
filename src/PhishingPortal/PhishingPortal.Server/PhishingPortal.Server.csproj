@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+
+
+	<PropertyGroup>
+		<BlazorVersion>6.0.4</BlazorVersion>
+		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
+		<EntityFrameworkVersion>6.0.0</EntityFrameworkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="WebPush" Version="1.0.11" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\PhishingPortal.Core\PhishingPortal.Core.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="cert_rsa512.pfx">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+
+</Project>

@@ -1,0 +1,33 @@
+﻿@page "/authentication/{action}"
+
+@inject NavigationManager NavigationManager
+
+<RemoteAuthenticatorViewCore
+    TAuthenticationState="PhishingPortalAuthState"
+    AuthenticationState="RemoteAuthenticationState"
+    OnLogInSucceeded="LogInSucceeded"
+    Action="@Action" />
+@*
+<RemoteAuthenticatorView Action=@Action />*@
+
+
+@code{
+    
+    [Parameter]
+    public string Action { get; set; }
+
+    public PhishingPortalAuthState RemoteAuthenticationState { get; set; } = new PhishingPortalAuthState();
+
+    //protected override void OnInitialized()
+    //{
+    //    if (RemoteAuthenticationActions.IsAction(RemoteAuthenticationActions.LogIn, Action))
+    //    {
+    //        // Preserve the current order so that we don't loose it
+    //    }
+    //}
+
+    private void LogInSucceeded(PhishingPortalAuthState authState)
+    {
+       
+    }
+}

@@ -13,7 +13,7 @@ namespace PhishingPortal.Dto.Admin
         public string ContactNumber { get; set; }
         public string UniqueId { get; set; }
         public string UrlPrefix { get; set; }
-        public virtual ICollection<TenantData> Data { get; set; }
+        public virtual ICollection<TenantData> SettingsData { get; set; }
 
     }
 }
