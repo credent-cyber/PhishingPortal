@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Server;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using PhishingPortal.Repositories;
+using PhishingPortal.Core;
+using PhishingPortal.Server.Services;
+using PhishingPortal.DataContext;
+using PhishingPortal.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 //var rsaCertificate = new X509Certificate2(
@@ -11,11 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 
 builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
-        options.UseSqlite("Data Source=phishsim-db.db"));
+        options.UseSqlite("Data Source=./App_Data/phishsim-db.db"));
+
+//builder.Services.AddDbContext<TenantDbContext>(options =>
+//        options.UseSqlite("Data Source=T334343.db"));
 
 builder.Services.AddDefaultIdentity<PhishingPortalUser>(options => {
     options.SignIn.RequireConfirmedAccount = true;
@@ -29,7 +37,10 @@ builder.Services.AddIdentityServer()
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
+// services and custom dependencies
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
+builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 
 
 var app = builder.Build();
@@ -42,6 +53,12 @@ using (var scope = scopeFactory.CreateScope())
     {
         //SeedData.Initialize(db);
     }
+
+    //var db2 = scope.ServiceProvider.GetRequiredService<TenantDbContext>();
+    //if (db2.Database.EnsureCreated())
+    //{
+    //    //SeedData.Initialize(db);
+    //}
 
 }
 

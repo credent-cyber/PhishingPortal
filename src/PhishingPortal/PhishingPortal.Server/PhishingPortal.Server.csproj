@@ -21,6 +21,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetCoreVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.4" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
 		<PackageReference Include="WebPush" Version="1.0.11" />
@@ -28,15 +29,15 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\PhishingPortal.Core\PhishingPortal.Core.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Repositories\PhishingPortal.Repositories.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="cert_rsa512.pfx">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+	  <Folder Include="App_Data\" />
 	</ItemGroup>
 
 

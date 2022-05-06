@@ -21,7 +21,7 @@ form {
 
 .top-bar {
     height: 5rem;
-    background-color: rgb(192,0,0);
+    background-color: rgb(87, 59, 175);
     background-image: linear-gradient(rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0) 70%);
     display: flex;
     align-items: stretch;

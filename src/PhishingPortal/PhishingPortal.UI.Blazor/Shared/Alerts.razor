@@ -1,0 +1,24 @@
+﻿@if (IsSuccess)
+{
+    <div class="alert alert-primary" role="alert">
+        @Message
+    </div>
+}
+
+@if (IsError)
+{
+    <div class="alert alert-primary" role="alert">
+        @Message
+    </div>
+}
+@code {
+
+        [Parameter]
+        public bool IsError { get; set; } = false;
+
+        [Parameter]
+        public bool IsSuccess { get; set; }
+
+        [Parameter]
+        public string Message { get; set; } = string.Empty;
+}

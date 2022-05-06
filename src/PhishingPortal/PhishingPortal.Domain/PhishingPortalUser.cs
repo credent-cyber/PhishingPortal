@@ -1,4 +1,4 @@
-﻿namespace PhishingPortal.Server
+﻿namespace PhishingPortal.Domain
 {
     using Microsoft.AspNetCore.Identity;
 

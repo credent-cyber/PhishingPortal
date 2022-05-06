@@ -1,0 +1,95 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+@page "/onboard"
+
+@inject TenantAdminClient AdminClient
+@inject ILogger<Onboard> Logger
+@inject NavigationManager navMgr
+
+<h3>Onboard New Client</h3>
+
+<EditForm Model="@model" OnValidSubmit="@OnValidSubmit" class="form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+    <div class="form-group">
+        <label for="Name">@nameof(model.Name)</label>
+        <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Address">@nameof(model.Address)</label>
+        <InputText @bind-Value="model.Address" id="Address" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="Website">@nameof(model.Website)</label>
+        <InputText @bind-Value="model.Website" id="Website" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="ContactEmail">@nameof(model.ContactEmail)</label>
+        <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label for="ContactNumber">@nameof(model.ContactNumber)</label>
+        <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+    </div>
+
+
+    <div class="form-group">
+        <label for="Domain">@nameof(model.Domain)</label>
+        <InputText @bind-Value="model.Domain" id="Domain" class="form-control" />
+
+    </div>
+    <div class="form-group">
+        <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
+        <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+            @foreach (var op in Enum.GetValues(typeof(DbOptions)))
+            {
+                <option value="@op">@op</option>
+            }
+        </InputSelect>
+    </div>
+    
+    <button class="btn btn-primary" type="submit">Register</button>
+    <button class="btn btn-secondary" type="reset">Clear</button>
+</EditForm>
+
+@code {
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    string Message = string.Empty;
+
+    Tenant model = new Tenant()
+        {
+            Name = "TEST",
+            Address = "ABC",
+            ContactEmail = "mkp@gmail.com",
+            Domain = "test.com",
+            DatabaseOption = DbOptions.SqlLite,
+            ContactNumber = "34738473894"
+        };
+
+
+    private async Task OnValidSubmit()
+    {
+        try
+        {
+            await AdminClient.CreateTenantAsync(model);
+            IsSuccess = true;
+            Message = "Client successfully registered!";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            Message = $"There was an error registering client, {ex.Message}";
+        }
+    }
+
+}

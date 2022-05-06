@@ -1,4 +1,4 @@
-﻿namespace PhishingPortal.Dto.Admin
+﻿namespace PhishingPortal.Dto
 {
     public class TenantData : Auditable
     {
