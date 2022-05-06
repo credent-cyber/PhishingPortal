@@ -1,0 +1,46 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+
+@page "/provision"
+@inject TenantAdminClient adminClient
+@inject NavigationManager navMgr
+
+<h3>Provision Client</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Domain</td>
+            <td>DbOption</td>
+            <td>UniqueId</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in AllTenants)
+        {
+            <tr>
+                <td>@t.Name</td>
+                <td>@t.Domain</td>
+                <td>@t.DatabaseOption</td>
+                <td>@t.UniqueId</td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@code {
+
+    ProvisionTenantRequest request = null;
+
+    List<Tenant> AllTenants = new List<Tenant>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllTenants = await adminClient.GetAllAsync();
+    }
+
+}

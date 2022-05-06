@@ -27,5 +27,20 @@ namespace PhishingPortal.Server.Controllers
             return await tenatAdminRepo.CreateTenantAsync(tenant);
         }
 
+        [HttpGet]
+        public async Task<List<Tenant>> GetAll(int pageIndex, int pageSize)
+        {
+            return await tenatAdminRepo.GetAllAsync(pageIndex, pageSize);
+        }
+
+        [HttpPost]
+        public async Task Provision(ProvisionTenantRequest request)
+        {
+            var result = await tenatAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);
+
+            if (result == false)
+                NotFound("Tenant not registered yet");
+        }
+
     }
 }
