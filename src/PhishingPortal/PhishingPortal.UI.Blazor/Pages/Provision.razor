@@ -11,20 +11,24 @@
 <table class="table">
     <thead>
         <tr>
-            <td>Name</td>
-            <td>Domain</td>
-            <td>DbOption</td>
             <td>UniqueId</td>
+            <td>Name</td>
+            <td>LicenseType</td>
+            <td>LicenseExpiry</td>
+            <td>ConfirmationLink</td>
+            
         </tr>
     </thead>
     <tbody>
         @foreach (var t in AllTenants)
         {
             <tr>
+                <td><a class="btn-link" href="edittenant/@t.UniqueId">@t.UniqueId</a></td>
                 <td>@t.Name</td>
-                <td>@t.Domain</td>
-                <td>@t.DatabaseOption</td>
-                <td>@t.UniqueId</td>
+                <td>@t.LicenseType</td>
+                <td>@t.LicenseExpiry</td>
+                <td><a class="btn-link" target="_blank" href="@t.ConfirmationLink">Confirm</a></td>
+
             </tr>
         }
     </tbody>

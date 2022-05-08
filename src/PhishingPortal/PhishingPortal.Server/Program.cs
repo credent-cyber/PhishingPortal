@@ -40,6 +40,7 @@ builder.Services.AddAuthentication()
 // services and custom dependencies
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
+builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 
 

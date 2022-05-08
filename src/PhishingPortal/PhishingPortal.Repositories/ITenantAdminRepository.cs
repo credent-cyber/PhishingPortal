@@ -8,5 +8,7 @@ namespace PhishingPortal.Repositories
         Task<Tenant> CreateTenantAsync(Tenant tenant);
 
         Task<bool> ProvisionAsync(int tenantId, string connectionString);
+
+        Task<Tenant> GetByUniqueId(string uniqueId);
     }
 }

@@ -1,0 +1,140 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+@page "/edittenant/{uniqueId}"
+
+@inject TenantAdminClient AdminClient
+@inject ILogger<Onboard> Logger
+@inject NavigationManager navMgr
+
+<h3>Onboard New Client</h3>
+
+<div class="row">
+
+    <div class=col-5>
+
+        <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+            <div class="form-group">
+                <label for="Name">@nameof(model.Name)</label>
+                <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="Address">@nameof(model.Address)</label>
+                <InputText @bind-Value="model.Address" id="Address" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="Website">@nameof(model.Website)</label>
+                <InputText @bind-Value="model.Website" id="Website" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="ContactEmail">@nameof(model.ContactEmail)</label>
+                <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="ContactNumber">@nameof(model.ContactNumber)</label>
+                <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+            </div>
+
+
+            <div class="form-group">
+                <label for="Domain">@nameof(model.LicenseType)</label>
+                <InputSelect @bind-Value="model.LicenseType" class="form-control">
+                    @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
+                    {
+                        <option value="@lic">@lic</option>
+                    }
+                </InputSelect>
+
+            </div>
+
+            <div class="form-group">
+                <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
+                <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
+                <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+                    @foreach (var op in Enum.GetValues(typeof(DbOptions)))
+                    {
+                        <option value="@op">@op</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+
+        </EditForm>
+    </div>
+    <div class=col-5>
+        @if (model.ConfirmationState == ConfirmationStats.Registered)
+        {
+               <button type="button" @onclick="OnVerifyClick" >Send Verification</button>
+        }
+        
+        @if(model.ConfirmationState == ConfirmationStats.DomainVerified)
+        {
+             <button type="button">Publish Defaults</button>
+        }
+       
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string UniqueId { get; set; } = string.Empty;
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    string Message = string.Empty;
+
+    Tenant model = new Tenant();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UniqueId != null)
+        {
+            var tenant = await AdminClient.GetTenantByUniqueId(UniqueId);
+            if (tenant == null)
+            {
+                navMgr.NavigateTo("/Error404");
+            }
+            else
+            {
+                model = tenant;
+            }
+
+        }
+
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        await Task.CompletedTask;
+    }
+
+
+    public void OnVerifyClick()
+    {
+        // send verificatin mail 
+        // ask user to create admin user
+
+    }
+
+    public void OnPublishDefaults()
+    {
+        // seed database 
+    }
+
+
+}

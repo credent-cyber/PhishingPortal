@@ -1,0 +1,236 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+@page "/tenant-confirmation/{uniqueId}/{cid}/{action?}"
+@layout SimpleLayout
+
+@inject TenantAdminClient AdminClient
+@inject ILogger<Onboard> Logger
+@inject NavigationManager navMgr
+
+<h3>
+    Onboarding |
+    @if (model.ConfirmationState == ConfirmationStats.Registered)
+    {
+        <text>Confirmation</text>
+    }
+
+    @if (model.ConfirmationState == ConfirmationStats.Verified)
+    {
+        <text>Domain Verification</text>
+    }
+
+    @if(model.ConfirmationState == ConfirmationStats.DomainVerified)
+    {
+        <text>Admin User Creation</text>
+    }
+
+</h3>
+
+<div class="container">
+    <div class="row">
+
+        <div class=col-10>
+            @if ((model.ConfirmationState == ConfirmationStats.Registered)
+            || model.ConfirmationState == ConfirmationStats.Verified && Action == "dv")
+            {
+                <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+                    <div class="form-group">
+                        <label for="Name">@nameof(model.Name)</label>
+                        <InputText disabled="disabled" @bind-Value="model.Name" id="Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Address">@nameof(model.Address)</label>
+                        <InputText @bind-Value="model.Address" id="Address" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Website">@nameof(model.Website)</label>
+                        <InputText @bind-Value="model.Website" id="Website" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ContactEmail">@nameof(model.ContactEmail)</label>
+                        <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ContactNumber">@nameof(model.ContactNumber)</label>
+                        <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="Domain">@nameof(model.LicenseType)</label>
+                        <InputSelect @bind-Value="model.LicenseType" class="form-control">
+                            @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
+                            {
+                            <option value="@lic">@lic</option>
+                            }
+                    </InputSelect>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
+                    <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
+                    <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+                        @foreach (var op in Enum.GetValues(typeof(DbOptions)))
+                            {
+                            <option value="@op">@op</option>
+                            }
+                    </InputSelect>
+                </div>
+                @if (model.ConfirmationState == ConfirmationStats.Registered)
+                    {
+                        <button class="btn btn-primary" type="submit">Confirm</button>
+                    }
+
+                    @if (model.ConfirmationState == ConfirmationStats.Verified)
+                    {
+                        <button class="btn btn-primary" type="submit">Verify Domain</button>
+                    }
+
+
+                </EditForm>
+            }
+
+            @if (Action == "mastusr" && model.ConfirmationState == ConfirmationStats.DomainVerified && model.ConfirmationState
+            != ConfirmationStats.MasterUser && model.ConfirmationState != ConfirmationStats.Licensed)
+            {
+                <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
+                    <DataAnnotationsValidator />
+
+                    <ValidationSummary />
+
+                    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+                    <div class="form-group">
+                        <label for="Email">@nameof(user.Email)</label>
+                        <InputText @bind-Value="user.Email" id="Email" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Password">@nameof(user.Password)</label>
+                        <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
+                        <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Submit</button>
+
+                </EditForm>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string UniqueId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Cid { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Action { get; set; }
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    string Message = string.Empty;
+
+    Tenant model = new Tenant();
+    TenantAdminUser user = new TenantAdminUser();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        Logger.LogInformation($"Action:{Action}");
+        if (UniqueId != null)
+        {
+            var tenant = await AdminClient.GetTenantByUniqueId(UniqueId);
+            if (tenant == null)
+            {
+                navMgr.NavigateTo("/Error404");
+            }
+            else
+            {
+                model = tenant;
+                //if (tenant.ToString() != Cid)
+                //{
+                //    IsError = true;
+                //    Message = "Invalid Confirmation Link";
+                //}
+                //else if (tenant.ConfirmationExpiry < DateTime.Now)
+                //{
+                //    IsError = true;
+                //    Message = "Confirmation Link Expired, please contact support team";
+                //}
+                //else
+                //{
+
+                //}
+
+            }
+
+        }
+
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        IsSuccess = true;
+
+        if (model.ConfirmationState == ConfirmationStats.Registered)
+        {
+            model.ConfirmationState = ConfirmationStats.Verified;
+            // request confirmation
+            // send confirmation email
+            // navigate for domain verification
+            Message = "Successfully confirmed!";
+            navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/dv");
+        }
+
+        else if (model.ConfirmationState == ConfirmationStats.Verified)
+        {
+            // request domain verification
+            // send verification email
+            // navigate for admin user creation
+            model.ConfirmationState = ConfirmationStats.DomainVerified;
+            Message = "Domain verified";
+            navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/mastusr");
+        }
+
+        await Task.CompletedTask;
+    }
+
+    protected async Task OnValidSubmitUser()
+    {
+
+        if (model.ConfirmationState == ConfirmationStats.DomainVerified)
+        {
+            // create admin user
+            IsSuccess = true;
+            Message = "Master user created successfully";
+        }
+        await Task.CompletedTask;
+    }
+
+
+}

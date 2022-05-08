@@ -22,7 +22,7 @@ namespace PhishingPortal.UI.Blazor.Client
             Tenant? o;
             try
             {
-                var res = await HttpClient.PostAsJsonAsync("api/Onboarding", tenant);
+                var res = await HttpClient.PostAsJsonAsync("api/Onboarding/Register", tenant);
 
                 res.EnsureSuccessStatusCode();
 
@@ -64,6 +64,14 @@ namespace PhishingPortal.UI.Blazor.Client
             return  list ?? Enumerable.Empty<Tenant>().ToList();
         }
 
+        
+        public async Task<Tenant> GetTenantByUniqueId(string uniqueId)
+        {
+            var res = await HttpClient.GetAsync($"api/onboarding/TenantByUniqueId?uniqueId={uniqueId}");
+            res.EnsureSuccessStatusCode();
+            var val = await res.Content.ReadFromJsonAsync<Tenant>() ;
+            return val;
+        }
         /// <summary>
         /// Provision
         /// </summary>

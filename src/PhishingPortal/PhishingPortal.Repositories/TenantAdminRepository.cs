@@ -5,17 +5,19 @@ using PhishingPortal.Dto;
 
 namespace PhishingPortal.Repositories
 {
+
     public class TenantAdminRepository : BaseRepository, ITenantAdminRepository
     {
 
-        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext centralDbContext)
+        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext centralDbContext, TenantAdminRepoConfig config)
             : base(logger)
         {
             CentralDbContext = centralDbContext;
-  
+            Config = config;
         }
 
         public PhishingPortalDbContext CentralDbContext { get; }
+        public TenantAdminRepoConfig Config { get; }
 
 
         /// <summary>
@@ -26,15 +28,45 @@ namespace PhishingPortal.Repositories
         public async Task<Tenant> CreateTenantAsync(Tenant tenant)
         {
 
-            tenant.UniqueId = $"ClientDb-{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            tenant.UniqueId = $"{Config.DbNamePrefix}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
+            tenant.ConfirmationLink = $"{Config.TenantConfirmBaseUrl}{tenant.GetConfirmationLink(tenant.ConfirmationLink)}";
+            tenant.ConfirmationState = ConfirmationStats.Registered;
+            tenant.ConfirmationExpiry = DateTime.Now.AddDays(Config.DaysToConfirm);
+
             tenant.CreatedOn = DateTime.Now;
-            tenant.CreatedBy = "System";
-            tenant.DomainVerificationCode = Guid.NewGuid().ToString();
-            tenant.IsDomainVerified = "F";
+            tenant.CreatedBy = Config.CreatedBy;
+
+            var connectionString = Config.ConnectionString;
+
+#if DEBUG
+            tenant.DatabaseOption = DbOptions.SqlLite;
+#endif
+
+            if (tenant.DatabaseOption == DbOptions.SqlLite)
+            {
+                connectionString = $"Data Source=./App_Data/{tenant.UniqueId}-db.db";
+            }
+            else
+            {
+                connectionString = connectionString.Replace("####", tenant.UniqueId);
+                        
+            }
+
+            var tenantSettings = new TenantData()
+            {  
+                Key = TenantData.Keys.ConnString,
+                Value = connectionString,
+                CreatedBy = Config.CreatedBy,
+                CreatedOn = DateTime.Now,
+            };
+
+            tenant.Settings = new List<TenantData>();
+            tenant.Settings.Add(tenantSettings);
 
             CentralDbContext.Add(tenant);
             CentralDbContext.SaveChanges();
 
+            var result = await CreateDatabase(tenant, tenantSettings.Value);
             
             return await Task.FromResult(tenant);
         }
@@ -50,6 +82,11 @@ namespace PhishingPortal.Repositories
            return await Task.FromResult(CentralDbContext.Tenants.Skip(pageIndex).Take(pageSize).ToList());
         }
 
+        public async Task<Tenant> GetByUniqueId(string uniqueId)
+        {
+            return await Task.FromResult(CentralDbContext.Tenants.Where(x => x.UniqueId == uniqueId).FirstOrDefault());
+        }
+
         /// <summary>
         /// ProvisionAsync
         /// </summary>
@@ -58,39 +95,25 @@ namespace PhishingPortal.Repositories
         /// <returns></returns>
         public async Task<bool> ProvisionAsync(int tenantId, string connectionString)
         {
-            
-            var tenant = await CentralDbContext.Tenants.SingleAsync(tenant => tenant.Id == tenantId);
+            throw new NotImplementedException();
+        }
+
+
+        private async Task<bool> CreateDatabase(Tenant tenant, string connectionString)
+        {
 
             if (tenant != null)
             {
-                if(tenant.DatabaseOption == DbOptions.SqlLite)
-                {
-                    connectionString = $"Data Source=./App_Data/{tenant.UniqueId}.db";
-                }
-                else
-                {
-                    connectionString = ConstructConnString(connectionString, tenant.DatabaseOption);
-                }
-
-                var tenantSettings = new TenantData()
-                {
-                    Key = "CONN_STR",
-                    Value = connectionString,
-                    CreatedBy = "System",
-                    CreatedOn = DateTime.Now,
-                };
-
-                CentralDbContext.Add(tenantSettings);
-                CentralDbContext.SaveChanges();
 
                 // start tenant onboarding console and which will provision a new tenant.
                 var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
 
                 if (tenant.DatabaseOption == DbOptions.SqlLite)
                 {
-                    optionsBuilder.UseSqlite(tenantSettings.Value);
+                    optionsBuilder.UseSqlite(connectionString);
                 }
-              
+                // todo other provider
+
                 TenantDbContext db;
                 try
                 {
@@ -105,18 +128,13 @@ namespace PhishingPortal.Repositories
             }
             else
             {
-                Logger.LogError($"$Tenant#{tenantId} not registered yet");
+                Logger.LogError($"$Tenant#{tenant?.UniqueId} not registered yet");
                 return false;
             }
-                
+
 
             return true;
         }
-
-        private string ConstructConnString(string connString, DbOptions options)
-        {
-            // TODO: reconstruct connection string from the input string
-            return connString;
-        }
+       
     }
 } 

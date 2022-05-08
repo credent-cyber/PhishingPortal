@@ -22,6 +22,7 @@ namespace PhishingPortal.Server.Controllers
         public ITenantAdminRepository tenatAdminRepo { get; }
 
         [HttpPost]
+        [Route("Register")]
         public async Task<Tenant> Register(Tenant tenant)
         {
             return await tenatAdminRepo.CreateTenantAsync(tenant);
@@ -33,7 +34,15 @@ namespace PhishingPortal.Server.Controllers
             return await tenatAdminRepo.GetAllAsync(pageIndex, pageSize);
         }
 
+        [HttpGet]
+        [Route("TenantByUniqueId")]
+        public async Task<Tenant> GetByUniqueId(string uniqueId)
+        {
+            return await tenatAdminRepo.GetByUniqueId(uniqueId);
+        }
+
         [HttpPost]
+        [Route("Provision")]
         public async Task Provision(ProvisionTenantRequest request)
         {
             var result = await tenatAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);

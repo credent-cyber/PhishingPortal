@@ -29,9 +29,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertificateManagementConsol
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Server", "PhishingPortal.Server\PhishingPortal.Server.csproj", "{E95C9A03-4A77-4B42-9C33-B69C674ECF3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.Repositories", "PhishingPortal.Repositories\PhishingPortal.Repositories.csproj", "{7C6D04E6-36B3-4595-8F32-C6C591B35CE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Repositories", "PhishingPortal.Repositories\PhishingPortal.Repositories.csproj", "{7C6D04E6-36B3-4595-8F32-C6C591B35CE6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.DataContext", "PhishingPortal.DataContext\PhishingPortal.DataContext.csproj", "{7D2A038F-A2E6-4DD7-B1EE-0503E9C0337A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Common", "PhishingPortal.Common\PhishingPortal.Common.csproj", "{BB5EF41A-1196-448B-A02C-0D982BD4EB8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{7D2A038F-A2E6-4DD7-B1EE-0503E9C0337A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D2A038F-A2E6-4DD7-B1EE-0503E9C0337A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D2A038F-A2E6-4DD7-B1EE-0503E9C0337A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB5EF41A-1196-448B-A02C-0D982BD4EB8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB5EF41A-1196-448B-A02C-0D982BD4EB8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB5EF41A-1196-448B-A02C-0D982BD4EB8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB5EF41A-1196-448B-A02C-0D982BD4EB8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -94,6 +100,7 @@ Global
 		{E95C9A03-4A77-4B42-9C33-B69C674ECF3E} = {1235EBC8-4F6F-497D-B55F-E76A77334336}
 		{7C6D04E6-36B3-4595-8F32-C6C591B35CE6} = {E5053D1B-8C49-42BC-8CDD-134B91B2C268}
 		{7D2A038F-A2E6-4DD7-B1EE-0503E9C0337A} = {E5053D1B-8C49-42BC-8CDD-134B91B2C268}
+		{BB5EF41A-1196-448B-A02C-0D982BD4EB8D} = {E5053D1B-8C49-42BC-8CDD-134B91B2C268}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3B8205F-FBA7-4A7D-BFCB-4EDF19CE3CD8}
