@@ -104,5 +104,62 @@ namespace PhishingPortal.UI.Blazor.Client
             }
             return result;
         }
+
+        /// <summary>
+        /// RegistrationConfirmation
+        /// </summary>
+        /// <param name="uniqueId">Tenant UniqueID</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<Tenant>> Confirmation(TenantConfirmationRequest request)
+        {
+            ApiResponse<Tenant> content;
+            var res = await HttpClient.PostAsJsonAsync($"api/onboarding/confirm", request);
+
+            res.EnsureSuccessStatusCode();
+            content = await res.Content.ReadFromJsonAsync<ApiResponse<Tenant>>();
+            return content;
+        }
+
+        /// <summary>
+        /// DomainConfirmation
+        /// </summary>
+        /// <param name="uniqueId">Tenant UniqueID</param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<Tenant>> DomainConfirmation(DomainVerificationRequest domain)
+        {
+            ApiResponse<Tenant> content;
+            var res = await HttpClient.PostAsJsonAsync($"api/onboarding/ConfirmDomain", domain);
+
+            res.EnsureSuccessStatusCode();
+            content = await res.Content.ReadFromJsonAsync<ApiResponse<Tenant>>();
+            return content;
+        }
+
+        /// <summary>
+        /// CreateTenandAdminUser
+        /// </summary>
+        /// <param name="uniqueId">Tenant UniqueID</param>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<bool> CreateTenandAdminUser(string uniqueId, string email, string password, string confirmPass)
+        {
+            ApiResponse<bool> content = new ApiResponse<bool>();
+            var res = await HttpClient.PostAsJsonAsync($"api/onboarding/CreateDefaultUser", new TenantAdminUser
+            {
+                TenantUniqueId = uniqueId,
+                Email = email,
+                Password = password,
+                ConfirmPassword = confirmPass
+            }) ;
+
+            res.EnsureSuccessStatusCode();
+            content = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+            return content?.Result ?? false;
+        }
+
     }
 }

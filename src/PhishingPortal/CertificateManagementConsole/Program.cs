@@ -3,7 +3,9 @@ using CertificateManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -11,6 +13,12 @@ class Program
 {
     static CreateCertificates? _cc;
     static void Main(string[] args)
+    {
+        CreateCertification(args);
+    }
+
+
+    static void CreateCertification(string[] args)
     {
         var cn = "PhishingPortal.UI.Blazor";
         var password = "1234";
@@ -43,7 +51,7 @@ class Program
         var iec = sp.GetService<ImportExportCertificate>();
 
         var rsaCertPfxBytes = iec.ExportSelfSignedCertificatePfx(password, rsaCert);
-        File.WriteAllBytes(Path.Combine( outputPath, "cert_rsa512.pfx"), rsaCertPfxBytes);
+        File.WriteAllBytes(Path.Combine(outputPath, "cert_rsa512.pfx"), rsaCertPfxBytes);
 
         var ecdsaCertPfxBytes = iec.ExportSelfSignedCertificatePfx(password, ecdsaCert);
         File.WriteAllBytes(Path.Combine(outputPath, "cert_ecdsa384.pfx"), ecdsaCertPfxBytes);

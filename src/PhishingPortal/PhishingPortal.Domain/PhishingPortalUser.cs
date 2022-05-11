@@ -2,6 +2,8 @@
 {
     using Microsoft.AspNetCore.Identity;
 
-    public class PhishingPortalUser : IdentityUser { }
+    public class PhishingPortalUser : IdentityUser { 
+    
+    }
 
 }

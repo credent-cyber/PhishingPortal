@@ -2,27 +2,17 @@
 @using PhishingPortal.UI.Blazor.Client
 @using Microsoft.Extensions.Logging
 @page "/tenant-confirmation/{uniqueId}/{cid}/{action?}"
-@layout SimpleLayout
 
-@inject TenantAdminClient AdminClient
+@*@inject TenantAdminClient AdminClient*@
 @inject ILogger<Onboard> Logger
+@inject ILogger<TenantAdminClient> Logger2
 @inject NavigationManager navMgr
+@inject HttpClient httpClient
 
 <h3>
-    Onboarding |
-    @if (model.ConfirmationState == ConfirmationStats.Registered)
+    Onboarding | @if (Action == "c")
     {
-        <text>Confirmation</text>
-    }
-
-    @if (model.ConfirmationState == ConfirmationStats.Verified)
-    {
-        <text>Domain Verification</text>
-    }
-
-    @if(model.ConfirmationState == ConfirmationStats.DomainVerified)
-    {
-        <text>Admin User Creation</text>
+        <text>Registration Confirmation</text>
     }
 
 </h3>
@@ -31,88 +21,42 @@
     <div class="row">
 
         <div class=col-10>
-            @if ((model.ConfirmationState == ConfirmationStats.Registered)
-            || model.ConfirmationState == ConfirmationStats.Verified && Action == "dv")
+
+            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+            @if (Action == "dv")
             {
-                <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
+                <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
+
                     <DataAnnotationsValidator />
                     <ValidationSummary />
-                    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
 
                     <div class="form-group">
-                        <label for="Name">@nameof(model.Name)</label>
-                        <InputText disabled="disabled" @bind-Value="model.Name" id="Name" class="form-control" />
+                        <label for="Domain">@nameof(domain.Domain)</label>
+                        <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
                     </div>
 
                     <div class="form-group">
-                        <label for="Address">@nameof(model.Address)</label>
-                        <InputText @bind-Value="model.Address" id="Address" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Website">@nameof(model.Website)</label>
-                        <InputText @bind-Value="model.Website" id="Website" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ContactEmail">@nameof(model.ContactEmail)</label>
-                        <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ContactNumber">@nameof(model.ContactNumber)</label>
-                        <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+                        <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
+                        <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
                     </div>
 
 
-                    <div class="form-group">
-                        <label for="Domain">@nameof(model.LicenseType)</label>
-                        <InputSelect @bind-Value="model.LicenseType" class="form-control">
-                            @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
-                            {
-                            <option value="@lic">@lic</option>
-                            }
-                    </InputSelect>
-
-                </div>
-
-                <div class="form-group">
-                    <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
-                    <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
-                    <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
-                        @foreach (var op in Enum.GetValues(typeof(DbOptions)))
-                            {
-                            <option value="@op">@op</option>
-                            }
-                    </InputSelect>
-                </div>
-                @if (model.ConfirmationState == ConfirmationStats.Registered)
-                    {
-                        <button class="btn btn-primary" type="submit">Confirm</button>
-                    }
-
-                    @if (model.ConfirmationState == ConfirmationStats.Verified)
-                    {
-                        <button class="btn btn-primary" type="submit">Verify Domain</button>
-                    }
-
+                    <button class="btn btn-primary" type="submit">Submit</button>
 
                 </EditForm>
             }
 
-            @if (Action == "mastusr" && model.ConfirmationState == ConfirmationStats.DomainVerified && model.ConfirmationState
-            != ConfirmationStats.MasterUser && model.ConfirmationState != ConfirmationStats.Licensed)
+            @if (Action == "mastusr")
             {
                 <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
                     <DataAnnotationsValidator />
 
                     <ValidationSummary />
 
-                    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+                    <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
+
 
                     <div class="form-group">
                         <label for="Email">@nameof(user.Email)</label>
@@ -157,64 +101,76 @@
 
     Tenant model = new Tenant();
     TenantAdminUser user = new TenantAdminUser();
+    DomainVerificationRequest domain = new DomainVerificationRequest();
+    TenantAdminClient AdminClient;
+
 
     protected override async Task OnInitializedAsync()
     {
 
+        AdminClient = new TenantAdminClient(Logger2, httpClient);
+
+        if (string.IsNullOrEmpty(Action))
+            Action = "c";
+
         Logger.LogInformation($"Action:{Action}");
-        if (UniqueId != null)
+
+        if (UniqueId != null && !string.IsNullOrEmpty(Cid))
         {
-            var tenant = await AdminClient.GetTenantByUniqueId(UniqueId);
-            if (tenant == null)
+            user.TenantUniqueId = UniqueId;
+            IsSuccess = true;
+
+            try
             {
-                navMgr.NavigateTo("/Error404");
+                var output = await AdminClient.Confirmation(new TenantConfirmationRequest
+                    {
+                        RegisterationHash = Cid,
+                        UniqueId = UniqueId,
+                        Url = navMgr.Uri
+                    });
+
+                if (output.IsSuccess)
+                {
+                    model = output.Result;
+                    domain.DomainVerificationCode = output.Result.UniqueId;
+                    if (output.Result.ConfirmationState == ConfirmationStats.Verified)
+                        navMgr.NavigateTo($"tenant-confirmation/{UniqueId}/{Cid}/dv");
+                    else if (output.Result.ConfirmationState == ConfirmationStats.DomainVerified)
+                        navMgr.NavigateTo($"tenant-confirmation/{UniqueId}/{Cid}/mastusr");
+                    else if (output.Result.ConfirmationState == ConfirmationStats.MasterUser)
+                        navMgr.NavigateTo($"/");
+                }
+
+                Message = output.Message;
             }
-            else
+            catch (Exception ex)
             {
-                model = tenant;
-                //if (tenant.ToString() != Cid)
-                //{
-                //    IsError = true;
-                //    Message = "Invalid Confirmation Link";
-                //}
-                //else if (tenant.ConfirmationExpiry < DateTime.Now)
-                //{
-                //    IsError = true;
-                //    Message = "Confirmation Link Expired, please contact support team";
-                //}
-                //else
-                //{
-
-                //}
-
+                Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
             }
 
         }
 
     }
 
-    protected async Task OnValidSubmit()
+    protected async Task OnValidSubmitDomain()
     {
-        IsSuccess = true;
-
-        if (model.ConfirmationState == ConfirmationStats.Registered)
+        try
         {
-            model.ConfirmationState = ConfirmationStats.Verified;
-            // request confirmation
-            // send confirmation email
-            // navigate for domain verification
-            Message = "Successfully confirmed!";
-            navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/dv");
+            domain.UniqueId = UniqueId;
+            var output = await AdminClient.DomainConfirmation(domain);
+
+            if (output.IsSuccess)
+            {
+                navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/mastusr");
+            }
+
+            Message = output.Message;
         }
-
-        else if (model.ConfirmationState == ConfirmationStats.Verified)
+        catch (Exception ex)
         {
-            // request domain verification
-            // send verification email
-            // navigate for admin user creation
-            model.ConfirmationState = ConfirmationStats.DomainVerified;
-            Message = "Domain verified";
-            navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/mastusr");
+            Message = ex.Message;
+            Logger.LogCritical(ex, ex.Message);
         }
 
         await Task.CompletedTask;
@@ -222,15 +178,19 @@
 
     protected async Task OnValidSubmitUser()
     {
-
         if (model.ConfirmationState == ConfirmationStats.DomainVerified)
         {
-            // create admin user
-            IsSuccess = true;
-            Message = "Master user created successfully";
+            var output = await AdminClient.CreateTenandAdminUser(UniqueId, user.Email, user.Password, user.ConfirmPassword);
+
+            if (output)
+                navMgr.NavigateTo("/");
+            else
+            {
+                IsSuccess = false;
+                Message = "User couldn't be created please try again or contact support team";
+            }
         }
         await Task.CompletedTask;
     }
-
 
 }

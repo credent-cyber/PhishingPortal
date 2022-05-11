@@ -13,15 +13,15 @@
         <Authorized>
 
             <div class="container-fluid">
-                <img src="img/user.svg" />
+                <img height="24px" width="24px" src="img/user.svg" />
                 <a href="authentication/profile" class="username">@context.User.Identity.Name.Split('@')[0].ToUpper()</a>
 
-                <button class="btn btn-link sign-out" @onclick="BeginSignOut">Logout</button>
+                <button class="btn btn-link sign-out" @onclick="BeginSignOut">LOGOUT</button>
             </div>
         </Authorized>
         <NotAuthorized>
             <div class=container-fluid>
-                <a class="btn-link" href="authentication/register">Register</a>
+              @*  <a class="btn-link" href="authentication/register">Register</a>*@
                 <a class="btn-link" href="authentication/login">Log in</a>
             </div>
 

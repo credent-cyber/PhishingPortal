@@ -36,9 +36,5 @@
 	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="App_Data\" />
-	</ItemGroup>
-
 
 </Project>

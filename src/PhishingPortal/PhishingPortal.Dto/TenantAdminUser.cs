@@ -13,6 +13,10 @@ namespace PhishingPortal.Dto
         
         [Required]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        public string TenantUniqueId { get; set; }
+
     }
 
 }

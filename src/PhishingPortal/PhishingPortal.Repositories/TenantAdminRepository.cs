@@ -49,11 +49,11 @@ namespace PhishingPortal.Repositories
             else
             {
                 connectionString = connectionString.Replace("####", tenant.UniqueId);
-                        
+
             }
 
             var tenantSettings = new TenantData()
-            {  
+            {
                 Key = TenantData.Keys.ConnString,
                 Value = connectionString,
                 CreatedBy = Config.CreatedBy,
@@ -67,7 +67,7 @@ namespace PhishingPortal.Repositories
             CentralDbContext.SaveChanges();
 
             var result = await CreateDatabase(tenant, tenantSettings.Value);
-            
+
             return await Task.FromResult(tenant);
         }
 
@@ -79,7 +79,7 @@ namespace PhishingPortal.Repositories
         /// <returns></returns>
         public async Task<List<Tenant>> GetAllAsync(int pageIndex = 0, int pageSize = 10)
         {
-           return await Task.FromResult(CentralDbContext.Tenants.Skip(pageIndex).Take(pageSize).ToList());
+            return await Task.FromResult(CentralDbContext.Tenants.Skip(pageIndex).Take(pageSize).ToList());
         }
 
         public async Task<Tenant> GetByUniqueId(string uniqueId)
@@ -96,6 +96,89 @@ namespace PhishingPortal.Repositories
         public async Task<bool> ProvisionAsync(int tenantId, string connectionString)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Confirms registration of a new tenant by clicking the emailed link
+        /// </summary>
+        /// <param name="uniqueId"></param>
+        /// <param name="hash"></param>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<Tenant> ConfirmRegistrationAsync(string uniqueId, string hash, string link)
+        {
+            var tenant = await Task.FromResult(CentralDbContext.Tenants.Where(x => x.UniqueId == uniqueId).FirstOrDefault());
+
+            if (tenant == null)
+                throw new InvalidOperationException("Invalid request, please contact support");
+
+            if (tenant.ConfirmationState == ConfirmationStats.Verified)
+                return tenant;
+
+            if (tenant.ConfirmationState == ConfirmationStats.Registered && tenant.ConfirmationExpiry < DateTime.Now)
+                throw new InvalidOperationException("Confirmation link is expired, please contant application support");
+
+           
+            if (tenant.ConfirmationExpiry > DateTime.Now && tenant.ConfirmationLink == link && tenant.ConfirmationState == ConfirmationStats.Registered)
+            {
+                tenant.ConfirmationState = ConfirmationStats.Verified;
+                CentralDbContext.SaveChanges();
+
+            }
+
+            return tenant;
+
+        }
+
+        /// <summary>
+        /// ConfirmDomain
+        /// </summary>
+        /// <param name="uniqueId"></param>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Tenant> ConfirmDomainAsync(DomainVerificationRequest domain)
+        {
+            var tenant = await Task.FromResult(CentralDbContext.Tenants.Where(x => x.UniqueId == domain.UniqueId).FirstOrDefault());
+
+            if (tenant == null)
+                throw new Exception("Tenant not found");
+
+            if (tenant.ConfirmationState == ConfirmationStats.DomainVerified)
+                return tenant;
+
+            if (tenant.ConfirmationState == ConfirmationStats.Verified && tenant.ConfirmationExpiry < DateTime.Now)
+                throw new InvalidOperationException("Confirmation link expired");
+            else
+            {
+                var d = tenant.TenantDomains?.FirstOrDefault(o => o.Domain.Equals(domain.Domain, StringComparison.InvariantCultureIgnoreCase));
+
+                if (d == null)
+                {
+                    d = new TenantDomain()
+                    {
+                        TenantId = tenant.Id,
+                        Domain = domain.Domain.ToLower(),
+                        DomainVerificationCode = domain.DomainVerificationCode,
+                        IsDomainVerified = true,
+                    };
+
+                    CentralDbContext.Add(d);
+                }
+                else
+                {
+                    d.IsDomainVerified = true;
+                    d.DomainVerificationCode = domain.DomainVerificationCode;
+                }
+
+                tenant.ConfirmationState = ConfirmationStats.DomainVerified;
+
+                CentralDbContext.SaveChanges();
+
+            }
+    
+            return tenant;
         }
 
 
@@ -135,6 +218,24 @@ namespace PhishingPortal.Repositories
 
             return true;
         }
-       
+
+        /// <summary>
+        /// Get tenant by domain
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Tenant> GetByDomain(string domain)
+        {
+            var tenant = CentralDbContext.Tenants.Include(o => o.TenantDomains)
+                .Where(o => o.TenantDomains.Any(o => o.Domain == domain.ToLower())).FirstOrDefault();
+
+            if (tenant == null)
+                throw new InvalidDataException("No tenant registered with this domain");
+
+
+            return await Task.FromResult(tenant);
+
+        }
     }
-} 
+}
