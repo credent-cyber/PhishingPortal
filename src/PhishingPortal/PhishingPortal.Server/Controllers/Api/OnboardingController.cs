@@ -153,6 +153,22 @@ namespace PhishingPortal.Server.Controllers
                 if (!result.Succeeded)
                     throw new Exception("User creation failed. Please try again or contact support team");
 
+                else
+                {
+                    var newUser = UserManager.Users.FirstOrDefault(o => o.Email == user.Email);
+                    if (newUser != null)
+                    {
+                        var claims = new List<System.Security.Claims.Claim>()
+                        {
+                            new System.Security.Claims.Claim("role", "tenantadmin"),
+                            new System.Security.Claims.Claim("tenant", tenant.UniqueId)
+                        };
+
+                        await UserManager.AddClaimsAsync(newUser, claims);
+                       
+                    }
+                }
+
                 response.IsSuccess = true;
                 response.Message = "User created successfully";
                 response.Result = true;

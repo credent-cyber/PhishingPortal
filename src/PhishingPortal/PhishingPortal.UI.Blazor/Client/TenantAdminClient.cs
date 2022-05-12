@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 
 namespace PhishingPortal.UI.Blazor.Client
 {
+
     public class TenantAdminClient : BaseHttpClient
     {
         public TenantAdminClient(ILogger<TenantAdminClient> logger, HttpClient httpClient)

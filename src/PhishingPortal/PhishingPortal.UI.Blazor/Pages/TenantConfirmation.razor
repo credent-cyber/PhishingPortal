@@ -162,6 +162,7 @@
 
             if (output.IsSuccess)
             {
+                model = output.Result;
                 navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/mastusr");
             }
 

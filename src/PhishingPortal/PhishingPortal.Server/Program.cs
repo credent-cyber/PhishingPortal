@@ -19,6 +19,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
@@ -29,15 +33,27 @@ builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
 //builder.Services.AddDbContext<TenantDbContext>(options =>
 //        options.UseSqlite("Data Source=T334343.db"));
 
-builder.Services.AddDefaultIdentity<PhishingPortalUser>(options => {
+builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
+{
     options.SignIn.RequireConfirmedAccount = true;
 })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PhishingPortalDbContext>();
 
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
+SmtpMessageSenderOptions options = new();
+builder.Configuration.GetSection(nameof(SmtpMessageSenderOptions))
+                 .Bind(options);
+
+builder.Services.Configure<SmtpMessageSenderOptions>(o =>
+{
+    o.Server = options.Server;
+    o.Port = options.Port;
+    o.Password = options.Password;
+    o.FromEmail = options.FromEmail;
+});
+
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddIdentityServer()
     //.AddSigningCredential(rsaCertificate)
@@ -70,14 +86,8 @@ using (var scope = scopeFactory.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<PhishingPortalDbContext>();
     if (db.Database.EnsureCreated())
     {
-        //SeedData.Initialize(db);
+        // seed data
     }
-
-    //var db2 = scope.ServiceProvider.GetRequiredService<TenantDbContext>();
-    //if (db2.Database.EnsureCreated())
-    //{
-    //    //SeedData.Initialize(db);
-    //}
 
 }
 

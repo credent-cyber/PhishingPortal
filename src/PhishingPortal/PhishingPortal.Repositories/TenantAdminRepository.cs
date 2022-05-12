@@ -208,6 +208,8 @@ namespace PhishingPortal.Repositories
                     throw;
                 }
                 await db.Database.EnsureCreatedAsync();
+
+                db.SeedDefaults();
             }
             else
             {
@@ -227,7 +229,7 @@ namespace PhishingPortal.Repositories
         /// <exception cref="NotImplementedException"></exception>
         public async Task<Tenant> GetByDomain(string domain)
         {
-            var tenant = CentralDbContext.Tenants.Include(o => o.TenantDomains)
+            var tenant = CentralDbContext.Tenants.Include(o => o.TenantDomains).Include(o => o.Settings)
                 .Where(o => o.TenantDomains.Any(o => o.Domain == domain.ToLower())).FirstOrDefault();
 
             if (tenant == null)

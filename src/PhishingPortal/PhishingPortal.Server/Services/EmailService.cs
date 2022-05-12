@@ -6,23 +6,32 @@ using System.Net.Mail;
 namespace PhishingPortal.Server.Services
 {
 
-    public class AuthMessageSenderOptions
+    public class SmtpMessageSenderOptions
     {
-        //public string? SendGridKey { get; set; }
+        public string Server { get; set; } = "smtp.gmail.com";
+        public int Port { get; set; } = 587;
+        public string FromEmail { get; set; } = "malaykp.devices@gmail.com";
+        public string Password { get; set; } = "***********";
+
+    }
+
+    public class SendGridMessagerSenderOptions
+    {
+        public string? SendGridKey { get; set; }
     }
 
     public class EmailSender : IEmailSender
     {
         private readonly ILogger _logger;
 
-        public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
+        public EmailSender(IOptions<SmtpMessageSenderOptions> optionsAccessor,
                            ILogger<EmailSender> logger)
         {
             Options = optionsAccessor.Value;
             _logger = logger;
         }
 
-        public AuthMessageSenderOptions Options { get; } //Set with Secret Manager.
+        public SmtpMessageSenderOptions Options { get; } //Set with Secret Manager.
 
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
@@ -39,13 +48,13 @@ namespace PhishingPortal.Server.Services
 
             _logger.LogInformation("Sending email");
 
-            var client = new SmtpClient("smtp.gmail.com", 587)
+            var client = new SmtpClient(Options.Server, Options.Port)
             {
-                Credentials = new NetworkCredential("malaykp.devices@gmail.com", "**********"),
+                Credentials = new NetworkCredential(Options.FromEmail, Options.Password),
                 EnableSsl = true
             };
             
-            await client.SendMailAsync("malaykp.devices@gmail.com", toEmail, subject, message);
+            await client.SendMailAsync(Options.FromEmail, toEmail, subject, message);
 
             _logger.LogInformation("Mail sent");
 

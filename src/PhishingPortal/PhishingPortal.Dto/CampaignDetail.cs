@@ -8,7 +8,8 @@ namespace PhishingPortal.Dto
     {
         public int CampaignId { get; set; }
         public string Type { get; set; }
-        public int TemplateId { get; set; }
+        public int CampaignTemplateId { get; set; }
+        public virtual CampaignTemplate Template { get; set; }
     }
 
 }

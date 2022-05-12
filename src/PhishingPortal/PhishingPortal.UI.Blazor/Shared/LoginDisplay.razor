@@ -12,17 +12,24 @@
         </Authorizing>
         <Authorized>
 
-            <div class="container-fluid">
-                <img height="24px" width="24px" src="img/user.svg" />
-                <a href="authentication/profile" class="username">@context.User.Identity.Name.Split('@')[0].ToUpper()</a>
-
-                <button class="btn btn-link sign-out" @onclick="BeginSignOut">LOGOUT</button>
+            <div class="dropdown">
+                <img height="24px" width="24px" src="img/user.png" />
+                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                                @context.User.Identity.Name.Split('@')[0].ToUpper()
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="authentication/profile">Profile</a></li>
+                    <li><a @onclick="BeginSignOut" class="dropdown-item" href="#">Logout</a></li>
+                </ul>
             </div>
+        
         </Authorized>
         <NotAuthorized>
             <div class=container-fluid>
-              @*  <a class="btn-link" href="authentication/register">Register</a>*@
-                <a class="btn-link" href="authentication/login">Log in</a>
+                @*  <a class="btn-link" href="authentication/register">Register</a>*@
+                 <img height="24px" width="24px" src="img/user.png" />
+                <a class="btn btn-outline-dark" href="authentication/login">Log in</a>
             </div>
 
         </NotAuthorized>

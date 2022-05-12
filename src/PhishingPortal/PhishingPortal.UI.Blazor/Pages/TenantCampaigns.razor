@@ -1,0 +1,59 @@
+﻿@page "/tenant-campaigns"
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+<h3>Campaigns</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>ScheduleType</th>
+            <th>Schedule</th>
+            <th>IsActive</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in campaigns.OrderByDescending(o => o.CreatedOn))
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.Name</td>
+                <td>@c.Description</td>
+                <td>@c.Schedule.ScheduleType.ToString()</td>
+                <td>
+                    @if (c.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+                    {
+                        <text>@c.Schedule.OnceOffSchedule.DateTime.ToString("dd MMM yyyy HH:mm:ss")</text>
+                    }
+                </td>
+                <td>@c.IsActive</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>
+
+
+@code {
+    string message = string.Empty;
+    IEnumerable<Campaign> campaigns = Enumerable.Empty<Campaign>();
+    int pageSize = 10;
+    int pageIndex = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
+
+        if (campaigns == null || campaigns.Count() == 0)
+            message = "No campaigns found!";
+
+
+
+    }
+}

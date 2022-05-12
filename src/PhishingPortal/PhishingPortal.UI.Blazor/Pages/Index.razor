@@ -1,7 +1,18 @@
 ﻿@page "/"
 @page "/Index"
-<PageTitle>Dashboard</PageTitle>
+<PageTitle>PhishSim | Home</PageTitle>
 
-<h1>Admin Dashboard</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>Dashboard</h1>
+    </Authorized>
+    <NotAuthorized>
+        <h1>PhishSim</h1>
+    </NotAuthorized>
+</AuthorizeView>
 
-Welcome to your Phishing Simulator.
+Welcome to Phishing Simulator.
+@*
+<DialogTemplate Show="true">
+    <h1>Somthing in the dialog</h1>
+</DialogTemplate>*@

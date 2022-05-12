@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication.Internal;
 
 namespace PhishingPortal.UI.Blazor
 {
-
-    public class CustomUserFactory
+    public class UserFactory
         : AccountClaimsPrincipalFactory<RemoteUserAccount>
     {
-        public CustomUserFactory(IAccessTokenProviderAccessor accessor)
+        public UserFactory(IAccessTokenProviderAccessor accessor)
             : base(accessor)
         {
         }

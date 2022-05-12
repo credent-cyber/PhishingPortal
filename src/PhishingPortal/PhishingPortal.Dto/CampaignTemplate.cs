@@ -8,4 +8,11 @@
         public int Version { get; set; }
         public  bool IsActive { get; set; }
     }
+
+    public enum CampaignType
+    {
+        Email,
+        Sms,
+        Whatsapp
+    }
 }
