@@ -5,7 +5,7 @@
         Once,
         Daily,
         Weekly,
-        Monthly,
-        Now
+        //Monthly,
+        None
     }
 }

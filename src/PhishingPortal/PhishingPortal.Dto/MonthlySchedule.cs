@@ -6,13 +6,13 @@ namespace PhishingPortal.Dto
     public class MonthlySchedule : BaseSchedule
     {
         public int DayOfMonth { get; set; }
-        public TimeSpan ScheduleTime { get; set; }
+        public TimeOfDay ScheduleTime { get; set; }
 
         public MonthlySchedule(string value)
         {
-            var val = JsonConvert.DeserializeObject<MonthlySchedule>(value);
-            DayOfMonth = val.DayOfMonth;
-            ScheduleTime = val.ScheduleTime;
+            //var val = JsonConvert.DeserializeObject<MonthlySchedule>(value);
+            DayOfMonth = int.Parse(value.Split("|")[0]);
+            ScheduleTime = new TimeOfDay(value.Split("|")[1]);
         }
 
         public override bool Eval()
@@ -21,11 +21,17 @@ namespace PhishingPortal.Dto
 
             if (day == DayOfMonth)
             {
+                var timespan = this.ScheduleTime.ToTimeSpan();
                 var minutesSoFar = (DateTime.Now - DateTime.Now.Date).TotalMinutes;
-                return minutesSoFar >= ScheduleTime.TotalMinutes && minutesSoFar - ScheduleTime.TotalMinutes < 10;
+                return minutesSoFar >= timespan.TotalMinutes && minutesSoFar - timespan.TotalMinutes < 10;
             }
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"{DayOfMonth}|{ScheduleTime}";
         }
     }
 }

@@ -9,19 +9,27 @@ namespace PhishingPortal.Dto
 
         public OnceOffSchedule(string value)
         {
-            this.DateTime = DateTime.Parse(value);
+            try
+            {
+                this.Date = DateTime.Parse(value);
+                this.Time = DateTime.Parse(value);
+            }
+            catch (Exception)
+            {
+            }
         }
 
-        public DateTime DateTime { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime Time { get; set; }
 
         public override bool Eval()
         {
-            return DateTime.Now >= DateTime && (DateTime.Now - DateTime).TotalMinutes < 10;
+            return DateTime.Now >= Date && (DateTime.Now - Date).TotalMinutes < 10;
         }
 
         public override string ToString()
         {
-            return this.DateTime.ToString();
+            return $"{this.Date.ToString("dd/MM/yyyy")} {this.Time.ToString("HH:mm:ss")}";
         }
     }
 }

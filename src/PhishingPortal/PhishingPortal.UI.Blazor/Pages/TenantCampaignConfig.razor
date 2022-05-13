@@ -1,0 +1,223 @@
+﻿@page "/tenant-campaign-config/{Id:int}"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+<h3>Campaign Configuration</h3>
+
+<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
+@if (model != null)
+{
+    <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="row">
+
+            <div class="col-sm-5">
+
+                <div class="form-group">
+
+                    <label class="form-label">Name</label>
+                    <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="form-label">Description</label>
+                    <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="form-label">State</label>
+                    <InputSelect @bind-Value="model.State" class="form-control" id="State">
+                        @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
+                        {
+                        <option value="@val">@val</option>
+                        }
+                </InputSelect>
+
+            </div>
+
+            <!-- campaing details-->
+
+            <div class="form-group">
+
+                <label class="form-label">CampaignType</label>
+                <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType">
+                    @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                        {
+                        <option value="@val">@val</option>
+                        }
+                </InputSelect>
+
+            </div>
+
+            <div class="form-group">
+
+                <label class="form-label">CampaignTemplate</label>
+                <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
+                    @foreach (var val in Templates)
+                        {
+                        <option value="@val.Id">@val.Name</option>
+                        }
+                </InputSelect>
+
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">CampaignSchedule</label>
+                <InputText readonly @bind-Value="@model.Schedule.ScheduleInfo" id="ScheduleInfo" class="form-control"></InputText>
+            </div>
+
+
+
+            <!-- schedule view -->
+
+            <button class="btn btn-primary" type="submit"> Submit</button>
+
+        </div>
+
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label class="form-label">CampaignScheduleType</label>
+                <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
+                    @foreach (var val in Enum.GetValues<ScheduleTypeEnum>())
+                        {
+                        <option value="@val">@val</option>
+                        }
+                </InputSelect>
+            </div>
+
+            <div class="form-group">
+                @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+                    {
+                        <label class="form-label">Scheduled Once</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="">Date & Time</span>
+                            </div>
+                            <input type="date" @bind="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></input>
+                            <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
+                        </div>
+
+                    }
+                    else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+                    {
+                        <label class="form-label">Scheduled Daily</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">Time Every Day</span>
+                            </div>
+                            <input type="time" @bind="dailySchedule.DailyScheduleTime" id="DailyScheduleTime"
+                           class="form-control" aria-describedby="basic-addon3"></input>
+                        </div>
+
+                    }
+                    else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+                    {
+                        <label class="form-label">Scheduled Weekly</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <InputSelect @bind-Value="weeklySchedule.WeekDay" class="form-control" id="ScheduleWeekDay">
+                                    @foreach (var val in Enum.GetValues<DayOfWeek>())
+                                    {
+                                <option value="@val">@val</option>
+                                    }
+                        </InputSelect>
+                    </div>
+                        <input type="time" @bind="weeklySchedule.ScheduleTime" id="WeeklyScheduleTime" class="form-control" aria-describedby="basic-addon3"></input>
+                    </div>
+
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    </EditForm>
+
+
+}
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    string message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+
+    Campaign model = null;
+
+    IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+
+    // campaing
+    // campaign details
+    // campaign schedule
+
+    OnceOffSchedule scheduleOnceOff = new();
+    DailySchedule dailySchedule = new("12:00:00");
+    WeeklySchedule weeklySchedule = new("1|12:00:00");
+
+    // campaign recipient (separatae screen)
+
+    protected override async Task OnInitializedAsync()
+    {
+        Templates = await client.GetCampaignTemplates();
+
+        if (Id != 0)
+        {
+            model = await client.GetCampaingById(Id);
+
+            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+                scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
+
+            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+                dailySchedule = new DailySchedule(model.Schedule.ScheduleInfo);
+
+            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+                weeklySchedule = new WeeklySchedule(model.Schedule.ScheduleInfo);
+
+        }
+
+    }
+
+    protected async Task OnValidSubmit()
+    {
+        UpdateModelScheduleInfo();
+
+        await client.UpsertCampaignAsync(model);
+    }
+
+    protected void OnScheduleTypeChange()
+    {
+        UpdateModelScheduleInfo();
+    }
+
+    private void UpdateModelScheduleInfo()
+    {
+
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+        {
+            model.Schedule.ScheduleInfo = scheduleOnceOff.ToString();
+        }
+
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+        {
+            model.Schedule.ScheduleInfo = dailySchedule.ToString();
+        }
+
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+        {
+            model.Schedule.ScheduleInfo = weeklySchedule.ToString();
+        }
+    }
+}

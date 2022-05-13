@@ -3,24 +3,33 @@ using System;
 
 namespace PhishingPortal.Dto
 {
+
     public class DailySchedule : BaseSchedule
     {
-        public TimeSpan DailyScheduleTime { get; set; }
+        public DateTime DailyScheduleTime { get; set; }
 
         public DailySchedule(string value)
         {
-            this.DailyScheduleTime = TimeSpan.Parse(value);
+            TimeSpan timeSpan = TimeSpan.Parse(value);
+
+            this.DailyScheduleTime = DateTime.MinValue
+                                .AddHours(timeSpan.Hours)
+                                .AddMinutes(timeSpan.Minutes)
+                                .AddSeconds(timeSpan.Seconds);
         }
 
         public override bool Eval()
         {
+            var timespan = TimeSpan.Parse(this.DailyScheduleTime.ToString());
+
             var minutesSoFar = (DateTime.Now - DateTime.Now.Date).TotalMinutes;
-            return minutesSoFar >= DailyScheduleTime.TotalMinutes && minutesSoFar - DailyScheduleTime.TotalMinutes < 10;
+
+            return minutesSoFar >= timespan.TotalMinutes && minutesSoFar - timespan.TotalMinutes < 10;
         }
 
         public override string ToString()
         {
-            return this.DailyScheduleTime.ToString();
+            return this.DailyScheduleTime.ToString("HH:mm:ss");
         }
     }
 }

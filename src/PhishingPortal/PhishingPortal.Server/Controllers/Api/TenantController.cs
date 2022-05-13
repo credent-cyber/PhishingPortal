@@ -29,5 +29,48 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
+        [HttpGet]
+        [Route("Campaign/{id}")]
+        public Campaign Get(int id)
+        {
+            Campaign result = null;
+
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).Include(o => o.Detail)
+                .FirstOrDefault(o => o.Id == id);
+
+            return result;
+        }
+
+
+        [HttpGet]
+        [Route("CampaignTemplates")]
+        public IEnumerable<CampaignTemplate> Get()
+        {
+            IEnumerable<CampaignTemplate> result = null;
+
+            result = TenantDbCtx.CampaignTemplates.ToList();
+
+            return result;
+        }
+
+
+        [HttpPost]
+        [Route("UpsertCampaign")]
+        public Campaign UpsertCampaign(Campaign campaign)
+        {
+            Campaign result = null;
+
+            if (campaign == null)
+                throw new ArgumentNullException("Invalid campaign data");
+
+            if(campaign.Id > 0)
+                TenantDbCtx.Campaigns.Update(campaign);
+            else
+                TenantDbCtx.Campaigns.Add(campaign);
+            
+            TenantDbCtx.SaveChanges();
+
+            return campaign;
+        }
     }
 }

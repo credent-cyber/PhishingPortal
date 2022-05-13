@@ -31,5 +31,71 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return campaigns;
         }
+
+        public async Task<Campaign> GetCampaingById(int id)
+        {
+            Campaign campaign = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/Campaign/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                campaign = await res.Content.ReadFromJsonAsync<Campaign>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return campaign;
+        }
+
+        public async Task<IEnumerable<CampaignTemplate>> GetCampaignTemplates()
+        {
+            List<CampaignTemplate>  templates = Enumerable.Empty<CampaignTemplate>().ToList();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
+
+                res.EnsureSuccessStatusCode();
+
+                templates = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return templates;
+        }
+
+        public async Task<Campaign> UpsertCampaignAsync(Campaign campaign)
+        {
+
+            Campaign result = null;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertCampaign", campaign);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<Campaign>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+
+        }
     }
 }

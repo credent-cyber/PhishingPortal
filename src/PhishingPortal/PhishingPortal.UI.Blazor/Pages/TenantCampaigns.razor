@@ -22,15 +22,12 @@
         @foreach (var c in campaigns.OrderByDescending(o => o.CreatedOn))
         {
             <tr>
-                <td>@c.Id</td>
+                <td><a class="btn-link" href="tenant-campaign-config/@c.Id">@c.Id</a></td>
                 <td>@c.Name</td>
                 <td>@c.Description</td>
                 <td>@c.Schedule.ScheduleType.ToString()</td>
                 <td>
-                    @if (c.Schedule.ScheduleType == ScheduleTypeEnum.Once)
-                    {
-                        <text>@c.Schedule.OnceOffSchedule.DateTime.ToString("dd MMM yyyy HH:mm:ss")</text>
-                    }
+                  @c.Schedule.ScheduleInfo
                 </td>
                 <td>@c.IsActive</td>
             </tr>

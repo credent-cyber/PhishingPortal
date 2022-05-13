@@ -35,7 +35,7 @@ namespace PhishingPortal.DataContext
                 CreatedBy = "system",
                 CreatedOn = DateTime.Now,
                 IsHtml = true,
-                Type = Dto.CampaignType.Email.ToString(),
+                Type = Dto.CampaignType.Email,
                 Content = "<div><img alt='banner' src='###Banner1###' /><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
             };
 
@@ -47,7 +47,7 @@ namespace PhishingPortal.DataContext
                 CreatedBy = "system",
                 CreatedOn = DateTime.Now,
                 IsHtml = true,
-                Type = Dto.CampaignType.Email.ToString(),
+                Type = Dto.CampaignType.Email,
                 Content = "<div><img alt='banner' src='###Banner1###' /><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
             };
 
@@ -62,16 +62,16 @@ namespace PhishingPortal.DataContext
                 Detail = new Dto.CampaignDetail
                 {
                     Template = template,
-                    Type = Dto.CampaignType.Email.ToString(),
+                    Type = Dto.CampaignType.Email,
                 },
                 Schedule = new Dto.CampaingSchedule
                 {
                     ScheduleType = Dto.ScheduleTypeEnum.Once,
                     WillRepeat = false,
-                    OnceOffSchedule = new Dto.OnceOffSchedule()
-                    {
-                         DateTime = DateTime.Now.Date.AddHours(12), // 12:00 noon
-                    }
+                    //OnceOffSchedule = new Dto.OnceOffSchedule()
+                    //{
+                    //     DateTime = DateTime.Now.Date.AddHours(12), // 12:00 noon
+                    //}
                 }
             };
 
