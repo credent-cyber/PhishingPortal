@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Common;
@@ -17,24 +18,53 @@ namespace PhishingPortal.Server.Controllers
     public class OnboardingController : BaseApiController
     {
 
-        public OnboardingController(ILogger<OnboardingController> logger, ITenantAdminRepository tenantAdminRepo, INsLookupHelper nsLookup,
+        private class OnboardingConfig
+        {
+            public string TestEmailRecipient { get; set; } = "malay.pandey@credentinfotech.com";
+            public string EmailContent { get; set; } = "Confirmation Email Content ###CONFIRM_LINK###";
+
+        }
+        
+
+        public OnboardingController(ILogger<OnboardingController> logger, IConfiguration config, ITenantAdminRepository tenantAdminRepo, INsLookupHelper nsLookup,
+            IEmailSender emailSender,
             UserManager<PhishingPortalUser> userManager) : base(logger)
         {
             tenatAdminRepo = tenantAdminRepo;
             NsLookup = nsLookup;
+            EmailSender = emailSender;
             UserManager = userManager;
+            _config = new OnboardingConfig();
+            config.GetSection("OnboardingConfig").Bind(_config);
         }
 
+        OnboardingConfig _config;
+        
         public ITenantAdminRepository tenatAdminRepo { get; }
         public INsLookupHelper NsLookup { get; }
+        public IEmailSender EmailSender { get; }
         public UserManager<PhishingPortalUser> UserManager { get; }
 
         [HttpPost]
         [Route("Register")]
         public async Task<Tenant> Register(Tenant tenant)
         {
-            return await tenatAdminRepo.CreateTenantAsync(tenant);
+            Tenant result;
+
+            try
+            {
+                result = await tenatAdminRepo.CreateTenantAsync(tenant);
+
+                await SendConfirmationEmail(tenant);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
         }
+
 
         [HttpGet]
         public async Task<List<Tenant>> GetAll(int pageIndex, int pageSize)
@@ -51,6 +81,7 @@ namespace PhishingPortal.Server.Controllers
 
         [HttpPost]
         [Route("Provision")]
+        [Obsolete]
         public async Task Provision(ProvisionTenantRequest request)
         {
             var result = await tenatAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);
@@ -127,7 +158,7 @@ namespace PhishingPortal.Server.Controllers
             {
                 var domain = user.Email.Split("@")[1];
                 var tenant = await tenatAdminRepo.GetByDomain(domain);
-                
+
                 if (tenant.UniqueId != user.TenantUniqueId)
                     throw new Exception("Invalid request");
 
@@ -135,7 +166,7 @@ namespace PhishingPortal.Server.Controllers
                     throw new Exception("Confirmed password didn't match with Password");
 
                 var existingUser = UserManager.Users.FirstOrDefault(o => o.Email.EndsWith(domain));
-                
+
                 if (existingUser != null)
                     throw new InvalidOperationException("Already tenant admin user is created");
 
@@ -149,7 +180,7 @@ namespace PhishingPortal.Server.Controllers
                 }, user.Password);
 
                 // TODO: assign tenant_admin role
-                
+
                 if (!result.Succeeded)
                     throw new Exception("User creation failed. Please try again or contact support team");
 
@@ -165,7 +196,7 @@ namespace PhishingPortal.Server.Controllers
                         };
 
                         await UserManager.AddClaimsAsync(newUser, claims);
-                       
+
                     }
                 }
 
@@ -182,7 +213,27 @@ namespace PhishingPortal.Server.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Send confirmation email to the newely onboarded tenant
+        /// </summary>
+        /// <param name="tenant"></param>
+        /// <returns></returns>
+        private async Task SendConfirmationEmail(Tenant tenant)
+        {
+            var to = tenant.ContactEmail;
+            var subject = $"PhishSim: Onboarding Confirmation Tenant ({tenant.UniqueId})";
+            var mailContent = "Hi there, <br /><p>";
+            mailContent += "You have been onboarded as new PhishSim application tenant.</p>";
+            mailContent += $"<p>Pleae confirm by clicking <a href='###CONFIRM_LINK###'>here</a> and proceed to the onboarding process</p>";
+            mailContent += "<br /><br /> System Admin <br/> PhishSim @CredentInfotech.com";
 
+            mailContent = mailContent.Replace("###CONFIRM_LINK###", tenant.ConfirmationLink);
+
+#if DEBUG
+            to = _config.TestEmailRecipient;
+#endif
+            await EmailSender.SendEmailAsync(to, subject, mailContent);
+        }
 
     }
 }

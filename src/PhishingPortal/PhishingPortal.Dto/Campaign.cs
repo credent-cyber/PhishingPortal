@@ -15,7 +15,11 @@ namespace PhishingPortal.Dto
         public CampaignStateEnum State { get; set; }
         public bool IsActive { get; set; }
         public virtual CampaignDetail Detail { get; set; }
-        public virtual CampaingSchedule Schedule { get; set; }
+
+        public int CampaignScheduleId { get; set; }
+
+        [ForeignKey("CampaignScheduleId")]
+        public virtual CampaignSchedule Schedule { get; set; }
 
     }
 }

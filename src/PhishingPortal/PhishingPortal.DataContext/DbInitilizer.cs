@@ -1,4 +1,5 @@
 ﻿using PhishingPortal.Domain;
+using PhishingPortal.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace PhishingPortal.DataContext
 {
     public static class DbInitilizer
     {
-
+       
         public static void SeedDefaults(this TenantDbContext dbContext)
         {
 
@@ -31,24 +32,28 @@ namespace PhishingPortal.DataContext
 
             var template = new Dto.CampaignTemplate
             {
+                Name = "Sample Template 1",
                 IsActive = true,
                 CreatedBy = "system",
                 CreatedOn = DateTime.Now,
                 IsHtml = true,
                 Type = Dto.CampaignType.Email,
-                Content = "<div><img alt='banner' src='###Banner1###' /><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
+                Version = 1.ToString(),
+                Content = "<div><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
             };
 
             dbContext.CampaignTemplates.Add(template);
 
             var template2 = new Dto.CampaignTemplate
             {
-                IsActive = false,
+                Name = "Sample Template 1",
+                IsActive = true,
                 CreatedBy = "system",
                 CreatedOn = DateTime.Now,
                 IsHtml = true,
                 Type = Dto.CampaignType.Email,
-                Content = "<div><img alt='banner' src='###Banner1###' /><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
+                Version = 1.ToString(),
+                Content = "<div><br /><p>Loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum loreum epsum</p></div>"
             };
 
             dbContext.CampaignTemplates.Add(template2);
@@ -64,14 +69,12 @@ namespace PhishingPortal.DataContext
                     Template = template,
                     Type = Dto.CampaignType.Email,
                 },
-                Schedule = new Dto.CampaingSchedule
+                Schedule = new Dto.CampaignSchedule
                 {
                     ScheduleType = Dto.ScheduleTypeEnum.Once,
                     WillRepeat = false,
-                    //OnceOffSchedule = new Dto.OnceOffSchedule()
-                    //{
-                    //     DateTime = DateTime.Now.Date.AddHours(12), // 12:00 noon
-                    //}
+                    ScheduleInfo = new OnceOffSchedule(DateTime.Now.AddDays(1)
+                                    .ToString("dd/MM/yyyy HH:mm:ss")).ToString()
                 }
             };
 

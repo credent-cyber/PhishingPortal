@@ -32,6 +32,9 @@ namespace PhishingPortal.DataContext
 
 
         public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<TenantDomain> TenantDomain { get; set; }
+
+
 
     }
 

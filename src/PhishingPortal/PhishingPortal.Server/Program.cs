@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
+
 //var rsaCertificate = new X509Certificate2(
 //    Path.Combine(builder.Environment.ContentRootPath, "cert_rsa512.pfx"), "1234");
 

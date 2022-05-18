@@ -28,6 +28,13 @@ namespace PhishingPortal.Repositories
         public async Task<Tenant> CreateTenantAsync(Tenant tenant)
         {
 
+            var t = CentralDbContext.Tenants.FirstOrDefault(t => (t.Id > 0 && t.Id == tenant.Id) 
+                || t.Name.ToLower() == tenant.Name.ToLower() && t.ContactEmail.ToLower() == tenant.ContactEmail.ToLower() 
+                && t.ConfirmationState == ConfirmationStats.Registered);
+
+            if(t != null)
+                return await Task.FromResult(t);
+
             tenant.UniqueId = $"{Config.DbNamePrefix}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
             tenant.ConfirmationLink = $"{Config.TenantConfirmBaseUrl}{tenant.GetConfirmationLink(tenant.ConfirmationLink)}";
             tenant.ConfirmationState = ConfirmationStats.Registered;
@@ -152,6 +159,9 @@ namespace PhishingPortal.Repositories
                 throw new InvalidOperationException("Confirmation link expired");
             else
             {
+                if (CentralDbContext.TenantDomain.Any(o => o.Domain.ToLower() == domain.Domain.ToLower()))
+                    throw new InvalidDataException("Domain already registered");
+              
                 var d = tenant.TenantDomains?.FirstOrDefault(o => o.Domain.Equals(domain.Domain, StringComparison.InvariantCultureIgnoreCase));
 
                 if (d == null)

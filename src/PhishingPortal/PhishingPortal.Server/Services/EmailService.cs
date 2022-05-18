@@ -53,8 +53,16 @@ namespace PhishingPortal.Server.Services
                 Credentials = new NetworkCredential(Options.FromEmail, Options.Password),
                 EnableSsl = true
             };
-            
-            await client.SendMailAsync(Options.FromEmail, toEmail, subject, message);
+
+            var mailMessage = new MailMessage();
+            mailMessage.IsBodyHtml = true;
+            mailMessage.Body = message;
+            mailMessage.Subject = subject;
+            mailMessage.From = new MailAddress(Options.FromEmail);
+            mailMessage.To.Add(new MailAddress(toEmail));
+            mailMessage.Sender = new MailAddress(Options.FromEmail);
+                 
+            await client.SendMailAsync(mailMessage);
 
             _logger.LogInformation("Mail sent");
 
