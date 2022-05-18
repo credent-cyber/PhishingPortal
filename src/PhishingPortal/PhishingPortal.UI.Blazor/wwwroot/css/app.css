@@ -133,8 +133,10 @@ a, .btn-link {
     z-index: 2000;
     align-self: center;
     margin: auto;
+    padding: 1%;
     width: 700px;
     max-height: calc(100% - 3rem);
+    overflow-y : scroll;
     animation: dialog-entry 0.4s;
     animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
 }
@@ -224,3 +226,13 @@ a, .btn-link {
     .dialog .topping-price::before {
         content: '£';
     }
+
+.table-container {
+    max-height: 250px;
+    overflow-y: scroll;
+}
+
+.edit-dialog-container {
+    max-height: 450px;
+    overflow-y: scroll;
+}

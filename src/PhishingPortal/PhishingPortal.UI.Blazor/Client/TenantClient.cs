@@ -97,5 +97,120 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
 
         }
+
+        /// <summary>
+        /// Imports a list of recipients (uniquely identified by email id)
+        /// </summary>
+        /// <param name="recipients"></param>
+        /// <returns></returns>
+        public async Task<List<RecipientImport>> ImportRecipientToCampaign(int campaignId, List<RecipientImport> recipients)
+        {
+            ApiResponse<List<RecipientImport>> result;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/import-recipients-to-campaign/{campaignId}", recipients);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<ApiResponse<List<RecipientImport>>>();
+             
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result.Result);
+        }
+
+        public async Task<List<CampaignRecipient>> GetRecipientByCampaignId(int campaignId)
+        {
+            List<CampaignRecipient> result = new List<CampaignRecipient>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/recipient-by-campaign/{campaignId}");
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<CampaignRecipient>>();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<List<CampaignTemplate>> GetTemplatesByType(CampaignType? type)
+        {
+            List<CampaignTemplate> result;
+
+            try
+            {
+                var url = $"api/tenant/templates-by-type";
+                if (type.HasValue)
+                    url += $"/{ type.Value }";
+                var res = await HttpClient.GetAsync(url);
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<CampaignTemplate> GetTemplateById(int id)
+        {
+            CampaignTemplate result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/template-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<CampaignTemplate>();
+            }
+            catch(Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
+        public async Task<CampaignTemplate> UpsertCampaignTemplate(CampaignTemplate template)
+        {
+            CampaignTemplate result;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/upsert-template", template);
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<CampaignTemplate>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
     }
 }

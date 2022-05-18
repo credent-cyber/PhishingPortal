@@ -1,8 +1,24 @@
 ﻿@if (Show)
 {
+
     <div class="dialog-container">
+
         <div class="dialog">
-            @ChildContent
+
+            <div class="card">
+                <div class="card-header">
+                    @Title
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            @ChildContent
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          
         </div>
     </div>
 }
@@ -10,4 +26,6 @@
 @code {
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public bool Show { get; set; }
+    [Parameter] public string Title { get; set; } = "Dialog";
+  
 }

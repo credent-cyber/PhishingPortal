@@ -7,15 +7,17 @@ namespace PhishingPortal.Dto
     {
         public int CampaignId { get; set; }
 
-        public int? RecipientId { get; set; }
+        [ForeignKey("CampaignId")]
+        public virtual Campaign Campaign { get; set; }
 
         [ForeignKey("RecipientId")]
-        public virtual ICollection<Recipient> Recipients { get; set; }
+        public int? RecipientId { get; set; }
+        public virtual Recipient Recipient { get; set; }
 
         public int? RecipientGroupId { get; set; }
 
         [ForeignKey("RecipientGroupId")]
-        public virtual ICollection<RecipientGroup> RecipientGroups { get; set; }
+        public virtual RecipientGroup RecipientGroup { get; set; }
     }
 
 }

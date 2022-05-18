@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Globalization;
 
 namespace PhishingPortal.Dto
 {
@@ -11,8 +12,11 @@ namespace PhishingPortal.Dto
         {
             try
             {
-                this.Date = DateTime.Parse(value);
-                this.Time = DateTime.Parse(value);
+                DateTime.TryParseExact(value, "dd/MM/yyyy HH:mm:ss", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTime result);
+                this.Date = result.Date;
+
+
+                this.Time = result;
             }
             catch (Exception)
             {

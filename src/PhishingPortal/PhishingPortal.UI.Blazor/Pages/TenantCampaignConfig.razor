@@ -1,148 +1,254 @@
-﻿@page "/tenant-campaign-config/{Id:int}"
+﻿@page "/tenant-campaign-config"
+@page "/tenant-campaign-config/{Id:int}"
 
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
+@using System.Text.RegularExpressions
+@using PhishingPortal.UI.Blazor.Shared.TenantCampaingConfig
 
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 
 <h3>Campaign Configuration</h3>
 
-<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
-@if (model != null)
-{
-    <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
 
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="row">
+
+<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
+@if (model == null || isloading)
+{
+    <div class="loading-bar"></div>
+}
+else
+{
+    <div class="form">
+        <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
+
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row">
+
+                <div class="col-sm-5">
+
+                    <div class="form-group">
+
+                        <label class="form-label">Name</label>
+                        <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">Description</label>
+                        <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">State</label>
+                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                            @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
+                            {
+                            <option value="@val">@val</option>
+                            }
+                    </InputSelect>
+
+                </div>
+
+                <!-- campaing details-->
+
+                <div class="form-group">
+
+                    <label class="form-label">CampaignType</label>
+                    <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType">
+                        @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                            {
+                            <option value="@val">@val</option>
+                            }
+                    </InputSelect>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="form-label">CampaignTemplate<span @onclick="() => OnShowPreview(model.Detail.CampaignTemplateId)" class="oi oi-eye" /></label>
+                    <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
+                        @foreach (var val in Templates)
+                            {
+                            <option value="@val.Id">@val.Name</option>
+                            }
+                    </InputSelect>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">CampaignSchedule</label>
+                    <InputText readonly @bind-Value="@model.Schedule.ScheduleInfo" id="ScheduleInfo" class="form-control"></InputText>
+                </div>
+
+
+
+                <!-- schedule view -->
+
+            </div>
 
             <div class="col-sm-5">
-
                 <div class="form-group">
-
-                    <label class="form-label">Name</label>
-                    <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
-
+                    <label class="form-label">CampaignScheduleType</label>
+                    <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
+                        @foreach (var val in Enum.GetValues<ScheduleTypeEnum>())
+                            {
+                            <option value="@val">@val</option>
+                            }
+                    </InputSelect>
                 </div>
 
                 <div class="form-group">
-
-                    <label class="form-label">Description</label>
-                    <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label class="form-label">State</label>
-                    <InputSelect @bind-Value="model.State" class="form-control" id="State">
-                        @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
+                    @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
                         {
-                        <option value="@val">@val</option>
-                        }
-                </InputSelect>
-
-            </div>
-
-            <!-- campaing details-->
-
-            <div class="form-group">
-
-                <label class="form-label">CampaignType</label>
-                <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType">
-                    @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                        {
-                        <option value="@val">@val</option>
-                        }
-                </InputSelect>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="form-label">CampaignTemplate</label>
-                <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                    @foreach (var val in Templates)
-                        {
-                        <option value="@val.Id">@val.Name</option>
-                        }
-                </InputSelect>
-
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">CampaignSchedule</label>
-                <InputText readonly @bind-Value="@model.Schedule.ScheduleInfo" id="ScheduleInfo" class="form-control"></InputText>
-            </div>
-
-
-
-            <!-- schedule view -->
-
-            <button class="btn btn-primary" type="submit"> Submit</button>
-
-        </div>
-
-        <div class="col-sm-5">
-            <div class="form-group">
-                <label class="form-label">CampaignScheduleType</label>
-                <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
-                    @foreach (var val in Enum.GetValues<ScheduleTypeEnum>())
-                        {
-                        <option value="@val">@val</option>
-                        }
-                </InputSelect>
-            </div>
-
-            <div class="form-group">
-                @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
-                    {
-                        <label class="form-label">Scheduled Once</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="">Date & Time</span>
+                            <label class="form-label">Scheduled Once</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="">Date & Time</span>
+                                </div>
+                                <input type="date" @bind="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></input>
+                                <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
                             </div>
-                            <input type="date" @bind="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></input>
-                            <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
-                        </div>
 
-                    }
-                    else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
-                    {
-                        <label class="form-label">Scheduled Daily</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3">Time Every Day</span>
+                        }
+                        else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+                        {
+                            <label class="form-label">Scheduled Daily</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon3">Time Every Day</span>
+                                </div>
+                                <input type="time" @bind="dailySchedule.DailyScheduleTime" id="DailyScheduleTime"
+                               class="form-control" aria-describedby="basic-addon3"></input>
                             </div>
-                            <input type="time" @bind="dailySchedule.DailyScheduleTime" id="DailyScheduleTime"
-                           class="form-control" aria-describedby="basic-addon3"></input>
-                        </div>
 
-                    }
-                    else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
-                    {
-                        <label class="form-label">Scheduled Weekly</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <InputSelect @bind-Value="weeklySchedule.WeekDay" class="form-control" id="ScheduleWeekDay">
-                                    @foreach (var val in Enum.GetValues<DayOfWeek>())
-                                    {
-                                <option value="@val">@val</option>
-                                    }
-                        </InputSelect>
-                    </div>
+                        }
+                        else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+                        {
+                            <label class="form-label">Scheduled Weekly</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <InputSelect @bind-Value="weeklySchedule.WeekDay" class="form-control" id="ScheduleWeekDay">
+                                        @foreach (var val in Enum.GetValues<DayOfWeek>())
+                                        {
+                                    <option value="@val">@val</option>
+                                        }
+                            </InputSelect>
+                        </div>
                         <input type="time" @bind="weeklySchedule.ScheduleTime" id="WeeklyScheduleTime" class="form-control" aria-describedby="basic-addon3"></input>
                     </div>
 
-                    }
+                        }
 
+                    </div>
+
+                    <div class="form-group">
+                        <DialogTemplate Show="showPreview" Title="Template Preview">
+
+                            @previewContent
+
+                            <button @onclick="() => showPreview = false">Close</button>
+
+                        </DialogTemplate>
+
+                        <!-- Import Dialog -->
+                    <DialogTemplate Title="Import Campaign Recipients" Show="ShowDialog">
+                            @if (isloading)
+                            {
+                                <div class="loading-bar"></div>
+                            }
+                            else
+                            {
+                                @if (showRecipients)
+                                {
+                                    <Recipients DataList="recipients"></Recipients>
+
+                                    <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false; this.sources = RecipientSources.None; recipients = new List<RecipientImport>(); }" class="btn btn-secondary" type="button">Close</button>
+                                }
+
+                                @if (showImportDialog)
+                                {
+                                    <div class="row mb-3">
+                                        <label class="col-sm-5 col-form-label">Import Source</label>
+                                        <div class="col-sm-5">
+                                            <InputSelect @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource" id="RecipientSources">
+                                                @foreach (var val in Enum.GetValues<RecipientSources>())
+                                                {
+                                        <option value="@val">@val</option>
+                                                }
+                                </InputSelect>
+                            </div>
+                        </div>
+
+                                    @if (sources == RecipientSources.Csv)
+                                    {
+                                        <div class="row mb-3">
+                                            <label class="col-sm-5 col-form-label" for="chkHasHeader">Has Header Row</label>
+                                            <div class="col-sm-5">
+                                                <InputCheckbox id="chkHasHeader" @bind-Value="HasHeader" class="form-check" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <label class="col-sm-5 col-form-label" for="chkHasHeader">Choose File</label>
+                                            <div class="col-sm-5">
+                                                <InputFile OnChange="@OnInputFileChange" class="form-control" />
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (recipients?.Count() > 0)
+                                    {
+                                        <Recipients DataList="recipients"></Recipients>
+
+                                        <button @onclick="OnImportRecipientClick" class="btn btn-primary" type="button">Import Recipients</button>
+
+
+                                    }
+                                    <button @onclick="OnCancelImportClick" class="btn btn-secondary" type="button">Cancel</button>
+                                }
+                            }
+
+                        </DialogTemplate>
+
+                    </div>
+
+
+                    <div class="row">
+                        <br />
+                        <button class="btn btn-primary me-2" type="submit">Save Campaign</button>
+                        <br />
+                        @if (model.Id > 0)
+                        {
+                            <button @onclick="() => this.showImportDialog = true" class="btn btn-secondary me-2" type="button">Import Recipients</button>
+                            <br />
+                            <button @onclick="OnShowRecipientClick" class="btn btn-outline-secondary  me-2" type="button">Show Recipients</button>
+                            <br />
+                            @if (model.State == CampaignStateEnum.Draft)
+                            {
+                                <button @onclick="OnPublishClick" class="btn btn-outline-secondary  me-2" type="button">Publish Campaign</button>
+                                <br />
+                            }
+
+                            @if (model.State == CampaignStateEnum.Published)
+                            {
+                                <button @onclick="OnUnpublish" class="btn btn-outline-secondary  me-2" type="button">UnPublish Campaign</button>
+                            }
+
+                        }
+                    </div>
                 </div>
+
             </div>
 
-        </div>
+        </EditForm>
 
-    </EditForm>
+    </div>
 
 
 }
@@ -154,20 +260,34 @@
     string message = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
-
+    bool HasHeader = false;
     Campaign model = null;
 
-    IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+    bool showImportDialog = false;
+    bool showRecipients = false;
+    bool showPreview = false;
+    bool isloading = false;
 
-    // campaing
-    // campaign details
-    // campaign schedule
+    public bool ShowDialog
+    {
+        get
+        {
+            return showImportDialog || showRecipients;
+        }
+
+    }
+
+    IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
 
     OnceOffSchedule scheduleOnceOff = new();
     DailySchedule dailySchedule = new("12:00:00");
     WeeklySchedule weeklySchedule = new("1|12:00:00");
 
-    // campaign recipient (separatae screen)
+    RecipientSources sources;
+    List<RecipientImport> recipients = new List<RecipientImport>();
+
+    string content = string.Empty;
+    MarkupString previewContent => (MarkupString)content;
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,20 +307,53 @@
                 weeklySchedule = new WeeklySchedule(model.Schedule.ScheduleInfo);
 
         }
+        else
+        {
+            model = new Campaign()
+                {
+                    State = CampaignStateEnum.Draft,
+                    Detail = new CampaignDetail
+                    {
+                        CampaignTemplateId = Templates.FirstOrDefault().Id,
+                        Type = CampaignType.Email,
+                    },
+                    Schedule = new CampaingSchedule
+                    {
+                        ScheduleType = ScheduleTypeEnum.None,
+                        WillRepeat = false
+                    }
+                };
+        }
 
     }
 
     protected async Task OnValidSubmit()
     {
+        message = string.Empty;
+        isloading = true;
         UpdateModelScheduleInfo();
 
-        await client.UpsertCampaignAsync(model);
+        try
+        {
+            await client.UpsertCampaignAsync(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = "Error while updating";
+        }
+        isloading = false;
+        IsSuccess = true;
+        message = "Updated successfully";
     }
 
     protected void OnScheduleTypeChange()
     {
         UpdateModelScheduleInfo();
     }
+
+
 
     private void UpdateModelScheduleInfo()
     {
@@ -220,4 +373,161 @@
             model.Schedule.ScheduleInfo = weeklySchedule.ToString();
         }
     }
+
+    protected void OnChangeRecipientSource(ChangeEventArgs arg)
+    {
+        if (arg.Value?.ToString() == RecipientSources.Csv.ToString())
+        {
+            this.showImportDialog = true;
+        }
+    }
+
+    public async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var singleFile = e.File;
+        isloading = true;
+        Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
+        if (!regex.IsMatch(singleFile.Name))
+        {
+            IsError = true;
+            message = "This file format not supported";
+        }
+        else
+        {
+            var stream = singleFile.OpenReadStream();
+            MemoryStream ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            stream.Close();
+            var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+            var index = 0;
+
+            foreach (var item in outputFileString.Split(Environment.NewLine))
+            {
+                if (HasHeader && index == 0)
+                {
+                    index++;
+                    continue;
+
+                }
+
+                var arr = SplitCSV(item.ToString());
+
+                // TODO: add validations
+
+                if (arr != null && arr.Length == 3)
+                {
+                    if (!recipients.Any(o => o.Email == arr[1]))
+                        recipients.Add(new RecipientImport
+                            {
+                                Name = arr[0],
+                                Email = arr[1],
+                                Mobile = arr[2]
+                            });
+                }
+            }
+
+        }
+
+        isloading = false;
+    }
+
+    private string[] SplitCSV(string input)
+    {
+        //Excludes commas within quotes
+        Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
+        List<string> list = new List<string>();
+        string curr = null;
+        foreach (Match match in csvSplit.Matches(input))
+        {
+            curr = match.Value;
+            if (0 == curr.Length) list.Add("");
+
+            list.Add(curr.TrimStart(','));
+        }
+
+        return list.ToArray();
+    }
+
+    protected void OnCancelImportClick()
+    {
+        recipients.Clear();
+        isloading = false;
+        this.showImportDialog = false;
+        this.showRecipients = false;
+    }
+
+    protected async Task OnImportRecipientClick()
+    {
+        showImportDialog = false;
+        isloading = true;
+        try
+        {
+            var data = await client.ImportRecipientToCampaign(model.Id, recipients);
+            recipients = data;
+            IsSuccess = true;
+            message = "Successfully imported";
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = "Recipient couldn't not be imported, please try again";
+        }
+        isloading = false;
+
+    }
+
+    protected async Task OnShowRecipientClick()
+    {
+        this.showImportDialog = false;
+        this.showRecipients = true;
+
+        isloading = true;
+        try
+        {
+            var data = await client.GetRecipientByCampaignId(model.Id);
+
+            recipients = data.Select(o => new RecipientImport
+                {
+                    Name = o.Recipient.Name,
+                    Email = o.Recipient.Email,
+                    Mobile = o.Recipient.Mobile
+                }).ToList();
+
+            isloading = false;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = ex.Message;
+            showRecipients = false;
+        }
+    }
+
+    protected async Task OnPublishClick()
+    {
+        model.State = CampaignStateEnum.Published;
+        await OnValidSubmit();
+        message = "Published Successfully";
+    }
+
+    protected async Task OnUnpublish()
+    {
+        if (model.State == CampaignStateEnum.Published)
+        {
+            model.State = CampaignStateEnum.Draft;
+            await OnValidSubmit();
+            message = "Published Successfully";
+        }
+    }
+
+    protected void OnShowPreview(int id)
+    {
+        var template = Templates.FirstOrDefault(o => o.Id == id);
+        showPreview = true;
+        content = template.Content;
+    }
+
 }

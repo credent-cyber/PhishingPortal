@@ -9,7 +9,27 @@ namespace PhishingPortal.Dto
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public int Mobile { get; set; }
-        public int WhatsAppNo { get; set; }
+        public string Mobile { get; set; }
+        public string WhatsAppNo { get; set; }
+    }
+
+    public class RecipientImport
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Mobile { get; set; }
+        public string ValidationErrMsg { get; set; }
+
+    }
+
+
+    public enum RecipientSources
+    {
+        None = 0,
+        Csv = 1,
+       // Xls,
+        ActiveDirectory,
+       // RecipientGroup
     }
 }
+ 

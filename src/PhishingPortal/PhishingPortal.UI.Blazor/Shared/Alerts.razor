@@ -1,11 +1,11 @@
-﻿@if (IsSuccess)
+﻿@if (IsSuccess && !string.IsNullOrEmpty(Message))
 {
     <div class="alert alert-primary" role="alert">
         @Message
     </div>
 }
 
-@if (IsError)
+@if (IsError && !string.IsNullOrEmpty(Message))
 {
     <div class="alert alert-primary" role="alert">
         @Message

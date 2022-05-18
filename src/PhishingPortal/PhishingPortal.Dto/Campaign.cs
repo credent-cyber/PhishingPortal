@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace PhishingPortal.Dto
         public bool IsActive { get; set; }
         public virtual CampaignDetail Detail { get; set; }
         public virtual CampaingSchedule Schedule { get; set; }
+
     }
 }
