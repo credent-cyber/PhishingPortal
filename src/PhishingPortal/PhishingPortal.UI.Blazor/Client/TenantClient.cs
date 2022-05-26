@@ -211,6 +211,28 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
+        public async Task<bool> CampaignHit(string urlKey)
+        {
+            try
+            {
+                var request = new GenericApiRequest<string>() { Param = urlKey };
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/campaign-hit", request);
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+
+                if (json != null)
+                    return json.Result;
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return false ;
+        }
 
     }
 }

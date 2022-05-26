@@ -28,7 +28,7 @@ namespace PhishingPortal.Dto
 
         public override bool Eval()
         {
-            return DateTime.Now >= Date && (DateTime.Now - Date).TotalMinutes < 10;
+            return DateTime.Now.Date == Date && (DateTime.Now - Time).TotalMinutes < 10;
         }
 
         public override string ToString()

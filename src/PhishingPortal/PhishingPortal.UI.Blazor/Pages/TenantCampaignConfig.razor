@@ -45,6 +45,21 @@ else
 
                     <div class="form-group">
 
+                        <label class="form-label">Subject</label>
+                        <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">Category</label>
+                        <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
+                        <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>
+
+                    </div>
+
+                    <div class="form-group">
+
                         <label class="form-label">State</label>
                         <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
                             @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))

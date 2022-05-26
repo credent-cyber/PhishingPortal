@@ -1,0 +1,66 @@
+﻿@page "/cmpgn/{Key}/{Url?}"
+@page "/cmp/{Key}/{Url?}"
+
+<h3>@Title</h3>
+
+@using PhishingPortal.UI.Blazor.Client
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+@inject NavigationManager navigation
+
+@code {
+
+    public string Title { get; set; } = "Wait ....";
+    
+    [Parameter]
+    public string Key { get; set; } = string.Empty;
+    [Parameter]
+    public string Url { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // load campaign data
+        // validate campaign
+        // update campaign hit if valid
+
+        try
+        {
+            if (await client.CampaignHit(Key))
+                Redirect();
+            else
+                navigation.NavigateTo("/error");
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private void Redirect()
+    {
+        if (!string.IsNullOrEmpty(Url))
+        {
+            try
+            {
+                if (new Uri(Url).Host == new Uri(navigation.Uri).Host)
+                    navigation.NavigateTo(Url, true);
+                else
+                    navigation.NavigateTo("/");
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, ex.Message);
+            }
+        }
+        else
+        {
+            navigation.NavigateTo("/");
+        }
+    }
+
+
+
+}

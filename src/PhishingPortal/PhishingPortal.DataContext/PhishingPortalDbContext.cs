@@ -9,6 +9,18 @@ namespace PhishingPortal.DataContext
     using PhishingPortal.Domain;
     using PhishingPortal.Dto;
 
+    public class CentralDbContext  : DbContext
+    {
+        public CentralDbContext(DbContextOptions<CentralDbContext> options)
+            :base(options)
+        {
+
+        }
+        public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<TenantDomain> TenantDomain { get; set; }
+
+    }
+
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {
         static bool _recreateDb = false;
@@ -19,6 +31,7 @@ namespace PhishingPortal.DataContext
         {
 
         }
+
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         //public PhishingPortalDbContext(DbContextOptions options, bool recreate = true) : this(options)

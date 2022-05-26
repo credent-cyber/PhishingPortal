@@ -27,12 +27,13 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
+var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
+var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 
-builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
-        options.UseSqlite("Data Source=./App_Data/phishsim-db.db"));
+if(useSqlLite)
+    builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+        options.UseSqlite(conString));
 
-//builder.Services.AddDbContext<TenantDbContext>(options =>
-//        options.UseSqlite("Data Source=T334343.db"));
 
 builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
 {
@@ -121,4 +122,4 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.Run();
+app.Run(); 

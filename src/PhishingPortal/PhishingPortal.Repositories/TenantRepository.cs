@@ -13,6 +13,61 @@ namespace PhishingPortal.Repositories
             TenantDbCtx = dbContext;
         }
 
+        public async Task<IEnumerable<Campaign>> GetAllCampaigns(int pageIndex = 0, int pageSize = 10)
+        {
+            var result = Enumerable.Empty<Campaign>();
+
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule)
+                .Skip(pageIndex * pageSize).Take(pageSize);
+
+            return result;
+        }
+
+        public async Task<Campaign> GetCampaignById(int id)
+        {
+            Campaign result = null;
+
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).Include(o => o.Detail)
+                .FirstOrDefault(o => o.Id == id);
+
+            return result;
+        }
+
+        public async Task<Campaign> UpsertCampaign(Campaign campaign)
+        {
+            Campaign result = null;
+
+            if (campaign == null)
+                throw new ArgumentNullException("Invalid campaign data");
+
+            campaign.IsActive = true;
+
+            if (campaign.Id > 0)
+            {
+                campaign.ModifiedOn = DateTime.Now;
+                TenantDbCtx.Campaigns.Update(campaign);
+            }
+            else
+            {
+                campaign.CreatedOn = DateTime.Now;
+
+                TenantDbCtx.Campaigns.Add(campaign);
+            }
+
+            TenantDbCtx.SaveChanges();
+
+            return campaign;
+        }
+
+        public async Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0 , int pageSize = 10)
+        {
+            IEnumerable<CampaignTemplate> result = null;
+
+            result = TenantDbCtx.CampaignTemplates.Skip(pageIndex * pageSize).Take(pageSize);
+
+            return result;
+        }
+
 
         public async Task<List<CampaignRecipient>> GetRecipientByCampaignId(int campaignId)
         {
@@ -122,6 +177,27 @@ namespace PhishingPortal.Repositories
                 throw;
             }
             return template;
+        }
+
+        public async Task<bool> CampaignHit(string key)
+        {
+            var status = CampaignLogStatus.Sent.ToString();
+            var campaignLog = TenantDbCtx.CampaignLogs
+                .FirstOrDefault(o => o.SecurityStamp == key 
+                                    && o.IsHit == false && o.Status == status);
+            if (campaignLog == null)
+                throw new Exception("Invalid Url");
+
+            campaignLog.Status = CampaignLogStatus.Completed.ToString();
+            campaignLog.IsHit = true;
+            campaignLog.ModifiedOn = DateTime.Now;
+            campaignLog.ModifiedBy = nameof(CampaignHit);
+
+            TenantDbCtx.Update(campaignLog);
+            TenantDbCtx.SaveChanges();
+
+            return await Task.FromResult(true);
+ 
         }
     }
 }

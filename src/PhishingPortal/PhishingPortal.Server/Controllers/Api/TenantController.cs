@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using Microsoft.EntityFrameworkCore;
+using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -23,39 +24,24 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpGet]
         [Route("Campaigns")]
         [Route("Campaigns/{pageIndex?}/{pageSize?}")]
-        public IEnumerable<Campaign> Get(int pageIndex = 0, int pageSize = 10)
+        public async Task<IEnumerable<Campaign>> Get(int pageIndex = 0, int pageSize = 10)
         {
-            var result = Enumerable.Empty<Campaign>();
-
-            result = TenantDbCtx.Campaigns.Include(o => o.Schedule)
-                .Skip(pageIndex * pageSize).Take(pageSize);
-
-            return result;
+            return await _tenantRepository.GetAllCampaigns(pageIndex, pageSize);
         }
 
         [HttpGet]
         [Route("Campaign/{id}")]
-       
-        public Campaign Get(int id)
+        public async Task<Campaign> Get(int id)
         {
-            Campaign result = null;
-
-            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).Include(o => o.Detail)
-                .FirstOrDefault(o => o.Id == id);
-
-            return result;
+            return await _tenantRepository.GetCampaignById(id);
         }
 
 
         [HttpGet]
-        [Route("CampaignTemplates")]
-        public IEnumerable<CampaignTemplate> Get()
+        [Route("CampaignTemplates/{pageIndex?}/{pageSize?}")]
+        public async Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0, int pageSize = 10)
         {
-            IEnumerable<CampaignTemplate> result = null;
-
-            result = TenantDbCtx.CampaignTemplates.ToList();
-
-            return result;
+            return await _tenantRepository.GetAllTemplates(pageIndex, pageSize);
         }
 
         [HttpGet]
@@ -67,24 +53,16 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
 
-
         [HttpPost]
         [Route("UpsertCampaign")]
-        public Campaign UpsertCampaign(Campaign campaign)
+        public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
-            Campaign result = null;
-
-            if (campaign == null)
-                throw new ArgumentNullException("Invalid campaign data");
-
             if (campaign.Id > 0)
-                TenantDbCtx.Campaigns.Update(campaign);
+                campaign.ModifiedOn = DateTime.Now;
             else
-                TenantDbCtx.Campaigns.Add(campaign);
-
-            TenantDbCtx.SaveChanges();
-
-            return campaign;
+                campaign.CreatedOn = DateTime.Now;
+            campaign.State = CampaignStateEnum.Draft;
+            return await _tenantRepository.UpsertCampaign(campaign);
         }
 
         /// <summary>
@@ -104,7 +82,7 @@ namespace PhishingPortal.Server.Controllers.Api
             var response = new ApiResponse<List<RecipientImport>>
             {
                 IsSuccess = true,
-                Message = ispartial ? "Imported partially" : "Imported succesfully"  ,
+                Message = ispartial ? "Imported partially" : "Imported succesfully",
                 Result = data
             };
 
@@ -133,7 +111,61 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-template")]
         public async Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template)
         {
-            return await _tenantRepository.UpsertTemplate(template); 
+            return await _tenantRepository.UpsertTemplate(template);
         }
+
+        [HttpPost]
+        [Route("campaign-hit")]
+        public async Task<ApiResponse<bool>> CampignLinkHit(GenericApiRequest<string> request)
+        {
+            var result = new ApiResponse<bool>();
+            try
+            {
+                bool outcome = await _tenantRepository.CampaignHit(request.Param);
+                result.IsSuccess = outcome;
+                result.Message = "Successful";
+                result.Result = outcome;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while hitting campaign url");
+            }
+
+            return result;
+
+        }
+
+
+        /// <summary>
+        /// Monthly phishing chart for the year input
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+       [HttpGet]
+        [Route("monthly-phishing-bar-chart-data/{year?}")]
+        public async Task<ApiResponse<MonthlyPhishingBarChartEntry>> GetMonthlyBarChartEntires(int year)
+        {
+            var result = new ApiResponse<MonthlyPhishingBarChartEntry>();
+
+            throw new NotImplementedException();
+        }
+
+         
+        /// <summary>
+        /// Provides data for catewory wise phishing test prone percentage
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet]
+        [Route("category-wise-phising-test-prone-percent/{startDate}/{endDate}")]
+        public async Task<ApiResponse<CategoryWisePhishingTestDData>> GetCategoryWisePhishingTestPronePercentage(DateTime startDate, DateTime endDate)
+        {
+            var result = new ApiResponse<CategoryWisePhishingTestDData>();
+
+            throw new NotImplementedException();
+        }
+
     }
 }

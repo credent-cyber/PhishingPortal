@@ -1,18 +1,117 @@
 ﻿@page "/"
 @page "/Index"
+
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
 <PageTitle>PhishSim | Home</PageTitle>
 
 <AuthorizeView>
     <Authorized>
         <h1>Dashboard</h1>
+
+        <div class="row">
+            <div class="col">
+                <div class="card text-white bg-primary mb-3" style="max-width: 12rem;">
+                    <div class="card-header">Total Phishing Tests</div>
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-secondary mb-3" style="max-width: 12rem;">
+                    <div class="card-header">Total Clicks</div>
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-white bg-success mb-3" style="max-width: 12rem;">
+                    <div class="card-header">Not Clicked</div>
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="card text-white bg-danger mb-3" style="max-width: 12rem;">
+                    <div class="card-header">Shared Details</div>
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card text-dark bg-warning mb-3" style="max-width: 12rem;">
+                    <div class="card-header">Attachements</div>
+                    <div class="card-body">
+                        <h5 class="card-title">0</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <Chart Id="pie1" Type="@Chart.ChartType.Pie" Responsive="true"
+                               Data="@(new[] { "10", "9", "7", "20", "40", "0", "7", "20", "40", "34" })"
+                               BackgroundColor="@(new[] { "yellow","red", "blue", "red", "blue", "yello", "gray", "yellow","red", "blue" })"
+                               Labels="@(new[] { "Jan","Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"  })">
+                        </Chart>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <Chart Id="pie2" Type="@Chart.ChartType.Pie" Responsive="true"
+                               Data="@(new[] { "10", "9", "7", "20", "40", "0", "7", "20", "40", "34" })"
+                               BackgroundColor="@(new[] { "yellow","red", "blue", "red", "blue", "yello", "gray", "yellow","red", "blue" })"
+                               Labels="@(new[] { "Jan","Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"  })">
+                        </Chart>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <Chart Id="bar1" Type="@Chart.ChartType.Bar"
+                               Data="@(new[] { "10", "9", "7", "20", "40", "0", "7", "20", "40", "34" })"
+                               BackgroundColor="@(new[] { "yellow","red", "blue", "red", "blue", "yello", "gray", "yellow","red", "blue"})"
+                               Labels="@(new[] { "Jan","Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct" })">
+                        </Chart>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <Chart Id="bar2" Type="@Chart.ChartType.Bar"
+                               Data="@(new[] { "10", "9", "7", "20", "40", "0", "7", "20", "40", "34" })"
+                               BackgroundColor="@(new[] { "red", "blue", "yello", "gray", "yellow","red", "blue", "yellow","red", "blue"})"
+                               Labels="@(new[] { "Jan","Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct" })">
+                        </Chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </Authorized>
     <NotAuthorized>
         <h1>PhishSim</h1>
     </NotAuthorized>
 </AuthorizeView>
 
-Welcome to Phishing Simulator.
+
 @*
-<DialogTemplate Show="true">
+    <DialogTemplate Show="true">
     <h1>Somthing in the dialog</h1>
-</DialogTemplate>*@
+    </DialogTemplate>*@

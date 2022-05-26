@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-PhishingPortal.Services.Notification-3A4ED887-503D-4BA0-B877-88550CA811EB</UserSecretsId>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
+		<EntityFrameworkVersion>6.0.0</EntityFrameworkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="EASendMail" Version="7.8.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhishingPortal.Common\PhishingPortal.Common.csproj" />
+    <ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
+    <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
+    <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+  </ItemGroup>
+	
+	
+</Project>

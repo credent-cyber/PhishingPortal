@@ -21,8 +21,9 @@ namespace PhishingPortal.Dto
         public DateTime ConfirmationExpiry { get; set; }
         public DbOptions DatabaseOption { get; set; } = DbOptions.SqlLite; // Sqlite || MySql || Postgre || MS Sql Server
         public LicenseTypes LicenseType { get; set; } = LicenseTypes.Subscription;
-        public DateTime LicenseExpiry { get; set; } 
+        public DateTime LicenseExpiry { get; set; }
         public string LicenseKey { get; set; }
+        public bool IsActive { get; set; }
         public virtual ICollection<TenantData> Settings { get; set; }
         public virtual ICollection<TenantDomain> TenantDomains { get; set; }
 

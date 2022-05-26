@@ -29,6 +29,12 @@
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="wwwroot\scripts\bootstrap.bundle.min.js">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 	
 
 </Project>
