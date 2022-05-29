@@ -141,16 +141,30 @@ namespace PhishingPortal.Server.Controllers.Api
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-       [HttpGet]
-        [Route("monthly-phishing-bar-chart-data/{year?}")]
-        public async Task<ApiResponse<MonthlyPhishingBarChartEntry>> GetMonthlyBarChartEntires(int year)
+        [HttpGet]
+        [Route("monthly-phishing-bar-chart-data/{year}")]
+        public async Task<ApiResponse<MonthlyPhishingBarChart>> GetMonthlyBarChartEntires(int year)
         {
-            var result = new ApiResponse<MonthlyPhishingBarChartEntry>();
+            var result = new ApiResponse<MonthlyPhishingBarChart>();
 
-            throw new NotImplementedException();
+            try
+            {
+                var data = await _tenantRepository.GetMonthlyBarChart(year);
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
         }
 
-         
+
         /// <summary>
         /// Provides data for catewory wise phishing test prone percentage
         /// </summary>
@@ -160,11 +174,25 @@ namespace PhishingPortal.Server.Controllers.Api
         /// <exception cref="NotImplementedException"></exception>
         [HttpGet]
         [Route("category-wise-phising-test-prone-percent/{startDate}/{endDate}")]
-        public async Task<ApiResponse<CategoryWisePhishingTestDData>> GetCategoryWisePhishingTestPronePercentage(DateTime startDate, DateTime endDate)
+        public async Task<ApiResponse<CategoryWisePhishingTestData>> GetCategoryWisePhishingTestPronePercentage(DateTime startDate, DateTime endDate)
         {
-            var result = new ApiResponse<CategoryWisePhishingTestDData>();
+            var result = new ApiResponse<CategoryWisePhishingTestData>();
+            try
+            {
+                var data = await _tenantRepository.GetCategoryWisePhishingReport(startDate, endDate);
+                result.Result = data;
+                result.IsSuccess = true;
+                result.Message = String.Empty;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
 
-            throw new NotImplementedException();
+            return result;
         }
 
     }

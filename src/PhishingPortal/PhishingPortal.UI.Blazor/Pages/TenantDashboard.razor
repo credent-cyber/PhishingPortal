@@ -1,0 +1,200 @@
+﻿@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
+
+@using PhishingPortal.UI.Blazor.Client;
+@using System.Drawing
+@inject TenantClient client;
+@inject ILogger<TenantDashboard> logger;
+<h3>Dashboard</h3>
+
+<div class="row">
+    <div class="col">
+        <div class="card text-white bg-primary mb-3" style="max-width: 12rem;">
+            <div class="card-header">Phishing Tests</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalPhishingTests</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-white bg-danger mb-3" style="max-width: 12rem;">
+            <div class="card-header">Total Clicks</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalClicks</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-white bg-success mb-3" style="max-width: 12rem;">
+            <div class="card-header">Not Clicked</div>
+            <div class="card-body">
+                <h5 class="card-title">@NotClicked</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 12rem;">
+            <div class="card-header">Shared Details</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalClicks</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-dark bg-warning mb-3" style="max-width: 12rem;">
+            <div class="card-header">Phish Prone %</div>
+            <div class="card-body">
+                <h5 class="card-title">@PronePercent</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <div class="card" style="min-width:18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Phish Prone %</h5>
+                <Chart Id="bar1" Type="@Chart.ChartType.Bar"
+                       Datasets="@BarChart1Data"
+                       Labels="@BarChart1Labels">
+                </Chart>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Phish Prone - Category Wise</h5>
+                <Chart Id="pie1" Type="@Chart.ChartType.Pie" Responsive="true"
+                    Data="@(PieChart1Data.ToArray())"
+                    BackgroundColor="@(PieChart1Background.ToArray())"
+                    Labels="@(PieChart1Labels.ToArray())">
+                    </Chart>
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <Chart Id="bar2" Type="@Chart.ChartType.Line"
+                       Datasets="@BarChart1Data"
+                       Labels="@BarChart1Labels"
+                       IsStacked="false">
+                </Chart>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    public int TotalPhishingTests { get; set; }
+    public int TotalClicks { get; set; }
+    public int NotClicked { get; set; }
+    public decimal PronePercent { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+
+    public bool IsError { get; set; }
+    public string Message { get; set; } = string.Empty;
+
+
+    // Barchart1 datasets
+    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public List<string> PieChart1Data { get; set; } = new List<string>();
+    public List<string> PieChart1Background { get; set; } = new List<string>() {  "green", "blue" };
+    public List<string> PieChart1Labels { get; set; } = new List<string>();
+
+    public string[] BarChart1Labels { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        StartDate = new DateTime(DateTime.Now.Year, 1, 1);
+        EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
+
+        TotalPhishingTests = 0;
+        TotalClicks = 0;
+        NotClicked = 0;
+        PronePercent = 0;
+
+        // getting data for the current year all months
+        try
+        {
+            var data = await client.GetMonthlyBarChartEntires(DateTime.Now.Year);
+            var data2 = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
+
+            if (data == null)
+                throw new Exception();
+
+            TotalPhishingTests = data.Entries.Sum(o => o.TotalCampaigns);
+            TotalClicks = data.Entries.Sum(o => o.TotalHits);
+            NotClicked = TotalPhishingTests - TotalClicks;
+            PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
+
+
+            // pie chart
+            foreach(var entry in data2.CategoryClickRatioDictionary)
+            {
+                //var colorNo = new System.Random().Next(91, 102);
+
+                PieChart1Data.Add(entry.Value.ToString());
+
+                //Enum.TryParse(typeof(KnownColor), colorNo.ToString(), out object color);
+
+                //PieChart1Background.Add(System.Drawing.Color.FromKnownColor((KnownColor)color).Name.ToLower());
+
+                PieChart1Labels.Add(entry.Key.ToUpper());
+
+            }
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Phishing Counts",
+                    Data = data.Entries.Select(o => o.TotalCampaigns.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Blue, data.Entries.Count()),
+                });
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Clicks",
+                    Data = data.Entries.Select(o => o.TotalHits.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Red, data.Entries.Count()),
+                });
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone%",
+                    Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
+                });
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "No Clicks",
+                    Data = data.Entries.Select(o => (-1 * (o.TotalCampaigns - o.TotalHits)).ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Green, data.Entries.Count()),
+                });
+
+            BarChart1Labels = data.Entries.Select(o => o.Month.ToString()).ToArray();
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = "Error gathering statistics";
+            logger.LogCritical(ex, ex.Message);
+        }
+    }
+
+    public string[] GetBackgroundColors(Color color, int arraySize)
+    {
+        var colors = new List<string>();
+        for (var i = 0; i < arraySize; i++)
+            colors.Add(color.Name.ToString().ToLower());
+        return colors.ToArray();
+    }
+}

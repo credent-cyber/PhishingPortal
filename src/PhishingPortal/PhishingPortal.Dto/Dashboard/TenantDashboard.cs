@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace PhishingPortal.Dto.Dashboard
 {
     /// <summary>
     /// Category wise pie chart
     /// </summary>
-    public class CategoryWisePhishingTestDData
+    public class CategoryWisePhishingTestData
     {
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -42,6 +43,7 @@ namespace PhishingPortal.Dto.Dashboard
     public class MonthlyPhishingBarChart
     {
         public string Title { get; set; }
+        public int Year { get; set; }
 
         public List<MonthlyPhishingBarChartEntry> Entries { get; set; }
     }
@@ -52,10 +54,9 @@ namespace PhishingPortal.Dto.Dashboard
     public class MonthlyPhishingBarChartEntry
     {
         public Months Month { get; set; }
-        public string Year { get; set; }
         public int TotalCampaigns { get; set; }
         public int TotalHits { get; set; }
-        public int HitPronePercent { get; set; }
+        public decimal HitPronePercent { get; set; }
     }
 
     /// <summary>
@@ -63,7 +64,7 @@ namespace PhishingPortal.Dto.Dashboard
     /// </summary>
     public enum Months
     {
-        Jan,
+        Jan = 1,
         Feb,
         Mar,
         Apr,
@@ -77,6 +78,12 @@ namespace PhishingPortal.Dto.Dashboard
         December,
     }
 
-
+    public class ChartJsDataset
+    {
+        public string Label { get; set; } = "Default Label";
+        public string[] Data { get; set; }
+        public string[] BackgroundColor { get; set; }
+       
+    }
 
 }

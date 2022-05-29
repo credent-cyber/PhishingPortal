@@ -1,4 +1,5 @@
 ﻿using PhishingPortal.Dto;
+using PhishingPortal.Dto.Dashboard;
 using System.Net.Http.Json;
 
 namespace PhishingPortal.UI.Blazor.Client
@@ -232,6 +233,50 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return false ;
+        }
+
+        public async Task<MonthlyPhishingBarChart?> GetMonthlyBarChartEntires(int year)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/monthly-phishing-bar-chart-data/{year}");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyPhishingBarChart>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
+        }
+
+        public async Task<CategoryWisePhishingTestData?> GetCategoryWisePhishingTestData(DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/category-wise-phising-test-prone-percent/{startDate.ToString("MM-dd-yyyy")}/{endDate.ToString("MM-dd-yyyy")}");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<CategoryWisePhishingTestData>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
         }
 
     }

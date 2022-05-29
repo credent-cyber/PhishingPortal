@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using PhishingPortal.Dto.Dashboard
+@inject IJSRuntime JSRuntime
 
 <canvas id="@Id"></canvas>
 
@@ -7,7 +8,8 @@
     public enum ChartType
     {
         Pie,
-        Bar
+        Bar,
+        Line
     }
 
     [Parameter]
@@ -28,46 +30,47 @@
     [Parameter]
     public bool Responsive { get; set; } = true;
 
+    [Parameter]
+    public bool IsStacked { get; set; }
+
+    [Parameter]
+    public List<ChartJsDataset> Datasets { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Here we create an anonymous type with all the options
         // that need to be sent to Chart.js
-        var config = new
+        if (Datasets == null || Datasets.Count() == 0)
+            return;
+
+        if (!IsStacked)
         {
-            Type = Type.ToString().ToLower(),
-            Options = new
+            var config = new
             {
-                Responsive = Responsive,
-                Scales = new
+                Type = Type.ToString().ToLower(),
+
+                Data = new
                 {
-                    XAxes = new[]
-                        {
-                        new
-                        {
-                            Stacked = true
-                        }
-                    }
-                    ,
-                    YAxes = new[]
-                                        {
-                        new { Ticks = new {
-                            BeginAtZero=true
-                        }, Stacked = true }
-                    }
-                }
-            },
-            Data = new
-            {
-                Datasets = new[]
-                                    {
-                    new { Data = Data, BackgroundColor = BackgroundColor},
-                    new { Data = Data, BackgroundColor = BackgroundColor}
+                    Labels = Labels,
+                    
+                    Datasets = Datasets.Select(o => new
+                    {
+                        Label = o.Label,
+                        Data = o.Data,
+                        BackgroundColor = o.BackgroundColor
+                    })
 
                 },
-                Labels = Labels
-            }
-        };
 
-        await JSRuntime.InvokeVoidAsync("setup", Id, config);
+                Options = new
+                {
+                    Responsive = Responsive,
+                }
+
+            };
+
+            await JSRuntime.InvokeVoidAsync("setup", Id, config);
+        }
+
     }
 }

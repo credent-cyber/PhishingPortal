@@ -2,6 +2,7 @@
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using Microsoft.EntityFrameworkCore;
+using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.Repositories
 {
@@ -59,7 +60,7 @@ namespace PhishingPortal.Repositories
             return campaign;
         }
 
-        public async Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0 , int pageSize = 10)
+        public async Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0, int pageSize = 10)
         {
             IEnumerable<CampaignTemplate> result = null;
 
@@ -183,7 +184,7 @@ namespace PhishingPortal.Repositories
         {
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
-                .FirstOrDefault(o => o.SecurityStamp == key 
+                .FirstOrDefault(o => o.SecurityStamp == key
                                     && o.IsHit == false && o.Status == status);
             if (campaignLog == null)
                 throw new Exception("Invalid Url");
@@ -197,7 +198,138 @@ namespace PhishingPortal.Repositories
             TenantDbCtx.SaveChanges();
 
             return await Task.FromResult(true);
- 
+
+        }
+
+        /// <summary>
+        /// Phsihing prone percentage - group by phishing category
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
+        {
+            CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
+
+            data.Entries = new List<PhisingPronePercentEntry>();
+            data.CategoryClickRatioDictionary = new Dictionary<string, decimal>();
+
+            var totatPhishingTests = TenantDbCtx.CampaignLogs
+              .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+
+            var campaignGroup = totatPhishingTests.ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+            {
+                CampaignId = key,
+                Total = entries.Count(),
+                TotalHits = entries.Count(i => i.IsHit),
+            });
+
+            foreach (var c in campaignGroup)
+            {
+                var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
+
+                if (campaign == null)
+                    continue;
+
+                var entry = new PhisingPronePercentEntry()
+                {
+                    Campaign = campaign,
+                    Count = c.Total,
+                    Hits = c.TotalHits,
+                };
+
+                data.Entries.Add(entry);
+            }
+
+            data.TotalCampaigns = data.Entries.Sum(i => i.Count);
+
+            // create category wise phish prone %
+            var categoryWiseGrp = data.Entries.GroupBy(o => o.Campaign.Category, (key, values) => new
+            {
+                Category = key,
+                Count = values.Sum(o => o.Count),
+                HitCount = values.Sum(o => o.Hits),
+            });
+
+            foreach (var category in categoryWiseGrp)
+            {
+                if (category.Count > 0 && data.TotalCampaigns > 0)
+                {
+                    var pp = ((decimal)category.HitCount / (decimal)category.Count) * 100;
+                    var cr = (pp / 100) * data.TotalCampaigns;
+                    var equivalenPp = ((decimal)cr / (decimal)data.TotalCampaigns) * 100;
+
+                    if (!data.CategoryClickRatioDictionary.ContainsKey(category.Category))
+                    {
+                        data.CategoryClickRatioDictionary.Add(category.Category, equivalenPp);
+                    }
+                }
+            }
+
+            return await Task.FromResult(data);
+        }
+
+        /// <summary>
+        /// Month wise phishing tests report for the year
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
+        public async Task<MonthlyPhishingBarChart> GetMonthlyBarChart(int year)
+        {
+            MonthlyPhishingBarChart data = new MonthlyPhishingBarChart();
+            data.Title = "Monthly Phishing Tests Statistics";
+            data.Year = year;
+            data.Entries = new List<MonthlyPhishingBarChartEntry>();
+
+            var yearStartDt = new DateTime(year, 1, 1);
+
+            var yearEndDt = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+
+            var totatPhishingTests = TenantDbCtx.CampaignLogs
+                .Where(i => i.CreatedOn >= yearStartDt && i.CreatedOn < yearEndDt);
+
+            var monthlyGroup = totatPhishingTests.ToList().GroupBy(i => i.CreatedOn.Month, (key, entries) => new
+            {
+                Month = (Months)key,
+                Total = entries.Count(),
+                TotalHits = entries.Count(i => i.IsHit),
+                Percent = 0.0f,
+            });
+
+
+            foreach (Months month in Enum.GetValues(typeof(Months)))
+            {
+
+                var log = monthlyGroup.FirstOrDefault(i => i.Month == month);
+
+                var entry = new MonthlyPhishingBarChartEntry
+                {
+                    Month = month,
+                };
+#if DEBUG
+
+                // this is just to test dashboard
+                if (month <= (Months)DateTime.Now.Month)
+                {
+                    entry.TotalCampaigns = new Random().Next(50, 100);
+                    entry.TotalHits = new Random().Next(15, 39);
+                    entry.HitPronePercent = Math.Round(((decimal)entry.TotalHits / (decimal)entry.TotalCampaigns) * 100, 2);
+                }
+
+#else
+                if (log != null)
+                {
+                    entry.TotalCampaigns = log.Total;
+                    entry.TotalHits = log.TotalHits;
+                    if (log.Total > 0)
+                        entry.HitPronePercent = (log.TotalHits / log.Total) * 100;
+
+                }
+#endif
+
+                data.Entries.Add(entry);
+            }
+            return await Task.FromResult(data);
         }
     }
 }
