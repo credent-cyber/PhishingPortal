@@ -1,6 +1,7 @@
 ﻿@page "/tenant-campaign-config"
 @page "/tenant-campaign-config/{Id:int}"
 
+@using PhishingPortal.Common
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using System.Text.RegularExpressions
@@ -400,6 +401,8 @@ else
     public async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var singleFile = e.File;
+        IsError = false;
+        message = string.Empty;
         isloading = true;
         Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
         if (!regex.IsMatch(singleFile.Name))
@@ -425,20 +428,40 @@ else
 
                 }
 
-                var arr = SplitCSV(item.ToString());
-
-                // TODO: add validations
-
-                if (arr != null && arr.Length == 3)
+                try
                 {
-                    if (!recipients.Any(o => o.Email == arr[1]))
-                        recipients.Add(new RecipientImport
-                            {
-                                Name = arr[0],
-                                Email = arr[1],
-                                Mobile = arr[2]
-                            });
+                    var arr = SplitCSV(item.ToString(), AppConfig.ImportRecipientCsvMinColumns);
+
+                    if (arr != null)
+                    {
+                        if (!recipients.Any(o => o.Email == arr[1]))
+                        {
+                            var r = new RecipientImport
+                                {
+                                    EmployeeCode = arr[0],
+                                    Name = arr[1],
+                                    Email = arr[2],
+                                    Mobile = arr[3],
+                                    DateOfBirth = arr[4],
+                                    Department = arr[5],
+                                    Branch = arr[6],
+                                    Address = arr[7]
+                                };
+
+                            r.Validate();
+                            recipients.Add(r);
+                        }
+
+                    }
                 }
+                catch(Exception ex)
+                {
+                    IsError = true;
+                    message = ex.Message;
+                    
+                }
+                isloading = false;
+
             }
 
         }
@@ -446,7 +469,7 @@ else
         isloading = false;
     }
 
-    private string[] SplitCSV(string input)
+    private string[] SplitCSV(string input, int colCount)
     {
         //Excludes commas within quotes
         Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
@@ -459,6 +482,9 @@ else
 
             list.Add(curr.TrimStart(','));
         }
+
+        if(list.Count() < colCount)
+            throw new Exception("Invalid columns specified in the CSV file");
 
         return list.ToArray();
     }
@@ -504,9 +530,15 @@ else
 
             recipients = data.Select(o => new RecipientImport
                 {
+                    EmployeeCode = o.Recipient.EmployeeCode,
                     Name = o.Recipient.Name,
                     Email = o.Recipient.Email,
-                    Mobile = o.Recipient.Mobile
+                    Mobile = o.Recipient.Mobile,
+                    Branch = o.Recipient.Branch,
+                    Department = o.Recipient.Department,
+                    Address = o.Recipient.Address,
+                    DateOfBirth = o.Recipient.DateOfBirth
+                    
                 }).ToList();
 
             isloading = false;

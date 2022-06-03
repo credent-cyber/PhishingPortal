@@ -4,6 +4,14 @@ using System.Drawing;
 
 namespace PhishingPortal.Dto.Dashboard
 {
+
+    public enum ChartType
+    {
+        Pie,
+        Bar,
+        Line
+    }
+
     /// <summary>
     /// Category wise pie chart
     /// </summary>

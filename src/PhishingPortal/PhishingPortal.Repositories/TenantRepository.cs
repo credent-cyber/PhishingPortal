@@ -89,10 +89,16 @@ namespace PhishingPortal.Repositories
                         Email = r.Email,
                         Mobile = r.Mobile,
                         Name = r.Name,
-                        WhatsAppNo = r.Mobile
+                        WhatsAppNo = r.Mobile,
+                        DateOfBirth = r.DateOfBirth,
+                        Address = r.Address,
+                        Branch = r.Branch,
+                        Department = r.Department,
+                        EmployeeCode = r.EmployeeCode,
+                        IsActive = true
                     };
-                    r.ValidationErrMsg = string.Empty;
-                    hasChanges = true;
+                  
+                    hasChanges = true; 
 
                     TenantDbCtx.CampaignRecipients.Add(new CampaignRecipient
                     {
@@ -251,22 +257,35 @@ namespace PhishingPortal.Repositories
                 HitCount = values.Sum(o => o.Hits),
             });
 
+            var totalHits = categoryWiseGrp.Sum(o => o.HitCount);
+
+            // calc phishing percentage out of total hits
             foreach (var category in categoryWiseGrp)
             {
                 if (category.Count > 0 && data.TotalCampaigns > 0)
                 {
-                    var pp = ((decimal)category.HitCount / (decimal)category.Count) * 100;
-                    var cr = (pp / 100) * data.TotalCampaigns;
-                    var equivalenPp = ((decimal)cr / (decimal)data.TotalCampaigns) * 100;
+                    var equivalenPp = CalcEquivalentPercent(category.HitCount, totalHits);
 
                     if (!data.CategoryClickRatioDictionary.ContainsKey(category.Category))
                     {
                         data.CategoryClickRatioDictionary.Add(category.Category, equivalenPp);
                     }
+
+                   
                 }
             }
 
             return await Task.FromResult(data);
+        }
+
+        private decimal CalcEquivalentPercent(int hitCount,int totalHits)
+        {
+            decimal hitPercent = 0.0M;
+
+            hitPercent = ((decimal)hitCount / totalHits) * 100;
+
+            return hitPercent;
+
         }
 
         /// <summary>

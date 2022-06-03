@@ -5,7 +5,7 @@
 @using System.Drawing
 @inject TenantClient client;
 @inject ILogger<TenantDashboard> logger;
-<h3>Dashboard</h3>
+<h5>Dashboard [(@StartDate.ToString("dd MMM yyyy") - @DateTime.Now.ToString("dd MMM yyyy")]</h5>
 
 <div class="row">
     <div class="col">
@@ -53,39 +53,58 @@
 
 <div class="row">
     <div class="col-sm-8">
+        <div class="card">
+            <div class="card-body" style="min-width:18rem;">
+                <h5 class="card-title">Phishing Campaign-Wise Prone %age</h5>
+                <Chart Id="bar3" Type="@ChartType.Bar"
+                       Datasets="@BarChart3Data"
+                       Labels="@BarChart3Labels"
+                       IsStacked="false">
+                </Chart>
+               
+            </div>
+        </div>
+         <hr />
         <div class="card" style="min-width:18rem;">
             <div class="card-body">
-                <h5 class="card-title">Phish Prone %</h5>
-                <Chart Id="bar1" Type="@Chart.ChartType.Bar"
+                <h5 class="card-title">Month-wise Phishing Tests Statistics</h5>
+                <Chart Id="bar1" Type="@ChartType.Bar"
                        Datasets="@BarChart1Data"
                        Labels="@BarChart1Labels">
                 </Chart>
+
+                
             </div>
         </div>
+        <hr />
+        <div class="card">
+            <div class="card-body" style="min-width:18rem;">
+                <h5 class="card-title">Monthly Phish Prone %age</h5>
+                <Chart Id="bar2" Type="@ChartType.Line"
+                       Datasets="@BarChart2Data"
+                       Labels="@BarChart1Labels"
+                       IsStacked="false">
+                </Chart>
+              
+            </div>
+        </div>
+
+          <hr />
 
     </div>
     <div class="col-sm-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Phish Prone - Category Wise</h5>
-                <Chart Id="pie1" Type="@Chart.ChartType.Pie" Responsive="true"
-                    Data="@(PieChart1Data.ToArray())"
-                    BackgroundColor="@(PieChart1Background.ToArray())"
-                    Labels="@(PieChart1Labels.ToArray())">
-                    </Chart>
+                <h5 class="card-title">Category Wise Failure % </h5>
+                <PieChart Id="pie1" Type="@ChartType.Pie" Responsive="true"
+                          Data="@(PieChart1Data.ToArray())"
+                          BackgroundColor="@(PieChart1Background.ToArray())"
+                          Labels="@(PieChart1Labels.ToArray())">
+                </PieChart>
 
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Special title treatment</h5>
-                <Chart Id="bar2" Type="@Chart.ChartType.Line"
-                       Datasets="@BarChart1Data"
-                       Labels="@BarChart1Labels"
-                       IsStacked="false">
-                </Chart>
-            </div>
-        </div>
+         <hr />
     </div>
 
 </div>
@@ -105,11 +124,15 @@
 
     // Barchart1 datasets
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public List<ChartJsDataset> BarChart2Data { get; set; } = new List<ChartJsDataset>();
+    public List<ChartJsDataset> BarChart3Data { get; set; } = new List<ChartJsDataset>();
+
     public List<string> PieChart1Data { get; set; } = new List<string>();
-    public List<string> PieChart1Background { get; set; } = new List<string>() {  "green", "blue" };
+    public List<string> PieChart1Background { get; set; } = new List<string>() { "red", "blue", "green" };
     public List<string> PieChart1Labels { get; set; } = new List<string>();
 
     public string[] BarChart1Labels { get; set; }
+    public string[] BarChart3Labels { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,20 +158,36 @@
             NotClicked = TotalPhishingTests - TotalClicks;
             PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
 
+            // campaign wise chart
+            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Campaign Count",
+                    Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Blue, data2.Entries.Count()),
+                });
+
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Click Count",
+                    Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                });
+
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone %",
+                    Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                });
+
+
 
             // pie chart
-            foreach(var entry in data2.CategoryClickRatioDictionary)
+            foreach (var entry in data2.CategoryClickRatioDictionary)
             {
-                //var colorNo = new System.Random().Next(91, 102);
-
                 PieChart1Data.Add(entry.Value.ToString());
-
-                //Enum.TryParse(typeof(KnownColor), colorNo.ToString(), out object color);
-
-                //PieChart1Background.Add(System.Drawing.Color.FromKnownColor((KnownColor)color).Name.ToLower());
-
                 PieChart1Labels.Add(entry.Key.ToUpper());
-
             }
 
             BarChart1Data.Add(new ChartJsDataset
@@ -158,6 +197,7 @@
                     BackgroundColor = GetBackgroundColors(Color.Blue, data.Entries.Count()),
                 });
 
+
             BarChart1Data.Add(new ChartJsDataset
                 {
                     Label = "Clicks",
@@ -166,6 +206,13 @@
                 });
 
             BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone%",
+                    Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
+                });
+
+            BarChart2Data.Add(new ChartJsDataset
                 {
                     Label = "Phish Prone%",
                     Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),

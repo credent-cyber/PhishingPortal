@@ -1,0 +1,79 @@
+﻿@using PhishingPortal.Dto.Dashboard
+@inject IJSRuntime JSRuntime
+
+<canvas id="@Id"></canvas>
+
+
+@code {
+    
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public ChartType Type { get; set; }
+
+    [Parameter]
+    public string[] Data { get; set; }
+
+    [Parameter]
+    public string[] BackgroundColor { get; set; }
+
+    [Parameter]
+    public string[] Labels { get; set; }
+
+    [Parameter]
+    public bool Responsive { get; set; } = true;
+
+    [Parameter]
+    public bool IsStacked { get; set; }
+
+    [Parameter]
+    public List<ChartJsDataset> Datasets { get; set; }
+
+     protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Here we create an anonymous type with all the options
+        // that need to be sent to Chart.js
+
+         if (Data == null || Data.Count() == 0)
+            return;
+
+        var config = new
+        {
+            Type = "pie",
+            Options = new
+            {
+                Responsive = Responsive,
+                Scales = new
+                {
+                    XAxes = new[]
+                        {
+                        new
+                        {
+                            Stacked = true
+                        }
+                    }
+                    ,
+                    YAxes = new[]
+                                        {
+                        new { Ticks = new {
+                            BeginAtZero=true
+                        }, Stacked = true }
+                    }
+                }
+            },
+            Data = new
+            {
+                Datasets = new[]
+                                    {
+                    new { Data = Data, BackgroundColor = BackgroundColor}
+
+                },
+                Labels = Labels
+            }
+        };
+
+        await JSRuntime.InvokeVoidAsync("setup", Id, config);
+    }
+}
