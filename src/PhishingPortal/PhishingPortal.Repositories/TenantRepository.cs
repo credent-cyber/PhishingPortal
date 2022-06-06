@@ -282,7 +282,10 @@ namespace PhishingPortal.Repositories
         {
             decimal hitPercent = 0.0M;
 
-            hitPercent = ((decimal)hitCount / totalHits) * 100;
+            if(totalHits == 0)
+                hitPercent = 0;
+            else
+                hitPercent = ((decimal)hitCount / totalHits) * 100;
 
             return hitPercent;
 

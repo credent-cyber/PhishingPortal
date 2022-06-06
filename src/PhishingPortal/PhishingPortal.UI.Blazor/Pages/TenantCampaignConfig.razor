@@ -14,13 +14,15 @@
 
 
 
-<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
+
 @if (model == null || isloading)
 {
     <div class="loading-bar"></div>
 }
 else
 {
+    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
+
     <div class="form">
         <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
 
@@ -72,6 +74,11 @@ else
                 </div>
 
                 <!-- campaing details-->
+                <!-- schedule view -->
+
+            </div>
+
+            <div class="col-sm-5">
 
                 <div class="form-group">
 
@@ -102,13 +109,6 @@ else
                     <InputText readonly @bind-Value="@model.Schedule.ScheduleInfo" id="ScheduleInfo" class="form-control"></InputText>
                 </div>
 
-
-
-                <!-- schedule view -->
-
-            </div>
-
-            <div class="col-sm-5">
                 <div class="form-group">
                     <label class="form-label">CampaignScheduleType</label>
                     <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
@@ -235,32 +235,30 @@ else
                     </div>
 
 
-                    <div class="row">
-                        <br />
-                        <button class="btn btn-primary me-2" type="submit">Save Campaign</button>
-                        <br />
-                        @if (model.Id > 0)
+
+                   
+                </div> <!-- col-->
+
+        </div>
+
+        <div class="row">
+            <div class="col"> <button class="btn btn-primary me-2" type="submit">Save Campaign</button>
+                    @if (model.Id > 0)
+                    {
+                        <button @onclick="() => this.showImportDialog = true" class="btn btn-secondary me-2" type="button">Import Recipients</button>
+                        <button @onclick="OnShowRecipientClick" class="btn btn-outline-secondary  me-2" type="button">Show Recipients</button>
+                        @if (model.State == CampaignStateEnum.Draft)
                         {
-                            <button @onclick="() => this.showImportDialog = true" class="btn btn-secondary me-2" type="button">Import Recipients</button>
-                            <br />
-                            <button @onclick="OnShowRecipientClick" class="btn btn-outline-secondary  me-2" type="button">Show Recipients</button>
-                            <br />
-                            @if (model.State == CampaignStateEnum.Draft)
-                            {
-                                <button @onclick="OnPublishClick" class="btn btn-outline-secondary  me-2" type="button">Publish Campaign</button>
-                                <br />
-                            }
-
-                            @if (model.State == CampaignStateEnum.Published)
-                            {
-                                <button @onclick="OnUnpublish" class="btn btn-outline-secondary  me-2" type="button">UnPublish Campaign</button>
-                            }
-
+                            <button @onclick="OnPublishClick" class="btn btn-outline-secondary  me-2" type="button">Publish Campaign</button>
                         }
-                    </div>
-                </div>
 
-            </div>
+                        @if (model.State == CampaignStateEnum.Published)
+                        {
+                            <button @onclick="OnUnpublish" class="btn btn-outline-secondary  me-2" type="button">UnPublish Campaign</button>
+                        }
+
+                    }</div>
+        </div>
 
         </EditForm>
 
@@ -454,11 +452,11 @@ else
 
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     IsError = true;
                     message = ex.Message;
-                    
+
                 }
                 isloading = false;
 
@@ -483,7 +481,7 @@ else
             list.Add(curr.TrimStart(','));
         }
 
-        if(list.Count() < colCount)
+        if (list.Count() < colCount)
             throw new Exception("Invalid columns specified in the CSV file");
 
         return list.ToArray();
@@ -538,7 +536,7 @@ else
                     Department = o.Recipient.Department,
                     Address = o.Recipient.Address,
                     DateOfBirth = o.Recipient.DateOfBirth
-                    
+
                 }).ToList();
 
             isloading = false;
@@ -557,7 +555,7 @@ else
     {
         model.State = CampaignStateEnum.Published;
         await OnValidSubmit();
-        message = "Published Successfully";
+       // message = "Published Successfully";
     }
 
     protected async Task OnUnpublish()
@@ -566,7 +564,7 @@ else
         {
             model.State = CampaignStateEnum.Draft;
             await OnValidSubmit();
-            message = "Published Successfully";
+           // message = "Published Successfully";
         }
     }
 

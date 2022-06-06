@@ -29,14 +29,13 @@ namespace PhishingPortal.Repositories
         {
 
             var t = CentralDbContext.Tenants.FirstOrDefault(t => (t.Id > 0 && t.Id == tenant.Id) 
-                || t.Name.ToLower() == tenant.Name.ToLower() && t.ContactEmail.ToLower() == tenant.ContactEmail.ToLower() 
-                && t.ConfirmationState == ConfirmationStats.Registered);
+                || t.ContactEmail.ToLower() == tenant.ContactEmail.ToLower());
 
-            if(t != null)
-                return await Task.FromResult(t);
+            if (t != null)
+                throw new Exception("Already registered");
 
             tenant.UniqueId = $"{Config.DbNamePrefix}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
-            tenant.ConfirmationLink = $"{Config.TenantConfirmBaseUrl}{tenant.GetConfirmationLink(tenant.ConfirmationLink)}";
+            tenant.ConfirmationLink = $"{tenant.GetConfirmationLink(Config.TenantConfirmBaseUrl)}";
             tenant.ConfirmationState = ConfirmationStats.Registered;
             tenant.ConfirmationExpiry = DateTime.Now.AddDays(Config.DaysToConfirm);
 
@@ -183,7 +182,7 @@ namespace PhishingPortal.Repositories
                 }
 
                 tenant.ConfirmationState = ConfirmationStats.DomainVerified;
-
+                tenant.IsActive = true;
                 CentralDbContext.SaveChanges();
 
             }

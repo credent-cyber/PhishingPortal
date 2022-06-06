@@ -60,8 +60,11 @@ namespace PhishingPortal.Server.Controllers.Api
             if (campaign.Id > 0)
                 campaign.ModifiedOn = DateTime.Now;
             else
+            {
                 campaign.CreatedOn = DateTime.Now;
-            campaign.State = CampaignStateEnum.Draft;
+                campaign.State = CampaignStateEnum.Draft;
+            }
+                
             return await _tenantRepository.UpsertCampaign(campaign);
         }
 

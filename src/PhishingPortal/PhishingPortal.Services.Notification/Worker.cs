@@ -55,6 +55,11 @@ namespace PhishingPortal.Services.Notification
                     var tenants = _centralDbContext.Tenants.Include(o => o.Settings).Include(o => o.TenantDomains)
                                .Where(o => o.IsActive);
 
+                    if (tenants == null || tenants.Count() == 0)
+                    {
+                        _logger.LogCritical("No active tenants found");
+                    }
+
                     List<Task> allTasks = new List<Task>();
                     _isprocessing = true;
                     foreach (var tenant in tenants)

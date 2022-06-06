@@ -44,6 +44,8 @@ namespace PhishingPortal.Services.Notification
                 {
 
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
+                    dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                    
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
                                             .Where(o => o.State == Dto.CampaignStateEnum.Published && o.IsActive).ToList();

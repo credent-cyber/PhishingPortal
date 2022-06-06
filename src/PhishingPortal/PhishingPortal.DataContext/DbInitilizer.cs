@@ -58,27 +58,29 @@ namespace PhishingPortal.DataContext
 
             dbContext.CampaignTemplates.Add(template2);
 
-            var campaign = new Dto.Campaign
-            {
-                IsActive = true,
-                Name = "Sample Email Campaign",
-                Description = "Sample Campaign description",
-                State = Dto.CampaignStateEnum.Draft,
-                Detail = new Dto.CampaignDetail
-                {
-                    Template = template,
-                    Type = Dto.CampaignType.Email,
-                },
-                Schedule = new Dto.CampaignSchedule
-                {
-                    ScheduleType = Dto.ScheduleTypeEnum.Once,
-                    WillRepeat = false,
-                    ScheduleInfo = new OnceOffSchedule(DateTime.Now.AddDays(1)
-                                    .ToString("dd/MM/yyyy HH:mm:ss")).ToString()
-                }
-            };
+            //var campaign = new Dto.Campaign
+            //{
+            //    IsActive = true,
+            //    Name = "Sample Email Campaign",
+            //    Description = "Sample Campaign description",
+            //    State = Dto.CampaignStateEnum.Draft,
+            //    Subject = "Sample Email Campaign",
+                
+            //    Detail = new Dto.CampaignDetail
+            //    {
+            //        Template = template,
+            //        Type = Dto.CampaignType.Email,
+            //    },
+            //    Schedule = new Dto.CampaignSchedule
+            //    {
+            //        ScheduleType = Dto.ScheduleTypeEnum.Once,
+            //        WillRepeat = false,
+            //        ScheduleInfo = new OnceOffSchedule(DateTime.Now.AddDays(1)
+            //                        .ToString("dd/MM/yyyy HH:mm:ss")).ToString()
+            //    }
+            //};
 
-            dbContext.Campaigns.Add(campaign);
+            //dbContext.Campaigns.Add(campaign);
 
             dbContext.SaveChanges();
 

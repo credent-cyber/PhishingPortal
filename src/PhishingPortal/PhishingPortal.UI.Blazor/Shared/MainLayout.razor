@@ -2,22 +2,72 @@
 @inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
 
-        <AuthorizeView Roles="superadmin">
+    <AuthorizeView Roles="superadmin">
+        <div class="sidebar">
             <NavMenu />
-        </AuthorizeView>
-
-        <AuthorizeView Roles="tenantadmin">
-            <NavMenuTenant></NavMenuTenant>
-        </AuthorizeView>
-
-    </div>
-    <main>
-        <div class="top-row px-4">
-            @*<a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>*@
-            <LoginDisplay />
         </div>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="tenantadmin">
+        <div class="sidebar">
+            <NavMenuTenant></NavMenuTenant>
+        </div>
+    </AuthorizeView>
+
+
+
+    <main>
+
+        <nav class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="/img/logo-img.png" alt="" class="img-thumbnail">
+                </a>
+
+                <LoginDisplay />
+            </div>
+        </nav>
+
+        @*<div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <LoginDisplay />
+            </div>*@
+
+        <AuthorizeView>
+            <NotAuthorized>
+
+                <div class="container">
+
+                    <div class="row" style="background-color:currentColor;">
+                        <div class="col-lg-6 col-md-10 col-sm-10" style="padding-top: calc(10%)">
+                            <h1 style="color:orangered !important">Phishing Simulator, Why?</h1>
+                            <p style="color:grey;">
+                                Phishing can lead to devastating financial losses for individuals as well as businesses.
+                            </p>
+                            <blockquote>
+                                <h3 style="color:cadetblue !important">Individuals </h3>
+                                <p style="color:grey;">
+                                    <strong> For an individual</strong>, if a hacker manages to access sensitive bank account information, personal funds  and investments are at risk of being stolen.
+                                </p>
+                            </blockquote>
+                            <blockquote>
+                                <h3 style="color:darkslateblue !important">Businesses</h3>
+                                <p style="color:grey;">
+                                    <strong>For businesses </strong>, financial losses can extend to regulatory fines and remediation costs.
+                                </p>
+                            </blockquote>
+                        </div>
+                        <div class="col-lg-6 col-md-10 col-sm-10">
+                            <img src="img/stats.png" style="margin-top:40px" />
+                        </div>
+                    </div>
+
+                </div>
+
+            </NotAuthorized>
+        </AuthorizeView>
+
         <article class="content px-4">
             @Body
         </article>

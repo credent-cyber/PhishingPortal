@@ -83,6 +83,7 @@ builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 var app = builder.Build();
 
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+
 using (var scope = scopeFactory.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PhishingPortalDbContext>();

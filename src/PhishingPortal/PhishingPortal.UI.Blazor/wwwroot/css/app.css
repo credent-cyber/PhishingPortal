@@ -134,9 +134,9 @@ a, .btn-link {
     align-self: center;
     margin: auto;
     padding: 1%;
-    width: 700px;
+    width: calc(100% - 5rem);
     max-height: calc(100% - 3rem);
-    overflow-y : scroll;
+    overflow-y : auto;
     animation: dialog-entry 0.4s;
     animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
 }

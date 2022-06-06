@@ -58,7 +58,7 @@
     
     <div class="form-group">
         <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
-        <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+        <InputSelect readonly @bind-Value="model.DatabaseOption" class="form-control">
             @foreach (var op in Enum.GetValues(typeof(DbOptions)))
             {
                 <option value="@op">@op</option>
@@ -80,9 +80,12 @@
         {
             Name = "TEST",
             Address = "ABC",
-            ContactEmail = "mkp@gmail.com",
+            Website = "http://www.test.com",
+            ContactEmail = "mkp@test.com",
             DatabaseOption = DbOptions.SqlLite,
-            ContactNumber = "34738473894"
+            ContactNumber = "9897659876",
+            LicenseExpiry = DateTime.MaxValue,
+            LicenseType = LicenseTypes.Subscription,
         };
 
 

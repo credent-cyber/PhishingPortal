@@ -2,12 +2,13 @@
 @using PhishingPortal.UI.Blazor.Client
 @using Microsoft.Extensions.Logging
 @page "/tenant-confirmation/{uniqueId}/{cid}/{action?}"
-
+@layout SimpleLayout
 @*@inject TenantAdminClient AdminClient*@
 @inject ILogger<Onboard> Logger
 @inject ILogger<TenantAdminClient> Logger2
 @inject NavigationManager navMgr
 @inject HttpClient httpClient
+
 
 <h3>
     Onboarding | @if (Action == "c")
@@ -24,59 +25,67 @@
 
             <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
 
-            @if (Action == "dv")
+            @if (IsDone)
             {
-                <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
+                <button class="btn btn-primary" @onclick="OnGoToHome">Go To Home Page</button>
+            }
+            else
+            {
+                if (Action == "dv")
+                {
+                    <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
 
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-
-
-                    <div class="form-group">
-                        <label for="Domain">@nameof(domain.Domain)</label>
-                        <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
-                        <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
-                    </div>
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
 
 
-                    <button class="btn btn-primary" type="submit">Submit</button>
+                        <div class="form-group">
+                            <label for="Domain">@nameof(domain.Domain)</label>
+                            <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
+                        </div>
 
-                </EditForm>
+                        <div class="form-group">
+                            <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
+                            <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
+                        </div>
+
+
+                        <button class="btn btn-primary" type="submit">Submit</button>
+
+                    </EditForm>
+                }
+
+                if (Action == "mastusr")
+                {
+                    <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
+                        <DataAnnotationsValidator />
+
+                        <ValidationSummary />
+
+                        <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
+
+
+                        <div class="form-group">
+                            <label for="Email">@nameof(user.Email)</label>
+                            <InputText @bind-Value="user.Email" id="Email" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Password">@nameof(user.Password)</label>
+                            <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
+                            <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Submit</button>
+
+                    </EditForm>
+                }
             }
 
-            @if (Action == "mastusr")
-            {
-                <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
-                    <DataAnnotationsValidator />
-
-                    <ValidationSummary />
-
-                    <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
-
-
-                    <div class="form-group">
-                        <label for="Email">@nameof(user.Email)</label>
-                        <InputText @bind-Value="user.Email" id="Email" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Password">@nameof(user.Password)</label>
-                        <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
-                        <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
-                    </div>
-
-                    <button class="btn btn-primary" type="submit">Submit</button>
-
-                </EditForm>
-            }
 
         </div>
 
@@ -97,6 +106,7 @@
 
     bool IsError = false;
     bool IsSuccess = false;
+    bool IsDone = false;
     string Message = string.Empty;
 
     Tenant model = new Tenant();
@@ -107,7 +117,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-
+        IsDone = false;
         AdminClient = new TenantAdminClient(Logger2, httpClient);
 
         if (string.IsNullOrEmpty(Action))
@@ -184,7 +194,11 @@
             var output = await AdminClient.CreateTenandAdminUser(UniqueId, user.Email, user.Password, user.ConfirmPassword);
 
             if (output)
-                navMgr.NavigateTo("/");
+            {
+                IsDone = true;
+                IsSuccess = true;
+                Message = "You have successfully confirmed your details. Please click the button to login to the portal";
+            }
             else
             {
                 IsSuccess = false;
@@ -192,6 +206,11 @@
             }
         }
         await Task.CompletedTask;
+    }
+
+    protected async Task OnGoToHome()
+    {
+            navMgr.NavigateTo("/");
     }
 
 }

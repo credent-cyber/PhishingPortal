@@ -58,8 +58,9 @@ namespace PhishingPortal.Server.Controllers
                 await SendConfirmationEmail(tenant);
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.LogCritical(ex, ex.Message);
                 throw;
             }
             return result;
@@ -220,6 +221,10 @@ namespace PhishingPortal.Server.Controllers
         /// <returns></returns>
         private async Task SendConfirmationEmail(Tenant tenant)
         {
+
+            if (string.IsNullOrEmpty(tenant.ConfirmationLink))
+                throw new ArgumentNullException($"Onboarding confirmation link is empty");
+
             var to = tenant.ContactEmail;
             var subject = $"PhishSim: Onboarding Confirmation Tenant ({tenant.UniqueId})";
             var mailContent = "Hi there, <br /><p>";
