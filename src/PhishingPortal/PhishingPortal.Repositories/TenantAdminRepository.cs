@@ -204,6 +204,14 @@ namespace PhishingPortal.Repositories
                 {
                     optionsBuilder.UseSqlite(connectionString);
                 }
+                else if(tenant.DatabaseOption == DbOptions.MySql)
+                {
+                    optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                }
+                else
+                {
+                    throw new NotImplementedException("This database provider is not implemented for the tenant");
+                }
                 // todo other provider
 
                 TenantDbContext db;

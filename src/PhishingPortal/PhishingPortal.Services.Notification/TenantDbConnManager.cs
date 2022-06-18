@@ -59,7 +59,7 @@ namespace PhishingPortal.Services.Notification
                 var cstr = connString.Replace("./App_Data", _sqlLiteDbPath);
                 optionsBuilder.UseSqlite(cstr);
             }
-            else if (tenant.DatabaseOption == DbOptions.MsSql)
+            else if (tenant.DatabaseOption == DbOptions.MySql)
             {
                 throw new NotImplementedException("NO implemantation for Mssql provider");
             }

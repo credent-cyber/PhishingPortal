@@ -5,6 +5,7 @@ using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
+using PhishingPortal.Server.Services;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -15,8 +16,9 @@ namespace PhishingPortal.Server.Controllers.Api
     {
 
         readonly TenantRepository _tenantRepository;
-        public TenantController(ILogger<TenantController> logger, ITenantAdminRepository adminRepository, IHttpContextAccessor httpContextAccessor) :
-            base(logger, adminRepository, httpContextAccessor)
+        public TenantController(ILogger<TenantController> logger, ITenantAdminRepository adminRepository, 
+            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
+            base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
         }

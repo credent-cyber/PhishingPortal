@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
@@ -11,7 +11,7 @@
 	<PropertyGroup>
 		<BlazorVersion>6.0.4</BlazorVersion>
 		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
-		<EntityFrameworkVersion>6.0.0</EntityFrameworkVersion>
+		<EntityFrameworkVersion>6.0.1</EntityFrameworkVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -25,6 +25,7 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
 		<PackageReference Include="WebPush" Version="1.0.11" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

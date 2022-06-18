@@ -37,6 +37,7 @@ namespace PhishingPortal.Repositories
         public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
             Campaign result = null;
+            var now = DateTime.Now;
 
             if (campaign == null)
                 throw new ArgumentNullException("Invalid campaign data");
@@ -45,13 +46,14 @@ namespace PhishingPortal.Repositories
 
             if (campaign.Id > 0)
             {
-                campaign.ModifiedOn = DateTime.Now;
+                campaign.ModifiedOn = now;
+                campaign.Detail.ModifiedOn = now;
                 TenantDbCtx.Campaigns.Update(campaign);
             }
             else
             {
-                campaign.CreatedOn = DateTime.Now;
-
+                campaign.CreatedOn = now;
+                campaign.Detail.CreatedOn = now;
                 TenantDbCtx.Campaigns.Add(campaign);
             }
 

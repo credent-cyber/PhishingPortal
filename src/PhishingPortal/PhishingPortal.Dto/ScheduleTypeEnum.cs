@@ -6,6 +6,6 @@
         Daily,
         Weekly,
         //Monthly,
-        None
+        NoSchedule
     }
 }

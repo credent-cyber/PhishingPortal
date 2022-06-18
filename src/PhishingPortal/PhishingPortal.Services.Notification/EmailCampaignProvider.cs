@@ -156,7 +156,7 @@ namespace PhishingPortal.Services.Notification
                 var cstr = connString.Value.Replace("./App_Data", _sqlLiteDbPath);
                 optionsBuilder.UseSqlite(cstr);
             }
-            else if (Tenant.DatabaseOption == DbOptions.MsSql)
+            else if (Tenant.DatabaseOption == DbOptions.MySql)
             {
                 // TODO: Mysql provider
                 //optionsBuilder.UseMySql()

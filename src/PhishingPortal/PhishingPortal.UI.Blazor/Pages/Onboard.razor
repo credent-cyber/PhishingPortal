@@ -58,7 +58,7 @@
     
     <div class="form-group">
         <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
-        <InputSelect readonly @bind-Value="model.DatabaseOption" class="form-control">
+        <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
             @foreach (var op in Enum.GetValues(typeof(DbOptions)))
             {
                 <option value="@op">@op</option>

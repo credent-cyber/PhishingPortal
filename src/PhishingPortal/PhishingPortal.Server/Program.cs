@@ -12,6 +12,8 @@ using PhishingPortal.Common;
 using IdentityUIServices = Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Pomelo.EntityFrameworkCore.MySql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,9 +32,19 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 
-if(useSqlLite)
+if (useSqlLite)
+{
     builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
         options.UseSqlite(conString));
+}
+else
+{
+    conString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+    {
+        options.UseMySql(conString, ServerVersion.AutoDetect(conString));
+    });
+}
 
 
 builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
@@ -66,7 +78,7 @@ builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
-
+builder.Services.AddScoped<ITenantDbResolver,TenantDbResolver>();
 
 var app = builder.Build();
 

@@ -42,7 +42,7 @@ namespace PhishingPortal.Dto
     public enum DbOptions
     {
         SqlLite,
-        MsSql,
+        MySql,
         PostGreSql
     }
 
