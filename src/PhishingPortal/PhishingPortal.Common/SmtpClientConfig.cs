@@ -1,5 +1,7 @@
-﻿namespace PhishingPortal.Services.Notification
+﻿
+namespace PhishingPortal.Common
 {
+    using Microsoft.Extensions.Configuration;
     public class SmtpClientConfig
     {
         public string Server { get; set; } = "smtp.gmail.com";

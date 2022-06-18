@@ -1,69 +1,47 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PhishingPortal.Common;
 using System.Net;
 using System.Net.Mail;
 
 namespace PhishingPortal.Server.Services;
 
-public class SmtpMessageSenderOptions
-{
-    public string Server { get; set; } = "smtp.gmail.com";
-    public int Port { get; set; } = 587;
-    public string FromEmail { get; set; } = "malaykp.devices@gmail.com";
-    public string Password { get; set; } = "***********";
-
-}
-
-public class SendGridMessagerSenderOptions
-{
-    public string? SendGridKey { get; set; }
-}
-
 public class EmailSender : IEmailSender
 {
     private readonly ILogger _logger;
+    private readonly IEmailClient _emailClient;
 
-    public EmailSender(IOptions<SmtpMessageSenderOptions> optionsAccessor,
-                       ILogger<EmailSender> logger)
+    public EmailSender(ILogger<EmailSender> logger, IEmailClient emailClient)
     {
-        Options = optionsAccessor.Value;
         _logger = logger;
+        _emailClient = emailClient;
     }
 
-    public SmtpMessageSenderOptions Options { get; } //Set with Secret Manager.
-
-    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        //if (string.IsNullOrEmpty(Options.SendGridKey))
-        //{
-        //    throw new Exception("Null SendGridKey");
-        //}
-        await Execute(string.Empty, subject, message, toEmail);
+        await Execute(email, subject, htmlMessage);
     }
 
-    public async Task Execute(string apiKey, string subject, string message, string toEmail)
+    public async Task Execute(string email, string subject, string message)
     {
-
-
         _logger.LogInformation("Sending email");
-
-        var client = new SmtpClient(Options.Server, Options.Port)
-        {
-            Credentials = new NetworkCredential(Options.FromEmail, Options.Password),
-            EnableSsl = true
-        };
 
         var mailMessage = new MailMessage();
         mailMessage.IsBodyHtml = true;
         mailMessage.Body = message;
         mailMessage.Subject = subject;
-        mailMessage.From = new MailAddress(Options.FromEmail);
-        mailMessage.To.Add(new MailAddress(toEmail));
-        mailMessage.Sender = new MailAddress(Options.FromEmail);
+        mailMessage.To.Add(new MailAddress(email));
 
-        await client.SendMailAsync(mailMessage);
-
+        if(_emailClient == null)
+        {
+            _logger.LogError($"Email client not initialized");
+            return;
+        }
+        
+            
+        await _emailClient.SendEmailAsync(mailMessage);
+        
         _logger.LogInformation("Mail sent");
 
         //var client = new SendGridClient(apiKey);
@@ -84,4 +62,5 @@ public class EmailSender : IEmailSender
         //                       ? $"Email to {toEmail} queued successfully!"
         //                       : $"Failure Email to {toEmail}");
     }
+
 }

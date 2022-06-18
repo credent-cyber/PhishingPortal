@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using PhishingPortal.Common;
+using System.Collections.Concurrent;
 
 namespace PhishingPortal.Services.Notification
 {
@@ -7,13 +8,13 @@ namespace PhishingPortal.Services.Notification
     {
         public ConcurrentQueue<EmailCampaignInfo> Queue { get; }
         public ILogger<EmailCampaignExecutor> Logger { get; }
-        public IEmailSender EmailSender { get; }
+        public IEmailClient EmailSender { get; }
         public ITenantDbConnManager TenantDbConnMgr { get; }
 
         readonly Task _processTask;
         readonly int _executorDelayInSeconds = 5;
         bool _stopped;
-        public EmailCampaignExecutor(ILogger<EmailCampaignExecutor> logger, IConfiguration config, IEmailSender emailSender,
+        public EmailCampaignExecutor(ILogger<EmailCampaignExecutor> logger, IConfiguration config, IEmailClient emailSender,
             ITenantDbConnManager connManager)
         {
             Logger = logger;

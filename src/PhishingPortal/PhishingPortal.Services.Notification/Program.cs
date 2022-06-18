@@ -4,6 +4,7 @@ using PhishingPortal.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Duende.IdentityServer.EntityFramework.Options;
+using PhishingPortal.Common;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -38,7 +39,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             //TODO: 
         }
 
-        services.AddSingleton<IEmailSender, Office365SmtpClient>();
+        services.AddSingleton<IEmailClient, Office365SmtpClient>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
         services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
         services.AddHostedService<Worker>();

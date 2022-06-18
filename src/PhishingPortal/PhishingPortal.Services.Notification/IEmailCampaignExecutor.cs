@@ -1,9 +1,11 @@
 ﻿
+using PhishingPortal.Common;
+
 namespace PhishingPortal.Services.Notification
 {
     public interface IEmailCampaignExecutor : IObserver<EmailCampaignInfo>
     {
-        IEmailSender EmailSender { get; }
+        IEmailClient EmailSender { get; }
         ILogger<EmailCampaignExecutor> Logger { get; }
 
         void Start();

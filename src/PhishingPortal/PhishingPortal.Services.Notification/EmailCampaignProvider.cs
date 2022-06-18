@@ -19,7 +19,7 @@ namespace PhishingPortal.Services.Notification
         private string BaseUrl = "http://localhost:7081/cmp";
         
         public EmailCampaignProvider(ILogger<EmailCampaignProvider> logger,
-            IEmailSender emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+            IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
         {
             Logger = logger;
             EmailSender = emailSender;
@@ -205,7 +205,7 @@ namespace PhishingPortal.Services.Notification
 
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
         public ILogger<EmailCampaignProvider> Logger { get; }
-        public IEmailSender EmailSender { get; }
+        public IEmailClient EmailSender { get; }
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
     }

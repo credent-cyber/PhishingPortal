@@ -1,9 +1,12 @@
 ﻿namespace PhishingPortal.Services.Notification
 {
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using PhishingPortal.Common;
     using System.Net;
     using System.Net.Mail;
 
-    public class GmailWrapper : IEmailSender
+    public class GmailWrapper : IEmailClient
     {
 
         public GmailWrapper(ILogger<GmailWrapper> logger, IConfiguration config)

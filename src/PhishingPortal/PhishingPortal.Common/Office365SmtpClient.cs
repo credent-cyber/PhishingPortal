@@ -1,10 +1,13 @@
 ﻿using System.Net.Mail;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Common
 {
 
     using EASendMail;
-    public class Office365SmtpClient : IEmailSender
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+
+    public class Office365SmtpClient : IEmailClient
     {
         readonly SmtpClientConfig _config;
         public Office365SmtpClient(ILogger<Office365SmtpClient> logger, IConfiguration config)
@@ -34,7 +37,7 @@ namespace PhishingPortal.Services.Notification
             {
                 SmtpMail oMail = new SmtpMail(_config.LicenseKey);
 
-                oMail.From = _config.From; 
+                oMail.From = _config.From;
                 oMail.To = to;
 
                 oMail.Subject = subject;

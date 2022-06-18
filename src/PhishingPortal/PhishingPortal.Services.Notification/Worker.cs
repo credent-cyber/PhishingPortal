@@ -2,6 +2,8 @@ namespace PhishingPortal.Services.Notification
 {
     using PhishingPortal.DataContext;
     using Microsoft.EntityFrameworkCore;
+    using PhishingPortal.Common;
+
     public class Worker : BackgroundService
     {
         class WorkerSettings
@@ -15,7 +17,7 @@ namespace PhishingPortal.Services.Notification
 
         public Worker(ILogger<Worker> logger,
             ILogger<EmailCampaignProvider> agentLogger,
-            IEmailSender emailClient,
+            IEmailClient emailClient,
             IConfiguration configuration,
             CentralDbContext centralDbContext,
             IEmailCampaignExecutor campaignExecutor, ITenantDbConnManager tenantDbConnManager)
@@ -35,7 +37,7 @@ namespace PhishingPortal.Services.Notification
         readonly ILogger<Worker> _logger;
         private readonly ILogger<EmailCampaignProvider> providerLogger;
         readonly WorkerSettings _settings;
-        readonly IEmailSender _emailClient;
+        readonly IEmailClient _emailClient;
         readonly IConfiguration _configuration;
         readonly CentralDbContext _centralDbContext;
         private readonly IEmailCampaignExecutor _campaignExecutor;

@@ -9,7 +9,7 @@ using PhishingPortal.Server.Services;
 using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Common;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using IdentityUIServices = Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -42,20 +42,8 @@ builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PhishingPortalDbContext>();
 
-
-SmtpMessageSenderOptions options = new();
-builder.Configuration.GetSection(nameof(SmtpMessageSenderOptions))
-                 .Bind(options);
-
-builder.Services.Configure<SmtpMessageSenderOptions>(o =>
-{
-    o.Server = options.Server;
-    o.Port = options.Port;
-    o.Password = options.Password;
-    o.FromEmail = options.FromEmail;
-});
-
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddSingleton<IEmailClient, Office365SmtpClient>();
+builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
 builder.Services.AddIdentityServer()
     //.AddSigningCredential(rsaCertificate)

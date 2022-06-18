@@ -19,11 +19,12 @@
 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(AspNetCoreVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PhishingPortal.Common\PhishingPortal.Common.csproj" />
+    <ProjectReference Include="..\PhishingPortal.Core\PhishingPortal.Core.csproj" />
     <ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
     <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
     <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />

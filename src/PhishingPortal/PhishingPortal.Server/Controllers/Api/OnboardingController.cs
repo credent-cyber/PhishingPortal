@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Common;
@@ -12,6 +12,8 @@ using PhishingPortal.Repositories;
 
 namespace PhishingPortal.Server.Controllers
 {
+    using Microsoft.AspNetCore.Identity.UI.Services;
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
