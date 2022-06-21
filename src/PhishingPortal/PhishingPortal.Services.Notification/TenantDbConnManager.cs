@@ -10,11 +10,17 @@ namespace PhishingPortal.Services.Notification
 
         private readonly CentralDbContext centralDbContext;
 
-        private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
+        private string _sqlLiteDbPath { get; } = "./../PhishingPortal.Server/App_Data";
 
-        public TenantDbConnManager(ILogger<TenantDbConnManager> logger, CentralDbContext centralDbContext)
+        public TenantDbConnManager(ILogger<TenantDbConnManager> logger, IConfiguration config, CentralDbContext centralDbContext)
         {
             _dicConnections = new Dictionary<string, TenantDbContext>();
+
+            if(config != null)
+            {
+                _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
+            }
+
             this.centralDbContext = centralDbContext;
         }
 
