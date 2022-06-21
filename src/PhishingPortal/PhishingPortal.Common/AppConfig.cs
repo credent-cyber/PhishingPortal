@@ -11,7 +11,7 @@ namespace PhishingPortal.Common
             // TODO: load from config
         }
 
-        public static int ImportRecipientCsvMinColumns  = 8;
-        public static string EmailRegex  = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
+        public const int ImportRecipientCsvMinColumns  = 8;
+        public const string EmailRegex  = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
     }
 }

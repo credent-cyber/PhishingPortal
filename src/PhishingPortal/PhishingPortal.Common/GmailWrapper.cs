@@ -25,9 +25,12 @@
         public ILogger<GmailWrapper> Logger { get; }
         public SmtpClient SmtpClient { get; }
 
-        public async Task SendEmailAsync(string email, string subject, string content, string correlationId = "")
+        public async Task SendEmailAsync(string email, string subject, string content, string correlationId = "", string from = "")
         {
-            var msg = new MailMessage(_smtpConfig.From, email);
+            if (string.IsNullOrEmpty(from))
+                from = _smtpConfig.From;
+
+            var msg = new MailMessage(from, email);
 
             msg.Priority = MailPriority.Normal;
             msg.Body = content;

@@ -26,4 +26,9 @@
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Folder Include="Scripts\" />
+	</ItemGroup>
+
 </Project>

@@ -108,6 +108,7 @@ namespace PhishingPortal.Services.Notification
                             EmailRecipients = r.Recipient.Email,
                             EmailSubject = campaign.Subject,
                             EmailContent = content,
+                            EmailFrom = campaign.FromEmail,
                             LogEntry = new CampaignLog
                             {
                                 SecurityStamp = key,
@@ -186,6 +187,10 @@ namespace PhishingPortal.Services.Notification
 
                 case ScheduleTypeEnum.Weekly:
                     result = new WeeklySchedule(scheduleInfo).Eval();
+                    break;
+
+                case ScheduleTypeEnum.NoSchedule:
+                    result = true;
                     break;
 
             }

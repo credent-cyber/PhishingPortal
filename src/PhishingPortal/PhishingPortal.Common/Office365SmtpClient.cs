@@ -18,9 +18,9 @@ namespace PhishingPortal.Common
 
         public ILogger<Office365SmtpClient> Logger { get; }
 
-        public async Task SendEmailAsync(string to, string subject, string content, string correlationId)
+        public async Task SendEmailAsync(string to, string subject, string content, string correlationId, string from = "")
         {
-            Send(to, subject, content, correlationId: correlationId);
+            Send(to, subject, content, correlationId: correlationId, from: from);
             await Task.CompletedTask;
         }
 
@@ -31,13 +31,13 @@ namespace PhishingPortal.Common
             await Task.CompletedTask;
         }
 
-        private void Send(string to, string subject, string content, bool ishtml = true, string correlationId = "")
+        private void Send(string to, string subject, string content, bool ishtml = true, string correlationId = "", string from = "")
         {
             try
             {
                 SmtpMail oMail = new SmtpMail(_config.LicenseKey);
 
-                oMail.From = _config.From;
+                oMail.From = string.IsNullOrEmpty(from) ? _config.From : from;
                 oMail.To = to;
 
                 oMail.Subject = subject;

@@ -48,7 +48,14 @@ namespace PhishingPortal.Repositories
             {
                 campaign.ModifiedOn = now;
                 campaign.Detail.ModifiedOn = now;
+
+                if (campaign.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                {
+                    campaign.Schedule.ScheduleInfo = String.Empty;
+                }
+
                 TenantDbCtx.Campaigns.Update(campaign);
+
             }
             else
             {

@@ -9,6 +9,7 @@ namespace PhishingPortal.Services.Notification
         public string EmailRecipients { get; set; }
         public string EmailSubject { get; set; }
         public string EmailContent { get; set; }
+        public string EmailFrom { get; set; }
         public CampaignLog LogEntry { get; set; }
 
     }

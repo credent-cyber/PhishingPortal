@@ -110,17 +110,21 @@ else
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">CampaignScheduleType</label>
-                    <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
+                    <label class="form-label">Is Scheduled</label>
+                    <input type="checkbox" checked="@isScheduled" @oninput="OnScheduleTypeChange" class="form-check-input" />
+                    @* <InputSelect @onchange="OnScheduleTypeChange" @bind-Value="model.Schedule.ScheduleType" class="form-control" id="ScheduleType">
                         @foreach (var val in Enum.GetValues<ScheduleTypeEnum>())
-                            {
-                            <option value="@val">@val</option>
-                            }
-                    </InputSelect>
+                        {
+                        <option value="@val">@val</option>
+                        }
+                        </InputSelect>*@
                 </div>
-
                 <div class="form-group">
-                    @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+                    @if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                        {
+
+                        }
+                        else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
                         {
                             <label class="form-label">Scheduled Once</label>
                             <div class="input-group">
@@ -161,6 +165,17 @@ else
 
                         }
 
+                    </div>
+                    <div class="form-group">
+
+                        <label class="form-label">Return Page</label>
+                        <InputText @bind-Value="@model.ReturnUrl" id="ReturnUrl" class="form-control"></InputText>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phishing Email Address</label>
+                        <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
                     </div>
 
                     <div class="form-group">
@@ -236,13 +251,14 @@ else
 
 
 
-                   
+
                 </div> <!-- col-->
 
         </div>
 
-        <div class="row">
-            <div class="col"> <button class="btn btn-primary me-2" type="submit">Save Campaign</button>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary me-2" type="submit">Save Campaign</button>
                     @if (model.Id > 0)
                     {
                         <button @onclick="() => this.showImportDialog = true" class="btn btn-secondary me-2" type="button">Import Recipients</button>
@@ -257,8 +273,9 @@ else
                             <button @onclick="OnUnpublish" class="btn btn-outline-secondary  me-2" type="button">UnPublish Campaign</button>
                         }
 
-                    }</div>
-        </div>
+                    }
+                </div>
+            </div>
 
         </EditForm>
 
@@ -281,6 +298,7 @@ else
     bool showRecipients = false;
     bool showPreview = false;
     bool isloading = false;
+    bool isScheduled = false;
 
     public bool ShowDialog
     {
@@ -320,6 +338,12 @@ else
             if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
                 weeklySchedule = new WeeklySchedule(model.Schedule.ScheduleInfo);
 
+            if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                isScheduled = false;
+            else
+            {
+                isScheduled = true;
+            }
         }
         else
         {
@@ -349,7 +373,7 @@ else
 
         try
         {
-            await client.UpsertCampaignAsync(model);
+            model = await client.UpsertCampaignAsync(model);
         }
         catch (Exception ex)
         {
@@ -362,8 +386,9 @@ else
         message = "Updated successfully";
     }
 
-    protected void OnScheduleTypeChange()
+    protected void OnScheduleTypeChange(ChangeEventArgs e)
     {
+        isScheduled = (bool)e.Value;
         UpdateModelScheduleInfo();
     }
 
@@ -371,6 +396,15 @@ else
 
     private void UpdateModelScheduleInfo()
     {
+
+        if (isScheduled)
+        {
+            model.Schedule.ScheduleType = ScheduleTypeEnum.Once;
+        }
+        else
+        {
+            model.Schedule.ScheduleType = ScheduleTypeEnum.NoSchedule;
+        }
 
         if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
         {
@@ -385,6 +419,11 @@ else
         if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
         {
             model.Schedule.ScheduleInfo = weeklySchedule.ToString();
+        }
+
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+        {
+            model.Schedule.ScheduleInfo = string.Empty;
         }
     }
 
@@ -555,7 +594,7 @@ else
     {
         model.State = CampaignStateEnum.Published;
         await OnValidSubmit();
-       // message = "Published Successfully";
+        // message = "Published Successfully";
     }
 
     protected async Task OnUnpublish()
@@ -564,7 +603,7 @@ else
         {
             model.State = CampaignStateEnum.Draft;
             await OnValidSubmit();
-           // message = "Published Successfully";
+            // message = "Published Successfully";
         }
     }
 

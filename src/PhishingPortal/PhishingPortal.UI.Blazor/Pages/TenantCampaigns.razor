@@ -25,6 +25,7 @@ else
                 <th>Description</th>
                 <th>ScheduleType</th>
                 <th>Schedule</th>
+                <th>Status</th>
                 <th>IsActive</th>
             </tr>
         </thead>
@@ -39,6 +40,7 @@ else
                     <td>
                         @c.Schedule.ScheduleInfo
                     </td>
+                     <td>@c.State.ToString()</td>
                     <td>@c.IsActive</td>
                 </tr>
             }
