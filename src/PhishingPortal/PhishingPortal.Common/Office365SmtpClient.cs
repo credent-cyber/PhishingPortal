@@ -2,7 +2,6 @@
 
 namespace PhishingPortal.Common
 {
-
     using EASendMail;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ namespace PhishingPortal.Common
     public class Office365SmtpClient : IEmailClient
     {
         readonly SmtpClientConfig _config;
+
         public Office365SmtpClient(ILogger<Office365SmtpClient> logger, IConfiguration config)
         {
             _config = new SmtpClientConfig(config);
@@ -18,12 +18,12 @@ namespace PhishingPortal.Common
 
         public ILogger<Office365SmtpClient> Logger { get; }
 
-        public async Task SendEmailAsync(string to, string subject, string content, string correlationId, string from = "")
+        public async Task SendEmailAsync(string to, string subject, string content, bool isHtml = true, string correlationId = "", string from = "")
         {
-            Send(to, subject, content, correlationId: correlationId, from: from);
+            Send(to, subject, content, ishtml: isHtml, correlationId: correlationId, from: from);
             await Task.CompletedTask;
         }
-
+         
         public async Task SendEmailAsync(MailMessage message, string correlationId)
         {
             var to = string.Join(';', message.To.Select(o => o.Address));
@@ -43,23 +43,45 @@ namespace PhishingPortal.Common
                 oMail.Subject = subject;
 
                 if (ishtml)
-                    oMail.HtmlBody = content;
+                {
+                    var mpc = content.ToMimePartCollection(_config.ImageRoot);
+
+                    oMail.HtmlBody = mpc.Item2;
+
+                    foreach (var mp in mpc.Item1) 
+                    {
+                        oMail.MimeParts.Add(mp);
+                    }
+                }
                 else
+                {
                     oMail.TextBody = content;
+                }
 
                 SmtpServer oServer = new SmtpServer(_config.Server);
 
-                oServer.User = _config.User;
-
-                oServer.Password = _config.Password;
-
                 oServer.Port = _config.Port;
 
-                // detect SSL/TLS connection automatically
-                oServer.ConnectType = SmtpConnectType.ConnectSSLAuto;
+                if (_config.UseDefaultCredentials)
+                {
+                    oServer.UseDefaultCredentials = true;
+                }
+                else
+                {
+                    oServer.User = _config.User;
+                    oServer.Password = _config.Password;
+
+                    if (_config.ConnectType != -1
+                        && Enum.TryParse<SmtpConnectType>(_config.ConnectType.ToString(), out SmtpConnectType ctype))
+                    {
+                        oServer.ConnectType = ctype;
+                    }
+
+                }
 
                 Logger.LogInformation($"start to send email over SSL... correlationID:[{correlationId}]");
 
+                //oMail.SaveAs("d:/text.eml", true);
                 SmtpClient oSmtp = new SmtpClient();
                 oSmtp.SendMail(oServer, oMail);
 

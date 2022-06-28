@@ -462,7 +462,6 @@ else
                 {
                     index++;
                     continue;
-
                 }
 
                 try
@@ -594,7 +593,6 @@ else
     {
         model.State = CampaignStateEnum.Published;
         await OnValidSubmit();
-        // message = "Published Successfully";
     }
 
     protected async Task OnUnpublish()
@@ -603,7 +601,6 @@ else
         {
             model.State = CampaignStateEnum.Draft;
             await OnValidSubmit();
-            // message = "Published Successfully";
         }
     }
 

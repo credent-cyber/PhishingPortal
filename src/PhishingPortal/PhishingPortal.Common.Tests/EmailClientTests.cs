@@ -15,7 +15,7 @@ namespace PhishingPortal.Common.Tests
             {
                 var moqLogger = new Mock<ILogger<Office365SmtpClient>>();
                 var client = new Office365SmtpClient(moqLogger.Object, GetConfigurationRoot(AppDomain.CurrentDomain.BaseDirectory));
-                await client.SendEmailAsync("malay.pandey@credentinfotech.com", "test subject", "test content", Guid.NewGuid().ToString());
+                await client.SendEmailAsync("malay.pandey@credentinfotech.com", "test subject", "test content", true, Guid.NewGuid().ToString());
 
                 Assert.True(true);
             }

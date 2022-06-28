@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
+
+
+var config = (IConfiguration)builder.Configuration;
+
+builder.Services.AddLogging((builder) =>
+{
+    Serilog.Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+    builder.AddSerilog();
+});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
@@ -54,7 +66,7 @@ builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PhishingPortalDbContext>();
 
-builder.Services.AddSingleton<IEmailClient, Office365SmtpClient>();
+builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
 builder.Services.AddIdentityServer()
@@ -102,12 +114,10 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 

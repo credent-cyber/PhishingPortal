@@ -67,7 +67,7 @@ namespace PhishingPortal.Services.Notification
                             if (ecinfo != null)
                             {
                                 var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
-                                EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, ecinfo.LogEntry.ReturnUrl, ecinfo.EmailFrom);
+                                EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.ReturnUrl, ecinfo.EmailFrom);
                                 ecinfo.LogEntry.SentOn = DateTime.Now;
                                 db.Add(ecinfo.LogEntry);
                                 db.SaveChanges();

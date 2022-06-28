@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PhishingPortal.UI.Blazor;
 using PhishingPortal.UI.Blazor.Client;
+using Serilog;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,6 +14,15 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
 });
 
+var config = (IConfiguration)builder.Configuration;
+
+builder.Services.AddLogging((builder) =>
+{
+    Serilog.Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(config)
+    .CreateLogger();
+    builder.AddSerilog();
+});
 
 builder.Services.AddScoped<PhishingPortalClientState>();
 

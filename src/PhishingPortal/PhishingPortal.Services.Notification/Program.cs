@@ -1,10 +1,8 @@
 using PhishingPortal.Services.Notification;
-using Microsoft.Extensions.Configuration.Json;
 using PhishingPortal.DataContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Duende.IdentityServer.EntityFramework.Options;
 using PhishingPortal.Common;
+using Serilog;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -21,7 +19,13 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices((hostContext, services) =>
     {
-        services.AddLogging();
+        services.AddLogging((builder) =>
+        {
+            Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(hostContext.Configuration)
+            .CreateLogger();
+            builder.AddSerilog();
+        });
 
         var useSqlLite = hostContext.Configuration.GetValue<bool>("UseSqlLite");
         var connectionString = hostContext.Configuration.GetValue<string>("CentralDbConnString");
@@ -39,7 +43,7 @@ IHost host = Host.CreateDefaultBuilder(args)
             //TODO: 
         }
 
-        services.AddSingleton<IEmailClient, Office365SmtpClient>();
+        services.AddSingleton<IEmailClient, SmtpEmailClient>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
         services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
         services.AddHostedService<Worker>();

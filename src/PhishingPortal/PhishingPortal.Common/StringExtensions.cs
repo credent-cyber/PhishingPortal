@@ -1,5 +1,6 @@
 ﻿namespace PhishingPortal.Common
 {
+
     public static class StringExtensions
     {
      
@@ -19,15 +20,17 @@
             }
         }
 
-
-        // Compares a value by converting in MD5 hash with it provided hash value
+        /// <summary>
+        /// Compare Hash
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         public static bool CompareHash(this string value, string hash)
         {
             var tempHash = ComputeMd5Hash(value);
             return tempHash == hash;
         }
-
-
         
     }
 }

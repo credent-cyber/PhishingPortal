@@ -4,10 +4,9 @@
         @Message
     </div>
 }
-
-@if (IsError && !string.IsNullOrEmpty(Message))
+else if (IsError && !string.IsNullOrEmpty(Message))
 {
-    <div class="alert alert-primary" role="alert">
+    <div class="alert alert-warning" role="alert">
         @Message
     </div>
 }

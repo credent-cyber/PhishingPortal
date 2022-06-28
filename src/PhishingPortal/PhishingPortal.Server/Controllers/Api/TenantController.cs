@@ -6,6 +6,9 @@ using PhishingPortal.Repositories;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using PhishingPortal.Server.Services;
+using System.Xml.Linq;
+using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -116,6 +119,42 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-template")]
         public async Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template)
         {
+            var htmlDoc = new HtmlDocument();
+
+            htmlDoc.LoadHtml(template.Content);
+
+            foreach (var childNode in htmlDoc.DocumentNode.Descendants(2))
+            {
+                try
+                {
+                    if (childNode.Name != "img")
+                        continue;
+
+                    var src = childNode.Attributes["src"].Value;
+                    var alt = childNode.Attributes["alt"]?.Value;
+                   
+                    if (!src.StartsWith("data:image"))
+                        continue;
+                    var type = src.Split(";")[0];
+                    
+                    var encoded_value = src.Split(";")[1];
+                    var code = encoded_value.Split(",")[0];
+                    var base64Content = encoded_value.Split(",")[1];
+                    var bytes = Convert.FromBase64String(base64Content);
+                    var ext = "jpeg";
+                    var nm = $"{Guid.NewGuid().ToString()}.{ext}";
+                    System.IO.File.WriteAllBytes(Path.Combine(@"D:\Credent\Git\PhishingPortal\src\PhishingPortal\PhishingPortal.UI.Blazor\wwwroot\img\", nm), bytes);
+
+                    childNode.SetAttributeValue("src", $"img\\{nm}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, ex.Message);
+                }
+            }
+
+            template.Content = htmlDoc.DocumentNode.WriteTo();
+
             return await _tenantRepository.UpsertTemplate(template);
         }
 
