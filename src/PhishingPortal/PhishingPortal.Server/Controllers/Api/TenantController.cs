@@ -19,11 +19,15 @@ namespace PhishingPortal.Server.Controllers.Api
     {
 
         readonly TenantRepository _tenantRepository;
-        public TenantController(ILogger<TenantController> logger, ITenantAdminRepository adminRepository, 
+        readonly string _templateImageRootPath;
+      
+        public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository, 
             IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
             base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
+
+            _templateImageRootPath = appConfig.GetValue<string>("TemplateImgRootPath");
         }
 
         [HttpGet]
@@ -152,9 +156,9 @@ namespace PhishingPortal.Server.Controllers.Api
                     var bytes = Convert.FromBase64String(base64Content);
                     var ext = "jpeg";
                     var nm = $"{Guid.NewGuid().ToString()}.{ext}";
-                    System.IO.File.WriteAllBytes(Path.Combine(@"D:\Credent\Git\PhishingPortal\src\PhishingPortal\PhishingPortal.UI.Blazor\wwwroot\img\", nm), bytes);
+                    System.IO.File.WriteAllBytes(Path.Combine(_templateImageRootPath, nm), bytes);
 
-                    childNode.SetAttributeValue("src", $"img\\{nm}");
+                    childNode.SetAttributeValue("src", $"img/email/{nm}");
                 }
                 catch (Exception ex)
                 {
