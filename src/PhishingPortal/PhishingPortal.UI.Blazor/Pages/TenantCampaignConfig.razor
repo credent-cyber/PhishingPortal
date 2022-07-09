@@ -12,9 +12,6 @@
 
 <h3>Campaign Configuration</h3>
 
-
-
-
 @if (model == null || isloading)
 {
     <div class="loading-bar"></div>
@@ -291,7 +288,7 @@ else
     string message = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
-    bool HasHeader = false;
+    bool HasHeader = true;
     Campaign model = null;
 
     bool showImportDialog = false;
@@ -485,7 +482,9 @@ else
                                 };
 
                             r.Validate();
-                            recipients.Add(r);
+
+                            if(!recipients.Any(i => i.Email == r.Email))
+                                recipients.Add(r);
                         }
 
                     }

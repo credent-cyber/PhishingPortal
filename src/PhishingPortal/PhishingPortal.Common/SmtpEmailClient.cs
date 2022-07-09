@@ -11,17 +11,24 @@
         {
             Logger = logger;
 
-            _smtpConfig = new SmtpClientConfig(config);
+            _smtpConfig = new SmtpClientConfig(config, logger);
             SmtpClient = new SmtpClient(_smtpConfig.Server, _smtpConfig.Port);
 
-            SmtpClient.EnableSsl = _smtpConfig.EnableSsl;
+            if (SmtpClient.EnableSsl)
+            {
+                Logger.LogInformation($"EnableSsl: True");
+                SmtpClient.EnableSsl = _smtpConfig.EnableSsl;
+            }
+               
 
             if (_smtpConfig.UseDefaultCredentials)
             {
+                Logger.LogInformation($"UseDefaultCredentials: True");
                 SmtpClient.UseDefaultCredentials = true;
             }
             else
             {
+                Logger.LogInformation($"NetworkCredentials Applied");
                 SmtpClient.Credentials = new NetworkCredential(_smtpConfig.From, _smtpConfig.Password);
             }
         }
@@ -41,11 +48,13 @@
         /// <returns></returns>
         public async Task SendEmailAsync(string email, string subject, string content, bool isHtml = true, string correlationId = "", string from = "")
         {
+            
+            Logger.LogInformation($"SendEmailAsync - Start");
             if (string.IsNullOrEmpty(from))
                 from = _smtpConfig.From;
 
             var msg = new MailMessage(from, email);
-
+            Logger.LogInformation($"MailTo: {email}");
             msg.Priority = MailPriority.Normal;
             msg.IsBodyHtml = isHtml;
 
@@ -58,11 +67,19 @@
             {
                 msg.Body = content;
             }
+            Logger.LogDebug($"Mail Body Content - {content}");
 
             msg.Subject = subject;
+
+            Logger.LogDebug($"Mail Subject - {subject}");
             msg.Sender = new MailAddress(_smtpConfig.From);
             msg.BodyEncoding = System.Text.Encoding.UTF8;
-            await SendEmailAsync(msg);
+
+            if(!_smtpConfig.IsSendingEnabled)
+               Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
+            else 
+                await SendEmailAsync(msg);
+
             await Task.CompletedTask;
         }
 

@@ -13,4 +13,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\PhishingPortal.Common\PhishingPortal.Common.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="mail.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

@@ -136,34 +136,12 @@ namespace PhishingPortal.Services.Notification
             catch (Exception ex)
             {
                 campaign.State = Dto.CampaignStateEnum.Aborted;
+                dbContext.Update(campaign);
+                dbContext.SaveChanges();
                 Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
             }
 
             await Task.CompletedTask;
-        }
-
-
-        /// <summary>
-        /// Setup dbcontext builder based on the tenantdata configuration
-        /// </summary>
-        /// <param name="connString"></param>
-        /// <returns></returns>
-        protected DbContextOptionsBuilder<TenantDbContext> SetupDbContextBuilder(TenantData? connString)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
-
-            if (Tenant.DatabaseOption == DbOptions.SqlLite)
-            {
-                var cstr = connString.Value.Replace("./App_Data", _sqlLiteDbPath);
-                optionsBuilder.UseSqlite(cstr);
-            }
-            else if (Tenant.DatabaseOption == DbOptions.MySql)
-            {
-                // TODO: Mysql provider
-                //optionsBuilder.UseMySql()
-            }
-
-            return optionsBuilder;
         }
 
         /// <summary>

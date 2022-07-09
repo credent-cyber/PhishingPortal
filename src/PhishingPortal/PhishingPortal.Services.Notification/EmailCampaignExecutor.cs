@@ -24,6 +24,7 @@ namespace PhishingPortal.Services.Notification
             Queue = new ConcurrentQueue<EmailCampaignInfo>();
 
             _executorDelayInSeconds = config.GetValue<int>("EmailCampaignExectorDelayInSeconds");
+            logger.LogInformation($"EmailCampaignExectorDelayInSeconds: {_executorDelayInSeconds}");
             if (_executorDelayInSeconds <= 0)
                 _executorDelayInSeconds = 1;
         }
@@ -54,7 +55,7 @@ namespace PhishingPortal.Services.Notification
 
         private Task ExecuteTask()
         {
-            return new Task(() =>
+            return new Task(async () =>
             {
 
                 try
@@ -66,11 +67,17 @@ namespace PhishingPortal.Services.Notification
                         {
                             if (ecinfo != null)
                             {
+                                Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
+                                
                                 var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
-                                EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.ReturnUrl, ecinfo.EmailFrom);
+                                await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.ReturnUrl, ecinfo.EmailFrom);
+
+                                Logger.LogInformation($"Email sent");
+
                                 ecinfo.LogEntry.SentOn = DateTime.Now;
                                 db.Add(ecinfo.LogEntry);
                                 db.SaveChanges();
+                                Logger.LogInformation($"CampaignLog with id: [{ecinfo.LogEntry.Id}] updated");
                             }
 
                         }

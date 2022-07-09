@@ -31,7 +31,16 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("Campaigns/{pageIndex?}/{pageSize?}")]
         public async Task<IEnumerable<Campaign>> Get(int pageIndex = 0, int pageSize = 10)
         {
-            return await _tenantRepository.GetAllCampaigns(pageIndex, pageSize);
+            try
+            {
+                var result = await _tenantRepository.GetAllCampaigns(pageIndex, pageSize);
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         [HttpGet]

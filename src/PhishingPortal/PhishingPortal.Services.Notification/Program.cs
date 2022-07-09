@@ -40,7 +40,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         }
         else
         {
-            //TODO: 
+            var conString = hostContext.Configuration.GetConnectionString("DefaultConnection");
+            var ctxBuilder = new DbContextOptionsBuilder<CentralDbContext>();
+            ctxBuilder.UseMySql(conString, ServerVersion.AutoDetect(conString));
+            services.AddSingleton<CentralDbContext>(new CentralDbContext(ctxBuilder.Options));
         }
 
         services.AddSingleton<IEmailClient, SmtpEmailClient>();

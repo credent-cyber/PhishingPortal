@@ -12,7 +12,7 @@ namespace PhishingPortal.Common
 
         public Office365SmtpClient(ILogger<Office365SmtpClient> logger, IConfiguration config)
         {
-            _config = new SmtpClientConfig(config);
+            _config = new SmtpClientConfig(config, logger);
             Logger = logger;
         }
 
@@ -23,7 +23,7 @@ namespace PhishingPortal.Common
             Send(to, subject, content, ishtml: isHtml, correlationId: correlationId, from: from);
             await Task.CompletedTask;
         }
-         
+
         public async Task SendEmailAsync(MailMessage message, string correlationId)
         {
             var to = string.Join(';', message.To.Select(o => o.Address));
@@ -38,6 +38,10 @@ namespace PhishingPortal.Common
                 SmtpMail oMail = new SmtpMail(_config.LicenseKey);
 
                 oMail.From = string.IsNullOrEmpty(from) ? _config.From : from;
+
+#if DEBUG
+                oMail.From = _config.From;
+#endif
                 oMail.To = to;
 
                 oMail.Subject = subject;
@@ -48,7 +52,7 @@ namespace PhishingPortal.Common
 
                     oMail.HtmlBody = mpc.Item2;
 
-                    foreach (var mp in mpc.Item1) 
+                    foreach (var mp in mpc.Item1)
                     {
                         oMail.MimeParts.Add(mp);
                     }
@@ -81,9 +85,12 @@ namespace PhishingPortal.Common
 
                 Logger.LogInformation($"start to send email over SSL... correlationID:[{correlationId}]");
 
-                //oMail.SaveAs("d:/text.eml", true);
                 SmtpClient oSmtp = new SmtpClient();
-                oSmtp.SendMail(oServer, oMail);
+
+                if (!_config.IsSendingEnabled)
+                    Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
+                else
+                    oSmtp.SendMail(oServer, oMail);
 
                 Logger.LogInformation($"Email with CorrelationID:[{correlationId}] was sent successfully!");
             }

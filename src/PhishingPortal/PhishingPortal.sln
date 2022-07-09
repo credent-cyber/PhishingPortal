@@ -43,7 +43,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{826310BD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Common.Tests", "PhishingPortal.Common.Tests\PhishingPortal.Common.Tests.csproj", "{F40BFD9F-84D1-4540-92DD-1BBEBB7F4B5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailTest", "MailTest\MailTest.csproj", "{6C144622-8820-4D1C-BB73-8F72965144A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +109,10 @@ Global
 		{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C144622-8820-4D1C-BB73-8F72965144A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C144622-8820-4D1C-BB73-8F72965144A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C144622-8820-4D1C-BB73-8F72965144A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C144622-8820-4D1C-BB73-8F72965144A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{6F36DBEA-5DC6-442B-AB0F-C37448766E72} = {363AB036-0661-460E-B9EF-86B5CB5F444A}
 		{F40BFD9F-84D1-4540-92DD-1BBEBB7F4B5C} = {826310BD-B0B2-469C-AFEC-EB44FBA4CF24}
 		{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA} = {8F04C3DA-E1DD-483D-A463-0CAB14B85827}
+		{6C144622-8820-4D1C-BB73-8F72965144A8} = {8F04C3DA-E1DD-483D-A463-0CAB14B85827}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3B8205F-FBA7-4A7D-BFCB-4EDF19CE3CD8}

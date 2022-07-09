@@ -364,3 +364,4 @@ FodyWeavers.xsd
 *.db-shm
 *.db-wal
 *.zip
+src/PhishingPortal/PhishingPortal.UI.Blazor/wwwroot/img/email/
