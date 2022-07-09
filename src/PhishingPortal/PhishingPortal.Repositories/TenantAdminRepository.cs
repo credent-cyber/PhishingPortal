@@ -90,7 +90,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<Tenant> GetByUniqueId(string uniqueId)
         {
-            return await Task.FromResult(CentralDbContext.Tenants.Where(x => x.UniqueId == uniqueId).FirstOrDefault());
+            return await Task.FromResult(CentralDbContext.Tenants.Where(x => x.UniqueId == uniqueId).Include(t => t.Settings).FirstOrDefault());
         }
 
         /// <summary>

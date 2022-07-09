@@ -1,20 +1,26 @@
-﻿@page "/cmpgn/{Key}/{Url?}"
-@page "/cmp/{Key}/{Url?}"
+﻿@page "/cmpgn/{TenantId}/{Key}/{Url?}"
+@page "/cmp/{TenantId}/{Key}/{Url?}"
 
 <h3>@Title</h3>
 
+@using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 
 @inject TenantClient client
+@inject HttpClient httpClient;
 @inject ILogger<TenantCampaigns> logger
 @inject NavigationManager navigation
 
 @code {
 
     public string Title { get; set; } = "Wait ....";
-    
+
     [Parameter]
     public string Key { get; set; } = string.Empty;
+
+       [Parameter]
+    public string TenantId { get; set; } = string.Empty;
+
     [Parameter]
     public string Url { get; set; } = string.Empty;
 
@@ -26,14 +32,28 @@
 
         try
         {
-            if (await client.CampaignHit(Key))
+            var payload = new GenericApiRequest<string>() { Param = Key };
+            var result = await httpClient.PostAsJsonAsync<GenericApiRequest<string>>($"api/tenant/campaign-hit?t={TenantId}", payload);
+            result.EnsureSuccessStatusCode();
+
+            if (result.IsSuccessStatusCode)
+            {
                 Redirect();
+            }
             else
-                navigation.NavigateTo("/error");
+            {
+                 navigation.NavigateTo("/error");
+            }
+
+            //if (await client.CampaignHit(Key))
+            //    Redirect();
+            //else
+            //    navigation.NavigateTo("/error");
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
+            navigation.NavigateTo("/error");
         }
 
         await Task.CompletedTask;

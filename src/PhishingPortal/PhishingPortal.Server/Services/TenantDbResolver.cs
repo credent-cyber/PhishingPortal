@@ -19,13 +19,25 @@ namespace PhishingPortal.Server.Services
             {
 
                 var usr = httpContextAccessor?.HttpContext?.User;
-                var email = usr?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
-                var domain = email?.Value.Split("@")[1];
 
-                if (domain == null)
-                    throw new InvalidOperationException("Tenant couldn't be resolved");
+                var isAuthenticated = usr?.Identity?.IsAuthenticated;
 
-                _tenant = adminRepository.GetByDomain(domain).Result;
+                if (isAuthenticated.HasValue && isAuthenticated.Value)
+                {
+                    var email = usr?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+                    var domain = email?.Value.Split("@")[1];
+
+                    if (domain == null)
+                        throw new InvalidOperationException("Tenant couldn't be resolved");
+
+                    _tenant = adminRepository.GetByDomain(domain).Result;
+                }
+                else
+                {
+                    var tenantId = httpContextAccessor?.HttpContext?.Request.Query["t"];
+                    if (tenantId.HasValue && !string.IsNullOrEmpty(tenantId))
+                        _tenant = adminRepository.GetByUniqueId(tenantId).Result;
+                }
 
                 if (Tenant == null)
                     throw new InvalidOperationException("Tenant couldn't be resolved");
@@ -41,7 +53,7 @@ namespace PhishingPortal.Server.Services
                 {
                     optionsBuilder.UseSqlite(dbSetting.Value);
                 }
-                else if(Tenant.DatabaseOption == DbOptions.MySql)
+                else if (Tenant.DatabaseOption == DbOptions.MySql)
                 {
                     optionsBuilder.UseMySql(dbSetting.Value, ServerVersion.AutoDetect(dbSetting.Value));
                 }

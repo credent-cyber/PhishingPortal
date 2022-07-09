@@ -12,7 +12,7 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureAppConfiguration((hostContext, config) =>
     {
-
+        Console.WriteLine($"Enivronment: {hostContext.HostingEnvironment.EnvironmentName}");
         config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", true, true);
 

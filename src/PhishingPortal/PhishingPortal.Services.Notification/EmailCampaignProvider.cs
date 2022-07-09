@@ -99,7 +99,7 @@ namespace PhishingPortal.Services.Notification
 
                         var timestamp = DateTime.Now;
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
-                        var returnUrl = $"{BaseUrl}/{key}";
+                        var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
                         var content = template.Content.Replace("###RETURN_URL###", returnUrl);
 
                         var ecinfo = new EmailCampaignInfo()
