@@ -9,18 +9,7 @@ namespace PhishingPortal.DataContext
     using PhishingPortal.Domain;
     using PhishingPortal.Dto;
 
-    public class CentralDbContext  : DbContext
-    {
-        public CentralDbContext(DbContextOptions<CentralDbContext> options)
-            :base(options)
-        {
-
-        }
-        public DbSet<Tenant> Tenants { get; set; }
-        public DbSet<TenantDomain> TenantDomain { get; set; }
-
-    }
-
+   
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {
         static bool _recreateDb = false;
