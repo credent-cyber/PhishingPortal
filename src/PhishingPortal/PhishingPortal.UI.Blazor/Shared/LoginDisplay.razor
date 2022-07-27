@@ -12,7 +12,6 @@
             <text>...</text>
         </Authorizing>
         <Authorized>
-
             <div class="dropdown">
                 <img height="24px" width="24px" src="img/user.png" />
                 <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1"
@@ -24,15 +23,16 @@
                     <li><a @onclick="BeginSignOut" class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </div>
-
         </Authorized>
         <NotAuthorized>
 
+
             <div class=container>
                 <img height="24px" width="24px" src="img/user.png" />
-                <a class="btn btn-primary btn-outline-dark" href="authentication/login">Already Have Account</a>
-                <a class="btn btn-outline-dark" href="#">Request Demo</a>
+                <a class="btn btn-secondary btn-outline-warning" href="authentication/login">Already Have Account</a>
+                <a class="btn btn-secondary btn-outline-info" href="#">Request Demo</a>
             </div>
+
 
         </NotAuthorized>
     </AuthorizeView>

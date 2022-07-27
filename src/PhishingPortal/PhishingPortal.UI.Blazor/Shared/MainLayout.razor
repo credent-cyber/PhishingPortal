@@ -15,15 +15,6 @@
 
     <main>
 
-        <nav class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="/img/logo-img.png" alt="" class="img-thumbnail">
-                </a>
-               
-                <LoginDisplay />
-            </div>
-        </nav>
 
         @*<div class="top-row px-4">
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
@@ -32,8 +23,37 @@
 
         <AuthorizeView>
             <NotAuthorized>
+                    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
+                        <div class="m-header">
+                           
+                            <a href="#!" class="b-brand">
+                                <img src="/custom/assets/images/credent_solutions_logo.png" alt="Credent Infotech" class="img-responsive"
+                                    width="220" height="45">
+                            </a>
+           
+                        </div>
+                             <ul class="navbar-nav ml-auto">
+                                <li class="nav-item">
+                                    <div style="float:right; marrgin-right:1%">
+                                        <LoginDisplay />
+                                     </div>
+                                </li>
+                            </ul>
+                    </header>
 
-                <div class="container">
+
+
+@*                <nav class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="/img/logo-img.png" alt="" class="img-thumbnail">
+                </a>
+               
+                <LoginDisplay />
+            </div>
+        </nav>*@
+        
+                <div class="container" style="margin-top:10%">
 
                     <div class="row" style="background-color:currentColor;">
                         <div class="col-lg-6 col-md-10 col-sm-10" style="padding-top: calc(10%)">
@@ -65,7 +85,9 @@
         </AuthorizeView>
 
         <article class="content px-4">
-            @Body
+            <div style="margin-top:7%">
+                @Body
+            </div>
         </article>
     </main>
 </div>
