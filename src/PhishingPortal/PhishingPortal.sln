@@ -45,7 +45,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Common.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailTest", "MailTest\MailTest.csproj", "{6C144622-8820-4D1C-BB73-8F72965144A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailTest", "MailTest\MailTest.csproj", "{6C144622-8820-4D1C-BB73-8F72965144A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

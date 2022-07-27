@@ -18,6 +18,8 @@ namespace PhishingPortal.Dto
 
         [ForeignKey("RecipientGroupId")]
         public virtual RecipientGroup RecipientGroup { get; set; }
+
+
     }
 
 }

@@ -7,17 +7,17 @@ namespace PhishingPortal.UI.Blazor.Client
     public class TenantClient : BaseHttpClient
     {
         public TenantClient(ILogger<TenantClient> logger, HttpClient httpClient)
-            :base(logger, httpClient)
+            : base(logger, httpClient)
         {
 
         }
 
-        public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex = 0, int pageSize = 10)
+        public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
             IEnumerable<Campaign> campaigns;
             try
             {
-                var res = await HttpClient.GetAsync("api/Tenant/Campaigns?pageIndex={pageIndex}&pageSize={pageSize}");
+                var res = await HttpClient.GetAsync($"api/Tenant/Campaigns/{pageIndex}/{pageSize}");
 
                 res.EnsureSuccessStatusCode();
 
@@ -56,7 +56,8 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<IEnumerable<CampaignTemplate>> GetCampaignTemplates()
         {
-            List<CampaignTemplate>  templates = Enumerable.Empty<CampaignTemplate>().ToList();
+            List<CampaignTemplate> templates = Enumerable.Empty<CampaignTemplate>().ToList();
+
             try
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
@@ -74,6 +75,8 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return templates;
         }
+
+
 
         public async Task<Campaign> UpsertCampaignAsync(Campaign campaign)
         {
@@ -114,7 +117,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 res.EnsureSuccessStatusCode();
 
                 result = await res.Content.ReadFromJsonAsync<ApiResponse<List<RecipientImport>>>();
-             
+
             }
             catch (Exception ex)
             {
@@ -156,7 +159,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var url = $"api/tenant/templates-by-type";
                 if (type.HasValue)
-                    url += $"/{ type.Value }";
+                    url += $"/{type.Value}";
                 var res = await HttpClient.GetAsync(url);
                 res.EnsureSuccessStatusCode();
 
@@ -182,7 +185,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 result = await res.Content.ReadFromJsonAsync<CampaignTemplate>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
                 throw;
@@ -224,7 +227,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 if (json != null)
                     return json.Result;
-                
+
             }
             catch (Exception ex)
             {
@@ -232,7 +235,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
 
-            return false ;
+            return false;
         }
 
         public async Task<MonthlyPhishingBarChart?> GetMonthlyBarChartEntires(int year)
@@ -263,6 +266,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/tenant/category-wise-phising-test-prone-percent/{startDate.ToString("MM-dd-yyyy")}/{endDate.ToString("MM-dd-yyyy")}");
                 res.EnsureSuccessStatusCode();
+
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<CategoryWisePhishingTestData>>();
 

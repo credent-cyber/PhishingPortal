@@ -7,56 +7,147 @@
 
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
-
-<h3>Campaign Templates</h3>
-
-
+@inject IJSRuntime JSRuntime
 
 @if (Templates == null)
 {
-    <div class="loading-bar"></div>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <div class="col-sm-12">
+
+            <div class="card-header">
+              <div class="loading-bar"></div>
+            </div>
+     
+    </div>
 }
 else
 {
     <div class="row">
-        <div class="col-sm-10 col-lg-3 col-md-3">  <button class="btn btn-primary" @onclick="OnNewClick"><span class="oi oi-plus"></span></button></div>
+      <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>All Templates</h5>
+                <button class="btn btn-primary" @onclick="OnNewClick"><span class="oi oi-plus"></span></button>            
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                   <table id="order-table" class="table table-striped table-bordered nowrap">
+                        <thead>
+                            <tr role="row">
+                            <th>Template Name</th>
+                            <th>IsActive</th>
+                            <th>IsHtml</th>
+                            <th>Campaign Type</th>
+                            <th>Version</th>
+                            <th>Preview</th>                  
+                            </tr>
+                        </thead>
+                        <tbody> 
+                            @foreach (var t in Templates)
+                            {
+                            <tr>
+                           
+                                <td>@t.Name </td>                        
+                                <td>@t.IsActive</td>
+                                <td>@t.IsHtml</td>
+                                <td>@t.Type</td>
+                                <td>@t.Version</td>
+                  
+                                <td>
+                                                           
+                                    <button  @onclick="() => OnPreviewClick(t)" title="View" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></button>
+                                    <button  @onclick="() => OnEditClick(t)" title="Edit" class="btn btn-primary btn-sm"><i class="fa fa-pencil-square-o"></i></button>
+                                    <button  title="Delete" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                }
+                        </tbody>
+                   </table>
+                               <div style="float:right">
+                                          <nav aria-label="Page navigation example">
+                                              <ul class="pagination">
+                                                            <li class="page-item"><button class="page-link" @onclick="Prevv">Previous</button></li>
+                                                            <li class="page-item"><a class="page-link">@pageIndext</a></li>
+                                                            <li class="page-item"><button class="page-link" @onclick="Nextt">Next</button></li>
+                                              </ul>
+                                          </nav>
+                               </div>                      
+                    
+                      @*<div class="modal fade sendTemplate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Template Name</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group row">
+                                <label for="txtReceiverName" class="col-form-label col-md-3" style="padding-right: 0;padding-left: 14px;">Receiver Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="txtReceiverName">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtReceiverEmail" class="col-form-label col-md-3" style="padding-right: 0;">Receiver Email</label>
+                                <div class="col-md-9">
+                                    <input type="email" class="form-control" id="txtReceiverEmail">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtSenderEmail" class="col-form-label col-md-3" style="padding-right: 0;">Sender Email</label>
+                                <div class="col-md-9">
+                                    <input type="email" class="form-control" id="txtSenderEmail">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtSenderName" class="col-form-label col-md-3" style="padding-right: 0;">Sender Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="txtSenderName">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="txtSubject" class="col-form-label col-md-3">Subject</label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="txtSubject">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn  btn-primary">Submit</button>
+                        <button type="button" class="btn  btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                        </div>
+                        </div>
+                        </div>*@
+                </div>
+            </div>
+        </div>
     </div>
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr><th>Name</th><th>IsActive</th><th>IsHtml</th><th>CampaignType</th><th>Version</th><th>Preview</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Templates)
-            {
-                <tr>
-                    <td>
-                        @t.Name
-                    </td>
-                    <td>@t.IsActive</td>
-                    <td>@t.IsHtml</td>
-                    <td>@t.Type</td>
-                    <td>@t.Version</td>
-                    <td><button type="button" @onclick="() => OnPreviewClick(t)" class="btn btn-outline-dark"><span class="oi oi-eye"></span></button></td>
-                    <td><button type="button" @onclick="() => OnEditClick(t)" class="btn btn-outline-dark"><span class="oi oi-pencil"></span></button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+</div>
 
 }
 
 <div class="edit-dialog-container">
 
-    <DialogTemplate Show="showNewDialog" Title="@Title">
-
+    <DialogTemplate Show="showNewDialog" Title = "@Title" >
+        
+        <br/>
         @if (loading)
         {
-            <div class="loading-bar"></div>
+               <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                <div class="col-sm-12">
+
+                        <div class="card-header">
+                          <div class="loading-bar"></div>
+                        </div>
+     
+                </div>
         }
         else
         {
-            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
-            <EditForm Model="@model" class="form" OnValidSubmit="OnSave">
+          <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+          <EditForm Model="@model" class="form" OnValidSubmit="OnSave">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -64,7 +155,7 @@ else
                     <label for="Name" class="form-label">Name Of Template</label>
                     <InputText id="Name" @bind-Value="model.Name" class="form-control" />
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 form-check">
                     <InputCheckbox id="IsActive" @bind-Value="model.IsActive" class="form-check-input" />
                     <label for="IsActive" class="form-check-label">Is Active</label>
                 </div>
@@ -79,8 +170,8 @@ else
                         {
                         <option value="@val">@val</option>
                         }
-                </InputSelect>
-            </div>
+                    </InputSelect>
+                </div>
             <div class="mb-3">
                 <label for="Content" class="form-label">Template Content</label>
                 <!-- Rich text editor -->
@@ -125,7 +216,7 @@ else
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
             <button class="btn btn-secondary" @onclick="() => showNewDialog = false">Close</button>
-        </EditForm>
+          </EditForm>
 
 
         }
@@ -194,6 +285,15 @@ else
     {
         Templates = await client.GetTemplatesByType(type);
 
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/form-select-custom.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.dataTables.min.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/dataTables.bootstrap4.min.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/buttons.colVis.min.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/dataTables.buttons.min.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/data-basic-custom.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.bootstrap.wizard.min.js");
+
+
     }
 
     public void OnValidSubmit()
@@ -260,4 +360,20 @@ else
 
     }
 
+    int pageSize = 5;
+    int pageIndex = 0;
+    int pageIndext = 0;
+    public void Prevv()
+    {
+        
+        if(pageIndex>0){ pageIndex--;} 
+        pageIndext = pageIndex;
+       // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
+    }
+    public void Nextt()
+    {
+        pageIndex++; 
+        pageIndext = pageIndex;
+     
+    }
 }

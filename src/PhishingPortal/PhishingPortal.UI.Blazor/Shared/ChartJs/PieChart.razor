@@ -41,7 +41,8 @@
 
         var config = new
         {
-            Type = "pie",
+
+            Type = Type.ToString(),
             Options = new
             {
                 Responsive = Responsive,
@@ -63,6 +64,7 @@
                     }
                 }
             },
+   
             Data = new
             {
                 Datasets = new[]

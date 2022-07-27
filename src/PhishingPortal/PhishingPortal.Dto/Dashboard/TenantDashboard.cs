@@ -7,9 +7,11 @@ namespace PhishingPortal.Dto.Dashboard
 
     public enum ChartType
     {
-        Pie,
-        Bar,
-        Line
+        pie,
+        doughnut,
+        polarArea,
+        bar,
+        line
     }
 
     /// <summary>
@@ -21,7 +23,11 @@ namespace PhishingPortal.Dto.Dashboard
         public DateTime EndDate { get; set; }
         public int TotalCampaigns { get; set; }
         public List<PhisingPronePercentEntry> Entries { get; set; }
+        // public List<DepartmentWiseCnt> DepartEntries { get; set; }
         public Dictionary<string, decimal> CategoryClickRatioDictionary { get; set; }
+        public Dictionary<string, decimal> DepartEntries { get; set; }
+        public Dictionary<string, decimal> TemplateClickEntries { get; set; }
+
 
     }
 
@@ -44,6 +50,22 @@ namespace PhishingPortal.Dto.Dashboard
             }
         }
     }
+    //public class DepartmentWiseCnt
+    //{
+    //    public Recipient Depart { get; set; }
+    //    public int TotalCount { get; set; }
+    //    public int TotalHits { get; set; }
+    //    public decimal DepartmntPronePercentage
+    //    {
+    //        get
+    //        {
+    //            if (TotalCount == 0)
+    //                return 0;
+
+    //            return (TotalHits / TotalCount) * 100;
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// Represents entries for monthly campaigns and hits
@@ -62,7 +84,7 @@ namespace PhishingPortal.Dto.Dashboard
     public class MonthlyPhishingBarChartEntry
     {
         public Months Month { get; set; }
-        public int TotalCampaigns { get; set; }
+        public int TotalCount { get; set; }
         public int TotalHits { get; set; }
         public decimal HitPronePercent { get; set; }
     }
@@ -91,7 +113,7 @@ namespace PhishingPortal.Dto.Dashboard
         public string Label { get; set; } = "Default Label";
         public string[] Data { get; set; }
         public string[] BackgroundColor { get; set; }
-       
+
     }
 
 }

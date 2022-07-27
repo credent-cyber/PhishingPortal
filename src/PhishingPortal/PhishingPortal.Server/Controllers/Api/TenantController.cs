@@ -20,8 +20,8 @@ namespace PhishingPortal.Server.Controllers.Api
 
         readonly TenantRepository _tenantRepository;
         readonly string _templateImageRootPath;
-      
-        public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository, 
+
+        public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
             IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
             base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
@@ -82,7 +82,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 campaign.CreatedOn = DateTime.Now;
                 campaign.State = CampaignStateEnum.Draft;
             }
-                
+
             return await _tenantRepository.UpsertCampaign(campaign);
         }
 
@@ -145,11 +145,11 @@ namespace PhishingPortal.Server.Controllers.Api
 
                     var src = childNode.Attributes["src"].Value;
                     var alt = childNode.Attributes["alt"]?.Value;
-                   
+
                     if (!src.StartsWith("data:image"))
                         continue;
                     var type = src.Split(";")[0];
-                    
+
                     var encoded_value = src.Split(";")[1];
                     var code = encoded_value.Split(",")[0];
                     var base64Content = encoded_value.Split(",")[1];
@@ -181,7 +181,7 @@ namespace PhishingPortal.Server.Controllers.Api
             {
                 bool outcome = await _tenantRepository.CampaignHit(request.Param);
                 result.IsSuccess = outcome;
-                result.Message = "Successful"; 
+                result.Message = "Successful";
                 result.Result = outcome;
             }
             catch (Exception ex)

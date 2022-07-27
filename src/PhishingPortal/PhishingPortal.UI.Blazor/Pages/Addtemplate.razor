@@ -1,0 +1,232 @@
+﻿@page "/addtemplate"
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using System.Text.RegularExpressions
+@using Blazored.TextEditor
+@inject IJSRuntime JSRuntime
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+
+<div class="edit-dialog-container">
+ <div class="pcoded-content" style="padding-top: 10px;">
+
+        <div class="row">
+            <div class="col-md-12">
+ 
+                <br/>
+                @if (loading)
+                {
+                    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                    <div class="col-sm-12">
+      
+                            <div class="card-header">
+                              <div class="loading-bar"></div>
+                            </div>
+   
+                    </div>
+                }
+                else
+                {
+                  <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+                 @* <EditForm Model="@model" class="form" OnValidSubmit="OnSave">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Name Of Template</label>
+                            <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                        </div>
+                        <div class="mb-3 form-check">
+                            <InputCheckbox id="IsActive" @bind-Value="model.IsActive" class="form-check-input" />
+                            <label for="IsActive" class="form-check-label">Is Active</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <InputCheckbox id="IsHtml" @bind-Value="model.IsHtml" class="form-check-input" />
+                            <label for="IsHtml" class="form-check-label">Is Html</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Type" class="form-label">Campaign Type</label>
+                            <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                @foreach (var val in Enum.GetValues<CampaignType>())
+                                {
+                                <option value="@val">@val</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    <div class="mb-3">
+                        <label for="Content" class="form-label">Template Content</label>
+                        <!-- Rich text editor -->
+                        <BlazoredTextEditor @ref="@QuillHtml">
+                            <ToolbarContent>
+                                <select class="ql-header">
+                                    <option selected=""></option>
+                                    <option value="1"></option>
+                                    <option value="2"></option>
+                                    <option value="3"></option>
+                                    <option value="4"></option>
+                                    <option value="5"></option>
+                                </select>
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-color"></select>
+                                    <select class="ql-background"></select>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-list" value="ordered"></button>
+                                    <button class="ql-list" value="bullet"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-link"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <button class="ql-image"></button>
+                                </span>
+                            </ToolbarContent>
+                            <EditorContent>
+
+                                @((MarkupString)model.Content)
+
+                            </EditorContent>
+                        </BlazoredTextEditor>
+                        <div id="contentHelp" class="form-text">Content can be a rich text or html in case of email templates</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button class="btn btn-secondary" href="tenant-templates">Close</button>
+                  </EditForm>*@
+
+
+                }
+
+
+            
+         </div>
+       </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public string Title
+    {
+
+        get
+        {
+            return model?.Id > 0 ? "Modify Template" : "Create New Template";
+        }
+    }
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+
+    bool showPreview = false;
+    bool showNewDialog = false;
+    string content = string.Empty;
+    MarkupString previewContent => (MarkupString)content;
+
+    List<CampaignTemplate> Templates;
+    CampaignTemplate model;
+    CampaignType? type = null;
+
+    #region Blazore Text Editor
+
+    BlazoredTextEditor QuillHtml;
+    string QuillHTMLContent;
+
+    public async Task GetHTML()
+    {
+        model.Content = await this.QuillHtml.GetHTML();
+        StateHasChanged();
+    }
+
+    public async void SetHTML()
+    {
+        await this.QuillHtml.LoadHTMLContent(model.Content);
+
+        StateHasChanged();
+    }
+    #endregion
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Templates = await client.GetTemplatesByType(type);
+
+        //OnNewClick();
+
+    }
+
+    public void OnValidSubmit()
+    {
+
+    }
+
+    protected void OnPreviewClick(CampaignTemplate template)
+    {
+        showPreview = true;
+        content = template.Content;
+    }
+
+    protected void OnClosePreview()
+    {
+        content = string.Empty;
+        showPreview = false;
+    }
+
+    public void OnNewClick()
+    {
+        Message = string.Empty;
+        model = new CampaignTemplate();
+        model.Version = "1";
+        showNewDialog = true;
+    }
+
+    public void OnEditClick(CampaignTemplate template)
+    {
+        Message = string.Empty;
+        model = template;
+        showNewDialog = true;
+    }
+
+    public async Task OnSave()
+    {
+        loading = true;
+
+        try
+        {
+            if (model.Id > 0)
+                Message = "Successfully Updated";
+            else
+                Message = "Successfully Added";
+
+            await GetHTML();
+
+            model = await client.UpsertCampaignTemplate(model);
+
+            ///showNewDialog = false;
+            IsSuccess = true;
+
+            if (!Templates.Any(o => o.Id == model.Id))
+                Templates.Add(model);
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        loading = false;
+
+    }
+
+}

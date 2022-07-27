@@ -4,15 +4,11 @@
 <div class="page">
 
     <AuthorizeView Roles="superadmin">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
+        <Admin_topbar/>
     </AuthorizeView>
 
     <AuthorizeView Roles="tenantadmin">
-        <div class="sidebar">
-            <NavMenuTenant></NavMenuTenant>
-        </div>
+       <Topbar/>
     </AuthorizeView>
 
 
