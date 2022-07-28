@@ -429,7 +429,7 @@ namespace PhishingPortal.Repositories
 #else
                 if (log != null)
                 {
-                    entry.TotalCampaigns = log.Total;
+                    entry.TotalCount = log.Total;
                     entry.TotalHits = log.TotalHits;
                     if (log.Total > 0)
                         entry.HitPronePercent = (log.TotalHits / log.Total) * 100;
