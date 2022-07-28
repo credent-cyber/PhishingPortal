@@ -280,10 +280,10 @@ namespace PhishingPortal.Repositories
             //    data.DepartEntries.Add(dentry);
 
             //}
-            CampaignTemplate campaignTemplate = new CampaignTemplate();
             var phishtestWithTemp = from log in totatPhishingTests
-                                    join crec in TenantDbCtx.CampaignDetails.Include(o => o.Template) on log.CampaignId equals crec.CampaignId
-                                    select new { logEntry = log, template = crec.CampaignTemplateId.ToString() };
+                                    join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
+                                    join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
+                                    select new { logEntry = log, template = ctem.Name };
             var tempwiseCnt = phishtestWithTemp.ToList().GroupBy(i => i.template, (key, tentries) => new
             {
                 template = key,
