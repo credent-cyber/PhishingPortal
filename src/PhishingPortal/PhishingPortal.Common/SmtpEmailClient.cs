@@ -50,10 +50,12 @@
         {
             
             Logger.LogInformation($"SendEmailAsync - Start");
+           
             if (string.IsNullOrEmpty(from))
                 from = _smtpConfig.From;
 
-            var msg = new MailMessage(from, email);
+            var msg = new MailMessage();
+           
             Logger.LogInformation($"MailTo: {email}");
             msg.Priority = MailPriority.Normal;
             msg.IsBodyHtml = isHtml;
@@ -72,7 +74,10 @@
             msg.Subject = subject;
 
             Logger.LogDebug($"Mail Subject - {subject}");
-            msg.Sender = new MailAddress(_smtpConfig.From);
+            
+            msg.To.Add(new MailAddress(email));
+            msg.Sender = new MailAddress(from);
+
             msg.BodyEncoding = System.Text.Encoding.UTF8;
 
             if(!_smtpConfig.IsSendingEnabled)

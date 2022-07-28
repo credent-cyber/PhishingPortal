@@ -26,6 +26,24 @@ namespace PhishingPortal.Common.Tests
             }
         }
 
+        [Fact]
+        public async void SmtpClientTest()
+        {
+            try
+            {
+                var moqLogger = new Mock<ILogger<SmtpEmailClient>>();
+                var client = new SmtpEmailClient(moqLogger.Object, GetConfigurationRoot(AppDomain.CurrentDomain.BaseDirectory));
+                await client.SendEmailAsync("malay.pandey@credentinfotech.com", "test subject", "test content", true, Guid.NewGuid().ToString());
+
+                Assert.True(true);
+            }
+            catch (Exception)
+            {
+                Assert.True(false);
+                throw;
+            }
+        }
+
         private IConfigurationRoot GetConfigurationRoot(string basePath)
         {
             return new ConfigurationBuilder().SetBasePath(basePath)

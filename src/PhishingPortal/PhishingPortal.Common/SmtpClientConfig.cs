@@ -10,8 +10,8 @@ namespace PhishingPortal.Common
         public bool IsSendingEnabled { get; set; } = true;
         public string Server { get; set; } = "smtp.gmail.com";
         public int Port { get; set; } = 587;
-        public string From { get; set; } = "malay.pandey@credentinfotech.com";
-        public string User { get; set; } = "malay.pandey@credentinfotech.com";
+        public string From { get; set; } = "admin@phish.credentinfotech.com";
+        public string User { get; set; } = "admin@phish.credentinfotech.com";
         public string Password { get; set; } = "***********";
         public string ImageRoot { get; set; } = @"D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.UI.Blazor/wwwroot/img/";
 
