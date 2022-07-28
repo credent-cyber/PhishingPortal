@@ -76,7 +76,8 @@
             Logger.LogDebug($"Mail Subject - {subject}");
             
             msg.To.Add(new MailAddress(email));
-            msg.Sender = new MailAddress(from);
+           // msg.Sender = new MailAddress(from);
+            msg.From = new MailAddress(from);
 
             msg.BodyEncoding = System.Text.Encoding.UTF8;
 
@@ -98,9 +99,6 @@
         {
             try
             {
-                if (message.From == null)
-                    message.From = new MailAddress(_smtpConfig.From);
-
                 Logger.LogInformation($"Mail with correlation id : {correlationId} being send");
                 await SmtpClient.SendMailAsync(message);
                 Logger.LogInformation($"Mail with correlation id: {correlationId} is send successfully");
