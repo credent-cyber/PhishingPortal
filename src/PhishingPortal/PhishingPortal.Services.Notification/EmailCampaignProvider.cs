@@ -48,7 +48,8 @@ namespace PhishingPortal.Services.Notification
                     
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == Dto.CampaignStateEnum.Published && o.IsActive).ToList();
+                                            .Where(o => o.State == Dto.CampaignStateEnum.Published && o.IsActive 
+                                                && o.Detail.Type == CampaignType.Email).ToList();
 
                     campaigns = campaigns.Where(o => IsScheduledNow(o.Schedule.ScheduleType, o.Schedule.ScheduleInfo)).ToList();
 
@@ -129,8 +130,9 @@ namespace PhishingPortal.Services.Notification
                     }
                 };
 
-                campaign.State = Dto.CampaignStateEnum.Completed;
-                dbContext.Update(campaign);
+                var c = dbContext.Campaigns.Find(campaign.Id);
+                c.State = Dto.CampaignStateEnum.Completed;
+                dbContext.Update(c);
                 dbContext.SaveChanges();
             }
             catch (Exception ex)

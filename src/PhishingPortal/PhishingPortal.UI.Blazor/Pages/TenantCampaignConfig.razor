@@ -656,18 +656,11 @@ else
         this.showRecipients = false;
     }
 
-    protected async Task OnShowRecipientClickk()
+    private async Task LoadRecipeints(int id)
     {
+        var data = await client.GetRecipientByCampaignId(id);
 
-        this.showImportDialog = false;
-        this.showRecipientss = true;
-
-        isloading = true;
-        try
-        {
-            var data = await client.GetRecipientByCampaignId(model.Id);
-
-            recipients = data.Select(o => new RecipientImport
+        recipients = data.Select(o => new RecipientImport
                 {
                     EmployeeCode = o.Recipient.EmployeeCode,
                     Name = o.Recipient.Name,
@@ -679,6 +672,19 @@ else
                     DateOfBirth = o.Recipient.DateOfBirth
 
                 }).ToList();
+    }
+
+    protected async Task OnShowRecipientClickk()
+    {
+
+        this.showImportDialog = false;
+        this.showRecipientss = true;
+
+        isloading = true;
+        try
+        {
+
+            await LoadRecipeints(model.Id);
 
             isloading = false;
 
@@ -729,6 +735,8 @@ else
 
     protected async Task OnPublishClick()
     {
+        await LoadRecipeints(model.Id);
+
         if(recipients.Count==0)
         {
             IsError = true;
