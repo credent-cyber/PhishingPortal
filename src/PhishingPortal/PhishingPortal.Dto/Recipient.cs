@@ -64,7 +64,7 @@ namespace PhishingPortal.Dto
         None = 0,
         Csv = 1,
         // Xls,
-        ActiveDirectory,
+        //ActiveDirectory,
         // RecipientGroup
     }
 }

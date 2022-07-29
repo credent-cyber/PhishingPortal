@@ -52,9 +52,9 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Select Template Category</label>
+                                                    <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType">
+                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" disabled="disabled">
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                                 {
                                                                 <option value="@val">@val</option>
@@ -357,6 +357,7 @@ else
     bool isScheduled = false;
     bool dailog = false;
 
+
     public bool ShowDialog
     {
         get
@@ -366,7 +367,9 @@ else
 
     }
 
-    IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+    //IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+    List<CampaignTemplate> Templates;
+    CampaignType? type = null;
 
     OnceOffSchedule scheduleOnceOff = new();
     DailySchedule dailySchedule = new("12:00:00");
@@ -380,20 +383,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Templates = await client.GetCampaignTemplates();
+        //Templates = await client.GetCampaignTemplates();
+         Templates = await client.GetTemplatesByType(type);
 
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
 
-            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
-                scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
+            //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+            //    scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
 
-            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
-                dailySchedule = new DailySchedule(model.Schedule.ScheduleInfo);
+            //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+            //    dailySchedule = new DailySchedule(model.Schedule.ScheduleInfo);
 
-            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
-                weeklySchedule = new WeeklySchedule(model.Schedule.ScheduleInfo);
+            //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+            //    weeklySchedule = new WeeklySchedule(model.Schedule.ScheduleInfo);
 
             if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
                 isScheduled = false;
@@ -432,7 +436,7 @@ else
             IsError = true;
             message = "Please fill all the required field";
             return;
-        }
+        } 
         @if(@model.FromEmail is not null)
         {
             var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
@@ -527,7 +531,7 @@ else
             this.showImportDialog = true;
         }
     }
-
+    
     public async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var singleFile = e.File;
