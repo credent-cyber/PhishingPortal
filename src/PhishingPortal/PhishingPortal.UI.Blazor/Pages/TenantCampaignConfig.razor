@@ -54,10 +54,10 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Select Template Category</label>
                                                     <div class="col-md-9">
-                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType">
+                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" disabled = "disabled">
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                                 {
-                                                                <option value="@val">@val</option>
+                                                                    <option value="@val">@val</option>
                                                                 }
                                                         </InputSelect>
                                                     </div>
@@ -366,7 +366,9 @@ else
 
     }
 
-    IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+    //IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
+    List<CampaignTemplate> Templates;
+    CampaignType? type = null;
 
     OnceOffSchedule scheduleOnceOff = new();
     DailySchedule dailySchedule = new("12:00:00");
@@ -380,7 +382,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        Templates = await client.GetCampaignTemplates();
+        //Templates = await client.GetCampaignTemplates();
+        Templates = await client.GetTemplatesByType(type);
 
         if (Id != 0)
         {

@@ -8,61 +8,26 @@
                         <label>Navigation</label>
                     </li>
                     <li class="nav-item">
-                        <a href="" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-home"></i></span><span class="pcoded-mtext">Home</span></a>
+                        <NavLink href="" class="nav-link "><span class="pcoded-micon">
+                            <i class="fa fa-home"></i></span><span class="pcoded-mtext"  Match="NavLinkMatch.All">Home</span>
+                        </NavLink>
                     </li>
-@*                     <li class="nav-item">
-                        <a href="users.html" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-user-plus"></i></span><span class="pcoded-mtext">Users</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="groups.html" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-users"></i></span><span class="pcoded-mtext">Groups</span></a>
-                    </li>*@
+
                     <li class="nav-item pcoded-hasmenu">
-                        <a href="tenant-campaigns" class="nav-link "><span class="pcoded-micon"><i class="fa fa-bullhorn"></i></span><span class="pcoded-mtext">Campaigns</span></a>
+                        <NavLink href="tenant-campaigns" class="nav-link ">
+                            <span class="pcoded-micon"><i class="fa fa-bullhorn"></i></span><span class="pcoded-mtext">Campaigns</span>
+                        </NavLink>
                         <ul class="pcoded-submenu">
-                            <li><a href="tenant-campaigns">All Campaigns</a></li>
-                            <li><a href="tenant-campaign-config">New Campaign</a></li>
-                           @* <li><a href="">Active Campaigns</a></li>
-                            <li><a href="">Completed Campaigns</a></li>
-                            <li><a href="">Campaign Summary</a></li>*@
+                            <li><NavLink href="tenant-campaigns">All Campaigns</NavLink></li>
+                            <li><NavLink href="tenant-campaign-config">New Campaign</NavLink></li>
                         </ul>
                        
                     </li>
                     <li class="nav-item">
-                        <a href="tenant-templates" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-envelope-square"></i></span><span class="pcoded-mtext">Templates</span></a>
+                        <NavLink href="tenant-templates" class="nav-link "><span class="pcoded-micon">
+                            <i class="fa fa-envelope-square"></i></span><span class="pcoded-mtext">Templates</span>
+                        </NavLink>
                     </li>
-                  @*  <li class="nav-item pcoded-hasmenu">
-                        <a href="tenant-templates" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-envelope-square"></i></span><span
-                                class="pcoded-mtext">Templates</span></a>
-                        <ul class="pcoded-submenu">
-                            <li><a href="addtemplate">New Template</a></li>
-                            <li><a href="tenant-templates">My Templates</a></li>
-                        </ul>
-                    </li>*@
-                 @*   <li class="nav-item pcoded-hasmenu">
-                        <a href="#!" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-bar-chart"></i></span><span class="pcoded-mtext">Reports</span></a>
-                        <ul class="pcoded-submenu">
-                            <li><a href="">Department Wise Report</a></li>
-                            <li><a href="">Designation Wise Report</a></li>
-                            <li><a href="">Branch Wise Report</a></li>
-                            <li><a href="">Executive Summary Report</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu">
-                        <a href="#!" class="nav-link "><span class="pcoded-micon"><i
-                                    class="fa fa-graduation-cap"></i></span><span class="pcoded-mtext">Awareness
-                                Trainings</span></a>
-                        <ul class="pcoded-submenu">
-                            <li><a href="">Training Campaigns</a></li>
-                            <li><a href="">Assign Training</a></li>
-                        </ul>
-                    </li>*@
-
           
                 </ul>
             </div>
@@ -107,7 +72,7 @@
                         <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i
                                 class="icon feather icon-bell"></i><span class="badge bg-danger"><span
                                     class="sr-only"></span></span></a>
-                        <div class="dropdown-menu dropdown-menu-right notification">
+                       @* <div class="dropdown-menu dropdown-menu-right notification">
                             <div class="noti-head">
                                 <h6 class="d-inline-block m-b-0">Notifications</h6>
                                 <div class="float-right">
@@ -160,7 +125,7 @@
                             <div class="noti-footer">
                                 <a href="#!">show all</a>
                             </div>
-                        </div>
+                        </div>*@
                     </div>
                 </li>
             </ul>
@@ -169,6 +134,7 @@
 
 
 @code {
+
     protected override async Task OnInitializedAsync()
     {
           await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcoded.min.js");

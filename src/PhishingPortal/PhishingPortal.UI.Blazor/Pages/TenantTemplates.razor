@@ -284,7 +284,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
-
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/form-select-custom.js");
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.dataTables.min.js");
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/dataTables.bootstrap4.min.js");
