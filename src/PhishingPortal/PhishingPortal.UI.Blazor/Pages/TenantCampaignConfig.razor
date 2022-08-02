@@ -32,7 +32,7 @@ else
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header bg-info">
-                        <h5 class="text-white">Create New Compaign</h5>
+                        <h5 class="text-white">@Title</h5>
                     </div>
                        <div class="card-body" style="padding-top: 20px;">
                          <div class="row">
@@ -353,7 +353,13 @@ else
     bool isloading = false;
     bool isScheduled = false;
     bool dailog = false;
-
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Compaign" : "Create New Compaign";
+        }
+    }
 
     public bool ShowDialog
     {
