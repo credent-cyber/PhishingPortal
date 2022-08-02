@@ -129,22 +129,19 @@ else
                                                                 {
 
                                                                 }
-                                                                else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
+                                                                @if(model.Schedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
                                                                 {
                                                                     <label class="form-label">Scheduled Once</label>
                                                                     <div class="input-group">
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" id="">Date & Time</span>
                                                                         </div>
-                                                                   @*     <input type="date" @bind="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></input>
-                                                                        <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>*@
-
                                                                         <InputDate @bind-Value="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></InputDate>
                                                                         <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
                                                                     </div>
 
                                                                 }
-                                                                else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily && isScheduled == true)
+                                                                @*else if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily && isScheduled == true)
                                                                 {
                                                                     <label class="form-label">Scheduled Daily</label>
                                                                     <div class="input-group mb-3">
@@ -171,7 +168,7 @@ else
                                                                         <input type="time" @bind="weeklySchedule.ScheduleTime" id="WeeklyScheduleTime" class="form-control" aria-describedby="basic-addon3"></input>
                                                                     </div>
 
-                                                                }
+                                                                }*@
                                                         </div>
                                                 
                                                     </div>
@@ -256,7 +253,7 @@ else
                                                 <div class="btn-group col-12" >
                                                     <button type="submit" class="btn btn-primary">Save</button>
                                                     <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                    @if (model.Id == 0)
+                                                    @if (model.Id == 0 && fileimport is null)
                                                     {
                                                         <button type="button" class="btn btn-dark"  @onclick="OnShowRecipientClickk" disabled>Show Recipients</button>                                                      
                                                     }
@@ -341,7 +338,7 @@ else
 
     [Parameter]
     public int Id { get; set; }
-    public string fileimport { get; set; }
+    List<RecipientImport> fileimport;
 
     string message = string.Empty;
     bool IsError = false;
@@ -409,7 +406,7 @@ else
         else
         {
             model = new Campaign()
-                {
+            {
                     State = CampaignStateEnum.Draft,
                     Detail = new CampaignDetail
                     {
@@ -421,7 +418,7 @@ else
                         ScheduleType = ScheduleTypeEnum.NoSchedule,
                         WillRepeat = false
                     }
-                };
+            };
         }
 
     }
@@ -503,25 +500,25 @@ else
             model.Schedule.ScheduleType = ScheduleTypeEnum.NoSchedule;
         }
 
-        //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
-        //{
-        //    model.Schedule.ScheduleInfo = scheduleOnceOff.ToString();
-        //}
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+        {
+            model.Schedule.ScheduleInfo = scheduleOnceOff.ToString();
+        }
 
-        //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
-        //{
-        //    model.Schedule.ScheduleInfo = dailySchedule.ToString();
-        //}
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
+        {
+            model.Schedule.ScheduleInfo = dailySchedule.ToString();
+        }
 
-        //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
-        //{
-        //    model.Schedule.ScheduleInfo = weeklySchedule.ToString();
-        //}
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.Weekly)
+        {
+            model.Schedule.ScheduleInfo = weeklySchedule.ToString();
+        }
 
-        //if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
-        //{
-        //    model.Schedule.ScheduleInfo = string.Empty;
-        //}
+        if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+        {
+            model.Schedule.ScheduleInfo = string.Empty;
+        }
     }
 
     protected void OnChangeRecipientSource(ChangeEventArgs arg)
@@ -531,7 +528,7 @@ else
             this.showImportDialog = true;
         }
     }
-    
+
     public async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var singleFile = e.File;
@@ -592,7 +589,7 @@ else
 
                     }
 
-
+                    fileimport = recipients;
                 }
                 catch (Exception ex)
                 {
@@ -687,9 +684,14 @@ else
         isloading = true;
         try
         {
-
-            await LoadRecipeints(model.Id);
-
+            if(model.Id > 0)
+            {
+                await LoadRecipeints(model.Id);
+            }
+            else
+            {
+                recipients = fileimport;
+            }
             isloading = false;
 
         }
