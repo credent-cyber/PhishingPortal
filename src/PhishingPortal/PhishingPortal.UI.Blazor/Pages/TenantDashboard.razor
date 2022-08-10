@@ -1,0 +1,522 @@
+﻿@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
+@using PhishingPortal.Dto;
+
+@using PhishingPortal.UI.Blazor.Client;
+@using System.Drawing
+@inject TenantClient client;
+@inject ILogger<TenantDashboard> logger;
+@inject IJSRuntime JSRuntime;
+
+
+@*<div class="row">
+    <div class="col">
+        <div class="card text-white bg-primary mb-3" style="max-width: 12rem;">
+            <div class="card-header">Phishing Tests</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalPhishingTests</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-white bg-danger mb-3" style="max-width: 12rem;">
+            <div class="card-header">Total Clicks</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalClicks</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-white bg-success mb-3" style="max-width: 12rem;">
+            <div class="card-header">Not Clicked</div>
+            <div class="card-body">
+                <h5 class="card-title">@NotClicked</h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-secondary mb-3" style="max-width: 12rem;">
+            <div class="card-header">Shared Details</div>
+            <div class="card-body">
+                <h5 class="card-title">@TotalClicks</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-dark bg-warning mb-3" style="max-width: 12rem;">
+            <div class="card-header">Phish Prone %</div>
+            <div class="card-body">
+                <h5 class="card-title">@PronePercent</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <div class="card">
+            <div class="card-body" style="min-width:18rem;">
+                <h5 class="card-title">Phishing Campaign-Wise Prone %age</h5>
+                <Chart Id="bar3" Type="@ChartType.Bar"
+                       Datasets="@BarChart3Data"
+                       Labels="@BarChart3Labels"
+                       IsStacked="false">
+                </Chart>
+               
+            </div>
+        </div>
+         <hr />
+        <div class="card" style="min-width:18rem;">
+            <div class="card-body">
+                <h5 class="card-title">Month-wise Phishing Tests Statistics</h5>
+                <Chart Id="bar1" Type="@ChartType.Bar"
+                       Datasets="@BarChart1Data"
+                       Labels="@BarChart1Labels">
+                </Chart>
+
+                
+            </div>
+        </div>
+        <hr />
+        <div class="card">
+            <div class="card-body" style="min-width:18rem;">
+                <h5 class="card-title">Monthly Phish Prone %age</h5>
+                <Chart Id="bar2" Type="@ChartType.Line"
+                       Datasets="@BarChart2Data"
+                       Labels="@BarChart1Labels"
+                       IsStacked="false">
+                </Chart>
+              
+            </div>
+        </div>
+
+          <hr />
+
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Category Wise Failure % </h5>
+                <PieChart Id="pie1" Type="@ChartType.Pie" Responsive="true"
+                          Data="@(PieChart1Data.ToArray())"
+                          BackgroundColor="@(PieChart1Background.ToArray())"
+                          Labels="@(PieChart1Labels.ToArray())">
+                </PieChart>
+
+            </div>
+        </div>
+         <hr />
+    </div>
+
+</div>*@
+
+@*<div style="margin-top:0%"></div>*@
+<div class="pcoded-content">
+   <h5><span style="color:orange">Dashboard</span> <span style="color:green">[@StartDate.ToString("dd MMM yyyy") - @DateTime.Now.ToString("dd MMM yyyy")]</span> </h5>
+   <div class="row">
+          <div class="col-md-6 col-xl-4">
+                <div class="card bg-c-blue order-card">
+                <div class="card-body">
+                    <a href="#!">
+                        <div class="row align-items-center m-b-0">
+                        <div class="col">
+                        <h6 class="m-b-5 text-white">Phishing Tests</h6>
+                        </div>
+                        <div class="col-auto">
+                       <h3 style="color:black">@TotalPhishingTests</h3> 
+                        </div>
+                        </div>
+                    </a>
+                </div>
+                </div>
+          </div>
+             <div class="col-md-6 col-xl-2">
+                    <div class="card bg-c-red order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col" style="padding: 0">
+                                        <h6 class=" m-b-5 text-white">Total Clicks</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                      <h3 style="color:black">@TotalClicks</h3> 
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                   </div>
+             </div>
+               <div class="col-md-6 col-xl-2">
+                    <div class="card bg-c-green order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="m-b-5 text-white">Not Clicked</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                     <h3 style="color:black"> @NotClicked</h3> 
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="col-md-6 col-xl-2">
+                    <div class="card bg-c-purple order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="m-b-5 text-white">Shared Details</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                      <h3 style="color:black">@TotalClicks</h3>  
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="col-md-6 col-xl-4">
+                    <div class="card bg-c-yellow order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="m-b-5 text-white">Phish Prone</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                       <h3 style="color:black">@PronePercent%</h3> 
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+        
+       
+ 
+
+
+                <div class="col-xl-4 col-md-6">
+                    <div class="row">
+                        <div class="col-xl-12 col-md-6">
+                            <div class="card comp-card">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-b-20">Emails Sent</h6>
+                                            <h3 class="text-c-blue">@NEmail </h3>
+                                            <p class="m-b-0">In Last Campaign</p>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-envelope fa-lg badge-light-primary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-12 col-md-6">
+                            <div class="card comp-card">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h6 class="m-b-20">SMS Sent</h6>
+                                            <h3 class="text-c-green">0</h3>
+                                            <p class="m-b-0">In Last Campaign</p>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fa fa-commenting fa-lg badge-light-success"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-12 col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="text-align:center">
+                                    <h5>Clicks % by Department </h5>
+                                </div>
+                                <div class="card-body">
+                                     <PieChart Id="donut1" Type="@ChartType.doughnut" Responsive="true" 
+                                                    Data="@(Donut1Data.ToArray())"
+                                                    BackgroundColor="@(Donut1Background.ToArray())"
+                                                    Labels="@(Donut1Labels.ToArray())">
+                                     </PieChart>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-8 col-md-6">
+                    <div class="row">
+                        <div class="col-xl-6 col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="text-align:center">
+                                    <h5 >No of clicks and Email sent per Campaign</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div style="width: 100%; height: 216px">
+                                         <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
+                                                        Labels="@BarChart3Labels" IsStacked="false">
+                                         </Chart>
+                                     </div>
+                                  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="text-align:center">
+                                    <h5>Trend of Clicks on Email per Campaign</h5>
+                                </div>
+                                <div class="card-body">
+                                      <div style="width: 100%; height: 216px">
+                                          <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data" 
+                                           Labels="@BarChart1Labels" IsStacked="false">
+                                          </Chart>
+                                      </div>
+                                                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="text-align:center">
+                                    <h5>Category Wise Failure %</h5>
+                                </div>
+                                <div class="card-body">
+
+                                     <PieChart Id="pie1" Type="@ChartType.pie" Responsive="true"
+                                                    Data="@(PieChart1Data.ToArray())"
+                                                    BackgroundColor="@(PieChart1Background.ToArray())"
+                                                    Labels="@(PieChart1Labels.ToArray())">
+                                     </PieChart>
+                                                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="text-align:center">
+                                    <h5>Percentage of Email Campaign Template</h5>
+                                </div>
+                                <div class="card-body">
+                                     <PieChart Id="TempPolar" Type="@ChartType.polarArea" Responsive="true" 
+                                                    Data="@(Polar1Data.ToArray())"
+                                                    BackgroundColor="@(Polar1Background.ToArray())"
+                                                    Labels="@(Polar1Labels.ToArray())">
+                                     </PieChart>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+          </div>
+   </div>
+
+    
+@code {
+
+    public int TotalPhishingTests { get; set; }
+    public int TotalClicks { get; set; }
+    public int NotClicked { get; set; }
+    public decimal PronePercent { get; set; }
+    public int NEmail { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+
+
+    public bool IsError { get; set; }
+    public string Message { get; set; } = string.Empty;
+
+
+    // Barchart1 datasets
+    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public List<ChartJsDataset> BarChart2Data { get; set; } = new List<ChartJsDataset>();
+    public List<ChartJsDataset> BarChart3Data { get; set; } = new List<ChartJsDataset>();
+
+    public List<string> PieChart1Data { get; set; } = new List<string>();
+    public List<string> PieChart1Background { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> PieChart1Labels { get; set; } = new List<string>();
+
+     public List<string> Donut1Data { get; set; } = new List<string>();
+    public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a",  "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Donut1Labels { get; set; } = new List<string>();
+
+    public List<string> Polar1Data { get; set; } = new List<string>();
+    public List<string> Polar1Background { get; set; } = new List<string>() {"#FF5370", "#0e9e4a", "#FFB64D",  "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Polar1Labels { get; set; } = new List<string>();
+
+
+    public string[] BarChart1Labels { get; set; }
+    public string[] BarChart3Labels { get; set; }
+
+
+    IEnumerable<CampaignRecipient>CampaignRecipients  = null;
+    IEnumerable<Campaign> campaigns = null;
+
+    void SomeStartupMethod()
+    {
+
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","scripts/my-chart-js.js");
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/bootstrap.min.js");
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/responsive-all.min.js");
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcoded.min.js");
+
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/dashboard-main.js");
+        //JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/chart.js");
+
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/Chart.min.js");
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/chart-chart-custom.js");  //2chart
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/apexcharts.min.js");
+        JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/chart-apex.js");  //6chart
+
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        StartDate = new DateTime(DateTime.Now.Year, 1, 1);
+        EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
+
+        TotalPhishingTests = 0;
+        TotalClicks = 0;
+        NotClicked = 0;
+        PronePercent = 0;
+        NEmail = 0;
+
+        // getting data for the current year all months
+        try
+        {
+            var data = await client.GetMonthlyBarChartEntires(DateTime.Now.Year);
+            var data2 = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
+
+            if (data == null)
+                throw new Exception();
+
+            TotalPhishingTests = data.Entries.Sum(o => o.TotalCount);
+            TotalClicks = data.Entries.Sum(o => o.TotalHits);
+            NotClicked = TotalPhishingTests - TotalClicks;
+            PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
+
+
+            data2.Entries.Select(o => o.Campaign.Id).ToArray();
+
+            // campaign wise chart
+            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Email Count",
+                    Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Green, data2.Entries.Count()),
+                });
+
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Click Count",
+                    Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Blue, data2.Entries.Count()),
+                });
+
+            //BarChart3Data.Add(new ChartJsDataset
+            //    {
+            //        Label = "Phish Prone %",
+            //        Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
+            //        BackgroundColor = GetBackgroundColors(Color.Red, data2.Entries.Count()),
+            //    });
+
+
+
+            // pie chart
+            foreach (var entry in data2.CategoryClickRatioDictionary)
+            {
+                PieChart1Data.Add(entry.Value.ToString());
+                PieChart1Labels.Add(entry.Key.ToUpper());
+            }
+            
+            foreach (var entry in data2.DepartEntries)
+            {
+                Donut1Data.Add(entry.Value.ToString());
+                Donut1Labels.Add(entry.Key.ToUpper());
+            }
+            foreach (var entry in data2.TemplateClickEntries)
+            {
+                Polar1Data.Add(entry.Value.ToString());
+                Polar1Labels.Add(entry.Key.ToUpper());
+            }
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Phishing Counts",
+                    Data = data.Entries.Select(o => o.TotalCount.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Blue, data.Entries.Count()),
+                });
+
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Clicks",
+                    Data = data.Entries.Select(o => o.TotalHits.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Red, data.Entries.Count()),
+                });
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone",
+                    Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
+                });
+
+            BarChart2Data.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone",
+                    //Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
+                    Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
+                });
+
+            BarChart1Data.Add(new ChartJsDataset
+                {
+                    Label = "No Clicks",
+                    Data = data.Entries.Select(o => (-1 * (o.TotalCount - o.TotalHits)).ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Green, data.Entries.Count()),
+                });
+
+            //BarChart1Labels = data.Entries.Select(o => o.Month.ToString()).ToArray();
+            BarChart1Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+
+            //CampaignRecipients = await client.GetRecipientByCampaignId();
+            NEmail = data2.Entries.FirstOrDefault().Count;
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = "Error gathering statistics";
+            logger.LogCritical(ex, ex.Message);
+        }
+    }
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            SomeStartupMethod();
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    public string[] GetBackgroundColors(Color color, int arraySize)
+    {
+        var colors = new List<string>();
+        for (var i = 0; i < arraySize; i++)
+            colors.Add(color.Name.ToString().ToLower());
+        return colors.ToArray();
+    }
+}

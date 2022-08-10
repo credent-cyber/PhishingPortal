@@ -1,0 +1,48 @@
+﻿@using PhishingPortal.Dto
+<div style="margin-bottom:50px">
+<div class="table-container" >
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <td>EmployeeCode</td>
+                <td>Name</td>
+                <td>Email</td>
+                <td>Mobile</td>
+                <td>DateOfBirth</td>
+                <td>Branch</td>
+                <td>Department</td>
+                <td>Address</td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (DataList?.Count == 0)
+            {
+                <tr><td colspan="3">No data found</td></tr>
+            }
+            else
+            {
+                foreach (var r in DataList)
+                {
+                    <tr>
+                        <td>@r.EmployeeCode</td>
+                        <td>@r.Name</td>
+                        <td>@r.Email</td>
+                        <td>@r.Mobile</td>
+                        <td>@r.DateOfBirth</td>
+                        <td>@r.Branch</td>
+                        <td>@r.Department</td>
+                        <td>@r.Address</td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+    </table>
+</div>
+</div>
+
+@code {
+    [Parameter] public List<RecipientImport> DataList { get; set; }
+
+}

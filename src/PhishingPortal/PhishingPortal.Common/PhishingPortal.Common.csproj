@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	
+	
+	<PropertyGroup>
+		<BlazorVersion>6.0.4</BlazorVersion>
+		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
+	</PropertyGroup>
+		
+
+	<ItemGroup>
+		<PackageReference Include="EASendMail" Version="7.8.0.7" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(AspNetCoreVersion)" />
+	</ItemGroup>
+
+</Project>

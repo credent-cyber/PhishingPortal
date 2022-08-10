@@ -1,0 +1,23 @@
+﻿@if (IsSuccess && !string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-primary" role="alert">
+        @Message
+    </div>
+}
+else if (IsError && !string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-warning" role="alert">
+        @Message
+    </div>
+}
+@code {
+
+        [Parameter]
+        public bool IsError { get; set; } = false;
+
+        [Parameter]
+        public bool IsSuccess { get; set; }
+
+        [Parameter]
+        public string Message { get; set; } = string.Empty;
+}

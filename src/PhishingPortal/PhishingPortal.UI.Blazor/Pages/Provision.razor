@@ -1,0 +1,54 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+
+@page "/provision"
+@inject TenantAdminClient adminClient
+@inject NavigationManager navMgr
+
+<div class="row">
+            <div class="card-header">
+                <h3>Provision Client</h3>
+                 <a class="btn btn-primary" href="onboard"><span class="oi oi-plus"></span></a>
+            </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <td>UniqueId</td>
+            <td>Name</td>
+            <td>LicenseType</td>
+            <td>LicenseExpiry</td>
+            <td>ConfirmationLink</td>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in AllTenants)
+        {
+            <tr>
+                <td><a class="btn-link" href="edittenant/@t.UniqueId">@t.UniqueId</a></td>
+                <td>@t.Name</td>
+                <td>@t.LicenseType</td>
+                <td>@t.LicenseExpiry</td>
+                <td><a class="btn-link" target="_blank" href="@t.ConfirmationLink">Confirm</a></td>
+
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@code {
+
+    ProvisionTenantRequest request = null;
+
+    List<Tenant> AllTenants = new List<Tenant>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllTenants = await adminClient.GetAllAsync();
+    }
+
+}

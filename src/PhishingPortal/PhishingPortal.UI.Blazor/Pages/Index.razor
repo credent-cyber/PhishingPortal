@@ -1,0 +1,26 @@
+﻿@page "/"
+@page "/Index"
+
+
+<PageTitle>PhishSim | Home</PageTitle>
+
+<AuthorizeView Roles="tenantadmin">
+    <Authorized>
+        <TenantDashboard />
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="superadmin">
+    <Authorized>
+        <AdminDashboard />
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="superadmin">
+    <NotAuthorized>
+
+
+
+    </NotAuthorized>
+</AuthorizeView>
+

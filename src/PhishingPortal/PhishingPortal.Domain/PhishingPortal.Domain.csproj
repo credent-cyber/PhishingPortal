@@ -6,4 +6,23 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+
+	<PropertyGroup>
+		<BlazorVersion>6.0.4</BlazorVersion>
+		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
+		<EntityFrameworkVersion>6.0.0</EntityFrameworkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="WebPush" Version="1.0.11" />
+	</ItemGroup>
+
 </Project>

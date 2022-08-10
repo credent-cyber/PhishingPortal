@@ -9,7 +9,7 @@ namespace PhishingPortal.Dto
     {
         public int Id { get; set; }
         public string Key { get; set; }
-        public int Value { get; set; }
-        public int Expression { get; set; }
+        public string Value { get; set; }
+        public string Expression { get; set; }
     }
 }

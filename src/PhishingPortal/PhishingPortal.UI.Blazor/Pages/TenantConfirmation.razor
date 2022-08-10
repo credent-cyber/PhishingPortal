@@ -1,0 +1,216 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Microsoft.Extensions.Logging
+@page "/tenant-confirmation/{uniqueId}/{cid}/{action?}"
+@layout SimpleLayout
+@*@inject TenantAdminClient AdminClient*@
+@inject ILogger<Onboard> Logger
+@inject ILogger<TenantAdminClient> Logger2
+@inject NavigationManager navMgr
+@inject HttpClient httpClient
+
+
+<h3>
+    Onboarding | @if (Action == "c")
+    {
+        <text>Registration Confirmation</text>
+    }
+
+</h3>
+
+<div class="container">
+    <div class="row">
+
+        <div class=col-10>
+
+            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+
+            @if (IsDone)
+            {
+                <button class="btn btn-primary" @onclick="OnGoToHome">Go To Home Page</button>
+            }
+            else
+            {
+                if (Action == "dv")
+                {
+                    <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
+
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+
+                        <div class="form-group">
+                            <label for="Domain">@nameof(domain.Domain)</label>
+                            <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
+                            <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
+                        </div>
+
+
+                        <button class="btn btn-primary" type="submit">Submit</button>
+
+                    </EditForm>
+                }
+
+                if (Action == "mastusr")
+                {
+                    <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
+                        <DataAnnotationsValidator />
+
+                        <ValidationSummary />
+
+                        <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
+
+
+                        <div class="form-group">
+                            <label for="Email">@nameof(user.Email)</label>
+                            <InputText @bind-Value="user.Email" id="Email" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="Password">@nameof(user.Password)</label>
+                            <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
+                            <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">Submit</button>
+
+                    </EditForm>
+                }
+            }
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string UniqueId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Cid { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Action { get; set; }
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool IsDone = false;
+    string Message = string.Empty;
+
+    Tenant model = new Tenant();
+    TenantAdminUser user = new TenantAdminUser();
+    DomainVerificationRequest domain = new DomainVerificationRequest();
+    TenantAdminClient AdminClient;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsDone = false;
+        AdminClient = new TenantAdminClient(Logger2, httpClient);
+
+        if (string.IsNullOrEmpty(Action))
+            Action = "c";
+
+        Logger.LogInformation($"Action:{Action}");
+
+        if (UniqueId != null && !string.IsNullOrEmpty(Cid))
+        {
+            user.TenantUniqueId = UniqueId;
+            IsSuccess = true;
+
+            try
+            {
+                var output = await AdminClient.Confirmation(new TenantConfirmationRequest
+                    {
+                        RegisterationHash = Cid,
+                        UniqueId = UniqueId,
+                        Url = navMgr.Uri
+                    });
+
+                if (output.IsSuccess)
+                {
+                    model = output.Result;
+                    domain.DomainVerificationCode = output.Result.UniqueId;
+                    if (output.Result.ConfirmationState == ConfirmationStats.Verified)
+                        navMgr.NavigateTo($"tenant-confirmation/{UniqueId}/{Cid}/dv");
+                    else if (output.Result.ConfirmationState == ConfirmationStats.DomainVerified)
+                        navMgr.NavigateTo($"tenant-confirmation/{UniqueId}/{Cid}/mastusr");
+                    else if (output.Result.ConfirmationState == ConfirmationStats.MasterUser)
+                        navMgr.NavigateTo($"/");
+                }
+
+                Message = output.Message;
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
+            }
+
+        }
+
+    }
+
+    protected async Task OnValidSubmitDomain()
+    {
+        try
+        {
+            domain.UniqueId = UniqueId;
+            var output = await AdminClient.DomainConfirmation(domain);
+
+            if (output.IsSuccess)
+            {
+                model = output.Result;
+                navMgr.NavigateTo($"tenant-confirmation/{model.UniqueId}/{Cid}/mastusr");
+            }
+
+            Message = output.Message;
+        }
+        catch (Exception ex)
+        {
+            Message = ex.Message;
+            Logger.LogCritical(ex, ex.Message);
+        }
+
+        await Task.CompletedTask;
+    }
+
+    protected async Task OnValidSubmitUser()
+    {
+        if (model.ConfirmationState == ConfirmationStats.DomainVerified)
+        {
+            var output = await AdminClient.CreateTenandAdminUser(UniqueId, user.Email, user.Password, user.ConfirmPassword);
+
+            if (output)
+            {
+                IsDone = true;
+                IsSuccess = true;
+                Message = "You have successfully confirmed your details. Please click the button to login to the portal";
+            }
+            else
+            {
+                IsSuccess = false;
+                Message = "User couldn't be created please try again or contact support team";
+            }
+        }
+        await Task.CompletedTask;
+    }
+
+    protected async Task OnGoToHome()
+    {
+            navMgr.NavigateTo("/");
+    }
+
+}

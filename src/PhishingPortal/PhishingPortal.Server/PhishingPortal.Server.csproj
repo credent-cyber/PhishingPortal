@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+
+
+	<PropertyGroup>
+		<BlazorVersion>6.0.4</BlazorVersion>
+		<AspNetCoreVersion>6.0.0</AspNetCoreVersion>
+		<EntityFrameworkVersion>6.0.1</EntityFrameworkVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="$(AspNetCoreVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(EntityFrameworkVersion)" />
+		<PackageReference Include="WebPush" Version="1.0.11" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
+
+		<PackageReference Include="Serilog" Version="2.10.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
+		<PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+		
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\PhishingPortal.Core\PhishingPortal.Core.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Repositories\PhishingPortal.Repositories.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
+	</ItemGroup>
+
+
+</Project>
