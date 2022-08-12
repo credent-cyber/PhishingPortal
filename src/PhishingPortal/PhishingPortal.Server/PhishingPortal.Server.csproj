@@ -15,6 +15,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="BlazingComponents.Summernote" Version="0.0.6" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(AspNetCoreVersion)" />
@@ -43,6 +44,12 @@
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Repositories\PhishingPortal.Repositories.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="rsaCert.pfx">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 

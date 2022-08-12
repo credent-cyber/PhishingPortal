@@ -1,5 +1,6 @@
 ﻿@inject IJSRuntime JSRuntime;
 
+
  <nav class="pcoded-navbar theme-horizontal menu-light brand-blue">
         <div class="navbar-wrapper">
             <div class="navbar-content sidenav-horizontal" id="layout-sidenav">
@@ -70,8 +71,8 @@
     </nav>
 
 
-    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
-        <div class="m-header">
+    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue" >
+        <div class="m-header" >
             <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
             <a href="#!" class="b-brand">
                 <img src="/custom/assets/images/credent_solutions_logo.png" alt="Credent Infotech" class="img-responsive"
@@ -171,6 +172,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-          await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcoded.min.js");
+       //await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcoded.min.js");
     }
+
 }

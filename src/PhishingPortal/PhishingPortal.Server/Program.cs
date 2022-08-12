@@ -18,8 +18,8 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var rsaCertificate = new X509Certificate2(
-//    Path.Combine(builder.Environment.ContentRootPath, "cert_rsa512.pfx"), "1234");
+var rsaCertificate = new X509Certificate2(
+    Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
 
 // Add services to the container.
 
@@ -69,6 +69,7 @@ builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
+
 builder.Services.AddIdentityServer()
     //.AddSigningCredential(rsaCertificate)
     .AddApiAuthorization<PhishingPortalUser, PhishingPortalDbContext>(options =>
@@ -77,7 +78,9 @@ builder.Services.AddIdentityServer()
         options.ApiResources.Single().UserClaims.Add("name");
         options.IdentityResources["openid"].UserClaims.Add("role");
         options.ApiResources.Single().UserClaims.Add("role");
+
     });
+
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
 

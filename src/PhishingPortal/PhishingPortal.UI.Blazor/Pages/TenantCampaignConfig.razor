@@ -11,7 +11,8 @@
 @inject ILogger<TenantCampaigns> logger
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager
-
+@using NPOI.SS.UserModel
+@using NPOI.XSSF.UserModel
 
 @if (model == null || isloading)
 {
@@ -31,8 +32,11 @@ else
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header bg-info">
+                    <div class="card-header bg-info" style="padding:15px !important;">
                         <h5 class="text-white">@Title</h5>
+                          <div style="float:right">
+                               <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                          </div>
                     </div>
                        <div class="card-body" style="padding-top: 20px;">
                          <div class="row">
@@ -109,15 +113,15 @@ else
                 
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Schedule Later</label>
+                                                    <label for="" class="col-form-label col-md-3">Schedule</label>
                                                     <div class="col-md-5">
                                                        <div class="radio radio-info radio-fill d-inline">
                                                             <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                            <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                            <label for="radio-i-infill-1" class="cr">Later</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
                                                             <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                            <label for="radio-i-infill-2" class="cr">No</label>
+                                                            <label for="radio-i-infill-2" class="cr">Now</label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -177,12 +181,16 @@ else
                                                 <div class="form-group row">
                                                     <label for="txtImportUsers" class="col-form-label col-md-3">Import Users</label>
                                                     <div class="col-md-9">
+                                                        <div class="input-group">
                                                         <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">                                                         
                                                             @foreach (var val in Enum.GetValues<RecipientSources>())
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
                                                         </InputSelect>
+                                                         @*<button class="btn btn-info"   @onclick="@(async() => {await GenerateExcel();})"><i class="fas fa-download"></i> Format</button>*@
+                                                         <button class="btn btn-info">Template <i class="fas fa-download"></i></button>
+                                                        </div>
                                                         <br/>
                                                         @if (sources == RecipientSources.Csv)
                                                         {
@@ -208,7 +216,7 @@ else
                                                                     <div class="input-group">
                                                                    
                                                                         @*<input type="file" id="uploadedFile" name="uploadedFile" class="form-control" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">*@
-                                                                        <InputFile OnChange="@OnInputFileChange" class="form-control" />
+                                                                        <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv"/>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -384,6 +392,7 @@ else
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
 
+
     protected override async Task OnInitializedAsync()
     {
         //Templates = await client.GetCampaignTemplates();
@@ -432,7 +441,6 @@ else
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
-        //model.RecipientCount  = recipients.Count();
 
         if(@model.Name is null||@model.Subject is null||@model.FromEmail is null||@model.Category is null||@model.ReturnUrl is null)
         {
@@ -788,4 +796,103 @@ else
         //recipients.Clear();
         NavigationManager.NavigateTo("tenant-campaigns"); 
     }
+
+    //public async Task GenerateExcel()
+    //{
+    //    IWorkbook workbook = new XSSFWorkbook();
+    //    var dataFormat = workbook.CreateDataFormat();
+    //    var dataStyle = workbook.CreateCellStyle();
+    //    dataStyle.DataFormat = dataFormat.GetFormat("MM/dd/yyyy HH:mm:ss");
+
+    //    ISheet worksheet = workbook.CreateSheet("Sheet1");
+    //    int rowNumber = 0;
+    //    IRow row = worksheet.CreateRow(rowNumber++);
+
+    //    //Table Header
+    //    ICell cell = row.CreateCell(0);
+    //    cell.SetCellValue("*Company Code");
+
+    //    cell = row.CreateCell(1);
+    //    cell.SetCellValue("*Employee ID");
+
+    //    cell = row.CreateCell(2);
+    //    cell.SetCellValue("*Employee Name");
+
+    //    cell = row.CreateCell(3);
+    //    cell.SetCellValue("*Father Name");
+
+    //    cell = row.CreateCell(4);
+    //    cell.SetCellValue("Employee Status");
+
+    //    cell = row.CreateCell(5);
+    //    cell.SetCellValue("*Email");
+
+    //    cell = row.CreateCell(6);
+    //    cell.SetCellValue("*Mobile Number");
+
+    //    cell = row.CreateCell(7);
+    //    cell.SetCellValue("*Permanent Address");
+
+    //    cell = row.CreateCell(8);
+    //    cell.SetCellValue("*Per. Addr. State");
+
+    //    cell = row.CreateCell(9);
+    //    cell.SetCellValue("*Per. Addr. Country");
+
+    //    cell = row.CreateCell(10);
+    //    cell.SetCellValue("Per. Addr. PIN");
+
+    //    cell = row.CreateCell(11);
+    //    cell.SetCellValue("Current Address");
+
+    //    cell = row.CreateCell(12);
+    //    cell.SetCellValue("Cur. Addr. State");
+
+    //    cell = row.CreateCell(13);
+    //    cell.SetCellValue("Cur. Addr. Country");
+
+    //    cell = row.CreateCell(14);
+    //    cell.SetCellValue("Cur. Addr. PIN");
+
+    //    cell = row.CreateCell(15);
+    //    cell.SetCellValue("*Date Of Birth");
+
+    //    cell = row.CreateCell(16);
+    //    cell.SetCellValue("Adhar Number");
+
+    //    cell = row.CreateCell(17);
+    //    cell.SetCellValue("PAN Number");
+
+    //    cell = row.CreateCell(18);
+    //    cell.SetCellValue("UAN Number");
+
+    //    cell = row.CreateCell(19);
+    //    cell.SetCellValue("Bank Name");
+    //    cell = row.CreateCell(20);
+    //    cell.SetCellValue("Acc No.");
+    //    cell = row.CreateCell(21);
+    //    cell.SetCellValue("IFSC Code");
+
+    //    cell = row.CreateCell(22);
+    //    cell.SetCellValue("*Emergency Number");
+
+    //    cell = row.CreateCell(23);
+    //    cell.SetCellValue("*Date Of Join");
+
+    //    cell = row.CreateCell(24);
+    //    cell.SetCellValue("Date Of Leaving");
+
+    //    cell = row.CreateCell(25);
+    //    cell.SetCellValue("Designation");
+
+    //    cell = row.CreateCell(26);
+    //    cell.SetCellValue("Report To");
+
+    //    MemoryStream ms = new MemoryStream();
+    //    workbook.Write(ms);
+    //    byte[] bytes = ms.ToArray();
+    //    ms.Close();
+
+    //    await JSRuntime.SaveAsFileAsync("Recipients", bytes, "application/.csv");
+    //}
 }

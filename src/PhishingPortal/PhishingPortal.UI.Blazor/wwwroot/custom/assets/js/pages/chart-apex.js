@@ -1837,8 +1837,8 @@ $(document).ready(function () {
         $(function () {
             var options = {
                 chart: {
-                    chart.canvas.parentNode.style.height = '128px';
-                    chart.canvas.parentNode.style.width = '128px';
+                    chart.canvas.parentNode.style.height = '128px',
+                    chart.canvas.parentNode.style.width = '128px',
                     type: 'pie',
                 },
                 labels: ['Template 1', 'Template 2', 'Template 3', 'Template 4'],

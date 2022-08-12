@@ -1,0 +1,327 @@
+﻿@page "/tenant-templates-config"
+@page "/tenant-templates-config/{Id:int}"
+
+@using System.IO
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using System.Text.RegularExpressions
+@using Blazored.TextEditor
+@using PhishingPortal.UI.Blazor.Pages
+@inject NavigationManager NavigationManager
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+@inject IJSRuntime JSRuntime
+@using BlazingComponents.Summernote
+
+
+
+@if (model == null)
+{
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <div class="col-sm-12">
+
+            <div class="card-header">
+              <div class="loading-bar"></div>
+            </div>
+     
+    </div>
+}
+        else
+        {
+              <div class="pcoded-content" style="padding-top: 10px;">
+
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-info" style="padding:15px !important;">
+                                    <h5 class="text-white">@Title</h5>
+                                    <div style="float:right">
+                                        <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                                    </div>
+                                </div>
+                                   <div class="card-body" style="padding-top: 20px;">
+                                     <div class="row">
+                                         <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+
+                   
+                                         <div class="row">
+                                             <div class="col-md-5">
+                                                <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                                    <div class="card" style="margin-bottom: 0;">
+                                                        <div class="card-body">
+                                                            <div class="form-group row">
+                                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Template</label>
+                                                                <div class="col-md-9">
+                                                                      <InputText id="Name" @bind-Value="model.Name" class="form-control" />                                                 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="" class="col-form-label col-md-3">Is Active</label>
+                                                                <div class="col-md-5">
+                                                                   <div class="radio radio-info radio-fill d-inline">
+                                                                        <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                                        <label for="radio-1" class="cr">Yes</label>
+                                                                    </div>
+                                                                    <div class="radio radio-info radio-fill d-inline">
+                                                                        <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" >
+                                                                        <label for="radio-2" class="cr">No</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="" class="col-form-label col-md-3">Is Html</label>
+                                                                <div class="col-md-5">
+                                                                   <div class="radio radio-info radio-fill d-inline">
+                                                                        <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
+                                                                        <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                                    </div>
+                                                                    <div class="radio radio-info radio-fill d-inline">
+                                                                        <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" >
+                                                                        <label for="radio-i-infill-2" class="cr">No</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="" class="col-form-label col-md-3">Template Type</label>
+                                                                <div class="col-md-9">
+                                                                   <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                                                        @foreach (var val in Enum.GetValues<CampaignType>())
+                                                                        {
+                                                                            <option value="@val">@val</option>
+                                                                        }
+                                                                   </InputSelect>
+                                                                </div>
+                                                            </div>
+                                                                    @if(model.Id==0)
+                                                                    {
+                                                    
+                                                                        <div class="form-group row">
+                                                                            <label for="" class="col-form-label col-md-3">Import Template</label>
+                                                                            <div class="col-md-5">
+                                                                               <div class="radio radio-info radio-fill d-inline">
+                                                                                    <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp" >
+                                                                                    <label for="radio-i-temp1" class="cr">Yes</label>
+                                                                                </div>
+                                                                                <div class="radio radio-info radio-fill d-inline">
+                                                                                    <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
+                                                                                    <label for="radio-i-temp2" class="cr">No</label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+                                                             
+                                                                    @if(model.Id==0 &&  import is true)
+                                                                    {    
+                                                                        <div class="form-group row" >
+                                                                            <label for="" class="col-form-label col-md-3"></label>
+                                                                            <div class="col-md-9">
+                                                                                <div class="input-group">
+                                                                                        <InputFile OnChange="@LoadFiles" class="form-control" accept=".html"/>
+                                                                                        @*<button class="btn btn-info" @onclick="LoadTempl">Upload</button>*@
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    }
+
+                                                        </div>
+
+
+
+                                                         <div class="btn-group col-12" >
+                                                            <button type="submit" class="btn btn-primary">Save</button>
+                                                            <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
+                                                          
+                                                        </div>
+                                                        <br/>
+                                                    </div>
+                                                </EditForm>
+                                             </div>
+                                             <div class="col-md-7" style="padding: 0;">
+                                                    <div class="card" style="margin-bottom: 0;">
+                                                        <div class="card-body">
+                                                               <div class="mb-3">
+                                                            <label for="Content" class="form-label">Template Content</label>
+                                                            <!-- Rich text editor -->
+                                                             <BlazingComponents.Summernote.Editor  @bind-Content = "@contents"/>  
+                                                              
+                                                            <!-- Rich text editor -->
+                                                             
+                                                            @*<div id="contentHelp" class="form-text">Content can be a rich text or html in case of email templates</div>*@
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                             </div>            
+                                         </div>
+                    
+
+                                    </div>
+                                </div>
+                            </div>
+                 
+                        </div>
+
+                    </div>
+              </div>
+        }
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    private string contents;
+
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Template" : "Create New Template";
+        }
+    }
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+    bool temp = false;
+    bool import = false;
+    bool showEditButton = true;
+
+    bool showPreview = false;
+    bool showNewDialog = false;
+    string content = string.Empty;
+    MarkupString previewContent => (MarkupString)content;
+
+    List<CampaignTemplate> Templates;
+    CampaignType? type = null;
+    CampaignTemplate model;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Templates = await client.GetTemplatesByType(type);
+        if (Id != 0)
+        {
+            model = await client.GetTemplateById(Id);
+            contents = model.Content;
+
+        }
+        else
+        {
+            model = new CampaignTemplate();
+
+        }
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/Summer.js");
+    }
+
+    protected void OnPreviewClick(CampaignTemplate template)
+    {
+        showPreview = true;
+        content = template.Content;
+    }
+
+    protected void OnClosePreview()
+    {
+        content = string.Empty;
+        showPreview = false;
+    }
+
+    public void OnNewClick()
+    {
+        Message = string.Empty;
+        model = new CampaignTemplate();
+        model.Version = "1";
+        showNewDialog = true;
+    }
+
+    public void OnEditClick(CampaignTemplate template)
+    {
+        Message = string.Empty;
+        model = template;
+        showNewDialog = true;
+    }
+
+    protected async Task OnSave()
+    {
+        loading = true;
+
+
+        try
+        {
+            if (model.Id > 0)
+                Message = "Successfully Updated";
+            else
+                Message = "Successfully Added";
+
+            //await GetHTML();
+            model.Content = contents;
+            model = await client.UpsertCampaignTemplate(model);
+
+            IsSuccess = true;
+
+            if (!Templates.Any(o => o.Id == model.Id))
+                Templates.Add(model);
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        loading = false;
+
+    }
+
+    int pageSize = 5;
+    int pageIndex = 0;
+    int pageIndext = 0;
+    public void Prevv()
+    {
+
+        if(pageIndex>0){ pageIndex--;} 
+        pageIndext = pageIndex;
+        // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
+    }
+    public void Nextt()
+    {
+        pageIndex++; 
+        pageIndext = pageIndex;
+
+    }
+    protected void onClose()
+    {
+        NavigationManager.NavigateTo("tenant-templates"); 
+    }
+    protected void OnActive(){model.IsActive = true;}
+    protected void OnNoActive(){model.IsActive = false;}
+
+    protected void Ishtml(){ model.IsHtml = true; }
+    protected void Nohtml(){ model.IsHtml = false; }
+
+    protected void Ytemp(){ import = true; }
+    protected void Ntemp(){ import = false; }
+
+    string result = "";
+    public async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var singleFile = e.File;
+        var fileStream = e.File.OpenReadStream();
+        var ms = new MemoryStream();
+        await fileStream.CopyToAsync(ms);
+        fileStream.Close();
+        result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+        // model.Content = result;
+        contents = result;
+        OnInitializedAsync();
+    }
+
+    public void LoadTempl()
+    {
+        
+    }
+}
+
