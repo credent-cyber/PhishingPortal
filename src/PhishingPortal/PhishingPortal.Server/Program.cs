@@ -18,8 +18,8 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var rsaCertificate = new X509Certificate2(
-    Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
+//var rsaCertificate = new X509Certificate2(
+    //Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
 
 // Add services to the container.
 

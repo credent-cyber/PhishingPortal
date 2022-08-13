@@ -144,7 +144,7 @@
                                                                <div class="mb-3">
                                                             <label for="Content" class="form-label">Template Content</label>
                                                             <!-- Rich text editor -->
-                                                             <BlazingComponents.Summernote.Editor  @bind-Content = "@contents"/>  
+                                                             <BlazingComponents.Summernote.Editor ContentChanged="@ContentChanged" />  
                                                               
                                                             <!-- Rich text editor -->
                                                              
@@ -199,7 +199,7 @@
     List<CampaignTemplate> Templates;
     CampaignType? type = null;
     CampaignTemplate model;
-    
+
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
@@ -215,6 +215,14 @@
 
         }
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/Summer.js");
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(model != null)
+            UpdateSummerNoteContent(contents);
+
+        return base.OnAfterRenderAsync(firstRender);
     }
 
     protected void OnPreviewClick(CampaignTemplate template)
@@ -244,6 +252,11 @@
         showNewDialog = true;
     }
 
+    protected void ContentChanged(string content)
+    {
+        contents = content;
+    }
+
     protected async Task OnSave()
     {
         loading = true;
@@ -257,6 +270,7 @@
                 Message = "Successfully Added";
 
             //await GetHTML();
+            contents = await GetSummerNoteContent();
             model.Content = contents;
             model = await client.UpsertCampaignTemplate(model);
 
@@ -321,7 +335,20 @@
 
     public void LoadTempl()
     {
-        
+
+    }
+
+    protected void UpdateSummerNoteContent(string content)
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        JSRuntime.InvokeVoidAsync("summernoteEditorHack", content, selector);
+    }
+
+    protected async Task<string> GetSummerNoteContent()
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
+        return result;
     }
 }
 
