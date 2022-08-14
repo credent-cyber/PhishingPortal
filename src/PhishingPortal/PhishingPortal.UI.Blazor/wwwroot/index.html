@@ -26,22 +26,9 @@
     <script type="text/javascript" src="scripts/my-chart-js.js"></script>
     <!-- Summernote Editor -->
     <link href="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.css" rel="stylesheet" />
-    <script type="text/javascript">
-
-        function summernoteEditorHack(code, selector) {
-            let $editor = $(selector);
-            if ($editor !== undefined)
-                $editor.summernote('code', code);
-        }
-
-        function getSummernoteEditorContent(selector) {
-            let $editor = $(selector);
-
-            if ($editor !== undefined)
-               return $editor.summernote('code');
-        }
-
-    </script>
+    <!--<script type="text/javascript">
+    </script>-->
+    <script src="scripts/SummerEditorHack.js"></script>
 </head>
 
 <body>

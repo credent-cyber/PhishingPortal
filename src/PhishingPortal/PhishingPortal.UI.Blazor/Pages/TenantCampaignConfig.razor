@@ -16,7 +16,7 @@
 
 @if (model == null || isloading)
 {
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <div class="col-sm-12">
 
             <div class="card-header">
@@ -115,14 +115,28 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Schedule</label>
                                                     <div class="col-md-5">
-                                                       <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                            <label for="radio-i-infill-1" class="cr">Later</label>
-                                                        </div>
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                            <label for="radio-i-infill-2" class="cr">Now</label>
-                                                        </div>
+                                                    @if(isScheduled == false)
+                                                        {                                                            
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                             <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" >
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div class="form-group row" id="divSchedule" >
@@ -187,9 +201,8 @@ else
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
-                                                        </InputSelect>
-                                                         @*<button class="btn btn-info"   @onclick="@(async() => {await GenerateExcel();})"><i class="fas fa-download"></i> Format</button>*@
-                                                         <button class="btn btn-info">Template <i class="fas fa-download"></i></button>
+                                                        </InputSelect>                                 
+                                                         <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
                                                         </div>
                                                         <br/>
                                                         @if (sources == RecipientSources.Csv)
