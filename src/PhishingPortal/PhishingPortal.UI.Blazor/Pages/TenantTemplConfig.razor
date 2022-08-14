@@ -15,7 +15,6 @@
 @using BlazingComponents.Summernote
 
 
-
 @if (model == null)
 {
     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -60,28 +59,56 @@
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Is Active</label>
                                                                 <div class="col-md-5">
-                                                                   <div class="radio radio-info radio-fill d-inline">
-                                                                        <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
-                                                                        <label for="radio-1" class="cr">Yes</label>
-                                                                    </div>
-                                                                    <div class="radio radio-info radio-fill d-inline">
-                                                                        <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" >
-                                                                        <label for="radio-2" class="cr">No</label>
-                                                                    </div>
+                                                                    @if(model.IsActive is false || model.Id == 0)
+                                                                    {                                                           
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" >
+                                                                            <label for="radio-1" class="cr">Yes</label>
+                                                                        </div>
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                                            <label for="radio-2" class="cr">No</label>
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                         <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                                            <label for="radio-1" class="cr">Yes</label>
+                                                                        </div>
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" >
+                                                                            <label for="radio-2" class="cr">No</label>
+                                                                        </div>
+                                                                    }
                                                                 </div>
                                                             </div>
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Is Html</label>
                                                                 <div class="col-md-5">
-                                                                   <div class="radio radio-info radio-fill d-inline">
-                                                                        <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
-                                                                        <label for="radio-i-infill-1" class="cr">Yes</label>
-                                                                    </div>
-                                                                    <div class="radio radio-info radio-fill d-inline">
-                                                                        <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" >
-                                                                        <label for="radio-i-infill-2" class="cr">No</label>
-                                                                    </div>
-                                                                </div>
+                                                                    @if (model.IsHtml is false || model.Id == 0)
+                                                                    {
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" >
+                                                                            <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                                        </div>
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
+                                                                            <label for="radio-i-infill-2" class="cr">No</label>
+                                                                        </div>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
+                                                                            <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                                        </div>
+                                                                        <div class="radio radio-info radio-fill d-inline">
+                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" >
+                                                                            <label for="radio-i-infill-2" class="cr">No</label>
+                                                                        </div>
+                                                                    }
+                                                    </div>
                                                             </div>
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Template Type</label>
@@ -147,8 +174,7 @@
                                                              <BlazingComponents.Summernote.Editor />  
                                                               
                                                             <!-- Rich text editor -->
-                                                             
-                                                            @*<div id="contentHelp" class="form-text">Content can be a rich text or html in case of email templates</div>*@
+                                         
                                                         </div>
                                                         </div>
                                                     </div>
@@ -212,6 +238,7 @@
         else
         {
             model = new CampaignTemplate();
+            model.Version = "1";
 
         }
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/Summer.js");
@@ -252,7 +279,7 @@
         showNewDialog = true;
     }
 
- 
+
 
     protected async Task OnSave()
     {
@@ -325,9 +352,24 @@
         await fileStream.CopyToAsync(ms);
         fileStream.Close();
         result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-        // model.Content = result;
+        const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";   
+        var matches = Regex.Matches(result, section ,RegexOptions.IgnoreCase|RegexOptions.Multiline);
+        foreach(Match match in matches)
+        {
+            if (match.Success)
+            {
+                var sdata = match.Groups["pick"].Value;
+                if (!string.IsNullOrEmpty(sdata))
+                {
+                    var newResult = Regex.Replace(result,sdata, @"img/");
+                    result = newResult;
+                }
+            }
+         }
+
+
         contents = result;
-        OnInitializedAsync();
+
     }
 
     public void LoadTempl()

@@ -16,7 +16,7 @@
 
 @if (model == null || isloading)
 {
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
     <div class="col-sm-12">
 
             <div class="card-header">
@@ -106,8 +106,17 @@ else
                                                  <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
                                                     <div class="col-md-9">
-                                                       <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
-                                                       <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>
+                                                      @* <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
+                                                       <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
+                                                       <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
+
+                                                                <option value="Clicks">Clicks</option>
+                                                                <option value="Offers">Offers</option>
+                                                                <option value="ITServices">IT Services</option>
+                                                                <option value="Banking">Banking</option>
+                                                                <option value="Finance">Finance</option>
+
+                                                        </InputSelect>
                                                     </div>
                                                 </div>
                 
@@ -115,14 +124,28 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Schedule</label>
                                                     <div class="col-md-5">
-                                                       <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                            <label for="radio-i-infill-1" class="cr">Later</label>
-                                                        </div>
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                            <label for="radio-i-infill-2" class="cr">Now</label>
-                                                        </div>
+                                                    @if(isScheduled == false)
+                                                        {                                                            
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                             <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" >
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div class="form-group row" id="divSchedule" >
@@ -187,9 +210,8 @@ else
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
-                                                        </InputSelect>
-                                                         @*<button class="btn btn-info"   @onclick="@(async() => {await GenerateExcel();})"><i class="fas fa-download"></i> Format</button>*@
-                                                         <button class="btn btn-info">Template <i class="fas fa-download"></i></button>
+                                                        </InputSelect>                                 
+                                                         <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
                                                         </div>
                                                         <br/>
                                                         @if (sources == RecipientSources.Csv)
@@ -797,102 +819,5 @@ else
         NavigationManager.NavigateTo("tenant-campaigns"); 
     }
 
-    //public async Task GenerateExcel()
-    //{
-    //    IWorkbook workbook = new XSSFWorkbook();
-    //    var dataFormat = workbook.CreateDataFormat();
-    //    var dataStyle = workbook.CreateCellStyle();
-    //    dataStyle.DataFormat = dataFormat.GetFormat("MM/dd/yyyy HH:mm:ss");
 
-    //    ISheet worksheet = workbook.CreateSheet("Sheet1");
-    //    int rowNumber = 0;
-    //    IRow row = worksheet.CreateRow(rowNumber++);
-
-    //    //Table Header
-    //    ICell cell = row.CreateCell(0);
-    //    cell.SetCellValue("*Company Code");
-
-    //    cell = row.CreateCell(1);
-    //    cell.SetCellValue("*Employee ID");
-
-    //    cell = row.CreateCell(2);
-    //    cell.SetCellValue("*Employee Name");
-
-    //    cell = row.CreateCell(3);
-    //    cell.SetCellValue("*Father Name");
-
-    //    cell = row.CreateCell(4);
-    //    cell.SetCellValue("Employee Status");
-
-    //    cell = row.CreateCell(5);
-    //    cell.SetCellValue("*Email");
-
-    //    cell = row.CreateCell(6);
-    //    cell.SetCellValue("*Mobile Number");
-
-    //    cell = row.CreateCell(7);
-    //    cell.SetCellValue("*Permanent Address");
-
-    //    cell = row.CreateCell(8);
-    //    cell.SetCellValue("*Per. Addr. State");
-
-    //    cell = row.CreateCell(9);
-    //    cell.SetCellValue("*Per. Addr. Country");
-
-    //    cell = row.CreateCell(10);
-    //    cell.SetCellValue("Per. Addr. PIN");
-
-    //    cell = row.CreateCell(11);
-    //    cell.SetCellValue("Current Address");
-
-    //    cell = row.CreateCell(12);
-    //    cell.SetCellValue("Cur. Addr. State");
-
-    //    cell = row.CreateCell(13);
-    //    cell.SetCellValue("Cur. Addr. Country");
-
-    //    cell = row.CreateCell(14);
-    //    cell.SetCellValue("Cur. Addr. PIN");
-
-    //    cell = row.CreateCell(15);
-    //    cell.SetCellValue("*Date Of Birth");
-
-    //    cell = row.CreateCell(16);
-    //    cell.SetCellValue("Adhar Number");
-
-    //    cell = row.CreateCell(17);
-    //    cell.SetCellValue("PAN Number");
-
-    //    cell = row.CreateCell(18);
-    //    cell.SetCellValue("UAN Number");
-
-    //    cell = row.CreateCell(19);
-    //    cell.SetCellValue("Bank Name");
-    //    cell = row.CreateCell(20);
-    //    cell.SetCellValue("Acc No.");
-    //    cell = row.CreateCell(21);
-    //    cell.SetCellValue("IFSC Code");
-
-    //    cell = row.CreateCell(22);
-    //    cell.SetCellValue("*Emergency Number");
-
-    //    cell = row.CreateCell(23);
-    //    cell.SetCellValue("*Date Of Join");
-
-    //    cell = row.CreateCell(24);
-    //    cell.SetCellValue("Date Of Leaving");
-
-    //    cell = row.CreateCell(25);
-    //    cell.SetCellValue("Designation");
-
-    //    cell = row.CreateCell(26);
-    //    cell.SetCellValue("Report To");
-
-    //    MemoryStream ms = new MemoryStream();
-    //    workbook.Write(ms);
-    //    byte[] bytes = ms.ToArray();
-    //    ms.Close();
-
-    //    await JSRuntime.SaveAsFileAsync("Recipients", bytes, "application/.csv");
-    //}
 }
