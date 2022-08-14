@@ -53,7 +53,8 @@
 
     <div class="form-group">
         <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
-        <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+        <InputDate  @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+
     </div>
     
     <div class="form-group">
@@ -64,6 +65,11 @@
                 <option value="@op">@op</option>
             }
         </InputSelect>
+    </div>
+
+      <div class="form-group">
+          <InputCheckbox id="RequireDomainVerification" @bind-Value="model.RequireDomainVerification" class="form-check-input" />
+                    <label for="RequireDomainVerification" class="form-check-label">Require Domain Verification</label>
     </div>
     
     <button class="btn btn-primary" type="submit">Register</button>
@@ -86,6 +92,7 @@
             ContactNumber = "9897659876",
             LicenseExpiry = DateTime.MaxValue,
             LicenseType = LicenseTypes.Subscription,
+            RequireDomainVerification = true,
         };
 
 

@@ -47,6 +47,11 @@ namespace PhishingPortal.Server.Controllers
         public IEmailSender EmailSender { get; }
         public UserManager<PhishingPortalUser> UserManager { get; }
 
+        /// <summary>
+        /// Step1 of tenant onboarding
+        /// </summary>
+        /// <param name="tenant"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Register")]
         public async Task<Tenant> Register(Tenant tenant)
@@ -57,7 +62,8 @@ namespace PhishingPortal.Server.Controllers
             {
                 result = await tenatAdminRepo.CreateTenantAsync(tenant);
 
-                await SendConfirmationEmail(tenant);
+                if(tenant.RequireDomainVerification)
+                    await SendConfirmationEmail(tenant);
 
             }
             catch (Exception ex)
@@ -84,7 +90,7 @@ namespace PhishingPortal.Server.Controllers
 
         [HttpPost]
         [Route("Provision")]
-        [Obsolete]
+        [Obsolete("This method is not used anymore")]
         public async Task Provision(ProvisionTenantRequest request)
         {
             var result = await tenatAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);
@@ -93,6 +99,11 @@ namespace PhishingPortal.Server.Controllers
                 NotFound("Tenant not registered yet");
         }
 
+        /// <summary>
+        /// Step 2 - Confirmation link hit
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Confirm")]
         [AllowAnonymous]
@@ -117,22 +128,46 @@ namespace PhishingPortal.Server.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Step 3 - domain verification
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("ConfirmDomain")]
         [AllowAnonymous]
         public async Task<ApiResponse<Tenant>> ConfirmDomain(DomainVerificationRequest domain)
         {
             var response = new ApiResponse<Tenant>();
-            Tenant t;
+            Tenant confirmedTenant;
             try
             {
-                // do actual domain verification
-                if (NsLookup.VerifyDnsRecords("TXT", domain.Domain.Trim().ToLower(), domain.DomainVerificationCode))
+                var tenant = await tenatAdminRepo.GetByUniqueId(domain.UniqueId);
+                if (tenant == null)
                 {
-                    t = await tenatAdminRepo.ConfirmDomainAsync(domain);
+                    Logger.LogError($"Tenant with uniqueid: [{domain.UniqueId}] not found");
                     response.IsSuccess = true;
                     response.Message = "Sucessfully verified domain";
-                    response.Result = t;
+                    return response;
+                }
+                
+                var verficationResult = false;
+                if(tenant.RequireDomainVerification)
+                {
+                    verficationResult = NsLookup.VerifyDnsRecords("TXT", domain.Domain.Trim().ToLower(), domain.DomainVerificationCode);
+                }
+                else
+                {
+                    Logger.LogWarning($"The domain verfication has been by passed for this tenant with unique ID: {tenant.UniqueId}");
+                    verficationResult = true;
+                }
+                // do actual domain verification
+                if (verficationResult)
+                {
+                    confirmedTenant = await tenatAdminRepo.ConfirmDomainAsync(domain);
+                    response.IsSuccess = true;
+                    response.Message = "Sucessfully verified domain";
+                    response.Result = confirmedTenant;
                 }
                 else
                 {
@@ -150,7 +185,12 @@ namespace PhishingPortal.Server.Controllers
             return response;
         }
 
-
+        /// <summary>
+        /// Step 4- Tenant admin user creation
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         [HttpPost]
         [Route("CreateDefaultUser")]
         [AllowAnonymous]
@@ -177,9 +217,7 @@ namespace PhishingPortal.Server.Controllers
                 {
                     UserName = user.Email,
                     Email = user.Email,
-#if DEBUG
-                    EmailConfirmed = true,
-#endif 
+                    EmailConfirmed = !tenant.RequireDomainVerification, // if tenant required domain verification then email confirmation is required
                 }, user.Password);
 
                 // TODO: assign tenant_admin role

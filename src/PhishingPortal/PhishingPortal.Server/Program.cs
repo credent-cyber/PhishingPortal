@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql;
 using Serilog;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,7 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
+var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
 
 if (useSqlLite)
 {
@@ -51,13 +53,39 @@ if (useSqlLite)
 }
 else
 {
-    conString = builder.Configuration.GetConnectionString("DefaultConnection");
-    builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+    #region Use configured sql provider
+    if (string.IsNullOrEmpty(sqlProvider))
     {
-        options.UseMySql(conString, ServerVersion.AutoDetect(conString));
-    });
-}
+        sqlProvider = "mysql";
+    }
 
+    conString = builder.Configuration.GetConnectionString("DefaultConnection");
+    switch (sqlProvider)
+    {
+        case "mysql":
+
+            builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+            {
+                options.UseMySql(conString, ServerVersion.AutoDetect(conString));
+            });
+
+
+            break;
+
+        case "mssql":
+
+            builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+            {
+                options.UseSqlServer(conString);
+            });
+
+            break;
+
+        default: throw new Exception($"Invalid SqlProvider configuration [{sqlProvider}]");
+    }
+
+    #endregion
+}
 
 builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
 {
@@ -93,17 +121,14 @@ builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver,TenantDbResolver>();
 
 var app = builder.Build();
-
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
-
 using (var scope = scopeFactory.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PhishingPortalDbContext>();
     if (db.Database.EnsureCreated())
     {
-        // seed data
+        // seed data if a single tenant application
     }
-
 }
 
 // Configure the HTTP request pipeline.

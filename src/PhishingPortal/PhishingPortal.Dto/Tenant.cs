@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using PhishingPortal.Common;
 
@@ -24,6 +25,7 @@ namespace PhishingPortal.Dto
         public DateTime LicenseExpiry { get; set; }
         public string LicenseKey { get; set; }
         public bool IsActive { get; set; }
+        public bool RequireDomainVerification { get; set; }
         public virtual ICollection<TenantData> Settings { get; set; }
         public virtual ICollection<TenantDomain> TenantDomains { get; set; }
 
@@ -43,7 +45,9 @@ namespace PhishingPortal.Dto
     {
         SqlLite,
         MySql,
+        MsSql,
         PostGreSql
+        
     }
 
     public enum LicenseTypes
@@ -58,7 +62,7 @@ namespace PhishingPortal.Dto
         Registered,
         Verified,
         DomainVerified,
-        MasterUser,
+        MasterUser,  // this the final state currently
         Licensed
     }
 

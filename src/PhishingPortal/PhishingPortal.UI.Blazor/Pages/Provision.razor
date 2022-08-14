@@ -31,7 +31,17 @@
                 <td>@t.Name</td>
                 <td>@t.LicenseType</td>
                 <td>@t.LicenseExpiry</td>
-                <td><a class="btn-link" target="_blank" href="@t.ConfirmationLink">Confirm</a></td>
+                <td>@if(t.ConfirmationState == ConfirmationStats.Registered 
+                                && t.ConfirmationState != ConfirmationStats.MasterUser 
+                                && t.ConfirmationState != ConfirmationStats.Licensed)
+                    {
+                        <a class="btn-link" target="_blank" href="@t.ConfirmationLink">Confirm</a>
+                    }
+                    else
+                    {
+                        @t.ConfirmationState.ToString()
+                    }
+                </td>
 
             </tr>
         }
