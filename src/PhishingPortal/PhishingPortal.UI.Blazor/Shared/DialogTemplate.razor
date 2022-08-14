@@ -5,19 +5,19 @@
 
     <div class="dialog-container" style="width:100%; height:100%">
 
-        <div class="dialog" style="width:60%;"> @*popup screen size*@
+        <div class="dialog" >
        
-                <div class="card" >
+                <div class="card">
                  
                    <div class="card-header bg-info" style="padding:15px !important;">
                      <h5 class="text-white">@Title</h5>
-                        @if(Title=="Template Preview")
-                        {
-                            <div style="float:right">
-                                   <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
-                            </div>
-                        }
-                   </div>
+                     @if(Title=="Template Preview")
+                    {
+                        <div style="float:right">
+                               <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                    }
+                </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -38,9 +38,11 @@
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
 
-
-    public void onClose()
+ 
+  
+    protected void onClose()
     {
-        Show = false;
+      
     }
+  
 }
