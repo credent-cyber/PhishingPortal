@@ -71,7 +71,7 @@ else
                                                     <label for="" class="col-form-label col-md-3">Select Template </label>
                                                     <div class="col-md-9">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                                                            @foreach (var val in Templates)
+                                                            @foreach (var val in Templates.OrderBy(o=>o.Name))
                                                                 {
                                                                 <option value="@val.Id">@val.Name</option>
                                                                 }
@@ -291,7 +291,7 @@ else
                                                     {
                                                         <button type="button" class="btn btn-dark"  @onclick="OnShowRecipientClickk" >Show Recipients</button>                                                      
                                                     }
-                                                    @if (model.State == CampaignStateEnum.Draft)
+                                                    @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                     {
                                                         <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
                                                     }
