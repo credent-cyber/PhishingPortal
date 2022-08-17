@@ -13,6 +13,8 @@
 @inject ILogger<TenantCampaigns> logger
 @inject IJSRuntime JSRuntime
 @using BlazingComponents.Summernote
+@inject HttpClient Http
+@using PhishingPortal.Common
 
 
 @if (model == null)
@@ -142,7 +144,7 @@
                                                                     @if(model.Id==0 &&  import is true)
                                                                     {    
                                                                         <div class="form-group row" >
-                                                                            <label for="" class="col-form-label col-md-3"></label>
+                                                                            <label for="" class="col-form-label col-md-3">Template</label>
                                                                             <div class="col-md-9">
                                                                                 <div class="input-group">
                                                                                         <InputFile OnChange="@LoadFiles" class="form-control" accept=".html"/>
@@ -150,6 +152,18 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+
+                                                                        <div class="input-group">
+
+	                                                                        <div class="custom-file">
+		                                                                        <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+		                                                                        <label class="custom-file-label" for="inputFile">Upload Images </label>
+	                                                                        </div>
+	                                                                        <div class="input-group-append">
+		                                                                        <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+	                                                                        </div>
+                                                                        </div>
+                                                                        <h>@message</h>
                                                                     }
 
                                                         </div>
@@ -361,7 +375,7 @@
                 var sdata = match.Groups["pick"].Value;
                 if (!string.IsNullOrEmpty(sdata))
                 {
-                    var newResult = Regex.Replace(result,sdata, @"img/");
+                    var newResult = Regex.Replace(result,sdata, @"img/email/");
                     result = newResult;
                 }
             }
@@ -389,5 +403,41 @@
         var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
         return result;
     }
+    
+    //Image Upload    
+    List<ImageFile> filesBase64 = new List<ImageFile>();
+	string message = "";
+	bool isDisabled = false;
+
+	async Task OnChange(InputFileChangeEventArgs e)
+	{
+		var files = e.GetMultipleFiles(); // get the files selected by the users
+		foreach(var file in files)
+		{
+			var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // resize the image file
+			var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+			using (var stream = resizedFile.OpenReadStream())
+			{
+				await stream.ReadAsync(buf); // copy the stream to the buffer
+			}
+			filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name }); // convert to a base64 string!!
+		}
+		message = "Click UPLOAD to continue";
+	}
+
+	async Task Upload()
+	{
+		isDisabled = true;
+		using (var msg = await Http.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64, System.Threading.CancellationToken.None))
+		{
+			isDisabled = false;
+			if (msg.IsSuccessStatusCode)
+			{
+				message = $"{filesBase64.Count} files uploaded";
+				filesBase64.Clear();
+			}
+		}
+	}
+
 }
 
