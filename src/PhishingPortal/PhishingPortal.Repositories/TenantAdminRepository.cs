@@ -37,6 +37,7 @@ namespace PhishingPortal.Repositories
             tenant.UniqueId = $"{Config.DbNamePrefix}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
             tenant.ConfirmationLink = $"{tenant.GetConfirmationLink(Config.TenantConfirmBaseUrl)}";
             tenant.ConfirmationState = ConfirmationStats.Registered;
+
             tenant.ConfirmationExpiry = DateTime.Now.AddDays(Config.DaysToConfirm);
 
             tenant.CreatedOn = DateTime.Now;
@@ -45,7 +46,7 @@ namespace PhishingPortal.Repositories
             var connectionString = Config.ConnectionString;
 
 #if DEBUG
-            tenant.DatabaseOption = DbOptions.SqlLite;
+            //tenant.DatabaseOption = DbOptions.SqlLite;
 #endif
 
             if (tenant.DatabaseOption == DbOptions.SqlLite)
@@ -207,6 +208,10 @@ namespace PhishingPortal.Repositories
                 else if(tenant.DatabaseOption == DbOptions.MySql)
                 {
                     optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                }
+                else if(tenant.DatabaseOption == DbOptions.MsSql)
+                {
+                    optionsBuilder.UseSqlServer(connectionString);
                 }
                 else
                 {

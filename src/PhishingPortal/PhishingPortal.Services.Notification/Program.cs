@@ -29,7 +29,11 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         var useSqlLite = hostContext.Configuration.GetValue<bool>("UseSqlLite");
         var connectionString = hostContext.Configuration.GetValue<string>("CentralDbConnString");
-
+        var sqlProvider = hostContext.Configuration.GetValue<string>("SqlProvider");
+        if (string.IsNullOrEmpty(sqlProvider))
+        {
+            sqlProvider = "mysql";
+        }
         if (useSqlLite)
         {
             var ctxBuilder = new DbContextOptionsBuilder<CentralDbContext>();
@@ -42,7 +46,24 @@ IHost host = Host.CreateDefaultBuilder(args)
         {
             var conString = hostContext.Configuration.GetConnectionString("DefaultConnection");
             var ctxBuilder = new DbContextOptionsBuilder<CentralDbContext>();
-            ctxBuilder.UseMySql(conString, ServerVersion.AutoDetect(conString));
+
+
+            switch (sqlProvider)
+            {
+                case "mysql":
+
+                    ctxBuilder.UseMySql(conString, ServerVersion.AutoDetect(conString));
+
+                    break;
+
+                case "mssql":
+
+                    ctxBuilder.UseSqlServer(conString);
+                    break;
+
+                default: throw new Exception($"Invalid SqlProvider configuration [{sqlProvider}]");
+            }
+
             services.AddSingleton<CentralDbContext>(new CentralDbContext(ctxBuilder.Options));
         }
 
