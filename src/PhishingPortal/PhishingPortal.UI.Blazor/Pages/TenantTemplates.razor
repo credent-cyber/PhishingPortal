@@ -11,8 +11,7 @@
 
 @if (Templates == null)
 {
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-    <div class="col-sm-12">
+    <div class="col-sm-12" style="margin-top:45vh">
 
             <div class="card-header">
               <div class="loading-bar"></div>
@@ -232,15 +231,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
-
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/form-select-custom.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.dataTables.min.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/dataTables.bootstrap4.min.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/buttons.colVis.min.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/dataTables.buttons.min.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/data-basic-custom.js");
-        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.bootstrap.wizard.min.js");
-
 
     }
 
