@@ -82,6 +82,12 @@ namespace PhishingPortal.Services.Notification
                 optionsBuilder.UseMySql(connString, ServerVersion.AutoDetect(connString));
             }
 
+            else if (tenant.DatabaseOption == DbOptions.MsSql)
+            {
+                _logger.LogInformation($"Using mssql");
+                optionsBuilder.UseSqlServer(connString, opts => { });
+            }
+
             return optionsBuilder;
         }
 

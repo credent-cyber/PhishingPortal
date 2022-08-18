@@ -57,6 +57,10 @@ namespace PhishingPortal.Server.Services
                 {
                     optionsBuilder.UseMySql(dbSetting.Value, ServerVersion.AutoDetect(dbSetting.Value));
                 }
+                else if(Tenant.DatabaseOption == DbOptions.MsSql)
+                {
+                    optionsBuilder.UseSqlServer(dbSetting.Value, opts => { });
+                }
                 else
                 {
                     throw new NotImplementedException("Db provider not implement");

@@ -1,5 +1,6 @@
 ﻿namespace PhishingPortal.Common
 {
+    using System;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using System.Net;
