@@ -27,6 +27,7 @@ namespace PhishingPortal.DataContext
         public DbSet<Recipient> Recipients { get; set; }
         public DbSet<RecipientGroup> RecipientGroups { get; set; }
         public DbSet<RecipientGroupMapping> RecipientGroupMappings { get; set; }
+        public DbSet<TenantSetting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -6,7 +6,7 @@ using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.Repositories
 {
-    public class TenantRepository : BaseRepository
+    public class TenantRepository : BaseRepository, ITenantRepository, ISettingsRepository
     {
         public TenantRepository(ILogger logger, TenantDbContext dbContext)
             : base(logger)
@@ -14,11 +14,23 @@ namespace PhishingPortal.Repositories
             TenantDbCtx = dbContext;
         }
 
+        public virtual async Task<T> GetSetting<T>(string key)
+        {
+            T value = default(T);
+
+            var v = await TenantDbCtx.Settings.FirstOrDefaultAsync(x => x.Key == key);
+
+            if (v != null)
+                value = (T)Convert.ChangeType(v, typeof(T));
+
+            return await Task.FromResult(value);
+        }
+
         public Task<IEnumerable<Campaign>> GetAllCampaigns(int pageIndex, int pageSize)
         {
             var result = Enumerable.Empty<Campaign>();
 
-            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).OrderByDescending(o=>o.Id)
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).OrderByDescending(o => o.Id)
                 .Skip(pageIndex * pageSize).Take(pageSize);
 
             return Task.FromResult(result);
@@ -440,6 +452,78 @@ namespace PhishingPortal.Repositories
                 data.Entries.Add(entry);
             }
             return await Task.FromResult(data);
+        }
+
+        /// <summary>
+        /// GetRecipientGroups
+        /// </summary>
+        /// <param name="adGroupOnly"></param>
+        /// <returns></returns>
+        public async Task<List<RecipientGroup>> GetRecipientGroups(bool adGroupOnly = false)
+        {
+            var query = TenantDbCtx.RecipientGroups.AsQueryable();
+
+            if (adGroupOnly)
+                query = query.Where(o => o.IsActiveDirectoryGroup);
+
+            return await query.ToListAsync();
+        }
+
+        /// <summary>
+        /// GetRecipientsByGroupId
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public async Task<List<Recipient>> GetRecipientsByGroupId(int groupId)
+        {
+            var query = from rm in TenantDbCtx.RecipientGroupMappings
+                        join r in TenantDbCtx.Recipients on rm.RecipientId equals r.Id
+                        where rm.GroupId == groupId
+                        select r;
+
+            return await query.ToListAsync();
+        }
+
+        /// <summary>
+        /// InsertRecipientGroupMappings
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="recipients"></param>
+        /// <returns></returns>
+        public async Task<List<Recipient>> ImportAdGroupMembers(RecipientGroup group, List<Recipient> recipients)
+        {
+            var grp = TenantDbCtx.RecipientGroups.FirstOrDefault(o => o.Uid == group.Uid);
+
+            if (grp == null)
+            {
+                grp = group;
+                TenantDbCtx.RecipientGroups.Add(group);
+                TenantDbCtx.SaveChanges();
+            }
+
+            foreach (var recipient in recipients)
+            {
+                var r = TenantDbCtx.Recipients.FirstOrDefault(o => o.Email == recipient.Email);
+
+                if (r == null)
+                {
+                    r = recipient;
+                    TenantDbCtx.Add(recipient);
+                    TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = r.Id });
+                    TenantDbCtx.SaveChanges();
+                }
+                else
+                {
+                    var rm = TenantDbCtx.RecipientGroupMappings.FirstOrDefault(o => o.GroupId == grp.Id && o.RecipientId == r.Id);
+                    if (rm == null)
+                    {
+                        TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = r.Id });
+                        TenantDbCtx.SaveChanges();
+                    }
+                }
+            }
+
+            return await Task.FromResult(recipients);
         }
     }
 }

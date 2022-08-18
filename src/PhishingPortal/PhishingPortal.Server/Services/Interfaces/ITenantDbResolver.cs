@@ -1,7 +1,7 @@
 ﻿using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 
-namespace PhishingPortal.Server.Services
+namespace PhishingPortal.Server.Services.Interfaces
 {
     public interface ITenantDbResolver
     {
