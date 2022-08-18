@@ -53,7 +53,7 @@ else
                                         </thead>
                                         <tbody> 
                                     
-                                             @foreach (var c in campaigns.OrderBy(o => o.Id))
+                                             @foreach (var c in campaigns)
                                              {
                                                 <tr role="row" class="odd">
                                                     <td><a class="btn-link" href="tenant-campaign-config/@c.Id">@c.Id</a></td>

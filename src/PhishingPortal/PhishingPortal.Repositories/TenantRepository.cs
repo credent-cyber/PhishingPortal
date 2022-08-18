@@ -18,7 +18,7 @@ namespace PhishingPortal.Repositories
         {
             var result = Enumerable.Empty<Campaign>();
 
-            result = TenantDbCtx.Campaigns.Include(o => o.Schedule)
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).OrderByDescending(o=>o.Id)
                 .Skip(pageIndex * pageSize).Take(pageSize);
 
             return Task.FromResult(result);
