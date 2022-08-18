@@ -16,8 +16,8 @@
 
 @if (model == null || isloading)
 {
-    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-    <div class="col-sm-12">
+    
+    <div class="col-sm-12" style="margin-top:45vh">
 
             <div class="card-header">
               <div class="loading-bar"></div>
@@ -110,6 +110,7 @@ else
                                                        <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
                                                        <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
 
+                                                                <option>-Select-</option>
                                                                 <option value="Clicks">Clicks</option>
                                                                 <option value="Offers">Offers</option>
                                                                 <option value="ITServices">IT Services</option>
@@ -424,8 +425,8 @@ else
         {
             model = await client.GetCampaingById(Id);
 
-            //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
-            //    scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
+            if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
+                scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
 
             //if (model.Schedule.ScheduleType == ScheduleTypeEnum.Daily)
             //    dailySchedule = new DailySchedule(model.Schedule.ScheduleInfo);
