@@ -177,7 +177,7 @@ else
                                                 </thead>
                                                 <tbody> 
                                     
-                                                     @foreach (var c in campaigns.Where(o => o.State==CampaignStateEnum.Published))
+                                                     @foreach (var c in campaigns.Where(o => o.State==CampaignStateEnum.Published ||o.State==CampaignStateEnum.Aborted))
                                                      {
                                                         <tr role="row" class="odd">
                                                             <td><a class="btn-link" href="tenant-campaign-config/@c.Id">@c.Id</a></td>
@@ -262,7 +262,7 @@ else
                                         
                                                             <td>
                                                                 @*<a href="#" title="View Campaign" class="btn btn-secondary btn-sm"><i class="fa fa-eye"></i></a>*@
-                                                                <a href="tenant-campaign-config/@c.Id" title="Edit Campaign" class="btn btn-primary btn-sm" ><i class="fa fa-edit fa-2x"></i></a>
+                                                                <a href="tenant-campaign-config/@c.Id" title="Edit Campaign" class="btn btn-primary btn-sm" ><i class="fa fa-edit"></i></a>
                                                                 @*<a href="#" title="Delete" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>*@
                                                             </td>
                                                         </tr>
