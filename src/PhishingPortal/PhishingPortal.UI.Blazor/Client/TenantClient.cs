@@ -295,9 +295,9 @@ namespace PhishingPortal.UI.Blazor.Client
                 var res = await HttpClient.GetAsync($"api/tenant/az-ad-groups");
                 res.EnsureSuccessStatusCode();
 
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Dictionary<string, string>>>();
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 if (json != null)
-                    response = json.Result;
+                    response = json;
 
             }
             catch (Exception ex)
@@ -340,13 +340,13 @@ namespace PhishingPortal.UI.Blazor.Client
         /// </summary>
         /// <param name="groups"></param>
         /// <returns></returns>
-        public async Task<List<Recipient>> ImportAzureADByUserGroups(string grpUid)
+        public async Task<List<Recipient>> ImportAzureADByUserGroups(RecipientGroup grp)
         {
             var response = new List<Recipient>();
 
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/tenant/az-ad-user-groups-import", grpUid);
+                var res = await HttpClient.PostAsJsonAsync<RecipientGroup>($"api/tenant/az-ad-user-groups-import", grp);
                 res.EnsureSuccessStatusCode();
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<List<Recipient>>>();

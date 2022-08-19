@@ -49,7 +49,8 @@ namespace PhishingPortal.Server.Services
             if (result == null)
                 return new Dictionary<string, string>();
 
-            return result.ToList().ToDictionary(k => k.Id, v => v.DisplayName);
+            return result.ToList().OrderBy(o =>o.DisplayName)
+                .ToDictionary(k => k.Id, v => v.DisplayName);
         }
 
         public async Task<List<User>> GetAdUsers()

@@ -285,8 +285,17 @@ namespace PhishingPortal.Server.Controllers.Api
         {
             var response = new ApiResponse<List<Recipient>>();
 
-            var adUsers = await _adImportClient.GetGroupMembers(adRecipientGroup.Uid);
-            
+            var adUsers = new List<Microsoft.Graph.User>();
+
+            if(adRecipientGroup.Uid == "all-users")
+            {
+                adUsers = await _adImportClient.GetAdUsers();
+            }
+            else
+            {
+                adUsers = await _adImportClient.GetGroupMembers(adRecipientGroup.Uid);
+            }
+
             if (adUsers != null && adUsers.Count() > 0)
             {
                 var recipients = adUsers.Select(o => new Recipient
@@ -305,6 +314,8 @@ namespace PhishingPortal.Server.Controllers.Api
                 }).ToList();
 
                 var result =  await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
+                
+                
                 response.IsSuccess = true;
                 response.Result = result;
             }

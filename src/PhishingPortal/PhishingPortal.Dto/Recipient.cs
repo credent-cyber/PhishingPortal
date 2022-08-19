@@ -37,6 +37,20 @@ namespace PhishingPortal.Dto
         public string DateOfBirth { get; set; }
         public string ValidationErrMsg { get; private set; }
 
+        public RecipientImport() { }
+
+        public RecipientImport(Recipient o)
+        {
+            EmployeeCode = o.EmployeeCode;
+            Name = o.Name;
+            Email = o.Email;
+            Mobile = o.Mobile;
+            Branch = o.Branch;
+            Department = o.Department;
+            Address = o.Address;
+            DateOfBirth = o.DateOfBirth;
+        }
+
         public void Validate()
         {
             ValidationErrMsg = string.Empty;

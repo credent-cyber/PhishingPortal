@@ -33,7 +33,7 @@ namespace PhishingPortal.DataContext
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<RecipientGroupMapping>().HasNoKey();
+            modelBuilder.Entity<RecipientGroupMapping>().HasKey(o => new { o.GroupId, o.RecipientId });
 
         }
 

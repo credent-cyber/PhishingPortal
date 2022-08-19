@@ -21,7 +21,7 @@ namespace PhishingPortal.Repositories
             var v = await TenantDbCtx.Settings.FirstOrDefaultAsync(x => x.Key == key);
 
             if (v != null)
-                value = (T)Convert.ChangeType(v, typeof(T));
+                value = (T)Convert.ChangeType(v.Value, typeof(T));
 
             return await Task.FromResult(value);
         }
@@ -492,35 +492,53 @@ namespace PhishingPortal.Repositories
         /// <returns></returns>
         public async Task<List<Recipient>> ImportAdGroupMembers(RecipientGroup group, List<Recipient> recipients)
         {
-            var grp = TenantDbCtx.RecipientGroups.FirstOrDefault(o => o.Uid == group.Uid);
-
-            if (grp == null)
+            try
             {
-                grp = group;
-                TenantDbCtx.RecipientGroups.Add(group);
-                TenantDbCtx.SaveChanges();
-            }
+                var grp = TenantDbCtx.RecipientGroups.FirstOrDefault(o => o.Uid == group.Uid);
 
-            foreach (var recipient in recipients)
-            {
-                var r = TenantDbCtx.Recipients.FirstOrDefault(o => o.Email == recipient.Email);
-
-                if (r == null)
+                if (grp == null)
                 {
-                    r = recipient;
-                    TenantDbCtx.Add(recipient);
-                    TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = r.Id });
+                    group.LastImported = DateTime.Now;
+                    grp = group;
+                    TenantDbCtx.RecipientGroups.Add(group);
                     TenantDbCtx.SaveChanges();
                 }
-                else
+
+                var recipientsToGroup = new List<Recipient>();
+                // add recipient if not existed
+                foreach (var recipient in recipients)
                 {
-                    var rm = TenantDbCtx.RecipientGroupMappings.FirstOrDefault(o => o.GroupId == grp.Id && o.RecipientId == r.Id);
+                    var r = TenantDbCtx.Recipients.FirstOrDefault(o => o.Email == recipient.Email);
+
+                    if (r == null)
+                    {
+                        r = recipient;
+                        TenantDbCtx.Add(recipient);
+                    }
+                    recipientsToGroup.Add(r);
+                }
+                TenantDbCtx.SaveChanges();
+
+                // map them
+                foreach (var recipient in recipientsToGroup)
+                {
+                    var rm = TenantDbCtx.RecipientGroupMappings.AsNoTracking()
+                        .FirstOrDefault(o => o.GroupId == grp.Id && o.RecipientId == recipient.Id);
+
                     if (rm == null)
                     {
-                        TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = r.Id });
-                        TenantDbCtx.SaveChanges();
+                        TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = recipient.Id });
+                        
                     }
                 }
+
+                TenantDbCtx.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                return Enumerable.Empty<Recipient>().ToList();
             }
 
             return await Task.FromResult(recipients);
