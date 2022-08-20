@@ -257,7 +257,7 @@ namespace PhishingPortal.Repositories
                                               select new { logEntry = log, Department = crec.Recipient.Department };
                 var depatwiseCnt = phishtestWithRecipients.ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
-                    Department = key,
+                    Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
                     Hits = entries.Count(o => o.logEntry.IsHit)
                 });
