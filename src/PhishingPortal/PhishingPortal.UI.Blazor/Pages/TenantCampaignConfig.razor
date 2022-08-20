@@ -237,8 +237,6 @@ else
                                                                 <label for="" class="col-form-label col-md-3">Select File</label>
                                                                 <div class="col-md-9">
                                                                     <div class="input-group">
-
-                                                                        @*<input type="file" id="uploadedFile" name="uploadedFile" class="form-control" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">*@
                                                                         <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
                                                                     </div>
                                                                 </div>
@@ -251,26 +249,6 @@ else
                                                     </div>
                                                 </div>
 
-                                                @*<div class="form-group row" id="divSelectGroups" style="display: none;">
-                                            <label for="txtFilter" class="col-form-label col-md-3">Select Groups</label>
-                                            <div class="col-md-9">
-                                            <select class="js-example-responsive" style="width: 100%;" multiple="multiple">
-                                            <option value="testGroup1">testGroup1</option>
-                                            <option value="testGroup2">testGroup2</option>
-                                            <option value="testGroup3">testGroup3</option>
-                                            </select>
-                                            </div>
-                                            </div>
-                                            <div class="form-group row">
-                                            <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Batch Count</label>
-                                            <div class="col-md-3">
-                                            <input type="number" class="form-control" id="">
-                                            </div>
-                                            <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Batch Interval</label>
-                                            <div class="col-md-3">
-                                            <input type="number" class="form-control" id="">
-                                            </div>
-                                            </div>*@
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">State</label>
                                                     <div class="col-md-9">
@@ -363,32 +341,6 @@ else
 
         <AzAdRecipientImporter ShowDialog="showAdImportDialog"  TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected" ></AzAdRecipientImporter>
 
-      @*  <DialogTemplate Title="Import Active Directory Recipients" Show="showAdImportDialog">
-            @if (sources == RecipientSources.AzureActiveDirectory)
-            {
-                <div class="form-group row" id="divUploadUsers">
-                        <label for="" class="col-form-label col-md-3">AD Group Name</label>
-                        <div class="col-md-9">
-                            <div class="input-group">
-
-                                <select id="AzAdGrp" @bind="seletedAdGroup" class="form-control" @oninput="@OnChangeRecipientAdGrp">
-                                      @foreach (var val in LstAzAdGroups)
-                                    {
-                                         <option value="@val.Key">@val.Value</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-
-                         <Recipients DataList="recipients"></Recipients>
-                          <button @onclick="() => { this.showAdImportDialog = false; this.showRecipients = false;}"
-                            class="btn btn-secondary" type="button">
-                              Close 
-                         </button>
-                 </div>
-            }
-        </DialogTemplate>*@
-
     </div>
 }
 
@@ -398,6 +350,7 @@ else
 
     [Parameter]
     public int Id { get; set; }
+
     List<RecipientImport> fileimport;
     Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
     string seletedAdGroup;
@@ -416,6 +369,7 @@ else
     bool isloading = false;
     bool isScheduled = false;
     bool dailog = false;
+
     public string Title
     {
         get
@@ -597,24 +551,9 @@ else
         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
 
-    //protected async void OnChangeRecipientAdGrp(ChangeEventArgs args)
-    //{
-    //    // bind recipients as per selected group
-    //    var grpId = Convert.ToString(args.Value);
-    //    if (!string.IsNullOrEmpty(grpId))
-    //    {
-    //        isloading = !isloading;
-    //        var result = await client.ImportAzureADByUserGroups(new RecipientGroup{ Uid = grpId, GroupName = LstAzAdGroups[grpId], IsActiveDirectoryGroup = true });
-    //        recipients = result.Select(o => new RecipientImport(o)).ToList();
-    //        isloading = !isloading;
-    //        seletedAdGroup = grpId;
-    //        await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
-
-    //    }
-    //}
-
     protected async void OnChangeRecipientSource(ChangeEventArgs arg)
     {
+        recipients = new List<RecipientImport>();
         if (arg.Value?.ToString() == RecipientSources.Csv.ToString())
         {
             this.showAdImportDialog = false;
@@ -625,16 +564,9 @@ else
         {
             this.showAdImportDialog = true;
                this.showImportDialog = false;
-            //var result =  await client.GetAzureADUserGroups();
-
-            //LstAzAdGroups = new Dictionary<string, string>() { { "", "--Select Ad Group--" } };
-
-            //foreach (var entry in result)
-              //  LstAzAdGroups.Add(entry.Key, entry.Value);
-
-            //seletedAdGroup = this.LstAzAdGroups.FirstOrDefault().Key;
-            //await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
         }
+
+         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
 
     public async Task OnInputFileChange(InputFileChangeEventArgs e)

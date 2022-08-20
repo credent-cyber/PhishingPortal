@@ -245,134 +245,122 @@ namespace PhishingPortal.Repositories
             data.DepartEntries = new Dictionary<string, decimal>();
             data.TemplateClickEntries = new Dictionary<string, decimal>();
 
-            var totatPhishingTests = TenantDbCtx.CampaignLogs
-              .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
-
-
-            var phishtestWithRecipients = from log in totatPhishingTests
-                                          join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
-                                          select new { logEntry = log, Department = crec.Recipient.Department };
-            var depatwiseCnt = phishtestWithRecipients.ToList().GroupBy(i => i.Department, (key, entries) => new
+            try
             {
-                Department = key,
-                Total = entries.Count(),
-                Hits = entries.Count(o => o.logEntry.IsHit)
-            });
-            var DtotalHits = depatwiseCnt.Sum(o => o.Hits);
 
-            foreach (var dep in depatwiseCnt)
-            {
-                if (dep.Total > 0)
+                var totatPhishingTests = TenantDbCtx.CampaignLogs
+                  .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+
+
+                var phishtestWithRecipients = from log in totatPhishingTests
+                                              join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                              select new { logEntry = log, Department = crec.Recipient.Department };
+                var depatwiseCnt = phishtestWithRecipients.ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
-                    var equivDep = CalcEquivalentPercent(dep.Hits, DtotalHits);
+                    Department = key,
+                    Total = entries.Count(),
+                    Hits = entries.Count(o => o.logEntry.IsHit)
+                });
+                var DtotalHits = depatwiseCnt.Sum(o => o.Hits);
 
-                    if (!data.DepartEntries.ContainsKey(dep.Department))
+                foreach (var dep in depatwiseCnt)
+                {
+                    if (dep.Total > 0)
                     {
-                        data.DepartEntries.Add(dep.Department, equivDep);
+                        var equivDep = CalcEquivalentPercent(dep.Hits, DtotalHits);
+
+                        if (!data.DepartEntries.ContainsKey(dep.Department))
+                        {
+                            data.DepartEntries.Add(dep.Department, equivDep);
+                        }
+
+
                     }
+                }
+
+                var phishtestWithTemp = from log in totatPhishingTests
+                                        join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
+                                        join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
+                                        select new { logEntry = log, template = ctem.Name };
+
+                var tempwiseCnt = phishtestWithTemp.ToList().GroupBy(i => i.template, (key, tentries) => new
+                {
+                    template = key,
+                    TTotal = tentries.Count(),
+                    THits = tentries.Count(o => o.logEntry.IsHit)
+                });
+                var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
+
+                foreach (var tem in tempwiseCnt)
+                {
+                    if (tem.TTotal > 0)
+                    {
+                        var equivTemp = CalcEquivalentPercent(tem.THits, TemptotalHits);
+
+                        if (!data.TemplateClickEntries.ContainsKey(tem.template))
+                        {
+                            data.TemplateClickEntries.Add(tem.template, equivTemp);
+                        }
+                    }
+                }
+
+                var campaignGroup = totatPhishingTests.ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                {
+                    CampaignId = key,
+                    Total = entries.Count(),
+                    TotalHits = entries.Count(i => i.IsHit),
+                });
+
+                foreach (var c in campaignGroup)
+                {
+                    var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
+
+                    if (campaign == null)
+                        continue;
+
+                    var entry = new PhisingPronePercentEntry()
+                    {
+                        Campaign = campaign,
+                        Count = c.Total,
+                        Hits = c.TotalHits,
+                    };
+
+                    data.Entries.Add(entry);
+                }
+                data.Entries = data.Entries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
+
+                data.TotalCampaigns = data.Entries.Sum(i => i.Count);
 
 
+                // create category wise phish prone %
+                var categoryWiseGrp = data.Entries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                {
+                    Category = key,
+                    Count = values.Sum(o => o.Count),
+                    HitCount = values.Sum(o => o.Hits),
+                });
+
+                var totalHits = categoryWiseGrp.Sum(o => o.HitCount);
+
+                // calc phishing percentage out of total hits
+                foreach (var category in categoryWiseGrp)
+                {
+                    if (category.Count > 0 && data.TotalCampaigns > 0)
+                    {
+                        var equivalenPp = CalcEquivalentPercent(category.HitCount, totalHits);
+
+                        if (!data.CategoryClickRatioDictionary.ContainsKey(category.Category))
+                        {
+                            data.CategoryClickRatioDictionary.Add(category.Category, equivalenPp);
+                        }
+
+
+                    }
                 }
             }
-
-            //foreach (var c in depatwiseCnt)
-            //{
-            //    var department = TenantDbCtx.Recipients.Find(c.Department);
-
-            //    if (department == null)
-            //        continue;
-            //    var dentry = new DepartmentWiseCnt()
-            //    {
-            //        Depart = department,
-            //        TotalCount = c.Total,
-            //        TotalHits = c.Hits
-
-            //    };
-
-            //    data.DepartEntries.Add(dentry);
-
-            //}
-            var phishtestWithTemp = from log in totatPhishingTests
-                                    join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
-                                    join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
-                                    select new { logEntry = log, template = ctem.Name };
-            var tempwiseCnt = phishtestWithTemp.ToList().GroupBy(i => i.template, (key, tentries) => new
+            catch (Exception ex)
             {
-                template = key,
-                TTotal = tentries.Count(),
-                THits = tentries.Count(o => o.logEntry.IsHit)
-            });
-            var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
-
-            foreach (var tem in tempwiseCnt)
-            {
-                if (tem.TTotal > 0)
-                {
-                    var equivTemp = CalcEquivalentPercent(tem.THits, TemptotalHits);
-
-                    if (!data.TemplateClickEntries.ContainsKey(tem.template))
-                    {
-                        data.TemplateClickEntries.Add(tem.template, equivTemp);
-                    }
-
-
-                }
-            }
-
-
-
-            var campaignGroup = totatPhishingTests.ToList().GroupBy(i => i.CampaignId, (key, entries) => new
-            {
-                CampaignId = key,
-                Total = entries.Count(),
-                TotalHits = entries.Count(i => i.IsHit),
-            });
-
-            foreach (var c in campaignGroup)
-            {
-                var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
-
-                if (campaign == null)
-                    continue;
-
-                var entry = new PhisingPronePercentEntry()
-                {
-                    Campaign = campaign,
-                    Count = c.Total,
-                    Hits = c.TotalHits,
-                };
-
-                data.Entries.Add(entry);
-            }
-            data.Entries = data.Entries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
-
-            data.TotalCampaigns = data.Entries.Sum(i => i.Count);
-
-
-            // create category wise phish prone %
-            var categoryWiseGrp = data.Entries.GroupBy(o => o.Campaign.Category, (key, values) => new
-            {
-                Category = key,
-                Count = values.Sum(o => o.Count),
-                HitCount = values.Sum(o => o.Hits),
-            });
-
-            var totalHits = categoryWiseGrp.Sum(o => o.HitCount);
-
-            // calc phishing percentage out of total hits
-            foreach (var category in categoryWiseGrp)
-            {
-                if (category.Count > 0 && data.TotalCampaigns > 0)
-                {
-                    var equivalenPp = CalcEquivalentPercent(category.HitCount, totalHits);
-
-                    if (!data.CategoryClickRatioDictionary.ContainsKey(category.Category))
-                    {
-                        data.CategoryClickRatioDictionary.Add(category.Category, equivalenPp);
-                    }
-
-
-                }
+                Logger.LogCritical(ex, ex.Message);
             }
 
             return await Task.FromResult(data);
@@ -543,5 +531,57 @@ namespace PhishingPortal.Repositories
 
             return await Task.FromResult(recipients);
         }
+
+        #region Settings
+        public async Task<Dictionary<string, string>> GetSettings()
+        {
+            var settings = await TenantDbCtx.Settings.ToListAsync();
+
+            return settings.ToDictionary(o => o.Key, v => v.Value);
+        }
+
+        public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings, string user)
+        {
+            var inserted = new Dictionary<string, string>();
+
+            try
+            {
+                foreach (var key in settings.Keys)
+                {
+                    var setting = await TenantDbCtx.Settings.FirstOrDefaultAsync(o => o.Key == key);
+
+                    if (setting != null)
+                    {
+                        setting.Value = settings[key];
+                        setting.ModifiedOn = DateTime.Now;
+                        setting.ModifiedBy = user;
+                        TenantDbCtx.Update(setting);
+                    }
+                    else
+                    {
+                        setting = new TenantSetting()
+                        {
+                            Key = key,
+                            Value = settings[key],
+                            CreatedBy = user,
+                            CreatedOn = DateTime.Now,
+                        };
+                        TenantDbCtx.Add(setting);
+                    }
+
+                    inserted.Add(key, setting.Value);
+
+                    TenantDbCtx.SaveChanges();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+            return inserted;
+        } 
+        #endregion
     }
 }

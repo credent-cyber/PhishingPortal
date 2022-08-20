@@ -20,5 +20,6 @@ namespace PhishingPortal.Repositories
         Task<List<RecipientImport>> ImportRecipientAsync(int campaignId, List<RecipientImport> data);
         Task<Campaign> UpsertCampaign(Campaign campaign);
         Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template);
+
     }
 }

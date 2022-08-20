@@ -325,5 +325,25 @@ namespace PhishingPortal.Server.Controllers.Api
 
         #endregion
 
+        [HttpGet]
+        [Route("settings")]
+
+        public async Task<Dictionary<string,string>> GetSettings()
+        {
+            var result = await _tenantRepository.GetSettings();
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("upsert-settings")] 
+
+        public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
+        {
+            var result = await _tenantRepository.UpsertSettings(settings, HttpContext.GetCurrentUser());
+
+            return result;
+        }
+
     }
 }

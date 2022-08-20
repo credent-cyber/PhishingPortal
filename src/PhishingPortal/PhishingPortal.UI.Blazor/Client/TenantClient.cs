@@ -281,6 +281,52 @@ namespace PhishingPortal.UI.Blazor.Client
             return null;
         }
 
+        #region Settings
+        public async Task<Dictionary<string, string>> GetSettings()
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/settings");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
+        public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<Dictionary<string, string>>($"api/tenant/upsert-settings", settings);
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        } 
+        #endregion
+
         #region Related to Azure Active Directory Integration
 
         /// <summary>

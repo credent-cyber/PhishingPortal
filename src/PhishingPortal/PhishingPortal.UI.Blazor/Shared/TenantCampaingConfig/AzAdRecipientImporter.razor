@@ -1,28 +1,55 @@
 ﻿@using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 
+@inject ILogger<AzAdRecipientImporter> Logger;
+
 <DialogTemplate Title="Import Active Directory Recipients" Show="ShowDialog">
     @if (Sources == RecipientSources.AzureActiveDirectory)
     {
-        <div class="form-group row" id="divUploadUsers">
-            <label for="" class="col-form-label col-md-3">AD Group Name</label>
-            <div class="col-md-9">
-                <div class="input-group">
+        <div class="form-group " id="divUploadUsers">
 
-                    <select id="AzAdGrp" @bind="seletedAdGroup" class="form-control" @oninput="@OnChangeRecipientAdGrp">
-                        @foreach (var val in LstAzAdGroups)
-                        {
-                            <option value="@val.Key">@val.Value</option>
-                        }
-                    </select>
-                </div>
+            <div class="input-group">
+                <label class="form-label">Choose Active Directory Group Name</label>
+                <select id="AzAdGrp" @bind="seletedAdGroup" class="form-control" @oninput="@OnChangeRecipientAdGrp">
+                    @foreach (var val in LstAzAdGroups)
+                    {
+                        <option value="@val.Key">@val.Value</option>
+                    }
+                </select>
             </div>
 
-            <Recipients DataList="_recipients"></Recipients>
-            <button @onclick="OnClose"
-                class="btn btn-secondary" type="button">
-                Close
-            </button>
+            <hr />
+            <div class="row">
+                <Alerts IsError="isError" Message="message"></Alerts>
+                @if (isloading)
+                {
+                    <div class="col-sm-12" style="margin-top:45px">
+
+                        <div class="card-header">
+                            <div class="loading-bar"></div>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <Recipients DataList="_recipients"></Recipients>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <button @onclick="OnSave"
+                        class="btn btn-secondary" type="button">
+                        Import
+                    </button>
+
+                    <button @onclick="OnClose"
+                        class="btn btn-secondary" type="button">
+                        Close
+                    </button>
+                </div>
+            </div>
         </div>
     }
 </DialogTemplate>
@@ -42,34 +69,56 @@
     public EventCallback<List<RecipientImport>> OnRecipientSelected { get; set; }
 
     private Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
-    private string seletedAdGroup;
+    private string seletedAdGroup = string.Empty;
     private List<RecipientImport> _recipients = new List<RecipientImport>();
-    private bool isloading = false;
+    private bool isloading = true;
+    private bool isError = false;
+    private string message = string.Empty;
 
 
     protected override async Task OnInitializedAsync()
     {
+        var result = await TenantClient.GetAzureADUserGroups();
 
-        LstAzAdGroups = await TenantClient.GetAzureADUserGroups();
-        seletedAdGroup = LstAzAdGroups.Keys.FirstOrDefault();
+        LstAzAdGroups.Add("", "--Select--");
+
+        foreach (var item in result)
+        {
+            LstAzAdGroups.Add(item.Key, item.Value);
+        }
+
+        seletedAdGroup = LstAzAdGroups?.Keys?.FirstOrDefault() ?? string.Empty;
+
+        isloading = false;
     }
 
     protected async void OnChangeRecipientAdGrp(ChangeEventArgs args)
     {
+        isError = false;
         var grpId = Convert.ToString(args.Value);
-        if (!string.IsNullOrEmpty(grpId))
+        try
         {
-            isloading = !isloading;
-            var result = await TenantClient.ImportAzureADByUserGroups(new RecipientGroup{ Uid = grpId, GroupName = LstAzAdGroups[grpId], IsActiveDirectoryGroup = true });
-            _recipients = result.Select(o => new RecipientImport(o)).ToList();
-            isloading = !isloading;
-            seletedAdGroup = grpId;
-            await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
-
+            if (!string.IsNullOrEmpty(grpId))
+            {
+                isloading = !isloading;
+                var result = await TenantClient.ImportAzureADByUserGroups(new RecipientGroup { Uid = grpId, GroupName = LstAzAdGroups[grpId], IsActiveDirectoryGroup = true });
+                _recipients = result.Select(o => new RecipientImport(o)).ToList();
+                isloading = !isloading;
+                seletedAdGroup = grpId;
+                await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
+            }
         }
+        catch (Exception ex) { isError = true; Logger.LogError(ex, ex.Message); }
     }
 
     protected async void OnClose()
+    {
+        _recipients.Clear();
+        await OnRecipientSelected.InvokeAsync(_recipients);
+        ShowDialog = false;
+    }
+
+    protected async void OnSave()
     {
         ShowDialog = false;
         await OnRecipientSelected.InvokeAsync(_recipients);
