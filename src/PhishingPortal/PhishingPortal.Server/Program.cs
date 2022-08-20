@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Pomelo.EntityFrameworkCore.MySql;
 using Serilog;
 using System;
+using PhishingPortal.Server.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

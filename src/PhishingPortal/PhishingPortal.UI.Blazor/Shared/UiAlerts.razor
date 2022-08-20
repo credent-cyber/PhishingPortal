@@ -1,0 +1,18 @@
+﻿@using PhishingPortal.UI.Blazor.Models
+@if (Model.IsSuccess && !string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-primary" role="alert">
+        @Model.Message
+    </div>
+}
+else if (Model.IsError && !string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-warning" role="alert">
+        @Model.Message
+    </div>
+}
+@code {
+
+    [Parameter]
+    public AlertModel Model { get; set; } = new AlertModel();
+}
