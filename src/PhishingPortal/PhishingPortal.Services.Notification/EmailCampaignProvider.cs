@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Sqlite;
 using PhishingPortal.Dto;
 using PhishingPortal.Common;
+using PhishingPortal.Services.Notification.Monitoring;
 
 namespace PhishingPortal.Services.Notification
 {
@@ -17,6 +18,8 @@ namespace PhishingPortal.Services.Notification
         private readonly List<IObserver<EmailCampaignInfo>> observers;
 
         private string BaseUrl = "http://localhost:7081/cmp";
+
+        private readonly EmailPhishingReportMonitor _reportMonitor;
         
         public EmailCampaignProvider(ILogger<EmailCampaignProvider> logger,
             IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
@@ -28,6 +31,7 @@ namespace PhishingPortal.Services.Notification
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
+            _reportMonitor = new EmailPhishingReportMonitor(logger, config, tenant, ConnManager);
         }
 
         /// <summary>
@@ -60,6 +64,9 @@ namespace PhishingPortal.Services.Notification
 
                         await Send(campaign, dbContext, Tenant.UniqueId);
                     }
+
+                    // TODO: report monitor should be run indepent of this module
+                    await _reportMonitor.ProcessAsync();
                 }
                 catch (Exception ex)
                 {

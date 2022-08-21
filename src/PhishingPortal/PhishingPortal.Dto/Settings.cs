@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PhishingPortal.Common;
 
 namespace PhishingPortal.Dto
 {
     public class AzureRegistrationSettings
     {
-
-        public const string ClIENT_ID = "az_client_id";
-        public const string CLIENT_SECRET = "az_client_secret";
-        public const string TENANT_ID = "az_tenant_id";
 
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
@@ -32,9 +29,9 @@ namespace PhishingPortal.Dto
 
         public AzureRegistrationSettings(Dictionary<string, string> values)
         {
-            ClientID = values[ClIENT_ID] ?? String.Empty;
-            ClientSecret = values[CLIENT_SECRET] ?? String.Empty;
-            TenantID = values[TENANT_ID] ?? String.Empty;
+            ClientID = values[Constants.Keys.ClIENT_ID] ?? String.Empty;
+            ClientSecret = values[Constants.Keys.CLIENT_SECRET] ?? String.Empty;
+            TenantID = values[Constants.Keys.TENANT_ID] ?? String.Empty;
         }
 
         public Dictionary<string, string> ToSettingsDictionary()
@@ -42,13 +39,13 @@ namespace PhishingPortal.Dto
             var result = new Dictionary<string, string>();
 
             if(ClientID != null)
-                result.Add(ClIENT_ID, ClientID);
+                result.Add(Constants.Keys.ClIENT_ID, ClientID);
 
             if(ClientSecret != null)
-                result[CLIENT_SECRET] = ClientSecret;
+                result[Constants.Keys.CLIENT_SECRET] = ClientSecret;
 
             if(TenantID != null)
-                result[TENANT_ID] = TenantID;
+                result[Constants.Keys.TENANT_ID] = TenantID;
 
             return result;
 
