@@ -211,8 +211,11 @@ else
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
-                                                        </InputSelect>                                 
-                                                         <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
+                                                        </InputSelect>   
+                                                            @if(sources == RecipientSources.Csv)
+                                                            {                                                                
+                                                                <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
+                                                            }
                                                         </div>
                                                         <br/>
                                                         @if (sources == RecipientSources.Csv)

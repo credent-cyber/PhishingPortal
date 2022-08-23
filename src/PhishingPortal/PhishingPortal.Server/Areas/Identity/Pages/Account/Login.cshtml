@@ -157,12 +157,12 @@ body {
         <form class="p-4 mt-4" id="account" method="post">
             <div class="form-field d-flex align-items-center">
                 <span class="far fa-user"></span>
-                  <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="false" />
+                  <input asp-for="Input.Email"  autocomplete="username" aria-required="true" />
             </div>
                     <span asp-validation-for="Input.Email" class="text-danger" style="font-size:12px"></span>
             <div class="form-field d-flex align-items-center">
                 <span class="fas fa-key"></span>
-                   <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="false" />
+                   <input asp-for="Input.Password"  autocomplete="current-password" aria-required="true" />
             </div>
                     <span asp-validation-for="Input.Password" class="text-danger" style="font-size:12px"></span>
             <div>
@@ -176,7 +176,7 @@ body {
             <button class="btn mt-3" id="login-submit" type="submit">Login</button>
         </form>
         <div class="text-center fs-6">
-            <a id="forgot-password" asp-page="./ForgotPassword">Forget password?</a> @*or <a href="#">Sign up</a>*@
+            <a id="forgot-password" asp-page="./ForgotPassword">Forget password?</a> @*or <a href="#">Sign up</a>*@  @*<a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>*@
         </div>
     </div>
 
