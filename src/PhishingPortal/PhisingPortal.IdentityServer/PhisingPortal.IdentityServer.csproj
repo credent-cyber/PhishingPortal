@@ -5,15 +5,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'PhishingPortal.IdentityProvider' " />
-  <ItemGroup>
-    <None Remove="rsaCert.pfx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="rsaCert.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="4.1.2" />
