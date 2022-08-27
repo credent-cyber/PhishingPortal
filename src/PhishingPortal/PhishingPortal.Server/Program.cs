@@ -21,10 +21,10 @@ using PhishingPortal.Server.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 //var rsaCertificate = new X509Certificate2(
-    //Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
+//Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
 
 // Add services to the container.
-
+builder.Configuration.AddEnvironmentVariables(prefix: "ASPNETCORE_");
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
 
@@ -125,6 +125,12 @@ builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver,TenantDbResolver>();
 
 var app = builder.Build();
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+// check if picked the correct configurations
+logger.LogInformation($"UseSqlLite: {useSqlLite}");
+logger.LogInformation($"SqlProvider: {sqlProvider}");
+
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
 {
