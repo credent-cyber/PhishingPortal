@@ -61,6 +61,12 @@
             msg.Priority = MailPriority.Normal;
             msg.IsBodyHtml = isHtml;
 
+            if (string.IsNullOrEmpty(correlationId))
+                correlationId = Guid.NewGuid().ToString();
+
+            if(!string.IsNullOrEmpty(correlationId))
+                 msg.Headers.Add("x-correlation-id", correlationId);
+
             if (isHtml)
             {
                 var altView = content.ToMultipartMailBody(_smtpConfig.ImageRoot);

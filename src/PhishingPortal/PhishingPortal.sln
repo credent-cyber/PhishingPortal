@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Services.Not
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{826310BD-B0B2-469C-AFEC-EB44FBA4CF24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Common.Tests", "PhishingPortal.Common.Tests\PhishingPortal.Common.Tests.csproj", "{F40BFD9F-84D1-4540-92DD-1BBEBB7F4B5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Tests", "PhishingPortal.Common.Tests\PhishingPortal.Tests.csproj", "{F40BFD9F-84D1-4540-92DD-1BBEBB7F4B5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestConsole", "TestConsole\TestConsole.csproj", "{B319E6BB-2E15-4F6D-8E6F-0123EEA044AA}"
 EndProject

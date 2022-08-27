@@ -7,7 +7,7 @@ using PhishingPortal.Repositories;
 using PhishingPortal.Server.Services;
 using System.Threading.Tasks;
 
-namespace PhishingPortal.Common.Tests
+namespace PhishingPortal.Tests
 {
     public class AzActDirClientServiceTests
     {
@@ -24,7 +24,7 @@ namespace PhishingPortal.Common.Tests
             Assert.True(result != null);
         }
 
-        
+
         [Fact]
         public async void TestGetAdUserGroups()
         {
@@ -33,7 +33,7 @@ namespace PhishingPortal.Common.Tests
             var azAdClient = new AzActDirClientService(mocklogger.Object, mockSettingRepo.Object);
 
             var result = await azAdClient.GetAllUserGroups();
-            
+
             Assert.True(result != null);
 
         }
@@ -45,7 +45,7 @@ namespace PhishingPortal.Common.Tests
             var mockSettingRepo = CreateMockSettings();
 
             var azAdClient = new AzActDirClientService(mocklogger.Object, mockSettingRepo.Object);
-            
+
             var result = await azAdClient.GetGroupMembers("00bb87ef-3e1f-4505-a7eb-6bb66c6fcf45");
 
             Assert.True(result != null);

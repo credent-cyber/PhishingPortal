@@ -3,6 +3,7 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.DataContext;
     using Microsoft.EntityFrameworkCore;
     using PhishingPortal.Common;
+    using PhishingPortal.Services.Notification.Monitoring;
 
     public class Worker : BackgroundService
     {
@@ -64,25 +65,32 @@ namespace PhishingPortal.Services.Notification
 
                     List<Task> allTasks = new List<Task>();
                     _isprocessing = true;
-                    foreach (var tenant in tenants)
+                    if (tenants != null)
                     {
-                        var task = Task.Factory.StartNew(async () =>
-                         {
-                             try
+                        foreach (var tenant in tenants)
+                        {
+                            var task = await Task.Factory.StartNew(async () =>
                              {
-                                 var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
-                                 provider.Subscribe(_campaignExecutor);
-                                 await provider.CheckAndPublish(stoppingToken);
-                             }
-                             catch (Exception ex)
-                             {
-                                 _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
-                             }
+                                 try
+                                 {
+                                     // run email campaing for each tenant
+                                     var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                     provider.Subscribe(_campaignExecutor);
+                                     await provider.CheckAndPublish(stoppingToken);
 
-                             await Task.CompletedTask;
-                         });
+                                     // monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
+                                     var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
+                                     await _reportMonitor.ProcessAsync();
+                                 }
+                                 catch (Exception ex)
+                                 {
+                                     _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                 }
+                                
+                             });
 
-                        allTasks.Add(task);
+                            allTasks.Add(task);
+                        } 
                     }
 
                     if (allTasks.Count > 0)
