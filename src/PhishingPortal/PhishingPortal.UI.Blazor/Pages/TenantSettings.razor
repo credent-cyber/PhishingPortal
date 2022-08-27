@@ -59,12 +59,18 @@
     private bool isError = false;
     private bool isSucess = false;
     private string message = string.Empty;
+    private string secret = string.Empty;
+
+    private const string SecretMask = "*******************************************";
 
     protected override async Task OnInitializedAsync()
     {
         var settings = await client.GetSettings();
 
         model = new AzureRegistrationSettings(settings);
+
+        secret = model.ClientSecret;
+        model.ClientSecret = SecretMask;
     }
 
     public async void OnSave()
@@ -74,7 +80,18 @@
             alert?.Clear();
             try
             {
+                if (model.ClientSecret == SecretMask)
+                {
+                    model.ClientSecret = secret;
+                }
+
                 var result = await client.UpsertSettings(model.ToSettingsDictionary());
+
+                model = new AzureRegistrationSettings(result);
+                
+                secret = model.ClientSecret;
+                model.ClientSecret = SecretMask;
+
                 alert?.SetSuccess("Settings saved successfully!");
                 StateHasChanged();
             }
