@@ -20,9 +20,10 @@ namespace PhishingPortal.Services.Notification.Monitoring
         public string[] Scopes { get; } = new[] { "https://graph.microsoft.com/.default" };
 
         #region Exchange Mail box settings
-       
+
         private const int MESSAGE_BATCH_SIZE = 10;
         private const string LAST_FETCH_CATCH_FILE_PATH = "lstfetchcatch.cache";
+        private const string DEFAULT_MAILBOX = "phishing-mail@credentinfotech.com";
         private ExchangeVersion _exchangeVersion;
         private string _account;
         private string _pwd;
@@ -50,6 +51,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
         private readonly TenantDbContext _dbContext;
         private readonly List<TenantSetting> _settings;
         private readonly MailTrackerConfig _mailTrackerConfig;
+        private static readonly Dictionary<string, string> _logHistoryDictionary = new Dictionary<string, string>();
 
 
         public EmailPhishingReportMonitor(ILogger logger, IConfiguration config, Tenant tenant, ITenantDbConnManager tenantDbConnManager)
@@ -63,7 +65,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
             _settings = _dbContext.Settings.AsNoTracking().ToList();
 
             _mailTrackerConfig = new MailTrackerConfig(config);
-            _correlationHeaderKey =_mailTrackerConfig.CorrelationHeaderKey;
+            _correlationHeaderKey = _mailTrackerConfig.CorrelationHeaderKey;
             _mailTrackerBlock = _mailTrackerConfig.MailTrackerBlock;
 
             Source = GetSetting(Constants.Keys.PHISHING_REPORT_REPOSITORY);
@@ -111,13 +113,13 @@ namespace PhishingPortal.Services.Notification.Monitoring
         /// CheckAsync
         /// </summary>
         /// <returns></returns>
-        public async Task<List<string>> CheckAsync()
+        public async Task<Dictionary<string, string>> CheckAsync()
         {
             switch (Source)
             {
                 case Constants.Keys.SRC_MSGRAPH:
                     if (string.IsNullOrEmpty(_emailAccount))
-                        _emailAccount = "malay.pandey@credentinfotech.com";
+                        _emailAccount = DEFAULT_MAILBOX;
 
                     return await ReadAzureMailBox(_emailAccount);
 
@@ -125,7 +127,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
                     throw new NotImplementedException("Reading Exchange Server message are not implemented");
             }
 
-            return Enumerable.Empty<string>().ToList();
+            return new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -148,17 +150,22 @@ namespace PhishingPortal.Services.Notification.Monitoring
             if (correlationValues == null)
                 return count;
 
-            foreach (var key in correlationValues)
+            foreach (var key in correlationValues.Keys)
             {
                 count++;
-                var log = await _dbContext.CampaignLogs.FirstOrDefaultAsync(o => o.SecurityStamp == key || o.ReturnUrl == key);
-                if (log != null)
-                {
-                    log.IsReported = true;
-                    log.ReportedBy = nameof(EmailPhishingReportMonitor);
-                    log.ReportedOn = DateTime.UtcNow;
 
-                    _dbContext.Update(log);
+                if (!_logHistoryDictionary.ContainsKey(key))
+                {
+                    var log = await _dbContext.CampaignLogs.FirstOrDefaultAsync(o => o.SecurityStamp == key || o.ReturnUrl == key);
+                    if (log != null)
+                    {
+                        log.IsReported = true;
+                        log.ReportedBy = correlationValues[key];
+                        log.ReportedOn = DateTime.UtcNow;
+
+                        _dbContext.Update(log);
+                        _logHistoryDictionary.Add(key, correlationValues[key]);
+                    }
                 }
             }
 
@@ -184,7 +191,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
             return result.Value;
         }
 
-        private async Task<List<string>> ReadAzureMailBox(string emailAccount)
+        private async Task<Dictionary<string, string>> ReadAzureMailBox(string emailAccount)
         {
 
             var createDateTimeString = (_lastRunUtcDateTime.HasValue ? _lastRunUtcDateTime.Value : DateTime.UtcNow).ToString("yyyy-MM-ddTHH:mm:ssZ");
@@ -195,7 +202,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
 
             var req = _graphClient.Users[emailAccount].MailFolders.Inbox.Messages.Request();
 
-            if (!string.IsNullOrEmpty(_filters))      
+            if (!string.IsNullOrEmpty(_filters))
                 req = req.Filter(_filters);
             else
             {
@@ -204,11 +211,11 @@ namespace PhishingPortal.Services.Notification.Monitoring
 
             _logger.LogInformation($"Reading mail box {emailAccount}");
             _logger.LogInformation($"Top:{MESSAGE_BATCH_SIZE} message will be processed in one go");
-            
-            var msgs = await req.Top(MESSAGE_BATCH_SIZE).GetAsync();   
+
+            var msgs = await req.Top(MESSAGE_BATCH_SIZE).GetAsync();
 
             List<Message> messages = new();
-            List<string> correlationIDs = new();
+            Dictionary<string, string> correlationIDs = new();
 
             messages.AddRange(msgs.CurrentPage);
 
@@ -230,7 +237,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
                     if (header != null)
                     {
                         _logger.LogInformation($"Found customer header in the mail message -  [{_correlationHeaderKey}:{header.Value}]");
-                        correlationIDs.Add(header.Value);
+                        correlationIDs.Add(header.Value, msg.From.EmailAddress.Address);
                     }
 
                     _logger.LogInformation($"Finding message key");
@@ -240,11 +247,11 @@ namespace PhishingPortal.Services.Notification.Monitoring
                     if (endIndex < startIndex) continue;
 
                     var id = msg.Body.Content.Substring(startIndex, endIndex - startIndex);
-                 
+
                     if (Guid.TryParse(id, out Guid guid))
                     {
                         _logger.LogInformation($"Found message key - {id}");
-                        correlationIDs.Add(guid.ToString());
+                        correlationIDs.Add(guid.ToString(), msg.From.EmailAddress.Address);
                     }
                 }
                 catch (Exception ex)
@@ -299,7 +306,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
             if (System.IO.File.Exists(GetFileName()))
             {
                 var content = System.IO.File.ReadAllText(GetFileName());
-                if(!DateTime.TryParse(content, out dt))
+                if (!DateTime.TryParse(content, out dt))
                 {
                     _logger.LogInformation($"Last activity timestamp couldn't be retrieved, defaulting to UtcNow: [{dt.ToString()}]");
                 }
@@ -314,7 +321,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
 
         private void SetLastActivityTimestamp(DateTime? dt)
         {
-            if(dt.HasValue)
+            if (dt.HasValue)
                 System.IO.File.WriteAllText(GetFileName(), dt.ToString());
         }
 

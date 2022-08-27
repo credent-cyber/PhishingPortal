@@ -8,6 +8,6 @@ namespace PhishingPortal.Core
 {
     public interface IPhishingEventReportWatcher
     {
-        Task<List<string>> CheckAsync();
+        Task<Dictionary<string,string>> CheckAsync();
     }
 }
