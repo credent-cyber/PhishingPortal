@@ -105,6 +105,9 @@ namespace PhishingPortal.Services.Notification
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
                         var content = template.Content.Replace("###RETURN_URL###", returnUrl);
 
+                        // TODO: calculate short urls
+
+
                         var ecinfo = new EmailCampaignInfo()
                         {
                             Tenantdentifier = tenantIdentifier,

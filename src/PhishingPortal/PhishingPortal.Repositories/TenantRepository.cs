@@ -209,14 +209,19 @@ namespace PhishingPortal.Repositories
             return template;
         }
 
-        public async Task<bool> CampaignHit(string key)
+        public async Task<Tuple<bool, string>> CampaignHit(string key)
         {
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
                 .FirstOrDefault(o => o.SecurityStamp == key
                                     && o.IsHit == false && o.Status == status);
+
             if (campaignLog == null)
                 throw new Exception("Invalid Url");
+
+            var campaign = TenantDbCtx.Campaigns.FirstOrDefault(o => o.Id == campaignLog.CampaignId);
+            if (campaign == null)
+                throw new Exception("Invalid Campaign");
 
             campaignLog.Status = CampaignLogStatus.Completed.ToString();
             campaignLog.IsHit = true;
@@ -226,7 +231,7 @@ namespace PhishingPortal.Repositories
             TenantDbCtx.Update(campaignLog);
             TenantDbCtx.SaveChanges();
 
-            return await Task.FromResult(true);
+            return await Task.FromResult(new Tuple<bool, string>(true, campaign.ReturnUrl));
 
         }
 

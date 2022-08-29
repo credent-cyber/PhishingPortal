@@ -18,6 +18,7 @@
             public const string EXCHANGE_ACCOUNT_DOMAIN = "exchange_account_domain";
             public const string EXCHANGE_DISCOVERY_URL = "exchange_discovery_url";
             public const string MonitoredMailBoxAccount = "monitored_mail_account";
+            public const string RETURN_URL_COLLECTION = "return_urls";
 
             public static string MonitoredMailBoxFilters { get; set; }
         }
