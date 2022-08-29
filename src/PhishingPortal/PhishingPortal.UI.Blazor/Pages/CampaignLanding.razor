@@ -18,7 +18,7 @@
     [Parameter]
     public string Key { get; set; } = string.Empty;
 
-       [Parameter]
+    [Parameter]
     public string TenantId { get; set; } = string.Empty;
 
     [Parameter]
@@ -38,17 +38,18 @@
 
             if (result.IsSuccessStatusCode)
             {
+                var content = await result.Content.ReadFromJsonAsync<ApiResponse<string>>();
+
+                if (content != null)
+                    Url = content.Result;
+
                 Redirect();
             }
             else
             {
-                 navigation.NavigateTo("/error");
+                navigation.NavigateTo("/error");
             }
 
-            //if (await client.CampaignHit(Key))
-            //    Redirect();
-            //else
-            //    navigation.NavigateTo("/error");
         }
         catch (Exception ex)
         {
@@ -65,10 +66,7 @@
         {
             try
             {
-                if (new Uri(Url).Host == new Uri(navigation.Uri).Host)
-                    navigation.NavigateTo(Url, true);
-                else
-                    navigation.NavigateTo("/");
+                navigation.NavigateTo(Url);
             }
             catch (Exception ex)
             {

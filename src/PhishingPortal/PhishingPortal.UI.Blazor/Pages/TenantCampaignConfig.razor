@@ -1,6 +1,7 @@
 ﻿@page "/tenant-campaign-config"
 @page "/tenant-campaign-config/{Id:int}"
 
+@using Newtonsoft.Json
 @using PhishingPortal.Common
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
@@ -88,7 +89,12 @@ else
                                             <div class="form-group row">
                                                 <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
                                                 <div class="col-md-9">
-                                                    <InputText @bind-Value="@model.ReturnUrl" id="ReturnUrl" class="form-control"></InputText>
+                                                    <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                        @foreach (var val in _returnUrlList.OrderBy(o => o))
+                                                            {
+                                                            <option value="@val">@val</option>
+                                                            }
+                                                    </InputSelect>
                                                 </div>
                                             </div>
                                             <div class="form-group row">
@@ -339,7 +345,7 @@ else
             }
         </DialogTemplate>
 
-        <AzAdRecipientImporter ShowDialog="showAdImportDialog"  TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected" ></AzAdRecipientImporter>
+        <AzAdRecipientImporter ShowDialog="showAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></AzAdRecipientImporter>
 
     </div>
 }
@@ -369,6 +375,8 @@ else
     bool isloading = false;
     bool isScheduled = false;
     bool dailog = false;
+    List<string> _returnUrlList = new List<string>() { "" };
+    string _selectReturnUrl = string.Empty;
 
     public string Title
     {
@@ -406,10 +414,16 @@ else
     {
         //Templates = await client.GetCampaignTemplates();
         Templates = await client.GetTemplatesByType(type);
-      
+
+        #region Bind Return urls
+        await BindReturnUrlsAsync();
+        #endregion
+
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
+
+            _selectReturnUrl = model.ReturnUrl;
 
             if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
                 scheduleOnceOff = new OnceOffSchedule(model.Schedule.ScheduleInfo);
@@ -563,10 +577,10 @@ else
         if (arg.Value?.ToString() == RecipientSources.AzureActiveDirectory.ToString())
         {
             this.showAdImportDialog = true;
-               this.showImportDialog = false;
+            this.showImportDialog = false;
         }
 
-         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
+        await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
 
     public async Task OnInputFileChange(InputFileChangeEventArgs e)
@@ -802,5 +816,24 @@ else
         NavigationManager.NavigateTo("tenant-campaigns");
     }
 
+    private async Task BindReturnUrlsAsync()
+    {
 
+        _returnUrlList.Clear();
+
+        var settings = await client.GetSettings();
+
+        if (settings != null)
+        {
+            var json = settings[Constants.Keys.RETURN_URL_COLLECTION];
+            var jsonSettings = JsonConvert.DeserializeObject<Settings>(json) ?? null;
+            if (jsonSettings != null)
+            {
+                _returnUrlList = jsonSettings.ReturnUrls.ToList();
+            }
+
+            _returnUrlList.Insert(0, "");
+            _selectReturnUrl = _returnUrlList?.FirstOrDefault() ?? string.Empty;
+        }
+    }
 }
