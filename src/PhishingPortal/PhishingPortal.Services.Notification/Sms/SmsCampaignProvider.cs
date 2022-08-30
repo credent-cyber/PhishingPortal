@@ -1,43 +1,37 @@
-﻿using PhishingPortal.DataContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
-using PhishingPortal.Dto;
+﻿using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Common;
-using PhishingPortal.Services.Notification.Monitoring;
-using PhishingPortal.Services.Notification.Helper;
+using PhishingPortal.DataContext;
+using PhishingPortal.Dto;
 using PhishingPortal.Dto.Extensions;
+using PhishingPortal.Services.Notification.Helper;
 
-namespace PhishingPortal.Services.Notification.Email
+namespace PhishingPortal.Services.Notification.Sms
 {
-
-    public class EmailCampaignProvider : IEmailCampaignProvider
+    public class SmsCampaignProvider : ISmsCampaignProvider
     {
-        private readonly List<IObserver<EmailCampaignInfo>> observers;
-
+        private readonly List<IObserver<SmsCampaignInfo>> observers;
         private string BaseUrl = "http://localhost:7081/cmp";
-
-        public EmailCampaignProvider(ILogger<EmailCampaignProvider> logger,
-            IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+        private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
+        public SmsCampaignProvider(ILogger logger,
+            ISmsGatewayClient smsSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
         {
             Logger = logger;
-            EmailSender = emailSender;
+            SmsSender = smsSender;
+            Config = config;
             Tenant = tenant;
             ConnManager = connManager;
+
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
         }
 
-        /// <summary>
-        /// ExecuteAsync
-        /// </summary>
-        /// <param name="stopppingToken"></param>
-        /// <returns></returns>
+        public ILogger Logger { get; }
+        public ISmsGatewayClient SmsSender { get; }
+        public IConfiguration Config { get; }
+        public Tenant Tenant { get; }
+        public ITenantDbConnManager ConnManager { get; }
+
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
             await Task.Run(async () =>
@@ -49,19 +43,19 @@ namespace PhishingPortal.Services.Notification.Email
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
                                             .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
-                                                && o.Detail.Type == CampaignType.Email).ToList();
+                                                && o.Detail.Type == CampaignType.Sms).ToList();
 
                     campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
 
                     foreach (var campaign in campaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
+                        
                         dbContext.SaveChanges();
 
-                        await Send(campaign, dbContext, Tenant.UniqueId);
+                        await QueueSms(campaign, dbContext, Tenant.UniqueId);
                     }
 
                 }
@@ -73,13 +67,23 @@ namespace PhishingPortal.Services.Notification.Email
             });
         }
 
+        public IDisposable Subscribe(IObserver<SmsCampaignInfo> observer)
+        {
+            if (!observers.Contains(observer))
+            {
+                observers.Add(observer);
+
+            }
+            return new Unsubscriber<SmsCampaignInfo>(observers, observer);
+        }
+
         /// <summary>
         /// Publish campaign event to the observers
         /// </summary>
         /// <param name="campaign"></param>
         /// <param name="dbContext"></param>
         /// <returns></returns>
-        protected async Task Send(Campaign campaign, TenantDbContext dbContext, string tenantIdentifier)
+        protected async Task QueueSms(Campaign campaign, TenantDbContext dbContext, string tenantIdentifier)
         {
             try
             {
@@ -92,11 +96,12 @@ namespace PhishingPortal.Services.Notification.Email
                 if (!string.IsNullOrEmpty(campaign.ReturnUrl))
                     BaseUrl = campaign.ReturnUrl;
 
-                var recipients = dbContext.CampaignRecipients.Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
+                var recipients = dbContext.CampaignRecipients
+                    .Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
 
                 foreach (var r in recipients)
                 {
-                    if (string.IsNullOrEmpty(r.Recipient.Email))
+                    if (string.IsNullOrEmpty(r.Recipient.Mobile))
                         continue;
 
                     foreach (var o in observers)
@@ -108,15 +113,12 @@ namespace PhishingPortal.Services.Notification.Email
                         var content = template.Content.Replace("###RETURN_URL###", returnUrl);
 
                         // TODO: calculate short urls
-
-
-                        var ecinfo = new EmailCampaignInfo()
+                        var smsInfo = new SmsCampaignInfo()
                         {
                             Tenantdentifier = tenantIdentifier,
-                            EmailRecipients = r.Recipient.Email,
-                            EmailSubject = campaign.Subject,
-                            EmailContent = content,
-                            EmailFrom = campaign.FromEmail,
+                            SmsRecipient = r.Recipient.Mobile,
+                            From = campaign.FromEmail,
+                            SmsContent = content,
                             LogEntry = new CampaignLog
                             {
                                 SecurityStamp = key,
@@ -133,7 +135,7 @@ namespace PhishingPortal.Services.Notification.Email
                             }
                         };
 
-                        o.OnNext(ecinfo);
+                        o.OnNext(smsInfo);
                     }
                 };
 
@@ -147,27 +149,10 @@ namespace PhishingPortal.Services.Notification.Email
                 campaign.State = CampaignStateEnum.Aborted;
                 dbContext.Update(campaign);
                 dbContext.SaveChanges();
-                Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
+                Logger.LogCritical(ex, $"Error sending sms campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
             }
 
             await Task.CompletedTask;
         }
-
-
-        public IDisposable Subscribe(IObserver<EmailCampaignInfo> observer)
-        {
-            if (!observers.Contains(observer))
-            {
-                observers.Add(observer);
-
-            }
-            return new Unsubscriber<EmailCampaignInfo>(observers, observer);
-        }
-
-        private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
-        public ILogger<EmailCampaignProvider> Logger { get; }
-        public IEmailClient EmailSender { get; }
-        public Tenant Tenant { get; }
-        public ITenantDbConnManager ConnManager { get; }
     }
 }
