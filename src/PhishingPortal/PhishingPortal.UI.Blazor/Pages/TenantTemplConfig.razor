@@ -58,6 +58,18 @@
                                                                       <InputText id="Name" @bind-Value="model.Name" class="form-control" />                                                 
                                                                 </div>
                                                             </div>
+                                                             <div class="form-group row">
+                                                                <label for="" class="col-form-label col-md-3">Template Type</label>
+                                                                <div class="col-md-9">
+                                                                   <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                                                     
+                                                                        @foreach (var val in Enum.GetValues<CampaignType>())
+                                                                        {
+                                                                            <option value="@val">@val</option>
+                                                                        }
+                                                                   </InputSelect>
+                                                                </div>
+                                                            </div>
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Is Active</label>
                                                                 <div class="col-md-5">
@@ -85,7 +97,9 @@
                                                                     }
                                                                 </div>
                                                             </div>
-                                                            <div class="form-group row">
+                                                            @if(model.Type==CampaignType.Email)
+                                                            {
+                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Is Html</label>
                                                                 <div class="col-md-5">
                                                                     @if (model.IsHtml is false || model.Id == 0)
@@ -112,17 +126,8 @@
                                                                     }
                                                     </div>
                                                             </div>
-                                                            <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Template Type</label>
-                                                                <div class="col-md-9">
-                                                                   <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
-                                                                        @foreach (var val in Enum.GetValues<CampaignType>())
-                                                                        {
-                                                                            <option value="@val">@val</option>
-                                                                        }
-                                                                   </InputSelect>
-                                                                </div>
-                                                            </div>
+                                                            }
+                                                           
                                                                     @if(model.Id==0)
                                                                     {
                                                     
@@ -177,19 +182,34 @@
                                                         </div>
                                                         <br/>
                                                     </div>
+                                                  
                                                 </EditForm>
                                              </div>
                                              <div class="col-md-7" style="padding: 0;">
                                                     <div class="card" style="margin-bottom: 0;">
                                                         <div class="card-body">
-                                                               <div class="mb-3">
-                                                            <label for="Content" class="form-label">Template Content</label>
-                                                            <!-- Rich text editor -->
-                                                             <BlazingComponents.Summernote.Editor />  
-                                                              
-                                                            <!-- Rich text editor -->
-                                         
-                                                        </div>
+                                                            <div class="mb-3">
+                                                                <label for="Content" class="form-label">Template Content</label>
+                                                               
+                                                                
+                                                                @if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp)
+                                                                {
+                                                                   @* <EditForm Model="@model" OnValidSubmit="@OnSave" >
+           
+                                                                        <InputTextArea @bind-Value=model.Content  class="col-sm-12" style="background-color:lavender; height:243px;" />
+                                                                
+                                                                    </EditForm>
+                                                                    <label for="count" class="form-label"> Charactor left</label>*@
+                                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />                                                                         
+                                                                    <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <!-- Rich text editor -->
+                                                                    <BlazingComponents.Summernote.Editor />
+                                                                }
+
+                                                            </div>
                                                         </div>
                                                     </div>
                                              </div>            
@@ -212,6 +232,7 @@
 
 @code {
 
+
     [Parameter]
     public int Id { get; set; }
     private string contents;
@@ -231,6 +252,9 @@
     bool import = false;
     bool showEditButton = true;
 
+    string text = "";
+    const int MAX_TEXT_COUNT = 160;
+
     bool showPreview = false;
     bool showNewDialog = false;
     string content = string.Empty;
@@ -247,7 +271,8 @@
         {
             Message = string.Empty;
             model = await client.GetTemplateById(Id);
-            contents = model.Content;
+            if(model.Type==CampaignType.Email){  contents = model.Content;}
+            if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp){ text = model.Content;}
 
         }
         else
@@ -301,7 +326,6 @@
     {
         loading = true;
 
-
         try
         {
             if (model.Id > 0)
@@ -314,10 +338,13 @@
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }
-
-            //await GetHTML();
-            contents = await GetSummerNoteContent();
-            model.Content = contents;
+         
+            if(model.Type==CampaignType.Email){ 
+                contents = await GetSummerNoteContent();
+                model.Content = contents;
+            }
+            if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp){ model.Content = text;}
+           
             model = await client.UpsertCampaignTemplate(model);
 
             IsSuccess = true;

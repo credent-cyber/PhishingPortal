@@ -58,7 +58,7 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" disabled="disabled">
+                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" >
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                                 {
                                                                 <option value="@val">@val</option>
@@ -71,38 +71,49 @@ else
                                                     <label for="" class="col-form-label col-md-3">Select Template </label>
                                                     <div class="col-md-9">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                                                            @foreach (var val in Templates.OrderBy(o=>o.Name))
+                                                            @foreach (var val in Templates.OrderBy(o=>o.Name).Where(o=>o.Type==model.Detail.Type))
                                                                 {
                                                                 <option value="@val.Id">@val.Name</option>
                                                                 }
                                                         </InputSelect>
                                                     </div>
                                                 </div>
-            
+                                                @if (model.Detail.Type == CampaignType.Email)
+                                                {                                                  
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                     <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
-                                                        <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.ReturnUrl" id="ReturnUrl" class="form-control"></InputText>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
-                                                        <InputText @bind-Value="@model.ReturnUrl" id="ReturnUrl" class="form-control"></InputText>
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
-                                                        <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
+                                                        <div class="col-md-9">
+                                                             <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
-                                                    <div class="col-md-9">
-                                                         <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-                                                    </div>
-                                                </div>
                                                  <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
                                                     <div class="col-md-9">
@@ -116,6 +127,7 @@ else
                                                                 <option value="ITServices">IT Services</option>
                                                                 <option value="Banking">Banking</option>
                                                                 <option value="Finance">Finance</option>
+                                                                <option value="Finance">Verification</option>
 
                                                         </InputSelect>
                                                     </div>
@@ -253,26 +265,7 @@ else
                                                     </div>
                                                 </div>
 
-                                                @*<div class="form-group row" id="divSelectGroups" style="display: none;">
-                                                    <label for="txtFilter" class="col-form-label col-md-3">Select Groups</label>
-                                                    <div class="col-md-9">
-                                                        <select class="js-example-responsive" style="width: 100%;" multiple="multiple">
-                                                          <option value="testGroup1">testGroup1</option>
-                                                          <option value="testGroup2">testGroup2</option>
-                                                          <option value="testGroup3">testGroup3</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Batch Count</label>
-                                                    <div class="col-md-3">
-                                                        <input type="number" class="form-control" id="">
-                                                    </div>
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Batch Interval</label>
-                                                    <div class="col-md-3">
-                                                        <input type="number" class="form-control" id="">
-                                                    </div>
-                                                </div>*@
+
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">State</label>
                                                     <div class="col-md-9">
@@ -618,9 +611,14 @@ else
                                     Branch = arr[6],
                                     Address = arr[7]
                             };
-
                             r.Validate();
-
+                            if(r.ValidationErrMsg is not null)
+                            {
+                                IsError = true;
+                                message = r.ValidationErrMsg;
+                                isloading = false;
+                                return;
+                            }
                             if(!recipients.Any(i => i.Email == r.Email))
                                 recipients.Add(r);
                         }

@@ -9,123 +9,22 @@
 @inject IJSRuntime JSRuntime;
 
 
-@*<div class="row">
-    <div class="col">
-        <div class="card text-white bg-primary mb-3" style="max-width: 12rem;">
-            <div class="card-header">Phishing Tests</div>
-            <div class="card-body">
-                <h5 class="card-title">@TotalPhishingTests</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card text-white bg-danger mb-3" style="max-width: 12rem;">
-            <div class="card-header">Total Clicks</div>
-            <div class="card-body">
-                <h5 class="card-title">@TotalClicks</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card text-white bg-success mb-3" style="max-width: 12rem;">
-            <div class="card-header">Not Clicked</div>
-            <div class="card-body">
-                <h5 class="card-title">@NotClicked</h5>
-            </div>
-        </div>
-    </div>
 
-    <div class="col">
-        <div class="card text-white bg-secondary mb-3" style="max-width: 12rem;">
-            <div class="card-header">Shared Details</div>
-            <div class="card-body">
-                <h5 class="card-title">@TotalClicks</h5>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card text-dark bg-warning mb-3" style="max-width: 12rem;">
-            <div class="card-header">Phish Prone %</div>
-            <div class="card-body">
-                <h5 class="card-title">@PronePercent</h5>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-sm-8">
-        <div class="card">
-            <div class="card-body" style="min-width:18rem;">
-                <h5 class="card-title">Phishing Campaign-Wise Prone %age</h5>
-                <Chart Id="bar3" Type="@ChartType.Bar"
-                       Datasets="@BarChart3Data"
-                       Labels="@BarChart3Labels"
-                       IsStacked="false">
-                </Chart>
-               
-            </div>
-        </div>
-         <hr />
-        <div class="card" style="min-width:18rem;">
-            <div class="card-body">
-                <h5 class="card-title">Month-wise Phishing Tests Statistics</h5>
-                <Chart Id="bar1" Type="@ChartType.Bar"
-                       Datasets="@BarChart1Data"
-                       Labels="@BarChart1Labels">
-                </Chart>
-
-                
-            </div>
-        </div>
-        <hr />
-        <div class="card">
-            <div class="card-body" style="min-width:18rem;">
-                <h5 class="card-title">Monthly Phish Prone %age</h5>
-                <Chart Id="bar2" Type="@ChartType.Line"
-                       Datasets="@BarChart2Data"
-                       Labels="@BarChart1Labels"
-                       IsStacked="false">
-                </Chart>
-              
-            </div>
-        </div>
-
-          <hr />
-
-    </div>
-    <div class="col-sm-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Category Wise Failure % </h5>
-                <PieChart Id="pie1" Type="@ChartType.Pie" Responsive="true"
-                          Data="@(PieChart1Data.ToArray())"
-                          BackgroundColor="@(PieChart1Background.ToArray())"
-                          Labels="@(PieChart1Labels.ToArray())">
-                </PieChart>
-
-            </div>
-        </div>
-         <hr />
-    </div>
-
-</div>*@
-
-@*<div style="margin-top:0%"></div>*@
 <div class="pcoded-content">
    <h5><span style="color:orange">Dashboard</span> <span style="color:green">[@StartDate.ToString("dd MMM yyyy") - @DateTime.Now.ToString("dd MMM yyyy")]</span> </h5>
    <div class="row">
           <div class="col-md-6 col-xl-3">
                 <div class="card bg-c-blue order-card">
                 <div class="card-body">
-                    <a href="#!">
+                    <a  href="#!">
                         <div class="row align-items-center m-b-0">
-                        <div class="col">
-                        <h6 class="m-b-5 text-white">Phishing Campaigns</h6>
-                        </div>
-                        <div class="col-auto">
-                       <h3 style="color:black">@TotalPhishingTests</h3> 
-                        </div>
+                            <div class="col">
+                                <h6 class="m-b-5 text-white">Phishing Campaigns</h6>
+                            </div>
+                            <div class="col-auto">
+                                <h3 style="color:black">@TotalPhishingTests</h3> 
+                            </div>
                         </div>
                     </a>
                 </div>
@@ -279,7 +178,7 @@
                                            Labels="@BarChart1Labels" IsStacked="false">
                                           </Chart>
                                       </div>
-                                                                </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-12">
@@ -294,7 +193,7 @@
                                                     BackgroundColor="@(PieChart1Background.ToArray())"
                                                     Labels="@(PieChart1Labels.ToArray())">
                                      </PieChart>
-                                                                 </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-12">
@@ -316,9 +215,12 @@
 
           </div>
    </div>
-
+   <Popup show = "test" Title="test">
+       hello
+   </Popup>
     
 @code {
+    public bool test = false;
 
     public int TotalPhishingTests { get; set; }
     public int TotalClicks { get; set; }
@@ -342,7 +244,7 @@
     public List<string> PieChart1Background { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> PieChart1Labels { get; set; } = new List<string>();
 
-     public List<string> Donut1Data { get; set; } = new List<string>();
+    public List<string> Donut1Data { get; set; } = new List<string>();
     public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a",  "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Donut1Labels { get; set; } = new List<string>();
 
@@ -438,7 +340,7 @@
                 PieChart1Data.Add(entry.Value.ToString());
                 PieChart1Labels.Add(entry.Key.ToUpper());
             }
-            
+
             foreach (var entry in data2.DepartEntries)
             {
                 Donut1Data.Add(entry.Value.ToString());
@@ -518,5 +420,10 @@
         for (var i = 0; i < arraySize; i++)
             colors.Add(color.Name.ToString().ToLower());
         return colors.ToArray();
+    }
+
+    public void  PopUp()
+    {
+        test = true;
     }
 }
