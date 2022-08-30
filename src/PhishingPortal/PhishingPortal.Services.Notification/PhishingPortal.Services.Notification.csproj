@@ -13,6 +13,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="logs\**" />
+	  <Content Remove="logs\**" />
+	  <EmbeddedResource Remove="logs\**" />
+	  <None Remove="logs\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="email.eml" />
+	  <None Remove="PhishSim-T-20220819115843-lstfetchcatch.cache" />
+	  <None Remove="T-20220606171146-lstfetchcatch.cache" />
+	  <None Remove="T-20220619003439-lstfetchcatch.cache" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="EASendMail" Version="7.8.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EntityFrameworkVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EntityFrameworkVersion)" />

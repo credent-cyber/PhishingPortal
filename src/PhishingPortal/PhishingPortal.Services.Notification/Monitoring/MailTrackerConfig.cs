@@ -1,4 +1,4 @@
-﻿namespace PhishingPortal.Services.Notification
+﻿namespace PhishingPortal.Services.Notification.Monitoring
 {
     public class MailTrackerConfig
     {

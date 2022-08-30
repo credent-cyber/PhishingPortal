@@ -4,6 +4,8 @@ namespace PhishingPortal.Services.Notification
     using Microsoft.EntityFrameworkCore;
     using PhishingPortal.Common;
     using PhishingPortal.Services.Notification.Monitoring;
+    using PhishingPortal.Services.Notification.Email;
+    using PhishingPortal.Services.Notification.Helper;
 
     public class Worker : BackgroundService
     {

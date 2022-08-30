@@ -9,8 +9,9 @@ using Microsoft.EntityFrameworkCore.Sqlite;
 using PhishingPortal.Dto;
 using PhishingPortal.Common;
 using PhishingPortal.Services.Notification.Monitoring;
+using PhishingPortal.Services.Notification.Helper;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Services.Notification.Email
 {
 
     public class EmailCampaignProvider : IEmailCampaignProvider
@@ -40,23 +41,23 @@ namespace PhishingPortal.Services.Notification
         {
             await Task.Run(async () =>
             {
-                
+
                 try
                 {
 
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-                    
+
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == Dto.CampaignStateEnum.Published && o.IsActive 
+                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
                                                 && o.Detail.Type == CampaignType.Email).ToList();
 
                     campaigns = campaigns.Where(o => IsScheduledNow(o.Schedule.ScheduleType, o.Schedule.ScheduleInfo)).ToList();
 
                     foreach (var campaign in campaigns)
                     {
-                        campaign.State = Dto.CampaignStateEnum.InProgress;
+                        campaign.State = CampaignStateEnum.InProgress;
                         dbContext.SaveChanges();
 
                         await Send(campaign, dbContext, Tenant.UniqueId);
@@ -81,7 +82,7 @@ namespace PhishingPortal.Services.Notification
         {
             try
             {
-                
+
                 var template = dbContext.CampaignTemplates.Find(campaign.Detail.CampaignTemplateId);
 
                 if (template == null)
@@ -97,7 +98,7 @@ namespace PhishingPortal.Services.Notification
                     if (string.IsNullOrEmpty(r.Recipient.Email))
                         continue;
 
-                    foreach(var o in observers)
+                    foreach (var o in observers)
                     {
 
                         var timestamp = DateTime.Now;
@@ -136,13 +137,13 @@ namespace PhishingPortal.Services.Notification
                 };
 
                 var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = Dto.CampaignStateEnum.Completed;
+                c.State = CampaignStateEnum.Completed;
                 dbContext.Update(c);
                 dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
-                campaign.State = Dto.CampaignStateEnum.Aborted;
+                campaign.State = CampaignStateEnum.Aborted;
                 dbContext.Update(campaign);
                 dbContext.SaveChanges();
                 Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
@@ -188,7 +189,7 @@ namespace PhishingPortal.Services.Notification
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
-            
+
             }
             return new Unsubscriber<EmailCampaignInfo>(observers, observer);
         }
@@ -211,8 +212,8 @@ namespace PhishingPortal.Services.Notification
 
         internal Unsubscriber(List<IObserver<EmailCampaignInfo>> observers, IObserver<EmailCampaignInfo> observer)
         {
-            this._observers = observers;
-            this._observer = observer;
+            _observers = observers;
+            _observer = observer;
         }
 
         public void Dispose()

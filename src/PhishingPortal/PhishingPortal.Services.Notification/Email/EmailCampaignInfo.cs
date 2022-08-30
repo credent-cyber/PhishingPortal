@@ -1,6 +1,6 @@
 ﻿using PhishingPortal.Dto;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Services.Notification.Email
 {
 
     public class EmailCampaignInfo

@@ -3,6 +3,8 @@ using PhishingPortal.DataContext;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Common;
 using Serilog;
+using PhishingPortal.Services.Notification.Email;
+using PhishingPortal.Services.Notification.Helper;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
