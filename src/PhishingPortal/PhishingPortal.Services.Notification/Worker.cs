@@ -66,7 +66,7 @@ namespace PhishingPortal.Services.Notification
         {
             _campaignExecutor.Start();
             _smsExecutor.Start();
-            _whatsappCampaignExecutor.Start();
+           // _whatsappCampaignExecutor.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -105,9 +105,9 @@ namespace PhishingPortal.Services.Notification
                                      await _smsProvider.CheckAndPublish(stoppingToken);
 
                                      // whatsapp provider 
-                                     var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
-                                     _waProvider.Subscribe(_whatsappCampaignExecutor);
-                                     await _waProvider.CheckAndPublish(stoppingToken);
+                                     //var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
+                                     //_waProvider.Subscribe(_whatsappCampaignExecutor);
+                                     //await _waProvider.CheckAndPublish(stoppingToken);
 
                                      //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
                                      var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);

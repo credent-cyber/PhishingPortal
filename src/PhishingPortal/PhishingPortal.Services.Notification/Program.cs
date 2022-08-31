@@ -82,7 +82,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<WhatsappGatewayConfig>();
         services.AddSingleton<IWhatsappCampaignExecutor, WhatsappCampaignExecutor>();
         services.AddSingleton<IWhatsappGatewayClient, WhatsappMateGatewayClient>();
-        
+
         services.AddHostedService<Worker>();
 
     })
