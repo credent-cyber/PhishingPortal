@@ -26,11 +26,15 @@ namespace PhishingPortal.Server
 				{
 					var buf = Convert.FromBase64String(file.base64data);
 					//await System.IO.File.WriteAllBytesAsync(env.ContentRootPath + System.IO.Path.DirectorySeparatorChar + file.fileName, buf);
+					#if DEBUG
+						await System.IO.File.WriteAllBytesAsync("./../PhishingPortal.UI.Blazor/wwwroot/img/email" + System.IO.Path.DirectorySeparatorChar + file.fileName, buf);
 
-					await System.IO.File.WriteAllBytesAsync("./../PhishingPortal.UI.Blazor/wwwroot/img/email" + System.IO.Path.DirectorySeparatorChar + file.fileName, buf);
-
+					#else
+						await System.IO.File.WriteAllBytesAsync("./../wwwroot/img/email" + System.IO.Path.DirectorySeparatorChar + file.fileName, buf);
 					
-				}
+					#endif   
+
+			    }
 			}
 		}
 	
