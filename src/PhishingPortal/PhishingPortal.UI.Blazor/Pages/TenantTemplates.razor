@@ -43,7 +43,7 @@ else
                             </tr>
                         </thead>
                         <tbody> 
-                            @foreach (var t in Templates)
+                            @foreach (var t in Templates.OrderByDescending(o=>o.Id))
                             {
                                 <tr>
                            

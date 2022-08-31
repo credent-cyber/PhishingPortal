@@ -1,0 +1,50 @@
+﻿@page
+@model LoginModel
+
+@{
+    Layout = "/Pages/Shared/_AuthLayout.cshtml";
+}
+
+<form id="account" method="post">
+    <div class="card-body">
+        <img src="~/custom/assets/images/credent_solutions_logo.png" alt="" class="img-fluid mb-4">
+        <h3 class="mb-3">Welcome to <br /><span class="text-c-blue">Phish Sims</span></h3>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="toggle-block">
+            @*  <ol class="position-relative carousel-indicators justify-content-center">
+            <li class="toggle-btn"></li>
+            <li class="active"></li>
+            </ol>*@
+            <div class="input-group mb-2 has-validation">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="feather icon-mail"></i></span>
+                </div>
+                <input asp-for="Input.Email" class="form-control" placeholder="Email address" autocomplete="username" aria-required="true" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="input-group mb-4">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                </div>
+                <input asp-for="Input.Password" class="form-control" placeholder="Password" autocomplete="current-password" aria-required="true" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group text-left">
+                <div class="checkbox checkbox-primary d-inline">
+                    <input type="checkbox" id="checkbox-fill-a1" asp-for="Input.RememberMe" />
+                    <label for="checkbox-fill-a1" class="cr"> Save credentials</label>
+                </div>
+            </div>
+            <button id="login-submit" type="submit" class="btn  btn-primary mb-4">Signin</button>
+            <p class="mb-2 text-muted">
+                Forgot password?
+                <a id="forgot-password" asp-page="./ForgotPassword" class="f-w-400">Reset</a>
+            </p>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
