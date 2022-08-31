@@ -65,7 +65,7 @@ namespace PhishingPortal.DataContext
             //    Description = "Sample Campaign description",
             //    State = Dto.CampaignStateEnum.Draft,
             //    Subject = "Sample Email Campaign",
-                
+
             //    Detail = new Dto.CampaignDetail
             //    {
             //        Template = template,
@@ -81,6 +81,30 @@ namespace PhishingPortal.DataContext
             //};
 
             //dbContext.Campaigns.Add(campaign);
+
+            dbContext.Settings.Add(new TenantSetting()
+            {
+                Key = "az_client_id",
+                Value = "e1fea56c-ef5c-4e10-9fa6-ab28d077e34c",
+                CreatedOn = DateTime.Now,
+                CreatedBy = "tenantadmin"
+            });
+
+            dbContext.Settings.Add(new TenantSetting()
+            {
+                Key = "az_client_secret",
+                Value = "~5A8Q~iYjzn188PLNj3kzdm8QVSPkwzS1owqBb.U",
+                CreatedOn = DateTime.Now,
+                CreatedBy = "tenantadmin"
+            });
+
+            dbContext.Settings.Add(new TenantSetting()
+            {
+                Key = "az_tenant_id",
+                Value = "cf92019c-152d-42f6-bbcc-0cf96e6b0108",
+                CreatedOn = DateTime.Now,
+                CreatedBy = "tenantadmin"
+            });
 
             dbContext.SaveChanges();
 

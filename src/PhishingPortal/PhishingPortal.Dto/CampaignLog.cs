@@ -28,6 +28,13 @@ namespace PhishingPortal.Dto
         public bool IsAttachmentOpen { get; set; }
         public bool IsMacroEnabled { get; set; }
         public bool IsReplied { get; set; }
+
+        /// <summary>
+        /// This will record if the campaign email is forwarded to a designated mailbox from the recipient
+        /// </summary>
+        public bool IsReported { get; set; }
+        public string ReportedBy { get; set; }
+        public DateTime ReportedOn { get; set; }
         public string Status { get; set; }
         public string SecurityStamp { get; set; }
     }

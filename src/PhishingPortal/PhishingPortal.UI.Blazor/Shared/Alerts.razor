@@ -12,12 +12,31 @@ else if (IsError && !string.IsNullOrEmpty(Message))
 }
 @code {
 
-        [Parameter]
-        public bool IsError { get; set; } = false;
+    private bool _isError;
 
-        [Parameter]
-        public bool IsSuccess { get; set; }
+    [Parameter]
+    public bool IsError
+    {
+        get { return _isError; }
+        set
+        {
+            _isError = value;
+            StateHasChanged();
+        }
+    }
 
-        [Parameter]
-        public string Message { get; set; } = string.Empty;
+    private bool _isSuccess;
+    [Parameter]
+    public bool IsSuccess
+    {
+        get { return _isSuccess; }
+        set
+        {
+            _isSuccess = value;
+            StateHasChanged();
+        }
+    }
+
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
 }

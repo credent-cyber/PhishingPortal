@@ -1,14 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using PhishingPortal.UI.Blazor.Models
 @inherits LayoutComponentBase
 
 <div class="page">
 
     <AuthorizeView Roles="superadmin">
-        <Admin_topbar/>
+        <Admin_topbar />
     </AuthorizeView>
 
     <AuthorizeView Roles="tenantadmin">
-       <Topbar/>
+        <Topbar />
     </AuthorizeView>
 
     <main>
@@ -17,42 +18,42 @@
 
 
         @*<div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-            <LoginDisplay />
-            </div>*@
+        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <LoginDisplay />
+        </div>*@
 
         <AuthorizeView>
             <NotAuthorized>
-                    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
-                        <div class="m-header">
-                           
-                            <a href="#!" class="b-brand">
-                                <img src="/custom/assets/images/credent_solutions_logo.png" alt="Credent Infotech" class="img-responsive"
-                                    width="220" height="45">
-                            </a>
-           
-                        </div>
-                             <ul class="navbar-nav ml-auto">
-                                <li class="nav-item">
-                                    <div style="float:right; marrgin-right:1%">
-                                        <LoginDisplay />
-                                     </div>
-                                </li>
-                            </ul>
-                    </header>
+                <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
+                    <div class="m-header">
+
+                        <a href="#!" class="b-brand">
+                            <img src="/custom/assets/images/credent_solutions_logo.png" alt="Credent Infotech" class="img-responsive"
+                                 width="220" height="45">
+                        </a>
+
+                    </div>
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <div style="float:right; marrgin-right:1%">
+                                <LoginDisplay />
+                            </div>
+                        </li>
+                    </ul>
+                </header>
 
 
 
-@*                <nav class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
-            <div class="container-fluid">
+                @*                <nav class="navbar sticky-top navbar-light" style="background-color: #e3f2fd;">
+                <div class="container-fluid">
                 <a class="navbar-brand" href="#">
-                    <img src="/img/logo-img.png" alt="" class="img-thumbnail">
+                <img src="/img/logo-img.png" alt="" class="img-thumbnail">
                 </a>
-               
+
                 <LoginDisplay />
-            </div>
-        </nav>*@
-        
+                </div>
+                </nav>*@
+
                 <div class="container" style="margin-top:10%">
 
                     <div class="row" style="background-color:currentColor;">
@@ -84,10 +85,17 @@
             </NotAuthorized>
         </AuthorizeView>
 
+        
         <article class="content px-4">
-            <div style="margin-top:100px">
-                @Body
-            </div>
+            <CascadingValue TValue="AlertModel" Value="alerts">
+                <div style="margin-top:100px">
+                    @Body
+                </div>
+            </CascadingValue>
         </article>
     </main>
 </div>
+
+@code {
+    private AlertModel alerts = new AlertModel();
+}

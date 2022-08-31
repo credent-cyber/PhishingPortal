@@ -32,34 +32,37 @@ namespace PhishingPortal.Services.Notification
 
         public TenantDbContext GetContext(string tenantUniqueId)
         {
-            if (!_dicConnections.ContainsKey(tenantUniqueId))
+            lock (this)
             {
-                _logger.LogInformation($"Dbcontext not found in the dictionary");
+                if (!_dicConnections.ContainsKey(tenantUniqueId))
+                {
+                    _logger.LogInformation($"Dbcontext not found in the dictionary");
 
-                var tenant = centralDbContext.Tenants.Include(o => o.Settings)
-                            .FirstOrDefault(o => o.UniqueId == tenantUniqueId);
+                    var tenant = centralDbContext.Tenants.Include(o => o.Settings)
+                                .FirstOrDefault(o => o.UniqueId == tenantUniqueId);
 
-                if (tenant == null)
-                    throw new InvalidDataException();
+                    if (tenant == null)
+                        throw new InvalidDataException();
 
-                var tenantData = tenant.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.ConnString);
+                    var tenantData = tenant.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.ConnString);
 
-                if (tenantData == null)
-                    throw new InvalidOperationException();
+                    if (tenantData == null)
+                        throw new InvalidOperationException();
 
-                var dbCtxOptions = SetupDbContextBuilder(tenant, tenantData.Value);
+                    var dbCtxOptions = SetupDbContextBuilder(tenant, tenantData.Value);
 
-                var dbcontext = new TenantDbContext(dbCtxOptions.Options);
+                    var dbcontext = new TenantDbContext(dbCtxOptions.Options);
 
-                _dicConnections[tenantUniqueId] = dbcontext;
+                    _dicConnections[tenantUniqueId] = dbcontext;
 
-                return dbcontext;
+                    return dbcontext;
 
-            }
-            else
-            {
-                _logger.LogInformation($"Dbcontext from cache, TenantId: {tenantUniqueId}");
-                return _dicConnections[tenantUniqueId];
+                }
+                else
+                {
+                    _logger.LogInformation($"Dbcontext from cache, TenantId: {tenantUniqueId}");
+                    return _dicConnections[tenantUniqueId];
+                } 
             }
 
         }

@@ -13,6 +13,7 @@ namespace PhishingPortal.Services.Notification
 
         readonly Task _processTask;
         readonly int _executorDelayInSeconds = 5;
+        readonly MailTrackerConfig _mailTrackerConfig;
         bool _stopped;
         public EmailCampaignExecutor(ILogger<EmailCampaignExecutor> logger, IConfiguration config, IEmailClient emailSender,
             ITenantDbConnManager connManager)
@@ -20,6 +21,7 @@ namespace PhishingPortal.Services.Notification
             Logger = logger;
             EmailSender = emailSender;
             TenantDbConnMgr = connManager;
+            _mailTrackerConfig = new MailTrackerConfig(config);
             _processTask = ExecuteTask();
             Queue = new ConcurrentQueue<EmailCampaignInfo>();
 
@@ -68,9 +70,13 @@ namespace PhishingPortal.Services.Notification
                             if (ecinfo != null)
                             {
                                 Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
-                                
+
                                 var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
-                                await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.ReturnUrl, ecinfo.EmailFrom);
+                                
+                                if(_mailTrackerConfig.EnableEmbedTracker)
+                                    ecinfo.EmailContent += EmbedTracker(ecinfo);
+
+                                await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
 
                                 Logger.LogInformation($"Email sent");
 
@@ -93,6 +99,11 @@ namespace PhishingPortal.Services.Notification
                 }
 
             });
+        }
+
+        private string EmbedTracker(EmailCampaignInfo ecinfo)
+        {
+            return $"<div style='display:none'>{_mailTrackerConfig.MailTrackerBlock}{ecinfo.LogEntry.SecurityStamp}{_mailTrackerConfig.MailTrackerBlock}</div>";
         }
 
         public void OnCompleted()

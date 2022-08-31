@@ -5,10 +5,11 @@ using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
-using PhishingPortal.Server.Services;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using PhishingPortal.Server.Services.Interfaces;
+using PhishingPortal.Server.Services;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -20,6 +21,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         readonly TenantRepository _tenantRepository;
         readonly string _templateImageRootPath;
+        readonly IAzActDirClientService _adImportClient;
 
         public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
             IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
@@ -28,6 +30,8 @@ namespace PhishingPortal.Server.Controllers.Api
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
 
             _templateImageRootPath = appConfig.GetValue<string>("TemplateImgRootPath");
+
+            _adImportClient = new AzActDirClientService(logger, _tenantRepository);
         }
 
         [HttpGet]
@@ -174,15 +178,15 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpPost]
         [Route("campaign-hit")]
         [AllowAnonymous]
-        public async Task<ApiResponse<bool>> CampignLinkHit(GenericApiRequest<string> request)
+        public async Task<ApiResponse<string>> CampignLinkHit(GenericApiRequest<string> request)
         {
-            var result = new ApiResponse<bool>();
+            var result = new ApiResponse<string>();
             try
             {
-                bool outcome = await _tenantRepository.CampaignHit(request.Param);
-                result.IsSuccess = outcome;
+                var outcome = await _tenantRepository.CampaignHit(request.Param);
+                result.IsSuccess = outcome.Item1;
                 result.Message = "Successful";
-                result.Result = outcome;
+                result.Result = outcome.Item2;
             }
             catch (Exception ex)
             {
@@ -249,6 +253,94 @@ namespace PhishingPortal.Server.Controllers.Api
                 Logger.LogCritical(ex, ex.Message);
                 throw;
             }
+
+            return result;
+        }
+
+
+        #region Azure Ad Integration
+
+        [HttpGet]
+        [Route("az-ad-groups")]
+
+        public async Task<Dictionary<string, string>> GetAzureAdUserGroups()
+        {
+            return await _adImportClient.GetAllUserGroups();
+        }
+
+        [HttpGet]
+        [Route("recipient-user-groups")]
+
+        public async Task<List<RecipientGroup>> GetRecipientGroups(bool adGroupsOnly = false)
+        {
+            var result = await _tenantRepository.GetRecipientGroups(adGroupsOnly);
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("az-ad-user-groups-import")]
+
+        public async Task<ApiResponse<List<Recipient>>> ImportAdUserGroups(RecipientGroup adRecipientGroup)
+        {
+            var response = new ApiResponse<List<Recipient>>();
+
+            var adUsers = new List<Microsoft.Graph.User>();
+
+            if(adRecipientGroup.Uid == "all-users")
+            {
+                adUsers = await _adImportClient.GetAdUsers();
+            }
+            else
+            {
+                adUsers = await _adImportClient.GetGroupMembers(adRecipientGroup.Uid);
+            }
+
+            if (adUsers != null && adUsers.Count() > 0)
+            {
+                var recipients = adUsers.Select(o => new Recipient
+                {
+                    IsActive = true,
+                    IsADUser = true,
+                    EmployeeCode = o.EmployeeId,
+                    Name = o.DisplayName,
+                    Mobile = o.MobilePhone,
+                    Address = o.OfficeLocation,
+                    DateOfBirth = o.Birthday?.ToString("dd MMM"),
+                    Department = o.Department,
+                    Branch = o.OfficeLocation,
+                    Email = o.Mail,
+                    WhatsAppNo = o.MobilePhone
+                }).ToList();
+
+                var result =  await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
+                
+                
+                response.IsSuccess = true;
+                response.Result = result;
+            }
+
+            return response;
+        }
+
+        #endregion
+
+        [HttpGet]
+        [Route("settings")]
+
+        public async Task<Dictionary<string,string>> GetSettings()
+        {
+            var result = await _tenantRepository.GetSettings();
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("upsert-settings")] 
+
+        public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
+        {
+            var result = await _tenantRepository.UpsertSettings(settings, HttpContext.GetCurrentUser());
 
             return result;
         }

@@ -7,6 +7,10 @@ namespace PhishingPortal.Dto
 {
     public class RecipientGroup : BaseEntity
     {
+        public string Uid { get; set; }
         public string GroupName { get; set; }
+        public bool IsActiveDirectoryGroup { get; set; } = false;
+        public DateTime LastImported { get; set; }
+
     }
 }
