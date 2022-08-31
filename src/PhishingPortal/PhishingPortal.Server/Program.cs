@@ -17,6 +17,7 @@ using Pomelo.EntityFrameworkCore.MySql;
 using Serilog;
 using System;
 using PhishingPortal.Server.Services.Interfaces;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +99,10 @@ builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
+var dataProtectPath = "./App_Data/";
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo($"{dataProtectPath}"));
 
 builder.Services.AddIdentityServer()
     //.AddSigningCredential(rsaCertificate)

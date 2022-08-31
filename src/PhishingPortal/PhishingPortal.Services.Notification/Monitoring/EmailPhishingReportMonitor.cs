@@ -9,7 +9,7 @@ namespace PhishingPortal.Services.Notification.Monitoring
 {
     using Microsoft.EntityFrameworkCore;
     using PhishingPortal.Common;
-    using PhishingPortal.Services.Notification;
+    using PhishingPortal.Services.Notification.Helper;
     using System.Net;
     using System.Net.Mail;
 

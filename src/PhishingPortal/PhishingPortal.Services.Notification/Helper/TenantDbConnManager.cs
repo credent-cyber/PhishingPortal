@@ -2,7 +2,7 @@
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Services.Notification.Helper
 {
     public class TenantDbConnManager : ITenantDbConnManager
     {
@@ -17,7 +17,7 @@ namespace PhishingPortal.Services.Notification
         {
             _dicConnections = new Dictionary<string, TenantDbContext>();
 
-            if(config != null)
+            if (config != null)
             {
                 _useSqlLite = config.GetValue<bool>("UseSqlLite");
                 _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
@@ -26,7 +26,7 @@ namespace PhishingPortal.Services.Notification
                 logger.LogInformation($"SqlLiteDbpath  : {_sqlLiteDbPath}");
             }
 
-            this._logger = logger;
+            _logger = logger;
             this.centralDbContext = centralDbContext;
         }
 
@@ -62,7 +62,7 @@ namespace PhishingPortal.Services.Notification
                 {
                     _logger.LogInformation($"Dbcontext from cache, TenantId: {tenantUniqueId}");
                     return _dicConnections[tenantUniqueId];
-                } 
+                }
             }
 
         }
@@ -96,10 +96,10 @@ namespace PhishingPortal.Services.Notification
 
         public void Dispose()
         {
-            if(_dicConnections != null)
+            if (_dicConnections != null)
             {
                 _logger.LogInformation("Disposing all tenant db connections");
-                foreach(var conn in _dicConnections.Values)
+                foreach (var conn in _dicConnections.Values)
                 {
                     _logger.LogDebug($"{conn}");
                     conn.Dispose();

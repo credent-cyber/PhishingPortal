@@ -4,6 +4,9 @@ namespace PhishingPortal.Services.Notification
     using Microsoft.EntityFrameworkCore;
     using PhishingPortal.Common;
     using PhishingPortal.Services.Notification.Monitoring;
+    using PhishingPortal.Services.Notification.Email;
+    using PhishingPortal.Services.Notification.Helper;
+    using PhishingPortal.Services.Notification.Sms;
 
     public class Worker : BackgroundService
     {
@@ -21,7 +24,10 @@ namespace PhishingPortal.Services.Notification
             IEmailClient emailClient,
             IConfiguration configuration,
             CentralDbContext centralDbContext,
-            IEmailCampaignExecutor campaignExecutor, ITenantDbConnManager tenantDbConnManager)
+            IEmailCampaignExecutor campaignExecutor, 
+            ISmsCampaignExecutor smsExecutor,
+            ITenantDbConnManager tenantDbConnManager, 
+            ISmsGatewayClient smsClient)
         {
             _logger = logger;
             this.providerLogger = agentLogger;
@@ -32,7 +38,9 @@ namespace PhishingPortal.Services.Notification
             _configuration = configuration;
             _centralDbContext = centralDbContext;
             this._campaignExecutor = campaignExecutor;
+            this._smsExecutor = smsExecutor;
             TenantDbConnManager = tenantDbConnManager;
+            SmsClient = smsClient;
         }
 
         readonly ILogger<Worker> _logger;
@@ -42,13 +50,17 @@ namespace PhishingPortal.Services.Notification
         readonly IConfiguration _configuration;
         readonly CentralDbContext _centralDbContext;
         private readonly IEmailCampaignExecutor _campaignExecutor;
+        private readonly ISmsCampaignExecutor _smsExecutor;
         bool _isprocessing = false;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
+        public ISmsGatewayClient SmsClient { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _campaignExecutor.Start();
+            _smsExecutor.Start();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
@@ -78,9 +90,15 @@ namespace PhishingPortal.Services.Notification
                                      provider.Subscribe(_campaignExecutor);
                                      await provider.CheckAndPublish(stoppingToken);
 
+                                     // sms campaign executor
+                                     var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                     _smsProvider.Subscribe(_smsExecutor);
+                                     await _smsProvider.CheckAndPublish(stoppingToken);
+
                                      // monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
                                      var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
                                      await _reportMonitor.ProcessAsync();
+                                   
                                  }
                                  catch (Exception ex)
                                  {
