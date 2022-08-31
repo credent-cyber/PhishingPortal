@@ -59,69 +59,81 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" disabled="disabled">
+                                                    <select @bind="CheckSelected" class="form-control" id="CampaignType" >
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
-                                                    </InputSelect>
+                                                    </select>
                                                 </div>
                                             </div>
 
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3">Select Template </label>
-                                                <div class="col-md-9">
-                                                    <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                                                        @foreach (var val in Templates.OrderBy(o => o.Name))
-                                                            {
-                                                            <option value="@val.Id">@val.Name</option>
-                                                            }
-                                                    </InputSelect>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-3">Select Template </label>
+                                                    <div class="col-md-9">
+                                                        <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
+                                                            @foreach (var val in Templates.OrderBy(o=>o.Name).Where(o=>o.Type==model.Detail.Type))
+                                                                {
+                                                                <option value="@val.Id">@val.Name</option>
+                                                                }
+                                                        </InputSelect>
+                                                    </div>
                                                 </div>
-                                            </div>
-
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
-                                                <div class="col-md-9">
-                                                    <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
-                                                <div class="col-md-9">
-                                                    <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                @if (model.Detail.Type == CampaignType.Email)
+                                                {                                                  
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                     <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                             <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
                                                         @foreach (var val in _returnUrlList.OrderBy(o => o))
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
                                                     </InputSelect>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
-                                                <div class="col-md-9">
-                                                    <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
-                                                <div class="col-md-9">
-                                                    <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
-                                                <div class="col-md-9">
-                                                    @* <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
-                                                    <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
-                                                    <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
+                                                        <div class="col-md-9">
+                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
+                                                        <div class="col-md-9">
+                                                             <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                        </div>
+                                                    </div>
+                                                 <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
+                                                    <div class="col-md-9">
+                                                      @* <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
+                                                       <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
+                                                       <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
 
-                                                        <option>-Select-</option>
-                                                        <option value="Clicks">Clicks</option>
-                                                        <option value="Offers">Offers</option>
-                                                        <option value="ITServices">IT Services</option>
-                                                        <option value="Banking">Banking</option>
-                                                        <option value="Finance">Finance</option>
+                                                                <option>-Select-</option>
+                                                                <option value="Clicks">Clicks</option>
+                                                                <option value="Offers">Offers</option>
+                                                                <option value="ITServices">IT Services</option>
+                                                                <option value="Banking">Banking</option>
+                                                                <option value="Finance">Finance</option>
+                                                                <option value="Finance">Verification</option>
 
                                                     </InputSelect>
                                                 </div>
@@ -212,18 +224,19 @@ else
                                                     <label for="txtImportUsers" class="col-form-label col-md-3">Import Users</label>
                                                     <div class="col-md-9">
                                                         <div class="input-group">
-                                                            <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">
-                                                                @foreach (var val in Enum.GetValues<RecipientSources>())
-                                                                {
-                                                                <option value="@val">@val</option>
-                                                                }
-                                                        </InputSelect>
-                                                        <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
-                                                    </div>
-
-                                                    <br />
-
-                                                    @if (sources == RecipientSources.Csv)
+                                                        <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">                                                         
+                                                            @foreach (var val in Enum.GetValues<RecipientSources>())
+                                                            {
+                                                            <option value="@val">@val</option>
+                                                            }
+                                                        </InputSelect>   
+                                                            @if(sources == RecipientSources.Csv)
+                                                            {                                                                
+                                                                <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
+                                                            }
+                                                        </div>
+                                                        <br/>
+                                                        @if (sources == RecipientSources.Csv)
                                                         {
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Has Header Row</label>
@@ -254,6 +267,7 @@ else
 
                                                     </div>
                                                 </div>
+
 
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">State</label>
@@ -353,7 +367,6 @@ else
 
 @code {
 
-
     [Parameter]
     public int Id { get; set; }
 
@@ -377,6 +390,10 @@ else
     bool dailog = false;
     List<string> _returnUrlList = new List<string>() { "" };
     string _selectReturnUrl = string.Empty;
+
+    public bool sms = false;
+  
+   
 
     public string Title
     {
@@ -422,6 +439,7 @@ else
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
+            
 
             _selectReturnUrl = model.ReturnUrl;
 
@@ -470,7 +488,7 @@ else
             message = "Please fill all the required field";
             return;
         }
-        @if (@model.FromEmail is not null)
+        @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
         {
             var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
             if (!formate)
@@ -631,11 +649,16 @@ else
                                     Department = arr[5],
                                     Branch = arr[6],
                                     Address = arr[7]
-                                };
-
+                            };
                             r.Validate();
-
-                            if (!recipients.Any(i => i.Email == r.Email))
+                            if(r.ValidationErrMsg is not null)
+                            {
+                                IsError = true;
+                                message = r.ValidationErrMsg;
+                                isloading = false;
+                                return;
+                            }
+                            if(!recipients.Any(i => i.Email == r.Email))
                                 recipients.Add(r);
                         }
 
@@ -835,5 +858,31 @@ else
             _returnUrlList.Insert(0, "");
             _selectReturnUrl = _returnUrlList?.FirstOrDefault() ?? string.Empty;
         }
+    }
+
+    private CampaignType CheckSelected
+    {
+        get
+        {
+            return model.Detail.Type;
+        }
+        set
+        {
+            ChangeEventArgs selectedEventArgs = new ChangeEventArgs();
+            selectedEventArgs.Value = value;
+            updt(selectedEventArgs);
+        }
+    }
+    public void updt(ChangeEventArgs e) 
+    {
+        if (e.Value.ToString() != string.Empty)
+        {
+            var a = e.Value.ToString();
+            if(a=="Sms"){ model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id; }
+            else if(a=="Email"){ model.Detail.Type = CampaignType.Email; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;}
+            else if(a=="Whatsapp"){ model.Detail.Type = CampaignType.Whatsapp; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;}
+
+        }
+
     }
 }

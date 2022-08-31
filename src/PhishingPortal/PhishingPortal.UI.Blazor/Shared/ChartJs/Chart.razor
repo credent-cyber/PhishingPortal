@@ -37,12 +37,27 @@
         // that need to be sent to Chart.js
         if (Datasets == null || Datasets.Count() == 0)
             return;
-
+      
         if (!IsStacked)
         {
             var config = new
             {
                 Type = Type.ToString().ToLower(),
+                Options = new
+                {
+                    Responsive = Responsive,
+                    Scales = new
+                    {
+
+                        YAxes = new[]
+                                            {
+                            new { Ticks = new {
+                                BeginAtZero=true
+                            }, Stacked = true }
+                        }
+                    }
+
+                },
 
                 Data = new
                 {
@@ -57,10 +72,7 @@
 
                 },
 
-                Options = new
-                {
-                    Responsive = Responsive,
-                }
+               
 
             };
 

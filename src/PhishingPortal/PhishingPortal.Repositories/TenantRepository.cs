@@ -30,7 +30,7 @@ namespace PhishingPortal.Repositories
         {
             var result = Enumerable.Empty<Campaign>();
 
-            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).OrderByDescending(o => o.Id)
+            result = TenantDbCtx.Campaigns.Include(o=>o.Detail).Include(o => o.Schedule).OrderByDescending(o => o.Id)
                 .Skip(pageIndex * pageSize).Take(pageSize);
 
             return Task.FromResult(result);
@@ -424,11 +424,19 @@ namespace PhishingPortal.Repositories
 #if DEBUG
 
                 // this is just to test dashboard
-                if (month <= (Months)DateTime.Now.Month)
+                //if (month <= (Months)DateTime.Now.Month)
+                //{
+                //    entry.TotalCount = new Random().Next(50, 100);
+                //    entry.TotalHits = new Random().Next(15, 39);
+                //    entry.HitPronePercent = Math.Round(((decimal)entry.TotalHits / (decimal)entry.TotalCount) * 100, 2);
+                //}
+                if (log != null)
                 {
-                    entry.TotalCount = new Random().Next(50, 100);
-                    entry.TotalHits = new Random().Next(15, 39);
-                    entry.HitPronePercent = Math.Round(((decimal)entry.TotalHits / (decimal)entry.TotalCount) * 100, 2);
+                    entry.TotalCount = log.Total;
+                    entry.TotalHits = log.TotalHits;
+                    if (log.Total > 0)
+                        entry.HitPronePercent = (log.TotalHits / log.Total) * 100;
+
                 }
 
 #else

@@ -53,7 +53,7 @@ namespace PhishingPortal.Dto
 
         public void Validate()
         {
-            ValidationErrMsg = string.Empty;
+            ValidationErrMsg = null;
 
             if (string.IsNullOrEmpty(EmployeeCode) || string.IsNullOrEmpty(Name)
                 || string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Mobile))
@@ -64,11 +64,15 @@ namespace PhishingPortal.Dto
             if (!isEmail)
                 ValidationErrMsg = "Invalid Email Id specified";
 
-            if (Mobile.Length <= 10)
+            if (Mobile.Length < 10)
                 ValidationErrMsg = "Invalid Mobile number specified";
+
+            if(string.IsNullOrEmpty(Mobile))
+                ValidationErrMsg = "Recipient Mobile number can't be empty";
 
             if (!string.IsNullOrEmpty(DateOfBirth) && !DateTime.TryParse(DateOfBirth, out DateTime result))
                 ValidationErrMsg = "Invalid date of birth specified, date should be specified as MM/DD/YYYY";
+
         }
 
     }
