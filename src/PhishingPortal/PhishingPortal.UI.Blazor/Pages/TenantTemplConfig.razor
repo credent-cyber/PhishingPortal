@@ -245,12 +245,14 @@
         Templates = await client.GetTemplatesByType(type);
         if (Id != 0)
         {
+            Message = string.Empty;
             model = await client.GetTemplateById(Id);
             contents = model.Content;
 
         }
         else
         {
+            Message = string.Empty;
             model = new CampaignTemplate();
             model.Version = "1";
 
@@ -303,9 +305,15 @@
         try
         {
             if (model.Id > 0)
+            {               
                 Message = "Successfully Updated";
+                model.ModifiedOn = DateTime.Now;
+            }
             else
+            {
                 Message = "Successfully Added";
+                model.CreatedOn = DateTime.Now;
+            }
 
             //await GetHTML();
             contents = await GetSummerNoteContent();
@@ -366,7 +374,8 @@
         await fileStream.CopyToAsync(ms);
         fileStream.Close();
         result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-        const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";   
+        // const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";   
+        const string section= @"<img src\s*=\s*""(?<pick>(\.{0,2}\/.+))(/.+\.jpg)";   
         var matches = Regex.Matches(result, section ,RegexOptions.IgnoreCase|RegexOptions.Multiline);
         foreach(Match match in matches)
         {
