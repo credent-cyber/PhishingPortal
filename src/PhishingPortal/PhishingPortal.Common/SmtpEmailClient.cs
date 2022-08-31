@@ -107,7 +107,16 @@
             try
             {
                 Logger.LogInformation($"Mail with correlation id : {correlationId} being send");
-                await SmtpClient.SendMailAsync(message);
+
+#if DEBUG
+                _smtpConfig.IsSendingEnabled = false;
+#endif
+
+                if (_smtpConfig.IsSendingEnabled)
+                    await SmtpClient.SendMailAsync(message);
+                else
+                    Logger.LogWarning($"Sending emails is disabled at moment");
+
                 Logger.LogInformation($"Mail with correlation id: {correlationId} is send successfully");
 
             }

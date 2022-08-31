@@ -1,7 +1,6 @@
-﻿
-using PhishingPortal.Common;
+﻿using PhishingPortal.Common;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Services.Notification.Email
 {
     public interface IEmailCampaignExecutor : IObserver<EmailCampaignInfo>
     {

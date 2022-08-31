@@ -59,12 +59,12 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                        <InputSelect @bind-Value="model.Detail.Type" class="form-control" id="CampaignType" >
+                                                    <select @bind="CheckSelected" class="form-control" id="CampaignType" >
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
                                                             <option value="@val">@val</option>
                                                             }
-                                                    </InputSelect>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -367,7 +367,6 @@ else
 
 @code {
 
-
     [Parameter]
     public int Id { get; set; }
 
@@ -391,6 +390,10 @@ else
     bool dailog = false;
     List<string> _returnUrlList = new List<string>() { "" };
     string _selectReturnUrl = string.Empty;
+
+    public bool sms = false;
+  
+   
 
     public string Title
     {
@@ -436,6 +439,7 @@ else
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
+            
 
             _selectReturnUrl = model.ReturnUrl;
 
@@ -854,5 +858,31 @@ else
             _returnUrlList.Insert(0, "");
             _selectReturnUrl = _returnUrlList?.FirstOrDefault() ?? string.Empty;
         }
+    }
+
+    private CampaignType CheckSelected
+    {
+        get
+        {
+            return model.Detail.Type;
+        }
+        set
+        {
+            ChangeEventArgs selectedEventArgs = new ChangeEventArgs();
+            selectedEventArgs.Value = value;
+            updt(selectedEventArgs);
+        }
+    }
+    public void updt(ChangeEventArgs e) 
+    {
+        if (e.Value.ToString() != string.Empty)
+        {
+            var a = e.Value.ToString();
+            if(a=="Sms"){ model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id; }
+            else if(a=="Email"){ model.Detail.Type = CampaignType.Email; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;}
+            else if(a=="Whatsapp"){ model.Detail.Type = CampaignType.Whatsapp; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;}
+
+        }
+
     }
 }

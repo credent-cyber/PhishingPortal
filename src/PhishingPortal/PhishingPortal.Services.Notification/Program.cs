@@ -3,6 +3,10 @@ using PhishingPortal.DataContext;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Common;
 using Serilog;
+using PhishingPortal.Services.Notification.Email;
+using PhishingPortal.Services.Notification.Helper;
+using PhishingPortal.Services.Notification.Sms;
+using PhishingPortal.Services.Notification.Whatsapp;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -70,6 +74,15 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IEmailClient, SmtpEmailClient>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
         services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
+       
+        services.AddSingleton<AmyntraSmsGatewayConfig>();
+        services.AddSingleton<ISmsCampaignExecutor, SmsCampaignExecutor>();
+        services.AddSingleton<ISmsGatewayClient, DefaultSmsGatewayClient>();
+
+        services.AddSingleton<WhatsappGatewayConfig>();
+        services.AddSingleton<IWhatsappCampaignExecutor, WhatsappCampaignExecutor>();
+        services.AddSingleton<IWhatsappGatewayClient, WhatsappMateGatewayClient>();
+
         services.AddHostedService<Worker>();
 
     })

@@ -1,7 +1,9 @@
 ﻿using PhishingPortal.Common;
+using PhishingPortal.Services.Notification.Helper;
+using PhishingPortal.Services.Notification.Monitoring;
 using System.Collections.Concurrent;
 
-namespace PhishingPortal.Services.Notification
+namespace PhishingPortal.Services.Notification.Email
 {
 
     public class EmailCampaignExecutor : IEmailCampaignExecutor
@@ -72,8 +74,8 @@ namespace PhishingPortal.Services.Notification
                                 Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
 
                                 var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
-                                
-                                if(_mailTrackerConfig.EnableEmbedTracker)
+
+                                if (_mailTrackerConfig.EnableEmbedTracker)
                                     ecinfo.EmailContent += EmbedTracker(ecinfo);
 
                                 await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
