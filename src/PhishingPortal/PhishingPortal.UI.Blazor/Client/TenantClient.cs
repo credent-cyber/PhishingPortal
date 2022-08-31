@@ -76,8 +76,6 @@ namespace PhishingPortal.UI.Blazor.Client
             return templates;
         }
 
-
-
         public async Task<Campaign> UpsertCampaignAsync(Campaign campaign)
         {
 
@@ -283,5 +281,139 @@ namespace PhishingPortal.UI.Blazor.Client
             return null;
         }
 
+        #region Settings
+        public async Task<Dictionary<string, string>> GetSettings()
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/settings");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
+        public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<Dictionary<string, string>>($"api/tenant/upsert-settings", settings);
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        } 
+        #endregion
+
+        #region Related to Azure Active Directory Integration
+
+        /// <summary>
+        /// Get all Azure AD User Groups if available
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Dictionary<string, string>> GetAzureADUserGroups()
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/az-ad-groups");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Get list of recipient groups Azure AD + non Ad groups
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<RecipientGroup>> GetRecipientUserGroups()
+        {
+            var response = new List<RecipientGroup>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/recipient-user-groups");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<List<RecipientGroup>>>();
+                if (json != null)
+                    response = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Mark Azure AD User groups to be imported
+        /// </summary>
+        /// <param name="groups"></param>
+        /// <returns></returns>
+        public async Task<List<Recipient>> ImportAzureADByUserGroups(RecipientGroup grp)
+        {
+            var response = new List<Recipient>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<RecipientGroup>($"api/tenant/az-ad-user-groups-import", grp);
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<List<Recipient>>>();
+                if (json != null)
+                    response = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
+
+        #endregion
+
     }
+
+
+
 }

@@ -3,8 +3,9 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System;
+using PhishingPortal.Common;
 
-namespace PhishingPortal.Common.Tests
+namespace PhishingPortal.Tests
 {
     public class EmailClientTests
     {

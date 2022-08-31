@@ -3,7 +3,6 @@ using System;
 
 namespace PhishingPortal.Dto
 {
-
     public class DailySchedule : BaseSchedule
     {
         public DateTime DailyScheduleTime { get; set; }

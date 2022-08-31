@@ -2,7 +2,7 @@
 
 namespace PhishingPortal.Repositories
 {
-    public class BaseRepository
+    public abstract class BaseRepository
     {
         public BaseRepository(ILogger logger)
         {

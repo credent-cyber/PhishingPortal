@@ -32,4 +32,5 @@ namespace PhishingPortal.Server.Services
             return tenant;
         }
     }
+
 }

@@ -54,7 +54,7 @@ else
                                         </thead>
                                         <tbody> 
                                     
-                                             @foreach (var c in campaigns)
+                                             @foreach (var c in campaigns.Where(o => o.Detail.Type == CampaignType.Email))
                                              {
                                                 <tr role="row" class="odd">
                                                     <td><a class="btn-link" href="tenant-campaign-config/@c.Id">@c.Id</a></td>
@@ -99,7 +99,7 @@ else
                                </div>
                                <div class="tab-pane card-body pt-4" id="tabs-t-tab2">                              
                                       <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
-                                         @* <div class="table-responsive">
+                                          <div class="table-responsive">
                                              <table id="sms" class="table table-striped table-bordered nowrap">
                                                 <thead>
                                                 <tr role="row">
@@ -115,7 +115,7 @@ else
                                                 </thead>
                                                 <tbody> 
                                     
-                                                     @foreach (var c in campaigns.Where(o => o.Detail.Type==CampaignType.Sms))
+                                                     @foreach (var c in campaigns.Where(o => o.Detail.Type == CampaignType.Sms))
                                                      {
                                                         <tr role="row" class="odd">
                                                             <td><a class="btn-link" href="tenant-campaign-config/@c.Id">@c.Id</a></td>
@@ -156,13 +156,13 @@ else
                                                      </ul>
                                                   </nav>
                                               </div>
-                                          </div>*@
+                                          </div>
                                       </div>
                             
                                </div>
                                <div class="tab-pane card-body pt-4" id="tabs-t-tab3">                              
                                       <div class="tab-pane card-body pt-4" id="tabs-t-tab3">
-                                         @* <div class="table-responsive">
+                                          <div class="table-responsive">
                                              <table id="SchdCampaign" class="table table-striped table-bordered nowrap">
                                                 <thead>
                                                 <tr role="row">
@@ -219,7 +219,7 @@ else
                                                      </ul>
                                                   </nav>
                                               </div>
-                                          </div>*@
+                                          </div>
                                       </div>
                                </div>
 
@@ -244,7 +244,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
+       
 
+       
         if (campaigns == null || campaigns.Count() == 0)
             message = "No campaigns found!";
 

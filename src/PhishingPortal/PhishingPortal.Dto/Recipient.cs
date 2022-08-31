@@ -20,6 +20,7 @@ namespace PhishingPortal.Dto
         public string DateOfBirth { get; set; }
         public string LastWorkingDate { get; set; }
         public bool IsActive { get; set; }
+        public bool IsADUser { get; set; } = false;
 
 
     }
@@ -35,6 +36,20 @@ namespace PhishingPortal.Dto
         public string Address { get; set; }
         public string DateOfBirth { get; set; }
         public string ValidationErrMsg { get; private set; }
+
+        public RecipientImport() { }
+
+        public RecipientImport(Recipient o)
+        {
+            EmployeeCode = o.EmployeeCode;
+            Name = o.Name;
+            Email = o.Email;
+            Mobile = o.Mobile;
+            Branch = o.Branch;
+            Department = o.Department;
+            Address = o.Address;
+            DateOfBirth = o.DateOfBirth;
+        }
 
         public void Validate()
         {
@@ -67,8 +82,6 @@ namespace PhishingPortal.Dto
     {
         None = 0,
         Csv = 1,
-        // Xls,
-        //ActiveDirectory,
-        // RecipientGroup
+        AzureActiveDirectory = 2
     }
 }

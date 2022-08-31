@@ -1,7 +1,7 @@
 ﻿using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
-using PhishingPortal.Server.Services;
+using PhishingPortal.Server.Services.Interfaces;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
