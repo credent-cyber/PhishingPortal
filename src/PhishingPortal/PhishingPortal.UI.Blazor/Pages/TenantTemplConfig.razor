@@ -192,7 +192,7 @@
                                                                 <label for="Content" class="form-label">Template Content</label>
                                                                
                                                                 
-                                                                @if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp)
+                                                                @if(model.Type==CampaignType.Sms)
                                                                 {
                                                                    @* <EditForm Model="@model" OnValidSubmit="@OnSave" >
            
@@ -411,7 +411,11 @@
                 var sdata = match.Groups["pick"].Value;
                 if (!string.IsNullOrEmpty(sdata))
                 {
-                    var newResult = Regex.Replace(result,sdata, @"img/email/");
+                    #if DEBUG
+                    var newResult = Regex.Replace(result,sdata, @"timg/");
+                    #else
+                    var newResult = Regex.Replace(result,sdata, @"C:/inetpub/wwwroot/phishing-simulator/wwwroot/timg/");
+                    #endif
                     result = newResult;
                 }
             }

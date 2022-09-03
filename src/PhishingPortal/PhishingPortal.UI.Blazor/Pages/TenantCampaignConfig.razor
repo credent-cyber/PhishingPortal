@@ -315,8 +315,17 @@ else
                                             }
                                             else
                                             {
-                                                OnShowPreview(model.Detail.CampaignTemplateId);
-                                                @previewContent
+                                                if(model.Detail.Type == CampaignType.Sms)
+                                                {
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);
+                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text"  disabled />
+                                                }
+                                                else
+                                                {
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);
+                                                    @previewContent 
+                                                }
+                                                
                                             }
                                         </div>
                                     </div>
@@ -392,7 +401,7 @@ else
     string _selectReturnUrl = string.Empty;
 
     public bool sms = false;
-  
+    string text = "";
    
 
     public string Title
@@ -831,7 +840,17 @@ else
     {
         var template = Templates.FirstOrDefault(o => o.Id == id);
         showPreview = true;
-        content = template.Content;
+        //content = template.Content;
+        if(template.Type==CampaignType.Email ||template.Type==CampaignType.Whatsapp)
+        {
+            sms = false;
+            content = template.Content;           
+        }
+        if(template.Type==CampaignType.Sms)
+        {
+            sms = true;
+            text = template.Content;           
+        }
     }
     protected void onClose()
     {
@@ -878,9 +897,15 @@ else
         if (e.Value.ToString() != string.Empty)
         {
             var a = e.Value.ToString();
-            if(a=="Sms"){ model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id; }
-            else if(a=="Email"){ model.Detail.Type = CampaignType.Email; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;}
-            else if(a=="Whatsapp"){ model.Detail.Type = CampaignType.Whatsapp; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;}
+            if(a=="Sms")
+            { 
+                model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id;
+                OnShowPreview(model.Detail.CampaignTemplateId);
+            }
+            else if(a=="Email")
+            { model.Detail.Type = CampaignType.Email; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;}
+            else if(a=="Whatsapp")
+            { model.Detail.Type = CampaignType.Whatsapp; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;}
 
         }
 

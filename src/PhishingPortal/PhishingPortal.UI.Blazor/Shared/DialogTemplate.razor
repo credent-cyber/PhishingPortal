@@ -3,15 +3,15 @@
 @if (Show)
 {
 
-    <div class="dialog-container" style="width:100%; height:100%">
+    <div class="dialog-container" style="width:100%; height:100vh">
 
-        <div class="dialog" style="width:60%;"> @*popup screen size*@
+        <div class="dialog" style="width:70%;"> @*popup screen size*@
        
                 <div class="card" >
                  
                    <div class="card-header bg-info" style="padding:15px !important;">
                      <h5 class="text-white">@Title</h5>
-                        @if(Title=="Template Preview")
+                        @if(Title=="Template Preview" || Title=="Import Campaign Recipients")
                         {
                             <div style="float:right">
                                    <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
