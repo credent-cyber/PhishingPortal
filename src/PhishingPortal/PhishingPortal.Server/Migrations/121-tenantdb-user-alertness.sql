@@ -12,4 +12,4 @@ Alter Table CampaignLogs
 Add ReportedOn datetime NULL;
 
 INSERT INTO `settings` (`Key`,`Value`,`CreatedBy`,`CreatedOn`)
-VALUES('monitored_mail_account','malay.pandey@credentinfotech.com', 'tenantadmin', current_date());
+VALUES('monitored_mail_account','phishing-mail@credentinfotech.com', 'tenantadmin', current_date());
