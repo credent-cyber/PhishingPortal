@@ -11,6 +11,7 @@ namespace PhishingPortal.Repositories
         Task<List<CampaignTemplate>> GetAllTemplates(CampaignType? type);
         Task<Campaign> GetCampaignById(int id);
         Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end);
+        Task<ConsolidatedPhishingStats> GetLastPhishingStatics();
         Task<MonthlyPhishingBarChart> GetMonthlyBarChart(int year);
         Task<List<CampaignRecipient>> GetRecipientByCampaignId(int campaignId);
         Task<List<RecipientGroup>> GetRecipientGroups(bool adGroupOnly = false);

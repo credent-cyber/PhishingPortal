@@ -220,7 +220,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Shared\Components\" />
 	  <Folder Include="wwwroot\img\email\" />
 	  <Folder Include="wwwroot\img\email\" />
 	</ItemGroup>
