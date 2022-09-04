@@ -385,6 +385,65 @@ namespace PhishingPortal.Repositories
         }
 
         /// <summary>
+        /// Get stats for each type of campaign last executed
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ConsolidatedPhishingStats> GetLastPhishingStatics()
+        {
+            var outcome = new ConsolidatedPhishingStats();
+
+            // emails
+            var lastEmailCmpgn = TenantDbCtx.Campaigns.Include(o => o.Detail)
+                .Where(o => o.State == CampaignStateEnum.Completed && o.Detail.Type == CampaignType.Email)
+                .OrderByDescending(c => c.ModifiedOn)
+                .FirstOrDefault();
+
+            if(lastEmailCmpgn != null)
+            {
+               var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastEmailCmpgn.Id 
+                            && o.Status == CampaignLogStatus.Sent.ToString());
+
+                outcome.Email.Total = logs.Count();
+                outcome.Email.TotalHits = logs.Count(o => o.IsHit);
+                outcome.Email.TotalReported = logs.Count(o => o.IsReported);
+            }
+
+            // sms
+            var lastSmsCmgn = TenantDbCtx.Campaigns.Include(o => o.Detail)
+                .Where(o => o.State == CampaignStateEnum.Completed && o.Detail.Type == CampaignType.Sms)
+                .OrderByDescending(c => c.ModifiedOn)
+                .FirstOrDefault();
+
+            if (lastSmsCmgn != null)
+            {
+                var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastSmsCmgn.Id
+                             && o.Status.ToString() == CampaignLogStatus.Sent.ToString());
+
+                outcome.Sms.Total = logs.Count();
+                outcome.Sms.TotalHits = logs.Count(o => o.IsHit);
+                outcome.Sms.TotalReported = logs.Count(o => o.IsReported);
+            }
+
+            //whatsapp
+            var lastWaCmgn = TenantDbCtx.Campaigns.Include(o => o.Detail)
+                .Where(o => o.State == CampaignStateEnum.Completed && o.Detail.Type == CampaignType.Whatsapp)
+                .OrderByDescending(c => c.ModifiedOn)
+                .FirstOrDefault();
+
+            if (lastWaCmgn != null)
+            {
+                var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastWaCmgn.Id
+                             && o.Status.ToString() == CampaignLogStatus.Sent.ToString());
+
+                outcome.Whatsapp.Total = logs.Count();
+                outcome.Whatsapp.TotalHits = logs.Count(o => o.IsHit);
+                outcome.Whatsapp.TotalReported = logs.Count(o => o.IsReported);
+            }
+
+            return await Task.FromResult(outcome);
+        }
+
+        /// <summary>
         /// Month wise phishing tests report for the year
         /// </summary>
         /// <param name="year"></param>

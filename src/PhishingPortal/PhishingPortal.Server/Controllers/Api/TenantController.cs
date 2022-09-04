@@ -197,6 +197,29 @@ namespace PhishingPortal.Server.Controllers.Api
 
         }
 
+        [HttpGet]
+        [Route("get-latest-statistics")]
+        public async Task<ApiResponse<ConsolidatedPhishingStats>> GetLatestStatistics()
+        {
+            var result = new ApiResponse<ConsolidatedPhishingStats>();
+
+            try
+            {
+                var data = await _tenantRepository.GetLastPhishingStatics();
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }   
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Monthly phishing chart for the year input

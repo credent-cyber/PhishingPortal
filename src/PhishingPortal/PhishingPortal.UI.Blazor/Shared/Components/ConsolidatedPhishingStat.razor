@@ -1,0 +1,88 @@
+﻿<ol class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 mr-2">
+            <div class="fw-bold">Email</div>
+        </div>
+        @if (Type == PhishingStatsType.Total)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Email.Total</span>
+        }
+        else if (Type == PhishingStatsType.Hits)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Email.TotalHits</span>
+        }
+        else if (Type == PhishingStatsType.Reported)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Email.TotalHits</span>
+        }
+        else if (Type == PhishingStatsType.NoClicks)
+        {
+            <span class="badge bg-primary rounded-pill">@(Data.Email.Total - Data.Email.TotalHits)</span>
+        }
+        else if (Type == PhishingStatsType.PronePercent)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Email.PronePercent<text>%</text></span>
+        }
+
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 mr-2">
+            <div class="fw-bold">SMS</div>
+        </div>
+        @if (Type == PhishingStatsType.Total)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Sms.Total</span>
+        }
+        else if (Type == PhishingStatsType.Hits)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Sms.TotalHits</span>
+        }
+        else if (Type == PhishingStatsType.Reported)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Sms.TotalHits</span>
+        }
+        else if (Type == PhishingStatsType.NoClicks)
+        {
+            <span class="badge bg-primary rounded-pill">@(Data.Sms.Total - Data.Sms.TotalHits)</span>
+        }
+        else if (Type == PhishingStatsType.PronePercent)
+        {
+            <span class="badge bg-primary rounded-pill">@Data.Sms.PronePercent<text>%</text></span>
+        }
+
+    </li>
+    @* <li class="list-group-item d-flex justify-content-between align-items-start">
+    <div class="ms-2 mr-2">
+    <div class="fw-bold">WhatsApp</div>
+    </div>
+    @if (Type == PhishingStatsType.Total)
+    {
+    <span class="badge bg-primary rounded-pill">@Data.Whatsapp.Total</span>
+    }
+    else if (Type == PhishingStatsType.Hits)
+    {
+    <span class="badge bg-primary rounded-pill">@Data.Whatsapp.TotalHits</span>
+    }
+    else if (Type == PhishingStatsType.Reported)
+    {
+    <span class="badge bg-primary rounded-pill">@Data.Whatsapp.TotalHits</span>
+    }
+    else if (Type == PhishingStatsType.NoClicks)
+    {
+    <span class="badge bg-primary rounded-pill">@(Data.Whatsapp.Total - Data.Whatsapp.TotalHits)</span>
+    }
+    else if (Type == PhishingStatsType.PronePercent)
+    {
+    <span class="badge bg-primary rounded-pill">@Data.Whatsapp.PronePercent<text>%</text></span>
+    }
+
+    </li>*@
+</ol>
+
+@code {
+    [Parameter]
+    public ConsolidatedPhishingStats Data { get; set; } = new ConsolidatedPhishingStats();
+
+    [Parameter]
+    public PhishingStatsType Type { get; set; } = PhishingStatsType.Total;
+}
