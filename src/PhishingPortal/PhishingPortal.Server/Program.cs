@@ -101,10 +101,17 @@ builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
 var dataProtectPath = "./App_Data/";
 
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo($"{dataProtectPath}"));
+//builder.Services.AddDataProtection()
+//    .PersistKeysToFileSystem(new DirectoryInfo($"{dataProtectPath}"));
 
-builder.Services.AddIdentityServer()
+builder.Services.AddIdentityServer(options =>
+{
+ 
+    options.KeyManagement.KeyPath = $"{dataProtectPath}";
+    options.KeyManagement.RotationInterval = TimeSpan.FromDays(30);
+    options.KeyManagement.PropagationTime = TimeSpan.FromDays(2);
+    options.KeyManagement.RetentionDuration = TimeSpan.FromDays(7);
+})
     //.AddSigningCredential(rsaCertificate)
     .AddApiAuthorization<PhishingPortalUser, PhishingPortalDbContext>(options =>
     {
@@ -127,7 +134,7 @@ builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
-builder.Services.AddScoped<ITenantDbResolver,TenantDbResolver>();
+builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
 
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
@@ -173,4 +180,4 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 
-app.Run(); 
+app.Run();
