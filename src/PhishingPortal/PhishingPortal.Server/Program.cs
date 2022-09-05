@@ -44,6 +44,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
+
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");

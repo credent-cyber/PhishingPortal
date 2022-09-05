@@ -8,6 +8,8 @@
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 @inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
+
 
 @if (Templates == null)
 {
@@ -33,13 +35,13 @@ else
                    <div class="col-md-12" style="padding: 0;">
                     <div class="bt-wizard" id="tabswizard">
                         <ul class="nav nav-pills">
-                        <li class="nav-item"><a href="#tabs-t-tab1" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
-                        <li class="nav-item"><a href="#tabs-t-tab2" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
-                        <li class="nav-item"><a href="#tabs-t-tab3" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
+                        <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
+                        <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
+                        <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 " data-toggle="tab">Whatsapp</a></li>
                         </ul>
                            <div class="tab-content card">
                                <div class="pt-1 bg-primary"></div>
-                               <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
+                               <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1" >
                                   <div class="table-responsive">
                                      <table id="email" class="table table-striped table-bordered nowrap">
                                         <thead>
@@ -78,7 +80,7 @@ else
                                   </div>
                                </div>
                                <div class="tab-pane card-body pt-4" id="tabs-t-tab2">                              
-                                      <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
+                                      <div class="tab-pane card-body pt-4" id="tabs-t-tab2">
                                           <div class="table-responsive">
                                              <table id="sms" class="table table-striped table-bordered nowrap">
                                                 <thead>
@@ -122,7 +124,7 @@ else
                             
                                </div>
                                 <div class="tab-pane card-body pt-4" id="tabs-t-tab3">                              
-                                      <div class="tab-pane card-body pt-4" id="tabs-t-tab3">
+                                      <div class="tab-pane card-body pt-4 " id="tabs-t-tab3">
                                           <div class="table-responsive">
                                              <table id="whatsapp" class="table table-striped table-bordered nowrap">
                                                 <thead>
@@ -175,7 +177,7 @@ else
             </div>
         </div>
     </div>
-
+    @Tab
 </div>
 
 }
@@ -216,6 +218,7 @@ else
 
     string text = "";
     public bool sms = false;
+    public int Tab = 1;
 
     bool showPreview = false;
     bool showNewDialog = false;
@@ -249,7 +252,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
-
+        Tab = await oLocalStore.GetItemAsync<int>("tTab");
+    }
+    public async void SaveSession()
+    {
+        await oLocalStore.SetItemAsync("tTab", Tab);
     }
 
     protected void OnPreviewClick(CampaignTemplate template)
@@ -266,7 +273,7 @@ else
             text = template.Content;           
         }
 
-        
+
     }
 
     protected void OnClosePreview()
@@ -326,15 +333,20 @@ else
     int pageIndext = 0;
     public void Prevv()
     {
-        
+
         if(pageIndex>0){ pageIndex--;} 
         pageIndext = pageIndex;
-       // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
+        // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
     }
     public void Nextt()
     {
         pageIndex++; 
         pageIndext = pageIndex;
-     
+
     }
+
+    public void Emailt(){ Tab = 1; SaveSession(); }
+    public void Smst(){ Tab = 2; SaveSession();}
+    public void Whatsappt(){Tab = 3; SaveSession();}
+
 }

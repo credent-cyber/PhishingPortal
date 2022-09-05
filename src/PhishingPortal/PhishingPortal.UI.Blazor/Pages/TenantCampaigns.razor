@@ -5,6 +5,7 @@
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 @inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 
 @if (campaigns == null)
 {
@@ -31,13 +32,30 @@ else
                 <div class="col-md-12" style="padding: 0;">
                     <div class="bt-wizard" id="tabswizard">
                         <ul class="nav nav-pills">
-                        <li class="nav-item"><a href="#tabs-t-tab1" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
-                        <li class="nav-item"><a href="#tabs-t-tab2" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
-                        <li class="nav-item"><a href="#tabs-t-tab3" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
+                            @if(CTab == 1)
+                            {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
+                            }
+                            @if(CTab == 2)
+                            {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0 active" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
+                            }
+                            @if(CTab == 3)
+                            {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0 active" data-toggle="tab">Whatsapp</a></li>
+                            }
+
                         </ul>
                            <div class="tab-content card">
                                <div class="pt-1 bg-primary"></div>
-                               <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
+                              
+                                <div class="tab-pane card-body pt-4 @Eml" id="tabs-t-tab1">
                                   <div class="table-responsive">
                                      <table id="email" class="table table-striped table-bordered nowrap">
                                         <thead>
@@ -98,7 +116,7 @@ else
                                   </div>
                                </div>
                                <div class="tab-pane card-body pt-4" id="tabs-t-tab2">                              
-                                      <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
+                                      <div class="tab-pane card-body pt-4 @Sm" id="tabs-t-tab2">
                                           <div class="table-responsive">
                                              <table id="sms" class="table table-striped table-bordered nowrap">
                                                 <thead>
@@ -161,7 +179,7 @@ else
                             
                                </div>
                                <div class="tab-pane card-body pt-4" id="tabs-t-tab3">                              
-                                      <div class="tab-pane card-body pt-4" id="tabs-t-tab3">
+                                      <div class="tab-pane card-body pt-4 @Wtsp" id="tabs-t-tab3">
                                           <div class="table-responsive">
                                              <table id="SchdCampaign" class="table table-striped table-bordered nowrap">
                                                 <thead>
@@ -229,7 +247,7 @@ else
             </div>
         </div>
 </div>
-
+@CTab
 </div>
 
 }
@@ -240,16 +258,23 @@ else
     int pageIndex = 0;
     int pageIndexx = 0;
     public string filter { get; set; }
-
+    int CTab = 1;
+    string Eml = "active show";
+    string Sm = "";
+    string Wtsp = "";
     protected override async Task OnInitializedAsync()
     {
         campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
-       
 
-       
+
+
         if (campaigns == null || campaigns.Count() == 0)
             message = "No campaigns found!";
 
+        CTab = await oLocalStore.GetItemAsync<int>("cTab");
+        if(CTab==1){Eml = "active show"; Sm = ""; Wtsp = "";}
+        else if(CTab==2){Eml = ""; Sm = "active show"; Wtsp = "";}
+        else if(CTab==3){Eml = ""; Sm = ""; Wtsp = "active show";}
 
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/form-select-custom.js");
         await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/jquery.dataTables.min.js");
@@ -266,6 +291,10 @@ else
         //await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/bootstrap.min.js");
         //await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/plugins/select2.full.min.js");
     }
+    public async void SaveSession()
+    {
+        await oLocalStore.SetItemAsync("cTab", CTab);
+    }
 
     protected async Task Next()
     {
@@ -281,6 +310,10 @@ else
             pageIndex--;
             pageIndexx = pageIndex;
         }
-         campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
+        campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
     }
+    public void Emailc(){ CTab = 1; SaveSession(); Eml = "active show"; Sm = ""; Wtsp = ""; }
+    public void Smsc(){ CTab = 2; SaveSession(); Eml = ""; Sm = "active show"; Wtsp = "";}
+    public void Whatsappc(){CTab = 3; SaveSession(); Eml = ""; Sm = ""; Wtsp = "active show";}
+
 }

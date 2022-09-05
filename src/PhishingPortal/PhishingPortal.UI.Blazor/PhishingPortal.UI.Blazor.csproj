@@ -194,6 +194,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="BlazingComponents.Summernote" Version="0.0.6" />
+		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
 		<PackageReference Include="Blazored.TextEditor" Version="1.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(BlazorVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(BlazorVersion)" PrivateAssets="all" />
