@@ -406,6 +406,10 @@ namespace PhishingPortal.Repositories
                 outcome.Email.Total = logs.Count();
                 outcome.Email.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Email.TotalReported = logs.Count(o => o.IsReported);
+                if(outcome.Email.Total > 0)
+                {
+                    outcome.Email.PronePercent = (outcome.Email.TotalHits / outcome.Email.Total)*100;
+                }
             }
 
             // sms
@@ -422,6 +426,10 @@ namespace PhishingPortal.Repositories
                 outcome.Sms.Total = logs.Count();
                 outcome.Sms.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Sms.TotalReported = logs.Count(o => o.IsReported);
+                if (outcome.Sms.Total > 0)
+                {
+                    outcome.Sms.PronePercent = (outcome.Sms.TotalHits / outcome.Sms.Total) * 100;
+                }
             }
 
             //whatsapp
@@ -438,6 +446,10 @@ namespace PhishingPortal.Repositories
                 outcome.Whatsapp.Total = logs.Count();
                 outcome.Whatsapp.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Whatsapp.TotalReported = logs.Count(o => o.IsReported);
+                if (outcome.Whatsapp.Total > 0)
+                {
+                    outcome.Whatsapp.PronePercent = (outcome.Whatsapp.TotalHits / outcome.Whatsapp.Total) * 100;
+                }
             }
 
             return await Task.FromResult(outcome);

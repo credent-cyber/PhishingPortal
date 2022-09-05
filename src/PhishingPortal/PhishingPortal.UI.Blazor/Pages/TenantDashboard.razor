@@ -306,10 +306,10 @@
             if (data == null)
                 throw new Exception();
 
-            TotalPhishingTests = stats.Email.Total;
-            TotalClicks = stats.Email.TotalHits;
-            NotClicked = TotalPhishingTests - TotalClicks;
-            PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
+            //TotalPhishingTests = stats.Email.Total;
+            //TotalClicks = stats.Email.TotalHits;
+            //NotClicked = TotalPhishingTests - TotalClicks;
+            //PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
 
             data2.Entries.Select(o => o.Campaign.Id).ToArray();
 
