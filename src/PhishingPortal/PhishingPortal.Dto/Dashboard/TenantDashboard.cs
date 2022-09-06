@@ -79,7 +79,45 @@ namespace PhishingPortal.Dto.Dashboard
     }
 
     /// <summary>
-    /// Represent data entry for monthly cammpaign stats
+    /// Represent stats for the latest Phish Tests  
+    /// </summary>
+    public class ConsolidatedPhishingStats
+    {
+        public PhishingTestStat Email { get; set; }
+        public PhishingTestStat Sms { get; set; }
+        public PhishingTestStat Whatsapp { get; set; }
+
+        public ConsolidatedPhishingStats()
+        {
+            Email = new PhishingTestStat();
+            Sms = new PhishingTestStat();
+            Whatsapp = new PhishingTestStat();
+        }
+
+    }
+
+    public enum PhishingStatsType { 
+    
+        Total,
+        Hits,
+        NoClicks,
+        Reported,
+        PronePercent
+    }
+
+    /// <summary>
+    /// Common phishing test outcomes
+    /// </summary>
+    public class PhishingTestStat
+    {
+        public int Total { get; set; }
+        public int TotalHits { get; set; }
+        public int TotalReported { get; set; }
+        public int PronePercent { get; set; }
+    }
+
+    /// <summary>
+    /// Represent data entry for monthly cammpaign stats++++++++
     /// </summary>
     public class MonthlyPhishingBarChartEntry
     {
@@ -115,5 +153,4 @@ namespace PhishingPortal.Dto.Dashboard
         public string[] BackgroundColor { get; set; }
 
     }
-
 }

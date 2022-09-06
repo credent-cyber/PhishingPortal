@@ -258,6 +258,29 @@ namespace PhishingPortal.UI.Blazor.Client
             return null;
         }
 
+        public async Task<ConsolidatedPhishingStats> GetLatestStats()
+        {
+            // get-latest-statistics
+            var result = new ConsolidatedPhishingStats();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/get-latest-statistics");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ConsolidatedPhishingStats>>();
+
+                if (json != null)
+                    result = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
         public async Task<CategoryWisePhishingTestData?> GetCategoryWisePhishingTestData(DateTime startDate, DateTime endDate)
         {
             try
