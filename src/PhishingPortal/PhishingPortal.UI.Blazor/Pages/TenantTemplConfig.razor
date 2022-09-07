@@ -194,12 +194,7 @@
                                                                 
                                                                 @if(model.Type==CampaignType.Sms)
                                                                 {
-                                                                   @* <EditForm Model="@model" OnValidSubmit="@OnSave" >
-           
-                                                                        <InputTextArea @bind-Value=model.Content  class="col-sm-12" style="background-color:lavender; height:243px;" />
-                                                                
-                                                                    </EditForm>
-                                                                    <label for="count" class="form-label"> Charactor left</label>*@
+
                                                                     <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />                                                                         
                                                                     <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
                                                                 }
