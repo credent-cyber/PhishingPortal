@@ -523,6 +523,8 @@ else
     {
         Templates = await client.GetTemplatesByType(type);
         Tab = await oLocalStore.GetItemAsync<int>("tTab");
+        if (Tab == 0)
+            Tab = 1;
     }
     public async void SaveSession()
     {

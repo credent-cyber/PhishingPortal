@@ -2,6 +2,12 @@
 {
     public class Constants
     {
+
+        public class LocalStorage
+        {
+            public const string P_INDEX = "pIndex";
+            public const string C_TAB = "cTab";
+        }
         public class Keys
         {
             public const string PHISHING_REPORT_REPOSITORY = "mailbox_reporting_source";
