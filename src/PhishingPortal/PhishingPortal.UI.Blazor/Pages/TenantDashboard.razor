@@ -99,42 +99,39 @@
 
 
 
+        <div class="col-xl-6 col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Trend of Clicks on Email per Campaign</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="width: 100%;" >
+                                <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
+                                       Labels="@BarChart3Labels" IsStacked="false">
+                                </Chart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-xl-6 col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Trend of Clicks on Email per Campaign</h5>
+                        </div>
+                        <div class="card-body">
+                           <div style="width: 100%;">
+                                <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data"
+                                       Labels="@BarChart1Labels" IsStacked="false">
+                                </Chart>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
         <div class="col-xl-4 col-md-6">
             <div class="row">
-                <div class="col-xl-12 col-md-6">
-                    <div class="card comp-card">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h6 class="m-b-20">Emails Sent</h6>
-                                    <h3 class="text-c-blue">@stats.Email.Total</h3>
-                                    <p class="m-b-0">In Last Campaign</p>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fa fa-envelope fa-lg badge-light-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-12 col-md-6">
-                    <div class="card comp-card">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h6 class="m-b-20">SMS Sent</h6>
-                                    <h3 class="text-c-green">@stats.Sms.Total</h3>
-                                    <p class="m-b-0">In Last Campaign</p>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fa fa-commenting fa-lg badge-light-success"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+             
                 <div class="col-xl-12 col-md-12">
                     <div class="card">
                         <div class="card-header" style="text-align:center">
@@ -154,35 +151,7 @@
 
         <div class="col-xl-8 col-md-6">
             <div class="row">
-                <div class="col-xl-6 col-md-12">
-                    <div class="card">
-                        <div class="card-header" style="text-align:center">
-                            <h5>No of clicks and Email sent per Campaign</h5>
-                        </div>
-                        <div class="card-body">
-                            <div style="width: 100%; height: 216px">
-                                <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
-                                       Labels="@BarChart3Labels" IsStacked="false">
-                                </Chart>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-6 col-md-12">
-                    <div class="card">
-                        <div class="card-header" style="text-align:center">
-                            <h5>Trend of Clicks on Email per Campaign</h5>
-                        </div>
-                        <div class="card-body">
-                            <div style="width: 100%; height: 216px">
-                                <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data"
-                                       Labels="@BarChart1Labels" IsStacked="false">
-                                </Chart>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+             
                 <div class="col-xl-6 col-md-12">
                     <div class="card">
                         <div class="card-header" style="text-align:center">

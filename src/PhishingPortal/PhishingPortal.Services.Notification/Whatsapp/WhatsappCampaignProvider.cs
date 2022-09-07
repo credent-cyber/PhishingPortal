@@ -88,8 +88,6 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                 if (template == null)
                     throw new Exception("Template not found");
 
-                if (!string.IsNullOrEmpty(campaign.ReturnUrl))
-                    BaseUrl = campaign.ReturnUrl;
 
                 var recipients = dbContext.CampaignRecipients
                     .Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);

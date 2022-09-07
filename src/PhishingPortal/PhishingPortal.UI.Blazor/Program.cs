@@ -1,9 +1,11 @@
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PhishingPortal.UI.Blazor;
 using PhishingPortal.UI.Blazor.Client;
 using Serilog;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -24,6 +26,8 @@ builder.Services.AddLogging((builder) =>
     builder.AddSerilog();
 });
 
+
+
 builder.Services.AddScoped<PhishingPortalClientState>();
 
 builder.Services.AddHttpClient<WeatherClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
@@ -40,5 +44,6 @@ builder.Services.AddApiAuthorization<PhishingPortalAuthState>(options =>
     options.AuthenticationPaths.LogOutSucceededPath = "";
 }).AddAccountClaimsPrincipalFactory<PhishingPortalAuthState, UserFactory>();
 
+builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();
