@@ -49,7 +49,7 @@ namespace PhishingPortal.Server.Services
             if (result == null)
                 return new Dictionary<string, string>();
 
-            return result.ToList().OrderBy(o =>o.DisplayName)
+            return result.OrderBy(o => o.DisplayName).ToList().Where(o => o.Visibility?.ToLower() == "private")
                 .ToDictionary(k => k.Id, v => v.DisplayName);
         }
 
@@ -62,7 +62,8 @@ namespace PhishingPortal.Server.Services
             if (result == null)
                 return Enumerable.Empty<User>().ToList();
 
-            return result.CurrentPage.ToList();
+            return result.CurrentPage.Where(o => !string.IsNullOrEmpty(o.EmployeeId) 
+                            && !string.IsNullOrEmpty(o.Mail)).ToList();
 
         }
 
@@ -82,7 +83,8 @@ namespace PhishingPortal.Server.Services
                 if(usr != null)
                     values.Add(usr);
             }
-            return values;
+
+            return values.ToList();
             
         }
 
