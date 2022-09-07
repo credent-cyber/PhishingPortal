@@ -20,6 +20,9 @@ namespace PhishingPortal.Common
 
                 var src = childNode.Attributes["src"].Value;
 
+                if (src.StartsWith("http"))
+                    continue;
+
                 var alt = childNode.Attributes["alt"]?.Value;
 
                 var p = Path.Combine(imageRoot, src);
