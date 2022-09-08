@@ -401,7 +401,7 @@ namespace PhishingPortal.Repositories
             if(lastEmailCmpgn != null)
             {
                var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastEmailCmpgn.Id 
-                            && o.Status == CampaignLogStatus.Sent.ToString());
+                            && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Email.Total = logs.Count();
                 outcome.Email.TotalHits = logs.Count(o => o.IsHit);
@@ -421,7 +421,7 @@ namespace PhishingPortal.Repositories
             if (lastSmsCmgn != null)
             {
                 var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastSmsCmgn.Id
-                             && o.Status == CampaignLogStatus.Sent.ToString());
+                             && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Sms.Total = logs.Count();
                 outcome.Sms.TotalHits = logs.Count(o => o.IsHit);
@@ -441,7 +441,7 @@ namespace PhishingPortal.Repositories
             if (lastWaCmgn != null)
             {
                 var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastWaCmgn.Id
-                             && o.Status == CampaignLogStatus.Sent.ToString());
+                             && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Whatsapp.Total = logs.Count();
                 outcome.Whatsapp.TotalHits = logs.Count(o => o.IsHit);
