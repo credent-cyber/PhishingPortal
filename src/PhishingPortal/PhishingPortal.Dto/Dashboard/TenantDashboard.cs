@@ -113,7 +113,7 @@ namespace PhishingPortal.Dto.Dashboard
         public int Total { get; set; }
         public int TotalHits { get; set; }
         public int TotalReported { get; set; }
-        public decimal PronePercent { get; set; }
+        public decimal PronePercent { get; set; } = 0.0M;
     }
 
     /// <summary>
