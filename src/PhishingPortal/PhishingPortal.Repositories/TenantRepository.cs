@@ -408,7 +408,7 @@ namespace PhishingPortal.Repositories
                 outcome.Email.TotalReported = logs.Count(o => o.IsReported);
                 if(outcome.Email.Total > 0)
                 {
-                    outcome.Email.PronePercent = (outcome.Email.TotalHits / outcome.Email.Total)*100;
+                    outcome.Email.PronePercent = Math.Round(((decimal)outcome.Email.TotalHits / outcome.Email.Total) * 100, 2);
                 }
             }
 
@@ -428,7 +428,7 @@ namespace PhishingPortal.Repositories
                 outcome.Sms.TotalReported = logs.Count(o => o.IsReported);
                 if (outcome.Sms.Total > 0)
                 {
-                    outcome.Sms.PronePercent = (outcome.Sms.TotalHits / outcome.Sms.Total) * 100;
+                    outcome.Sms.PronePercent = Math.Round(((decimal)outcome.Sms.TotalHits / outcome.Sms.Total) * 100, 2);
                 }
             }
 
@@ -448,7 +448,7 @@ namespace PhishingPortal.Repositories
                 outcome.Whatsapp.TotalReported = logs.Count(o => o.IsReported);
                 if (outcome.Whatsapp.Total > 0)
                 {
-                    outcome.Whatsapp.PronePercent = (outcome.Whatsapp.TotalHits / outcome.Whatsapp.Total) * 100;
+                    outcome.Whatsapp.PronePercent = Math.Round(((decimal)outcome.Whatsapp.TotalHits / outcome.Whatsapp.Total) * 100, 2);
                 }
             }
 
