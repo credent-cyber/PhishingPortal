@@ -42,15 +42,24 @@ namespace PhishingPortal.Server.Services
 
         public async Task<Dictionary<string, string>> GetAllUserGroups()
         {
-            var result = await _graphClient.Groups
-                .Request()
-                .GetAsync();
+            var defaultValue = new Dictionary<string, string>(); 
+            try
+            {
+                var result = await _graphClient.Groups
+                        .Request()
+                        .GetAsync();
 
-            if (result == null)
-                return new Dictionary<string, string>();
+                if (result == null)
+                    return new Dictionary<string, string>();
 
-            return result.OrderBy(o => o.DisplayName).ToList().Where(o => o.Visibility?.ToLower() == "private")
-                .ToDictionary(k => k.Id, v => v.DisplayName);
+                return result.OrderBy(o => o.DisplayName).ToList().Where(o => o.Visibility?.ToLower() == "private")
+                    .ToDictionary(k => k.Id, v => v.DisplayName);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                return defaultValue;
+            }
         }
 
         public async Task<List<User>> GetAdUsers()

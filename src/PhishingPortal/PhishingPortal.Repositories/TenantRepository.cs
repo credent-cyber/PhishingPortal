@@ -401,14 +401,14 @@ namespace PhishingPortal.Repositories
             if(lastEmailCmpgn != null)
             {
                var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastEmailCmpgn.Id 
-                            && o.Status == CampaignLogStatus.Sent.ToString());
+                            && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Email.Total = logs.Count();
                 outcome.Email.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Email.TotalReported = logs.Count(o => o.IsReported);
                 if(outcome.Email.Total > 0)
                 {
-                    outcome.Email.PronePercent = (outcome.Email.TotalHits / outcome.Email.Total)*100;
+                    outcome.Email.PronePercent = Math.Round(((decimal)outcome.Email.TotalHits / outcome.Email.Total) * 100, 2);
                 }
             }
 
@@ -421,14 +421,14 @@ namespace PhishingPortal.Repositories
             if (lastSmsCmgn != null)
             {
                 var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastSmsCmgn.Id
-                             && o.Status == CampaignLogStatus.Sent.ToString());
+                             && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Sms.Total = logs.Count();
                 outcome.Sms.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Sms.TotalReported = logs.Count(o => o.IsReported);
                 if (outcome.Sms.Total > 0)
                 {
-                    outcome.Sms.PronePercent = (outcome.Sms.TotalHits / outcome.Sms.Total) * 100;
+                    outcome.Sms.PronePercent = Math.Round(((decimal)outcome.Sms.TotalHits / outcome.Sms.Total) * 100, 2);
                 }
             }
 
@@ -441,14 +441,14 @@ namespace PhishingPortal.Repositories
             if (lastWaCmgn != null)
             {
                 var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastWaCmgn.Id
-                             && o.Status == CampaignLogStatus.Sent.ToString());
+                             && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Whatsapp.Total = logs.Count();
                 outcome.Whatsapp.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Whatsapp.TotalReported = logs.Count(o => o.IsReported);
                 if (outcome.Whatsapp.Total > 0)
                 {
-                    outcome.Whatsapp.PronePercent = (outcome.Whatsapp.TotalHits / outcome.Whatsapp.Total) * 100;
+                    outcome.Whatsapp.PronePercent = Math.Round(((decimal)outcome.Whatsapp.TotalHits / outcome.Whatsapp.Total) * 100, 2);
                 }
             }
 
