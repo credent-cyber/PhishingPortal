@@ -356,18 +356,20 @@ namespace PhishingPortal.UI.Blazor.Client
         /// Get all Azure AD User Groups if available
         /// </summary>
         /// <returns></returns>
-        public async Task<Dictionary<string, string>> GetAzureADUserGroups()
+        public async Task<Dictionary<string, string>?> GetAzureADUserGroups()
         {
             var response = new Dictionary<string, string>();
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/az-ad-groups");
                 res.EnsureSuccessStatusCode();
+                if (res.StatusCode.ToString().Equals("NoContent"))
+                    return null;
 
                 var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 if (json != null)
                     response = json;
-
+               
             }
             catch (Exception ex)
             {

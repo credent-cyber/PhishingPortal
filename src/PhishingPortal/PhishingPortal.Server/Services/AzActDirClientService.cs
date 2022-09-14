@@ -32,28 +32,36 @@ namespace PhishingPortal.Server.Services
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
             };
+            if(ClientID != "")
+            {
+                var clientSecretCredential = new ClientSecretCredential(TenantID, ClientID, ClientSecret, options);
 
-            var clientSecretCredential = new ClientSecretCredential(TenantID, ClientID, ClientSecret, options);
-
-            _graphClient = new GraphServiceClient(clientSecretCredential, Scopes); 
+                _graphClient = new GraphServiceClient(clientSecretCredential, Scopes); 
+            }
 
             #endregion
         }
 
-        public async Task<Dictionary<string, string>> GetAllUserGroups()
+        public async Task<Dictionary<string, string>?> GetAllUserGroups()
         {
             var defaultValue = new Dictionary<string, string>(); 
             try
             {
-                var result = await _graphClient.Groups
-                        .Request()
-                        .GetAsync();
+                if (_graphClient is not null)
+                {
 
-                if (result == null)
-                    return new Dictionary<string, string>();
+                    var result = await _graphClient.Groups
+                            .Request()
+                            .GetAsync();
 
-                return result.OrderBy(o => o.DisplayName).ToList().Where(o => o.Visibility?.ToLower() == "private")
-                    .ToDictionary(k => k.Id, v => v.DisplayName);
+                    if (result == null)
+                        return new Dictionary<string, string>();
+
+                    return result.OrderBy(o => o.DisplayName).ToList().Where(o => o.Visibility?.ToLower() == "private")
+                        .ToDictionary(k => k.Id, v => v.DisplayName);
+                }
+                else
+                    return null;
             }
             catch (Exception ex)
             {
