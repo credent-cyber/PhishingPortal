@@ -1,0 +1,56 @@
+﻿@page "/gridsample"
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.Dto
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+
+
+
+
+    @if (_task.IsCompleted)
+    {
+        <GridComponent T="CampaignTemplate" Grid="@_grid"></GridComponent>
+    }
+    else
+    {
+        <p><em>Loading...</em></p>
+    }
+
+    @code
+    {
+        private CGrid<CampaignTemplate> _grid;
+        private Task _task;
+
+        Action<IGridColumnCollection<CampaignTemplate>> columns = c =>
+        {
+            c.Add(o => o.Id);
+            c.Add(o => o.CreatedOn);
+            c.Add(o => o.Name);
+            c.Add(o => o.IsActive);
+            c.Add(o => o.Type);
+        };
+
+        protected override async Task OnParametersSetAsync()
+        {
+           // string url = NavigationManager.BaseUri + "odata/templates-by-type";
+           // string url = "https://localhost:7018/" + "odata/templates-by-type/";
+            string url = "https://localhost:7018/" + "odata/campaignTemplate";
+            var query = new QueryDictionary<StringValues>();
+
+            var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+                .Sortable()
+                .Filterable()
+                .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                .Searchable(true, false, false);
+            _grid = client.Grid;
+
+            // Set new items to grid
+            _task = client.UpdateGrid();
+            await _task;
+        }
+    }

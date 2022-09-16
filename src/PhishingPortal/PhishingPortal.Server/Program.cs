@@ -18,6 +18,8 @@ using Serilog;
 using System;
 using PhishingPortal.Server.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.OData;
+using PhishingPortal.Server.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -137,6 +139,11 @@ builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
 
+// GridBlazor
+//builder.Services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", EdmModel.GetEdmModel())
+//               .Select().Expand().Filter().OrderBy().SetMaxTop(100).Count());
+//builder.Services.AddOData();
+
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
@@ -176,9 +183,16 @@ app.UseIdentityServer();
 app.UseAuthorization();
 
 app.MapPhishingApi();
+app.UseEndpoints(endpoints =>
+{
+    //endpoints.Select().Expand().Filter().OrderBy().MaxTop(100).Count();
+    //endpoints.MapODataRoute("odata", "odata", EdmModel.GetEdmModel());
 
+    endpoints.MapControllers();
+    endpoints.MapFallbackToFile("index.html");
+});
 app.MapRazorPages();
-app.MapControllers();
-app.MapFallbackToFile("index.html");
+//app.MapControllers();
+//app.MapFallbackToFile("index.html");
 
 app.Run();
