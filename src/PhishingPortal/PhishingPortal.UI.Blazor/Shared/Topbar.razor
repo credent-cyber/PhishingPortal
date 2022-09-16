@@ -84,11 +84,11 @@
 </nav>
 
 
-<header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
+<header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-info">
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
-        <a href="#!" class="b-brand">
-            <img src="/custom/assets/images/credent_solutions_logo.png" alt="Credent Infotech" class="img-responsive"
+        <a href="#!" class="b-brand" style="margin-left:-50px">
+            <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-responsive"
                  width="220" height="45">
         </a>
         <a href="#!" class="mob-toggler">
@@ -96,7 +96,7 @@
         </a>
     </div>
     <div class="collapse navbar-collapse">
-        <ul class="navbar-nav mr-auto">
+@*        <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a href="#!" class="pop-search"><i class="feather icon-search"></i></a>
                 <div class="search-bar">
@@ -112,18 +112,18 @@
                 </a>
             </li>
 
-        </ul>
+        </ul>*@
         <ul class="navbar-nav ml-auto">
             <li>
                 <LoginDisplay />
             </li>
             <li>
                 <div class="dropdown">
-                    <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+                    @*<a class="dropdown-toggle" href="#" data-toggle="dropdown">
                         <i class="icon feather icon-bell"></i><span class="badge bg-danger">
                             <span class="sr-only"></span>
                         </span>
-                    </a>
+                    </a>*@
                     @* <div class="dropdown-menu dropdown-menu-right notification">
                     <div class="noti-head">
                     <h6 class="d-inline-block m-b-0">Notifications</h6>
@@ -179,6 +179,11 @@
                     </div>
                     </div>*@
                 </div>
+            </li>
+            <li class="nav-item">
+                <a href="#!" class="full-screen" onclick="javascript:toggleFullScreen()">
+                    <i class="feather icon-maximize"></i>
+                </a>
             </li>
         </ul>
     </div>
