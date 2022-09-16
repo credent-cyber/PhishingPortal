@@ -310,19 +310,28 @@
             // pie chart
             foreach (var entry in data2.CategoryClickRatioDictionary)
             {
-                PieChart1Data.Add(entry.Value.ToString());
-                PieChart1Labels.Add(entry.Key.ToUpper());
+                if(entry.Value != 0)
+                {                   
+                    PieChart1Data.Add(entry.Value.ToString());
+                    PieChart1Labels.Add(entry.Key.ToUpper());
+                }
             }
 
             foreach (var entry in data2.DepartEntries)
             {
-                Donut1Data.Add(entry.Value.ToString());
-                Donut1Labels.Add(entry.Key.ToUpper());
+                if (entry.Value != 0)
+                {
+                    Donut1Data.Add(entry.Value.ToString());
+                    Donut1Labels.Add(entry.Key.ToUpper());
+                }
             }
             foreach (var entry in data2.TemplateClickEntries)
             {
-                Polar1Data.Add(entry.Value.ToString());
-                Polar1Labels.Add(entry.Key.ToUpper());
+                if (entry.Value != 0)
+                {
+                    Polar1Data.Add(entry.Value.ToString());
+                    Polar1Labels.Add(entry.Key.ToUpper());
+                }
             }
 
             BarChart1Data.Add(new ChartJsDataset
