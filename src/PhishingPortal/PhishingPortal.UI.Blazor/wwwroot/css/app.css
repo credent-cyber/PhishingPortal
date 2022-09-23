@@ -236,3 +236,7 @@ a, .btn-link {
     max-height: 450px;
     overflow-y: scroll;
 }
+/**/
+.gridStyle{
+    height:10px;
+}

@@ -99,7 +99,7 @@
 
 
 
-        <div class="col-xl-6 col-md-6">
+                <div class="col-xl-6 col-md-6">
                     <div class="card">
                         <div class="card-header">
                             <h5>Trend of Clicks on Email per Campaign</h5>
@@ -186,9 +186,6 @@
 
     </div>
 </div>
-<Popup show="test" Title="test">
-    hello
-</Popup>
 
 @code {
     public bool test = false;
@@ -205,7 +202,7 @@
     public bool IsError { get; set; }
     public string Message { get; set; } = string.Empty;
 
-
+ 
     // Barchart1 datasets
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public List<ChartJsDataset> BarChart2Data { get; set; } = new List<ChartJsDataset>();
@@ -404,8 +401,5 @@
         return colors.ToArray();
     }
 
-    public void PopUp()
-    {
-        test = true;
-    }
+
 }

@@ -22611,6 +22611,19 @@ input.highcharts-range-selector{
     min-height:100vh;
     background:linear-gradient(45deg,#4099ff,#82bcff)
 }
+.blue-wrapper {
+    position: relative;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    overflow: hidden;
+    min-width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(45deg,#4099ff,#82bcff)
+}
 @media(min-width:1200px){
     .auth-wrapper .container{
         max-width:1140px

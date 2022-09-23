@@ -153,4 +153,5 @@ namespace PhishingPortal.Dto.Dashboard
         public string[] BackgroundColor { get; set; }
 
     }
+
 }

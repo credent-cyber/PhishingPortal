@@ -40,6 +40,6 @@ namespace PhishingPortal.Dto
        // [RegularExpression(pattern: AppConfig.EmailRegex, ErrorMessage = "Please specify a valid email id")]
         public string FromEmail { get; set; }
 
-
+        public virtual CampaignLog CampLogs { get; set; }
     }
 }

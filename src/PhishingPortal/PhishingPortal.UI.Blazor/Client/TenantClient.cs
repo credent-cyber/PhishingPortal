@@ -32,6 +32,26 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return campaigns;
         }
+        public async Task<IEnumerable<Campaign>> GetAllCampaignsAsync()
+        {
+            IEnumerable<Campaign> campaigns;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/Campaignss");
+
+                res.EnsureSuccessStatusCode();
+
+                campaigns = await res.Content.ReadFromJsonAsync<IEnumerable<Campaign>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return campaigns;
+        }
 
         public async Task<Campaign> GetCampaingById(int id)
         {

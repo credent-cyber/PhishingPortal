@@ -368,5 +368,20 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
+        [HttpGet]
+        [Route("Campaignss")]
+        public async Task<IEnumerable<Campaign>> GetCamplog()
+        {
+            try
+            {
+                var result = await _tenantRepository.AllCampaigns();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
     }
 }

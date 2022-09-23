@@ -1,11 +1,14 @@
-﻿@using PhishingPortal.Dto.Dashboard
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
 @inject IJSRuntime JSRuntime
-
-<canvas id="@Id"></canvas>
+@inject TenantClient client
+@inject NavigationManager NavManager
+<canvas id="@Id" ></canvas>
 
 
 @code {
-    
 
     [Parameter]
     public string Id { get; set; }
@@ -31,13 +34,17 @@
     [Parameter]
     public List<ChartJsDataset> Datasets { get; set; }
 
+    [Parameter] 
+    public EventCallback<int> OnChartClick { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Here we create an anonymous type with all the options
         // that need to be sent to Chart.js
+
         if (Datasets == null || Datasets.Count() == 0)
             return;
-      
+
         if (!IsStacked)
         {
             var config = new
@@ -50,19 +57,20 @@
                     {
 
                         YAxes = new[]
-                                            {
-                            new { Ticks = new {
-                                BeginAtZero=true
-                            }, Stacked = true }
-                        }
-                    }
+                        {
+                                new { Ticks = new {
+                                    BeginAtZero = true
+                                }, Stacked = true }
+    }
+                    },
+
 
                 },
 
                 Data = new
                 {
                     Labels = Labels,
-                    
+
                     Datasets = Datasets.Select(o => new
                     {
                         Label = o.Label,
@@ -72,12 +80,48 @@
 
                 },
 
-               
+
+
+
 
             };
 
             await JSRuntime.InvokeVoidAsync("setup", Id, config);
+
+
         }
 
     }
+
+    public static string Label;
+    public static string CanvasId;
+    IEnumerable<Campaign> campaigns;
+
+    [JSInvokable]
+    public static async Task ChartClick(string label, string id)
+    {
+        Call call = new Call();
+        Console.WriteLine($"Received click {label}");
+        Label = label;
+        CanvasId = id;
+       // await call.TestMethod(label, id);
+        //_ = await client.GetAllCampaignsAsync(); 
+       // NavManager.NavigateTo("/");
+    }
+
+
+    [JSInvokable]
+    public static void ChartHover()
+    {
+        // Console.WriteLine($"ChartHover");
+    }
+
+    [JSInvokable]
+    public static string ChartScaleXTicks(string val, int index)
+    {
+        Console.WriteLine($"ChartScaleXTicks {index}");
+        return index % 2 == 0 ? val : "";
+    }
+    
+
 }

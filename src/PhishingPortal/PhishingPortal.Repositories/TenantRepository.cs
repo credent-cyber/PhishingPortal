@@ -30,8 +30,17 @@ namespace PhishingPortal.Repositories
         {
             var result = Enumerable.Empty<Campaign>();
 
-            result = TenantDbCtx.Campaigns.Include(o=>o.Detail).Include(o => o.Schedule).OrderByDescending(o => o.Id)
+            result = TenantDbCtx.Campaigns.Include(o=>o.Detail).Include(o => o.CampLogs).Include(o => o.Schedule).OrderByDescending(o => o.Id)
                 .Skip(pageIndex * pageSize).Take(pageSize);
+
+            return Task.FromResult(result);
+        }
+        public Task<IEnumerable<Campaign>> AllCampaigns()
+        {
+            var result = Enumerable.Empty<Campaign>();
+
+            result = TenantDbCtx.Campaigns.Include(o => o.CampLogs).Include(o => o.Detail).OrderByDescending(o => o.Id);
+
 
             return Task.FromResult(result);
         }
@@ -235,12 +244,14 @@ namespace PhishingPortal.Repositories
 
         }
 
-        /// <summary>
+
+        /// <summary
         /// Phsihing prone percentage - group by phishing category
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
+
         public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
         {
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
