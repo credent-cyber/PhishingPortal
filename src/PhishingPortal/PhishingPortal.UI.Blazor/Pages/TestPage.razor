@@ -1,12 +1,12 @@
 ﻿@page "/gridsample"
+
 @using GridShared
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.Dto
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
-
-
+@inject AuthState authState;
 
 
     @if (_task.IsCompleted)
@@ -34,9 +34,8 @@
 
         protected override async Task OnParametersSetAsync()
         {
-           // string url = NavigationManager.BaseUri + "odata/templates-by-type";
-           // string url = "https://localhost:7018/" + "odata/templates-by-type/";
-            string url = "https://localhost:7018/" + "odata/campaignTemplate";
+            string url = $"odata/template?t={authState.TenantIdentifier}";
+
             var query = new QueryDictionary<StringValues>();
 
             var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "ordersGrid", columns, 10)
@@ -47,6 +46,7 @@
                 .WithMultipleFilters()
                 .WithGridItemsCount()
                 .Searchable(true, false, false);
+
             _grid = client.Grid;
 
             // Set new items to grid
