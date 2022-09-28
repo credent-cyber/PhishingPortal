@@ -5,7 +5,7 @@
 @inject IJSRuntime JSRuntime
 @inject TenantClient client
 @inject NavigationManager NavManager
-<canvas id="@Id" ></canvas>
+<canvas id="@Id"></canvas>
 
 
 @code {
@@ -58,11 +58,13 @@
 
                         YAxes = new[]
                         {
-                                new { Ticks = new {
-                                    BeginAtZero = true
-                                }, Stacked = true }
-    }
-                    },
+                                new 
+                                { 
+                                    Ticks = new {  BeginAtZero = true}, 
+                                    Stacked = true 
+                                }
+                        }
+                     },
 
 
                 },
@@ -75,7 +77,9 @@
                     {
                         Label = o.Label,
                         Data = o.Data,
-                        BackgroundColor = o.BackgroundColor
+                        Tension = 0.4,
+                        BackgroundColor = o.BackgroundColor,
+                        //Fill : true
                     })
 
                 },
@@ -85,43 +89,30 @@
 
 
             };
-
-            await JSRuntime.InvokeVoidAsync("setup", Id, config);
+            var ObjRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
 
 
         }
 
     }
 
-    public static string Label;
-    public static string CanvasId;
     IEnumerable<Campaign> campaigns;
 
     [JSInvokable]
-    public static async Task ChartClick(string label, string id)
+    public async Task ChartClick(string label, string id)
     {
-        Call call = new Call();
-        Console.WriteLine($"Received click {label}");
-        Label = label;
-        CanvasId = id;
-       // await call.TestMethod(label, id);
-        //_ = await client.GetAllCampaignsAsync(); 
-       // NavManager.NavigateTo("/");
+        Console.WriteLine($"Received click {label} id = {id}");
+        var Camp = await client.GetCampaingByName(label);
+        var CampId = Camp.Id;
+
+        NavManager.NavigateTo($"/layout/{CampId}");
+
     }
-
-
     [JSInvokable]
-    public static void ChartHover()
+    public static async Task ChartHover()
     {
-        // Console.WriteLine($"ChartHover");
+       //Console.WriteLine("MouseHovered"); 
     }
-
-    [JSInvokable]
-    public static string ChartScaleXTicks(string val, int index)
-    {
-        Console.WriteLine($"ChartScaleXTicks {index}");
-        return index % 2 == 0 ? val : "";
-    }
-    
 
 }

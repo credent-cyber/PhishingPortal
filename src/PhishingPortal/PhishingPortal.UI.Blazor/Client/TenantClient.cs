@@ -32,26 +32,6 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return campaigns;
         }
-        public async Task<IEnumerable<Campaign>> GetAllCampaignsAsync()
-        {
-            IEnumerable<Campaign> campaigns;
-            try
-            {
-                var res = await HttpClient.GetAsync($"api/Tenant/Campaignss");
-
-                res.EnsureSuccessStatusCode();
-
-                campaigns = await res.Content.ReadFromJsonAsync<IEnumerable<Campaign>>();
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return campaigns;
-        }
 
         public async Task<Campaign> GetCampaingById(int id)
         {
@@ -73,7 +53,26 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return campaign;
         }
+        public async Task<Campaign> GetCampaingByName(string name)
+        {
+            Campaign campaign = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/Campaign-by-name/{name}");
 
+                res.EnsureSuccessStatusCode();
+
+                campaign = await res.Content.ReadFromJsonAsync<Campaign>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return campaign;
+        }
         public async Task<IEnumerable<CampaignTemplate>> GetCampaignTemplates()
         {
             List<CampaignTemplate> templates = Enumerable.Empty<CampaignTemplate>().ToList();

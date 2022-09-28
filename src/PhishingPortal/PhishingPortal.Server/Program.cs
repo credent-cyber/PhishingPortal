@@ -18,6 +18,9 @@ using Serilog;
 using System;
 using PhishingPortal.Server.Services.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.OData;
+using PhishingPortal.Server.Intrastructure;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,8 +44,17 @@ builder.Services.AddLogging((builder) =>
 });
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
+builder.Services.AddControllersWithViews()
+    .AddODataControllers();
+
+builder.Services.AddRazorPages()
+    .AddRazorRuntimeCompilation();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PhishsimsODataDemo", Version = "v1" });
+});
 
 
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
@@ -118,8 +130,12 @@ builder.Services.AddIdentityServer(options =>
     {
         options.IdentityResources["openid"].UserClaims.Add("name");
         options.ApiResources.Single().UserClaims.Add("name");
+
         options.IdentityResources["openid"].UserClaims.Add("role");
         options.ApiResources.Single().UserClaims.Add("role");
+
+        options.IdentityResources["openid"].UserClaims.Add("tenant");
+        options.ApiResources.Single().UserClaims.Add("tenant");
 
     });
 
@@ -165,6 +181,9 @@ else
     app.UseHsts();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v1"));
+
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
@@ -175,10 +194,12 @@ app.UseAuthentication();
 app.UseIdentityServer();
 app.UseAuthorization();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapFallbackToFile("index.html");
+});
+
 app.MapPhishingApi();
-
 app.MapRazorPages();
-app.MapControllers();
-app.MapFallbackToFile("index.html");
-
 app.Run();

@@ -57,6 +57,12 @@ namespace PhishingPortal.Server.Controllers.Api
         {
             return await _tenantRepository.GetCampaignById(id);
         }
+        [HttpGet]
+        [Route("Campaign-by-name/{Name}")]
+        public async Task<Campaign> GetCampByName(string name)
+        {
+            return await _tenantRepository.GetCampaignByName(name);
+        }
 
 
         [HttpGet]
@@ -368,20 +374,5 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
-        [HttpGet]
-        [Route("Campaignss")]
-        public async Task<IEnumerable<Campaign>> GetCamplog()
-        {
-            try
-            {
-                var result = await _tenantRepository.AllCampaigns();
-                return result.ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, ex.Message);
-                throw;
-            }
-        }
     }
 }

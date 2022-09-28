@@ -102,7 +102,7 @@
                 <div class="col-xl-6 col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5>Trend of Clicks on Email per Campaign</h5>
+                            <h5>Recent five Email Campaigns </h5>
                         </div>
                         <div class="card-body">
                             <div style="width: 100%;" >
@@ -117,7 +117,7 @@
                 <div class="col-xl-6 col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h5>Trend of Clicks on Email per Campaign</h5>
+                            <h5>Trend of Clicks % on Email per Campaign</h5>
                         </div>
                         <div class="card-body">
                            <div style="width: 100%;">
@@ -202,11 +202,15 @@
     public bool IsError { get; set; }
     public string Message { get; set; } = string.Empty;
 
- 
+
     // Barchart1 datasets
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public string[] BarChart1Labels { get; set; }
+
     public List<ChartJsDataset> BarChart2Data { get; set; } = new List<ChartJsDataset>();
+
     public List<ChartJsDataset> BarChart3Data { get; set; } = new List<ChartJsDataset>();
+    public string[] BarChart3Labels { get; set; }
 
     public List<string> PieChart1Data { get; set; } = new List<string>();
     public List<string> PieChart1Background { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
@@ -221,8 +225,6 @@
     public List<string> Polar1Labels { get; set; } = new List<string>();
 
 
-    public string[] BarChart1Labels { get; set; }
-    public string[] BarChart3Labels { get; set; }
 
 
 
@@ -295,12 +297,12 @@
                     BackgroundColor = GetBackgroundColors(Color.Blue, data2.Entries.Count()),
                 });
 
-            //BarChart3Data.Add(new ChartJsDataset
-            //    {
-            //        Label = "Phish Prone %",
-            //        Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
-            //        BackgroundColor = GetBackgroundColors(Color.Red, data2.Entries.Count()),
-            //    });
+            BarChart3Data.Add(new ChartJsDataset
+                {
+                    Label = "Reported",
+                    Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
+                    BackgroundColor = GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                });
 
 
 
@@ -331,33 +333,35 @@
                 }
             }
 
-            BarChart1Data.Add(new ChartJsDataset
-                {
-                    Label = "Phishing Counts",
-                    Data = data.Entries.Select(o => o.TotalCount.ToString()).ToArray(),
-                    BackgroundColor = GetBackgroundColors(Color.Blue, data.Entries.Count()),
-                });
+            //BarChart1Data.Add(new ChartJsDataset
+            //    {
+            //        Label = "Phishing Counts",
+            //        Data = data.Entries.Select(o => o.TotalCount.ToString()).ToArray(),
+            //        BackgroundColor = GetBackgroundColors(Color.Blue, data.Entries.Count()),
+            //    });
 
 
-            BarChart1Data.Add(new ChartJsDataset
-                {
-                    Label = "Clicks",
-                    Data = data.Entries.Select(o => o.TotalHits.ToString()).ToArray(),
-                    BackgroundColor = GetBackgroundColors(Color.Red, data.Entries.Count()),
-                });
+            //BarChart1Data.Add(new ChartJsDataset
+            //    {
+            //        Label = "Clicks",
+            //        Data = data.Entries.Select(o => o.TotalHits.ToString()).ToArray(),
+            //        BackgroundColor = GetBackgroundColors(Color.Red, data.Entries.Count()),
+            //    });
 
-            BarChart1Data.Add(new ChartJsDataset
-                {
-                    Label = "Phish Prone",
-                    Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
-                    BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
-                });
+ 
+
+            //BarChart1Data.Add(new ChartJsDataset
+            //    {
+            //        Label = "Phish Prone",
+            //        Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
+            //        BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
+            //    });
 
             BarChart2Data.Add(new ChartJsDataset
                 {
-                    Label = "Phish Prone",
+                    Label = "Phish Prone%",
                     //Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
-                    Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
+                    Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
                     BackgroundColor = GetBackgroundColors(Color.Orange, data.Entries.Count()),
                 });
 
@@ -388,7 +392,8 @@
     //{
     //    if(firstRender)
     //    {
-    //        SomeStartupMethod();
+    //        var ObjRef = DotNetObjectReference.Create(this);
+    //        JSRuntime.InvokeVoidAsync("", ObjRef);
     //    }
     //    return base.OnAfterRenderAsync(firstRender);
     //}
@@ -400,6 +405,5 @@
             colors.Add(color.Name.ToString().ToLower());
         return colors.ToArray();
     }
-
 
 }
