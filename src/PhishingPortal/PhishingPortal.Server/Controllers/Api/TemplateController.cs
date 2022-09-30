@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.DataContext;
@@ -23,10 +24,11 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [EnableQuery]
-
         public IQueryable<CampaignTemplate> Get()
         {
             return DbContext.CampaignTemplates.AsQueryable();
         }
+        
+
     }
 }

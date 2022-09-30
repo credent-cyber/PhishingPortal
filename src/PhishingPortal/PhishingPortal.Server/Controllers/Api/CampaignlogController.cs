@@ -27,12 +27,5 @@ namespace PhishingPortal.Server.Controllers.Api
             return DbContext.CampaignLogs.AsQueryable();
         }
 
-        [ODataRoute("Camplog({id})")]
-        public IQueryable<CampaignLog> GetCamplogById(int id)
-        {
-            return null;
-        }
-
-
     }
 }

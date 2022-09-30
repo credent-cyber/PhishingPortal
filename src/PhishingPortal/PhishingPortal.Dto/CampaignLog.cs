@@ -33,9 +33,6 @@ namespace PhishingPortal.Dto
         public virtual Campaign Camp { get; set; }
         public virtual Recipient Recipient { get; set; }
 
-        // public virtual CampaignTemplate Template { get; set; }
-        //public virtual CampaignDetail Details { get; set; }
-
         /// <summary>
         /// This will record if the campaign email is forwarded to a designated mailbox from the recipient
         /// </summary>

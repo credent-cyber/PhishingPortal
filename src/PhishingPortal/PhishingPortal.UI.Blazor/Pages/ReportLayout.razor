@@ -1,5 +1,5 @@
 ﻿@page "/layout"
-@page "/layout/{ishit:bool}"
+@page "/layout/{id:int}"
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.UI.Blazor.Models
@@ -160,7 +160,7 @@
     protected override async Task OnInitializedAsync()
     { 
         //StartDate = new DateTime(DateTime.Now.Year, 1, 1);
-    //EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
+        //EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
         //var Camp = await client.GetCampaingById(Id);
 
 
@@ -186,7 +186,7 @@
     }
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        var data2 =  client.GetCategoryWisePhishingTestData(StartDate, EndDate);
+        //var data2 =  client.GetCategoryWisePhishingTestData(StartDate, EndDate);
         return base.OnAfterRenderAsync(firstRender);
     }
 
@@ -205,6 +205,7 @@
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Id).Titled("CampID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name");;
         c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px");
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
@@ -212,18 +213,17 @@
         c.Add(o => o.IsHit).Css("table-bordered");
         c.Add(o => o.IsReported).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered");
-       // c.Add(o => o.Template.Name).Css("table-bordered");
-       // c.Add(o => o.Recipient.Department).Css("table-bordered");
-      
+    // c.Add(o => o.Recipient.Department).Css("table-bordered");
+
 
     };
 
     protected override async Task OnParametersSetAsync()
     {
-        //string url = NavigationManager.GetBaseUri() + "odata/orders";
         string url =  $"odata/campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-  
+        query.Add("grid-filter", $"Camp.Id__1__{Id}");
+
         var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
             .Sortable()
             .ChangePageSize(true)
