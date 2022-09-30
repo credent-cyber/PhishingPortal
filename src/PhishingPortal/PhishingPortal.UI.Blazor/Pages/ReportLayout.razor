@@ -20,101 +20,7 @@
 <div class="pcoded-content">
     <h5><span style="color:orange;">Report Details</span></h5>
     <div class="row">
-         <div class="col-xl-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                           @* <h5>Charts</h5>*@
-                        </div>
-                        <div class="card-body">
-                            <div style="width: 100%;" >
 
-                                @* <Chart Id="bar" Type="@ChartType.bar" Datasets="@BarChartData" 
-                                        Labels="@BarChartLabels" IsStacked="false" >
-                                 </Chart>*@
-                            </div>
-                        </div>
-                    </div>
-         </div>
-
-         <div class="col-xl-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                           
-                        </div>
-                        <div class="card-body" >
-                           <div style="width: 100%;">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="col-md-6 ">
-                                            <div class="card bg-c-blue order-card">
-                                                <div class="card-body">
-                                                        <div class="row align-items-center m-b-0">
-                                                            <div class="col" style="padding: 0">
-                                                                <h6 class="m-b-5 text-white">Total </h6>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                 <h3 style="color:black">@Total</h3>  
-                                                                @*<ConsolidatedPhishingStat Type="PhishingStatsType.Total" Data="stats"></ConsolidatedPhishingStat>*@
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>  
-                                        <div class="col-md-6">
-                                            <div class="card bg-c-red order-card">
-                                                <div class="card-body">
-                                                        <div class="row align-items-center m-b-0">
-                                                            <div class="col" style="padding: 0">
-                                                                <h6 class="m-b-5 text-white">Hits </h6>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                 <h3 style="color:black">@Hits</h3>  
-                                                                  @*<ConsolidatedPhishingStat Type="PhishingStatsType.Total" Data="stats"></ConsolidatedPhishingStat>*@
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                     <div class="row">
-                                        <div class="col-md-6 ">
-                                            <div class="card bg-c-green order-card">
-                                                <div class="card-body">
-                                                        <div class="row align-items-center m-b-0">
-                                                            <div class="col" style="padding: 0">
-                                                                <h6 class="m-b-5 text-white">Reported </h6>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                 <h3 style="color:black">@Reported</h3> 
-                                                                @*<ConsolidatedPhishingStat Type="PhishingStatsType.Total" Data="stats"></ConsolidatedPhishingStat>*@
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>  
-                                        <div class="col-md-6">
-                                            <div class="card bg-c-yellow order-card">
-                                                <div class="card-body">
-                                                        <div class="row align-items-center m-b-0">
-                                                            <div class="col" style="padding: 0">
-                                                                <h6 class="m-b-5 text-white">Prone% </h6>
-                                                            </div>
-                                                            <div class="col-auto">
-                                                                 <h3 style="color:black">@Prone %</h3> 
-                                                                @*<ConsolidatedPhishingStat Type="PhishingStatsType.Total" Data="stats"></ConsolidatedPhishingStat>*@
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                           </div>
-                        </div>
-                    </div>
-         </div>
          <div class="col-xl-12 col-md-12">
                     <div class="card">
                         <div class="card-header">
@@ -141,55 +47,6 @@
 
     [Parameter]
     public int Id{ get; set; }
-    [Parameter]
-    public bool IsHit{ get; set; }
-
-
-
-    public List<ChartJsDataset> BarChartData { get; set; } = new List<ChartJsDataset>();
-    public string[] BarChartLabels { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-
-    public int Total = 20;
-    public int Hits = 5;
-    public int Reported = 10;
-    public decimal Prone = 25;
-
-
-    protected override async Task OnInitializedAsync()
-    { 
-        //StartDate = new DateTime(DateTime.Now.Year, 1, 1);
-        //EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
-        //var Camp = await client.GetCampaingById(Id);
-
-
-
-        //var data2 = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
-
-
-        //BarChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
-        //BarChartData.Add(new ChartJsDataset
-        //     {
-        //        Label = "Email Count",
-        //        Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
-        //        BackgroundColor = GetBackgroundColors(Color.Green, data2.Entries.Count()),
-        //     });
-        //BarChartData.Add(new ChartJsDataset
-        //   {
-        //       Label = "Click Count",
-        //       Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
-        //       BackgroundColor = GetBackgroundColors(Color.Blue, data2.Entries.Count()),
-        //   });
-
-
-    }
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        //var data2 =  client.GetCategoryWisePhishingTestData(StartDate, EndDate);
-        return base.OnAfterRenderAsync(firstRender);
-    }
-
 
     public string[] GetBackgroundColors(Color color, int arraySize)
     {
@@ -199,7 +56,6 @@
         return colors.ToArray();
     }
 
-    //IEnumerable<Campaign> campaigns = null;
     private CGrid<CampaignLog> _grid;
     private Task _task;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
