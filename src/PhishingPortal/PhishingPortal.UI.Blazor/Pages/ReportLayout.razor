@@ -1,6 +1,7 @@
 ﻿@page "/layout"
 @page "/layout/{id:int}"
 
+@using GridShared.Events
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.Dto
 @using System.Drawing
@@ -24,6 +25,10 @@
 <div class="pcoded-content">
     <h5><span style="color:orange;">Report Details</span></h5>
     <div class="row">
+        <div class="col-3">
+            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
+            </DrillDown_Summary>
+        </div>
 
         <div class="col-xl-6 col-md-6">
             <div class="card" style="max-width:30rem;">
@@ -32,7 +37,7 @@
                 </div>
                 <div class="card-body">
                     <div style="width: 100%;">
-                        @*<Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
+                  @*      <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
                                Labels="@BarChart1Labels" IsStacked="false">
                         </Chart>*@
                     </div>
@@ -40,10 +45,7 @@
             </div>
         </div>
 
-        <div class="col-4">
-            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
-            </DrillDown_Summary>
-        </div>
+      
 
     </div>
 
@@ -52,7 +54,7 @@
             <div class="card">
                 <div class="card-body">
                     <div style="width: 100%;">
-                        <GridComponent @ref="_gridComponent" T="CampaignLog"  Grid="@_grid"></GridComponent>
+                        <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
                     </div>
                 </div>
             </div>
@@ -107,10 +109,8 @@
         _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
     }
 
-
     private async Task AfterRefreshGrid()
     {
-
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
 
         if (grid != null)
@@ -133,7 +133,7 @@
         if (Id > 0)
             query.Add("grid-filter", $"Camp.Id__1__{Id}");
 
-        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 100)
+        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
             .Sortable()
             .ChangePageSize(true)
             .Filterable()
