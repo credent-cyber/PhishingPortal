@@ -36,8 +36,13 @@ namespace PhishingPortal.Server.Services
                 else
                 {
                     var tenantId = httpContextAccessor?.HttpContext?.Request.Query["t"];
+                    
                     if (tenantId.HasValue && !string.IsNullOrEmpty(tenantId))
-                        _tenant = adminRepository.GetByUniqueId(tenantId).Result;
+                    {
+                        var sanitizeId = tenantId.Value.ToString().Replace("()", "");
+                        _tenant = adminRepository.GetByUniqueId(sanitizeId).Result;
+                    }
+                        
                 }
 
                 if (Tenant == null)
