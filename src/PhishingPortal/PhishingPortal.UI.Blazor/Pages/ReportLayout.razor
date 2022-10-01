@@ -37,9 +37,9 @@
                 </div>
                 <div class="card-body">
                     <div style="width: 100%;">
-                  @*      <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
+                        <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
                                Labels="@BarChart1Labels" IsStacked="false">
-                        </Chart>*@
+                        </Chart>
                     </div>
                 </div>
             </div>
@@ -133,7 +133,7 @@
         if (Id > 0)
             query.Add("grid-filter", $"Camp.Id__1__{Id}");
 
-        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
             .Sortable()
             .ChangePageSize(true)
             .Filterable()
@@ -165,8 +165,10 @@
         total = CampaignLogs.Count();
         hits = CampaignLogs.Count(o => o.IsHit);
         reported = CampaignLogs.Count(o => o.IsReported);
-        pronePercent = Math.Round((decimal)(hits / ((total == 0) ? 1 : total)) * 100, 2);
 
+        if(total > 0){
+            pronePercent = Math.Round((decimal) hits / total * 100, 2);
+        }
 
         var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
         {
@@ -175,6 +177,8 @@
         });
 
         BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
+
+        BarChart1Data.Clear();  
 
         BarChart1Data.Add(new ChartJsDataset
             {
@@ -187,14 +191,14 @@
             {
                 Label = "Hits",
                 Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightYellow, data.Select(o => o.CampaignId).Count()),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data.Select(o => o.CampaignId).Count()),
             });
 
         BarChart1Data.Add(new ChartJsDataset
             {
                 Label = "Reported",
-                Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString().ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data.Select(o => o.CampaignId).Count()),
+                Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Select(o => o.CampaignId).Count()),
             });
     }
 }

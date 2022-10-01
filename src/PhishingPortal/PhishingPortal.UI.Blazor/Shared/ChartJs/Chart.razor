@@ -63,8 +63,8 @@
                                     Ticks = new {  BeginAtZero = true}, 
                                     Stacked = true 
                                 }
-                        }
-                     },
+                    }
+                    },
 
 
                 },
@@ -90,8 +90,8 @@
 
             };
             var ObjRef = DotNetObjectReference.Create(this);
-            await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
 
+            await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
 
         }
 
