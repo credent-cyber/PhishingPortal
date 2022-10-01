@@ -1,0 +1,103 @@
+﻿@page "/request_demo"
+@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
+@using PhishingPortal.Dto;
+@using PhishingPortal.UI.Blazor.Client;
+@using System.Drawing
+@layout BlankLayout
+
+
+
+    <div class="auth-wrapper" >
+        <div style="width:600px;">
+            <div class="card text-center">
+                <div class="card-body" >
+                            <div>
+                                <img src="~/custom/assets/images/ps.png" alt="" class="img-fluid mb-4" >
+                                <h3 class="mb-3"><span class="text-c-blue">Request a Demo</span></h3>
+                            </div>
+                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+                            <div class="card-body p-3">
+
+                                <!--Body-->
+                                <div class="form-group">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-user text-"></i></div>
+                                        </div>
+                                        <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+                                    </div>
+                                </div>
+                                 <div class="form-group">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-phone text-"></i></div>
+                                        </div>
+                                        <input type="number" class="form-control" id="contactno" name="contactno" placeholder="Contact Number" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-building text-"></i></div>
+                                        </div>
+                                        <input type="text" class="form-control" id="company" name="company" placeholder="Company" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-envelope text-"></i></div>
+                                        </div>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="example@email.com" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-comment text-"></i></div>
+                                        </div>
+                                        <textarea class="form-control" placeholder="..." required></textarea>
+                                    </div>
+                                </div>
+
+                               @* <div class="text-center">
+                                    <input type="submit" value="Submit" class="btn btn-info btn-block rounded-0 py-2">
+                                </div>*@
+                            </div>
+                                 <div class="col-12">
+                                      <button type="buttom"  class="btn btn-primary">Submit</button>
+                                      <button type="button" href="/" class="btn btn-secondary">Close</button>
+
+                                 </div>
+
+                        </div>        
+                @*</div>*@
+            </div>
+        </div>
+    </div>
+
+
+@code {
+
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+    bool temp = false;
+    bool import = false;
+    bool showEditButton = true;
+
+ 
+
+    List<CampaignTemplate> Templates;
+    CampaignType? type = null;
+    CampaignTemplate model;
+
+    public void OnValidSubmit()
+    {
+        
+    }
+
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,6 +29,9 @@ namespace PhishingPortal.Dto
         public bool IsAttachmentOpen { get; set; }
         public bool IsMacroEnabled { get; set; }
         public bool IsReplied { get; set; }
+
+        public virtual Campaign Camp { get; set; }
+        public virtual Recipient Recipient { get; set; }
 
         /// <summary>
         /// This will record if the campaign email is forwarded to a designated mailbox from the recipient

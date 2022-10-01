@@ -57,6 +57,12 @@ namespace PhishingPortal.Server.Controllers.Api
         {
             return await _tenantRepository.GetCampaignById(id);
         }
+        [HttpGet]
+        [Route("Campaign-by-name/{Name}")]
+        public async Task<Campaign> GetCampByName(string name)
+        {
+            return await _tenantRepository.GetCampaignByName(name);
+        }
 
 
         [HttpGet]

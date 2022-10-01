@@ -36,6 +36,7 @@ namespace PhishingPortal.Repositories
             return Task.FromResult(result);
         }
 
+
         public async Task<Campaign> GetCampaignById(int id)
         {
             Campaign result = null;
@@ -47,7 +48,23 @@ namespace PhishingPortal.Repositories
 
             return result;
         }
+        public async Task<Campaign> GetCampaignByName(string name)
+        {
+            Campaign result = null;
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+            result = TenantDbCtx.Campaigns.Include(o => o.Schedule).Include(o => o.Detail)
+                .FirstOrDefault(o => o.Name == name);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return result;
+        }
+        //public async Task<CampaignLog> GetCamplogByCampId(int id)
+        //{
+        //    CampaignLog result = null;
+        //    result = TenantDbCtx.CampaignLogs.Include();
+        //    return result;
+        //}
         public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
             Campaign result = null;
@@ -235,12 +252,14 @@ namespace PhishingPortal.Repositories
 
         }
 
-        /// <summary>
+
+        /// <summary
         /// Phsihing prone percentage - group by phishing category
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
+
         public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
         {
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
@@ -264,7 +283,8 @@ namespace PhishingPortal.Repositories
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
-                    Hits = entries.Count(o => o.logEntry.IsHit)
+                    Hits = entries.Count(o => o.logEntry.IsHit),
+                    Reported = entries.Count(o => o.logEntry.IsReported),
                 });
                 var DtotalHits = depatwiseCnt.Sum(o => o.Hits);
 
@@ -314,6 +334,7 @@ namespace PhishingPortal.Repositories
                     CampaignId = key,
                     Total = entries.Count(),
                     TotalHits = entries.Count(i => i.IsHit),
+                    TotalReported = entries.Count(i => i.IsReported),
                 });
 
                 foreach (var c in campaignGroup)
@@ -328,6 +349,7 @@ namespace PhishingPortal.Repositories
                         Campaign = campaign,
                         Count = c.Total,
                         Hits = c.TotalHits,
+                        Reported = c.TotalReported,
                     };
 
                     data.Entries.Add(entry);
@@ -343,6 +365,7 @@ namespace PhishingPortal.Repositories
                     Category = key,
                     Count = values.Sum(o => o.Count),
                     HitCount = values.Sum(o => o.Hits),
+                    ReportedCount = values.Sum(o => o.Reported),
                 });
 
                 var totalHits = categoryWiseGrp.Sum(o => o.HitCount);
