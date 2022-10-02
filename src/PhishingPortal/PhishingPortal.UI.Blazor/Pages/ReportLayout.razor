@@ -1,5 +1,5 @@
-﻿@page "/layout"
-@page "/layout/{id:int}"
+﻿@page "/report"
+@page "/report/{id:int}"
 
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
@@ -25,13 +25,8 @@
 <div class="pcoded-content">
     <h5><span style="color:orange;">Report Details</span></h5>
     <div class="row">
-        <div class="col-3">
-            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
-            </DrillDown_Summary>
-        </div>
-
-        <div class="col-xl-6 col-md-6">
-            <div class="card" style="max-width:30rem;">
+        <div class="col-md-6 col-sm-12 col-xl-6 ">
+            <div class="card" style="width:30rem;">
                 <div class="card-header">
                     <h5>Statistics</h5>
                 </div>
@@ -44,27 +39,20 @@
                 </div>
             </div>
         </div>
-
-      
-
-    </div>
-
-    <div class="row">
-        <div class="col-xl-12 col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div style="width: 100%;">
-                        <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
-                    </div>
-                </div>
-            </div>
+        <div class="col-sm-12 col-md-6 col-xl-6">
+            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
+            </DrillDown_Summary>
         </div>
     </div>
 </div>
 
+<div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
+    <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
+</div>
+
 @code {
 
-    [Parameter]
+    [Parameter] 
     public int Id { get; set; }
 
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
@@ -166,8 +154,9 @@
         hits = CampaignLogs.Count(o => o.IsHit);
         reported = CampaignLogs.Count(o => o.IsReported);
 
-        if(total > 0){
-            pronePercent = Math.Round((decimal) hits / total * 100, 2);
+        if (total > 0)
+        {
+            pronePercent = Math.Round((decimal)hits / total * 100, 2);
         }
 
         var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
@@ -178,7 +167,7 @@
 
         BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
 
-        BarChart1Data.Clear();  
+        BarChart1Data.Clear();
 
         BarChart1Data.Add(new ChartJsDataset
             {
