@@ -280,5 +280,6 @@ namespace PhishingPortal.Server.Controllers
             await EmailSender.SendEmailAsync(to, subject, mailContent);
         }
 
+       
     }
 }

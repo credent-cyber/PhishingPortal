@@ -18,6 +18,7 @@ namespace PhishingPortal.Repositories
 
         Task<Tenant> ConfirmDomainAsync(DomainVerificationRequest domain);
 
+        Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor);
 
     }
 }

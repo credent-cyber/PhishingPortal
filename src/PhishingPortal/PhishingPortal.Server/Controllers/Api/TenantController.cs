@@ -373,6 +373,6 @@ namespace PhishingPortal.Server.Controllers.Api
 
             return result;
         }
-
+        
     }
 }

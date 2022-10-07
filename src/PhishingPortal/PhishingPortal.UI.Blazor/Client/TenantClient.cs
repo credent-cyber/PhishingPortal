@@ -81,7 +81,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
 
-                res.EnsureSuccessStatusCode();
+                res.EnsureSuccessStatusCode(); 
 
                 templates = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
 

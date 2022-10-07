@@ -688,7 +688,10 @@ namespace PhishingPortal.Repositories
                 throw;
             }
             return inserted;
-        } 
+        }
         #endregion
+
+      
+
     }
 }

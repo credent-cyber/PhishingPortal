@@ -261,5 +261,21 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(tenant);
 
         }
+        
+        public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
+        {
+            try
+            {
+
+                CentralDbContext.DemoRequestor.Add(demoRequestor);
+                CentralDbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return demoRequestor;
+        }
     }
 }

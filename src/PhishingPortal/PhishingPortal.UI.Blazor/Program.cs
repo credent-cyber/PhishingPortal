@@ -7,6 +7,7 @@ using PhishingPortal.UI.Blazor.Client;
 using Serilog;
 
 
+
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -40,6 +41,7 @@ builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress =
 builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
 
+builder.Services.AddHttpClient("ServerAPI.NoAuthenticationClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
 builder.Services.AddApiAuthorization<PhishingPortalAuthState>(options =>
 {

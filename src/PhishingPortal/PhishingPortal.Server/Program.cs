@@ -153,6 +153,7 @@ builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
 
+
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
@@ -184,6 +185,8 @@ else
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v1"));
 
+
+
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
@@ -193,6 +196,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseIdentityServer();
 app.UseAuthorization();
+
 
 app.UseEndpoints(endpoints =>
 {
