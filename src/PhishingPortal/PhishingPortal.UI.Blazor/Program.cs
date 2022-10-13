@@ -26,9 +26,10 @@ builder.Services.AddLogging((builder) =>
     builder.AddSerilog();
 });
 
+//builder.Services.AddOptions();
+//builder.Services.AddAuthorizationCore();
 
-
-builder.Services.AddScoped<PhishingPortalClientState>();
+builder.Services.AddScoped<AuthState>();
 
 builder.Services.AddHttpClient<WeatherClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
@@ -38,6 +39,7 @@ builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress =
 
 builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+
 
 builder.Services.AddApiAuthorization<PhishingPortalAuthState>(options =>
 {

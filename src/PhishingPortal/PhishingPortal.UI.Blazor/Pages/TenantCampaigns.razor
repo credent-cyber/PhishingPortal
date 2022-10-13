@@ -642,7 +642,7 @@ else
         pageIndexx = pageIndex == 0 ? 1 : pageIndex;
 
         campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
-
+        
         if (campaigns == null || campaigns.Count() == 0)
             message = "No campaigns found!";
 

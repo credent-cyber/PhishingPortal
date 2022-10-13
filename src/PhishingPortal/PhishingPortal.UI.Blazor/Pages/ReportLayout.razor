@@ -1,0 +1,193 @@
+﻿@page "/report"
+@page "/report/{id:int}"
+
+@using GridShared.Events
+@using Newtonsoft.Json.Linq
+@using PhishingPortal.Dto
+@using System.Drawing
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Helpers
+@using PhishingPortal.UI.Blazor.Models
+@using PhishingPortal.UI.Blazor.Shared.ChartJs
+@using PhishingPortal.UI.Blazor.Shared.Components.Reports
+
+@inject TenantClient client
+@inject ILogger<TenantDashboard> logger
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject AuthState authState;
+
+<div class="pcoded-content">
+    <h5><span style="color:orange;">Report Details</span></h5>
+    <div class="row">
+        <div class="col-md-6 col-sm-12 col-xl-6 ">
+            <div class="card" style="width:30rem;">
+                <div class="card-header">
+                    <h5>Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div style="width: 100%;">
+                        <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
+                               Labels="@BarChart1Labels" IsStacked="false">
+                        </Chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-6 col-xl-6">
+            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
+            </DrillDown_Summary>
+        </div>
+    </div>
+</div>
+
+<div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
+    <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
+</div>
+
+@code {
+
+    [Parameter] 
+    public int Id { get; set; }
+
+    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public string[] BarChart1Labels { get; set; }
+
+    private List<CampaignLog> CampaignLogs = new List<CampaignLog>();
+    private int total;
+    private int hits;
+    private int reported;
+    private decimal pronePercent;
+
+    public string[] GetBackgroundColors(Color color, int arraySize)
+    {
+        var colors = new List<string>();
+        for (var i = 0; i < arraySize; i++)
+            colors.Add(color.Name.ToString().ToLower());
+        return colors.ToArray();
+    }
+
+    private GridComponent<CampaignLog> _gridComponent;
+    private CGrid<CampaignLog> _grid;
+    private Task _task;
+    private GridODataClient<CampaignLog> _client;
+
+    private bool _eventHooked = false;
+    Action<IGridColumnCollection<CampaignLog>> columns = c =>
+    {
+        c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Id).Titled("CampID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px");
+        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
+        c.Add(o => o.Recipient.Email).Css("table-bordered").Titled("Recipient Email");
+        c.Add(o => o.IsHit).Css("table-bordered");
+        c.Add(o => o.IsReported).Css("table-bordered");
+        c.Add(o => o.CreatedOn).Css("table-bordered");
+        // c.Add(o => o.Recipient.Department).Css("table-bordered");
+    };
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
+    }
+
+    private async Task AfterRefreshGrid()
+    {
+        var grid = _gridComponent.Grid as CGrid<CampaignLog>;
+
+        if (grid != null)
+        {
+            Calculate(grid);
+
+            StateHasChanged();
+        }
+
+        await Task.CompletedTask;
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string url = $"odata/campaignlog?t={authState.TenantIdentifier}";
+
+        var query = new QueryDictionary<StringValues>();
+
+        if (Id > 0)
+            query.Add("grid-filter", $"Camp.Id__1__{Id}");
+
+        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
+            .Sortable()
+            .ChangePageSize(true)
+            .Filterable()
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .Searchable(true, false, false)
+            .SetExcelExport(true, "Report.xlsx")
+            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+            .AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
+
+
+        _grid = client.Grid;
+
+        _task = client.UpdateGrid();
+
+        await _task.ContinueWith(async (st) =>
+        {
+            Calculate(_grid);
+            await Task.CompletedTask;
+        });
+
+    }
+
+    private void Calculate(CGrid<CampaignLog> grid)
+    {
+        CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
+        total = CampaignLogs.Count();
+        hits = CampaignLogs.Count(o => o.IsHit);
+        reported = CampaignLogs.Count(o => o.IsReported);
+
+        if (total > 0)
+        {
+            pronePercent = Math.Round((decimal)hits / total * 100, 2);
+        }
+
+        var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
+        {
+            CampaignId = k,
+            Logs = v,
+        });
+
+        BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
+
+        BarChart1Data.Clear();
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Total",
+                Data = data.Select(o => o.Logs.Count().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data.Select(o => o.CampaignId).Count()),
+            });
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Hits",
+                Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data.Select(o => o.CampaignId).Count()),
+            });
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Reported",
+                Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Select(o => o.CampaignId).Count()),
+            });
+    }
+}

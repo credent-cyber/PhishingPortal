@@ -1,11 +1,14 @@
-﻿@using PhishingPortal.Dto.Dashboard
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
 @inject IJSRuntime JSRuntime
-
+@inject TenantClient client
+@inject NavigationManager NavManager
 <canvas id="@Id"></canvas>
 
 
 @code {
-    
 
     [Parameter]
     public string Id { get; set; }
@@ -31,13 +34,17 @@
     [Parameter]
     public List<ChartJsDataset> Datasets { get; set; }
 
+    [Parameter] 
+    public EventCallback<int> OnChartClick { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Here we create an anonymous type with all the options
         // that need to be sent to Chart.js
+
         if (Datasets == null || Datasets.Count() == 0)
             return;
-      
+
         if (!IsStacked)
         {
             var config = new
@@ -50,34 +57,62 @@
                     {
 
                         YAxes = new[]
-                                            {
-                            new { Ticks = new {
-                                BeginAtZero=true
-                            }, Stacked = true }
-                        }
+                        {
+                                new 
+                                { 
+                                    Ticks = new {  BeginAtZero = true}, 
+                                    Stacked = true 
+                                }
                     }
+                    },
+
 
                 },
 
                 Data = new
                 {
                     Labels = Labels,
-                    
+
                     Datasets = Datasets.Select(o => new
                     {
                         Label = o.Label,
                         Data = o.Data,
-                        BackgroundColor = o.BackgroundColor
+                        Tension = 0.4,
+                        BackgroundColor = o.BackgroundColor,
+                        //Fill : true
                     })
 
                 },
 
-               
+
+
+
 
             };
+            var ObjRef = DotNetObjectReference.Create(this);
 
-            await JSRuntime.InvokeVoidAsync("setup", Id, config);
+            await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
+
         }
 
     }
+
+    IEnumerable<Campaign> campaigns;
+
+    [JSInvokable]
+    public async Task ChartClick(string label, string id)
+    {
+        Console.WriteLine($"Received click {label} id = {id}");
+        var Camp = await client.GetCampaingByName(label);
+        var CampId = Camp.Id;
+
+        NavManager.NavigateTo($"/layout/{CampId}");
+
+    }
+    [JSInvokable]
+    public static async Task ChartHover()
+    {
+       //Console.WriteLine("MouseHovered"); 
+    }
+
 }

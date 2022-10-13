@@ -39,14 +39,16 @@ namespace PhishingPortal.Dto.Dashboard
         public Campaign Campaign { get; set; }
         public int Count { get; set; }
         public int Hits { get; set; }
+        public int Reported { get; set; }
         public decimal PronePercentage
         {
             get
             {
                 if (Count == 0)
                     return 0;
-
-                return (Hits / Count) * 100;
+                //var prone = (Hits / Count) * 100;
+                var prone = Math.Round(((decimal)Hits / Count) * 100, 2);
+                return prone;
             }
         }
     }
@@ -153,4 +155,5 @@ namespace PhishingPortal.Dto.Dashboard
         public string[] BackgroundColor { get; set; }
 
     }
+
 }
