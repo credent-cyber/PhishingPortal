@@ -22,9 +22,10 @@
 
         public void SetSuccess(string msg)
         {
-            IsError = false;
             IsSuccess = true;
+            IsError = false;
             Message = msg;
         }
+
     }
 }

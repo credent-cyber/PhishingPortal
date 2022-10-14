@@ -7,6 +7,7 @@ using PhishingPortal.Services.Notification.Email;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Services.Notification.Sms;
 using PhishingPortal.Services.Notification.Whatsapp;
+using PhishingPortal.Services.Notification.RequestMonitor;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -82,6 +83,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<WhatsappGatewayConfig>();
         services.AddSingleton<IWhatsappCampaignExecutor, WhatsappCampaignExecutor>();
         services.AddSingleton<IWhatsappGatewayClient, WhatsappMateGatewayClient>();
+          
+        services.AddSingleton<IDbConnManager ,DbConnManager>();
+        services.AddSingleton<IDemoRequestHandler ,DemoRequestHandler>();
+        services.AddSingleton<IRequestEmailSender ,RequestEmailSender>();
 
         services.AddHostedService<Worker>();
 

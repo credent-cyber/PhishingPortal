@@ -13,6 +13,9 @@ namespace PhishingPortal.DataContext
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {
         static bool _recreateDb = false;
+        private DbContextOptionsBuilder<PhishingPortalDbContext> dbCtxOptions;
+        private DbContextOptions<PhishingPortalDbContext> options;
+
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public PhishingPortalDbContext(DbContextOptions<PhishingPortalDbContext> options,

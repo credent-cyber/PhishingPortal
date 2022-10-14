@@ -1,27 +1,13 @@
-﻿@page "/tenant-settings"
-
-@using PhishingPortal.Dto
+﻿@using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.UI.Blazor.Models
 
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 
-
 <div class="row">
-    <div class="card">
-        <div class="card-header" style="padding:25px 25px 0px;">
-            <h5>Settings</h5>
-            <div style="float:right">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active">Setting</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="card-body">
-            @*<div class="card">
+    <div class="card-body" style="padding: 1px 25px;">
+            <div class="card">
                 <div class="card-header">
                     <h5>Azure App Configurations</h5>
                     <div class="col-auto" style=" width:200px; text-align:center; line-height:0px; float:right; margin-top: -2px;">
@@ -50,18 +36,12 @@
                         </div>
                     </EditForm>
                 </div>
-            </div>*@
-            <AzureAppConfigurations/>
-           <TenantRedirecUrls/>
-            
-        </div>
+            </div>
     </div>
-
-
 </div>
 
 
-@*@code {
+@code {
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -100,7 +80,7 @@
                 var result = await client.UpsertSettings(model.ToSettingsDictionary());
 
                 model = new AzureRegistrationSettings(result);
-                
+
                 secret = model.ClientSecret;
                 model.ClientSecret = SecretMask;
 
@@ -114,4 +94,4 @@
             }
         }
     }
-}*@
+}

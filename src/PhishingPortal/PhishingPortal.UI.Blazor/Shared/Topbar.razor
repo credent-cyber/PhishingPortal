@@ -204,10 +204,12 @@
 </header>
 
 
-@code {
+@functions {
     protected override async Task OnInitializedAsync()
     {
         //await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcoded.min.js");
+        await JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pcodedExp.js");
     }
+
 
 }

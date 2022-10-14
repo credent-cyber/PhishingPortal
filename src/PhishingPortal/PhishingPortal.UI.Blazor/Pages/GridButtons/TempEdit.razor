@@ -1,0 +1,25 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Dto
+@implements ICustomGridComponent<CampaignTemplate>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-primary' @onclick="MyClickHandler"><i class="fa fa-pencil-square-o"></i></button>
+
+@code {
+    [Parameter]
+    public CampaignTemplate Item { get; set; }
+
+    [Parameter]
+    public CGrid<CampaignTemplate> Grid { get; set; }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        //string gridState = Grid.GetState();
+        //string returnUrl = (string)Object;
+        NavigationManager.NavigateTo($"/tenant-templates-config/{Item.Id}");
+    }
+}

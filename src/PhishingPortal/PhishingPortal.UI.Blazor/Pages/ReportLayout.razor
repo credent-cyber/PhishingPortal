@@ -58,6 +58,7 @@
 
     private CGrid<CampaignLog> _grid;
     private Task _task;
+
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
@@ -69,6 +70,8 @@
         c.Add(o => o.IsHit).Css("table-bordered");
         c.Add(o => o.IsReported).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered");
+        
+        
     // c.Add(o => o.Recipient.Department).Css("table-bordered");
 
 

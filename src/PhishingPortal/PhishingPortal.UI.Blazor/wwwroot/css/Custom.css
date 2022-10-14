@@ -1,0 +1,63 @@
+﻿.table td {
+    padding: 0.30rem 0.75rem !important;
+    vertical-align: middle !important;
+}
+
+.gridOcolor {
+    background-color: #f8f9fa !important;
+    /*font-size: larger !important;*/
+    background: border-box;
+    color: #001327;
+}
+
+.gridEcolor {
+    background-color: #dee2e6 !important;
+    /*font-size: larger !important;*/
+    background: border-box;
+    color: #001327;
+}
+
+.gridtitle {
+    background-color: lightskyblue !important;
+    font-size: 16px !important;
+    background: border-box;
+}
+
+table.grid-table .grid-header > .grid-header-group > .grid-header-title > button {
+    color: #007bff;
+    font-size: 16px !important;
+}
+
+.grid-header-title button {
+    text-decoration: none !important;
+    background-color: transparent !important;
+    font-size: large !important;
+    cursor: pointer;
+}
+/*.table thead th {
+            border: 1px solid black !important;
+            background: aliceblue !important;
+        }*/
+.table-bordered td, .table-bordered th {
+    border: 1px solid #e2e5e8;
+}
+
+.custom {
+    font-weight: 500 !important;
+    font-size: 16px !important;
+}
+/*.dropdown-menu {
+            left:270px;
+        }*/
+.dropdown-menu[data-bs-popper] {
+    top: 145% !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: #360406;
+}
+/*.dropdown:hover .dropdown-menu {
+            display: block !important;
+            margin-top: 0 !important;
+            
+        }*/

@@ -32,7 +32,7 @@
 }
         else
         {
-              <div class="pcoded-content" style="padding-top: 10px;">
+              <div class="pcoded-content" style="padding:10px 10px">
 
                     <div class="row">
 
@@ -52,7 +52,7 @@
                                          <div class="row">
                                              <div class="col-md-5">
                                                 <EditForm Model="@model" OnValidSubmit="@OnSave">
-                                                    <div class="card" style="margin-bottom: 0;">
+                                                    <div class="card" >
                                                         <div class="card-body">
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Template</label>
@@ -177,7 +177,7 @@
 
 
 
-                                                         <div class="btn-group col-12" >
+                                                        <div style="text-align:center;">    
                                                             <button type="submit" class="btn btn-primary">Save</button>
                                                             <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
                                                           
@@ -187,7 +187,7 @@
                                                   
                                                 </EditForm>
                                              </div>
-                                             <div class="col-md-7" style="padding: 0;">
+                                             <div class="col-md-7">
                                                     <div class="card" style="margin-bottom: 0;">
                                                         <div class="card-body">
                                                             <div class="mb-3">
@@ -279,7 +279,7 @@
             model.Version = "1";
 
         }
-  
+
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -322,16 +322,31 @@
     protected async Task OnSave()
     {
         loading = true;
-
+        IsError = false;
+        IsSuccess = false;
+        message = string.Empty;
         try
         {
+            
             if (model.Id > 0)
-            {               
+            {
+                if (model.Name is null || model.Type == 0)
+                {
+                    IsError = true;
+                    message = "Template Name, Template Type can't be null!";
+                    return;
+                }
                 Message = "Successfully Updated";
                 model.ModifiedOn = DateTime.Now;
             }
             else
             {
+                if (model.Name is null || model.Type == 0)
+                {
+                    IsError = true;
+                    message = "Template Name, Template Type can't be null!";
+                    return;
+                }
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }

@@ -1,6 +1,4 @@
-﻿@page "/gridsample"
-
-@using GridShared
+﻿@using GridShared
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.Dto
@@ -10,24 +8,24 @@
 @inject AuthState authState;
 
 
-    @if (_task.IsCompleted)
-    {
-      <div class="row">
-         <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="col-md-12" style="padding: 0;">
-                        <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
-                    </div>
-                </div>
-            </div>
-         </div>
-      </div>
-    }
-    else
-    {
-        <p><em>Loading...</em></p>
-    }
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+             <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:5vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
 
 @code
 {
@@ -36,15 +34,15 @@
 
     Action<IGridColumnCollection<Campaign>> columns = c =>
     {
-    //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px");
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
+        // c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true).SortInitialDirection(GridSortDirection.Descending).ThenSortByDescending(o => o.Id);
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true);
         c.Add(o => o.Name).Css("table-bordered");
         c.Add(o => o.Description).Css("table-bordered");
+        c.Add(o => o.Detail.Type).Titled("Type").SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Schedule.ScheduleType).Css("table-bordered").Titled("Schedule Type");
         c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info");
         c.Add(o => o.State).Css("table-bordered").Titled("Status");
-        c.Add(o => o.IsActive).Css("table-bordered");
-        c.Add(o => o.Detail.Type).Css("table-bordered");
+        //c.Add(o => o.IsActive, true).SetWidth("50px").Css("table-bordered");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampEdit>();
     };
 
@@ -53,8 +51,9 @@
         string url = $"odata/campaign?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-filter", "Detail.Type__1__Sms");
+
         var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable(true)
+             .Sortable(true)
             .Filterable(true)
             .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
@@ -63,7 +62,10 @@
             .WithGridItemsCount()
             .SetExcelExport(true, "Report.xlsx")
             .ChangePageSize(true)
+            .EmptyText("-")
+            .SetKeyboard(true)
             .Searchable(true, false, false);
+        //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
 
         _grid = client.Grid;
 

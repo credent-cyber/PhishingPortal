@@ -9,13 +9,10 @@
     </AuthorizeView>
 
     <AuthorizeView Roles="tenantadmin">
-        <Topbar />
+        <Topnav />
     </AuthorizeView>
 
     <main>
-
-
-
 
         @*<div class="top-row px-4">
         <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
@@ -93,7 +90,7 @@
         
         <article class="content px-4">
             <CascadingValue TValue="AlertModel" Value="alerts">
-                <div style="margin-top:100px">
+                <div style="margin-top:0px">
                     @Body
                 </div>
             </CascadingValue>

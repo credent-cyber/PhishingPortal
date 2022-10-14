@@ -8,6 +8,7 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.Helper;
     using PhishingPortal.Services.Notification.Sms;
     using PhishingPortal.Services.Notification.Whatsapp;
+    using PhishingPortal.Services.Notification.RequestMonitor;
     public class Worker : BackgroundService
     {
         class WorkerSettings
@@ -29,7 +30,10 @@ namespace PhishingPortal.Services.Notification
             IWhatsappCampaignExecutor whatsappCampaignExecutor,
             ITenantDbConnManager tenantDbConnManager, 
             ISmsGatewayClient smsClient, 
+            IDemoRequestHandler demoRequestHandler,
             IWhatsappGatewayClient waClient)
+
+
         {
             _logger = logger;
             this.providerLogger = agentLogger;
@@ -45,6 +49,7 @@ namespace PhishingPortal.Services.Notification
             TenantDbConnManager = tenantDbConnManager;
             SmsClient = smsClient;
             WaClient = waClient;
+            this._demoRequestHandler = demoRequestHandler;
         }
 
         readonly ILogger<Worker> _logger;
@@ -57,13 +62,17 @@ namespace PhishingPortal.Services.Notification
         private readonly ISmsCampaignExecutor _smsExecutor;
         private readonly IWhatsappCampaignExecutor _whatsappCampaignExecutor;
         bool _isprocessing = false;
+        private readonly IDemoRequestHandler _demoRequestHandler;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
         public ISmsGatewayClient SmsClient { get; }
         public IWhatsappGatewayClient WaClient { get; }
 
+       
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _demoRequestHandler.Start();
+            _demoRequestHandler.Execute();
             _campaignExecutor.Start();
             _smsExecutor.Start();
            // _whatsappCampaignExecutor.Start();
