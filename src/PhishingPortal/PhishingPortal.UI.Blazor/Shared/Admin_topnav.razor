@@ -1,0 +1,41 @@
+﻿
+
+<nav class="navbar navbar-expand-lg navbar-dark " style=" background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">
+
+    <a href="/" class="b-brand" style="margin-left:-50px">
+        <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-responsive"
+             width="210" height="40">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent" style="">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a href="/" class="nav-link custom"><i class="fa fa-home"></i> Home </a>
+            </li>
+            <li class="nav-item custom">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-bullhorn"></i> Tenants
+                </a>
+                <div class="dropdown-menu" style="left:263px;" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="provision">All Tenants</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="onboard">New Tenant</a>
+                </div>
+            </li>
+        </ul>
+
+        <div class="form-inline my-2 my-lg-0">
+            <LoginDisplay />
+        </div>
+        <li class="nav-item">
+            <a href="#!" class="full-screen" onclick="javascript:toggleFullScreen()">
+                <i class="feather icon-maximize"></i>
+            </a>
+        </li>
+    </div>
+
+</nav>
+

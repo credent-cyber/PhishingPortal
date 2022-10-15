@@ -59,14 +59,14 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                    <select @bind="CheckSelected" class="form-control" id="CampaignType" >
-                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                                            {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                    </select>
+                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" >
+                                                                @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                                                {
+                                                                <option value="@val">@val</option>
+                                                                }
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
 
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Select Template </label>
@@ -302,9 +302,11 @@ else
                                                         <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
                                                     }
                                                 </div>
+                                                <br/>
                                             </div>
                                         </div>
                                     </EditForm>
+                                   
                                 </div>
 
                                 <div class="col-md-6">
@@ -323,8 +325,8 @@ else
                                                 }
                                                 else
                                                 {
-                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                  
-                                                    @previewContent                                              
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                                                                      
+                                                    @previewContent 
                                                 }
                                                 
                                             }
