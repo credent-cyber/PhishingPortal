@@ -79,15 +79,18 @@
     protected override async Task OnInitializedAsync()
     {
         var result = await TenantClient.GetAzureADUserGroups();
-
         LstAzAdGroups.Add("", "--Select--");
-
-        foreach (var item in result)
+        if(result is not null)
         {
-            LstAzAdGroups.Add(item.Key, item.Value);
-        }
+            
 
-        seletedAdGroup = LstAzAdGroups?.Keys?.FirstOrDefault() ?? string.Empty;
+            foreach (var item in result)
+            {
+                LstAzAdGroups.Add(item.Key, item.Value);
+            }
+
+            seletedAdGroup = LstAzAdGroups?.Keys?.FirstOrDefault() ?? string.Empty;
+        }
 
         isloading = false;
     }

@@ -292,9 +292,13 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpGet]
         [Route("az-ad-groups")]
 
-        public async Task<Dictionary<string, string>> GetAzureAdUserGroups()
+        public async Task<Dictionary<string, string>?> GetAzureAdUserGroups()
         {
-            return await _adImportClient.GetAllUserGroups();
+            var data = _adImportClient.GetAllUserGroups();
+            if (data.Result is null)
+                return null;
+            else
+                return await _adImportClient.GetAllUserGroups();
         }
 
         [HttpGet]
