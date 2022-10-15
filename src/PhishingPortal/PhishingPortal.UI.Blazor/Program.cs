@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PhishingPortal.UI.Blazor;
 using PhishingPortal.UI.Blazor.Client;
+using PhishingPortal.UI.Blazor.Pages;
 using Serilog;
 
 

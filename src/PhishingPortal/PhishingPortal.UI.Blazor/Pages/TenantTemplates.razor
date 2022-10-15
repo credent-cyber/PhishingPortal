@@ -8,7 +8,6 @@
 @using PhishingPortal.UI.Blazor.Pages.GridComponent
 @inject NavigationManager NavigationManager
 @inject TenantClient client
-@inject ILogger<TenantCampaigns> logger
 @inject IJSRuntime JSRuntime
 @inject HttpClient HttpClient
 @inject AuthState authState;
@@ -27,6 +26,7 @@
                         </ol>
                      </div>
                 </div>
+            
                 <div class="card-body" >
                     <div class="bt-wizard" id="tabswizard">
                         <ul class="nav nav-pills">
@@ -106,15 +106,16 @@
 </DialogTemplate>
 
 @code {
-    static bool showPreview = false;
+    bool showPreview = false;
     bool showNewDialog = false;
-    static string content = string.Empty;
+    string content = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
+    
 
-    static string text = "";
-    static bool sms = false;
+    string text = "";
+    bool sms = false;
     MarkupString previewContent => (MarkupString)content;
 
     List<CampaignTemplate> Templates;
@@ -125,14 +126,15 @@
     protected override async Task OnInitializedAsync()
     {
         //Templates = await client.GetTemplatesByType(type);
-        //Tab = await oLocalStore.GetItemAsync<int>("tTab");
-        //if (Tab == 0)
-        //    Tab = 1;
+        Tab = await oLocalStore.GetItemAsync<int>("tTab");
+        if (Tab == 0)
+            Tab = 1;
     }
 
-    public static void OnPreviewClick(CampaignTemplate template)
+    public void OnPreviewClick(CampaignTemplate template)
     {
         showPreview = true;
+
         if(template.Type==CampaignType.Email)
         {
 
@@ -145,7 +147,7 @@
             text = template.Content;           
         }
 
-
+        //InvokeAsync(() => StateHasChanged());
     }
 
 

@@ -98,12 +98,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //pageIndex = await oLocalStore.GetItemAsync<int>(LocalStorage.P_INDEX);
-        //pageIndexx = pageIndex == 0 ? 1 : pageIndex;
-        //campaigns = await client.GetCampaignsAsync(pageIndex, pageSize);
-
-        //CTab = await oLocalStore.GetItemAsync<int>(LocalStorage.C_TAB);
-        //CTab = CTab == 0 ? 1 : CTab;
+        CTab = await oLocalStore.GetItemAsync<int>(LocalStorage.C_TAB);
+        CTab = CTab == 0 ? 1 : CTab;
     }
     public async void SaveSession()
     {

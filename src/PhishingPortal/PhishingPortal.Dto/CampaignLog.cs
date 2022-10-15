@@ -28,6 +28,8 @@ namespace PhishingPortal.Dto
         public bool IsDataEntered { get; set; }
         public bool IsAttachmentOpen { get; set; }
         public bool IsMacroEnabled { get; set; }
+
+        [Obsolete]
         public bool IsReplied { get; set; }
 
         public virtual Campaign Camp { get; set; }

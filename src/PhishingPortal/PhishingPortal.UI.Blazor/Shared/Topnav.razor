@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JSRuntime;
+﻿
    
 <nav class="navbar navbar-expand-lg navbar-dark " style=" background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">
             
@@ -31,11 +31,11 @@
                     <li class="nav-item custom">
                         <a href="tenant-settings" class="nav-link "> <i class="fa fa-gears"></i> Settings </a>
                     </li>
-                    <li class="nav-item custom">
-                        <a href="redirect-urls" class="nav-link "> <i class="fa fa-link"></i> Redirect Links </a>
-                    </li>
-                    <li class="nav-item custom">
+                    @*<li class="nav-item custom">
                         <a href="gridsample" class="nav-link "> <i class="fa fa-link"></i> test </a>
+                    </li>*@
+                    <li class="nav-item custom">
+                       <a href="report" class="nav-link "> <i class="fa fa-list"></i> Report </a>
                     </li>
                 </ul>
 
@@ -51,10 +51,3 @@
 
    </nav>
 
-@code{
-
-    //protected override async Task OnInitializedAsync()
-    //{
-    //   // await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/pcodedExp.js");
-    //}
-}

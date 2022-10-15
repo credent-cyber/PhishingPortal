@@ -7,21 +7,14 @@
 @implements ICustomGridComponent<CampaignTemplate>
 @inject NavigationManager NavigationManager
 
-
 <button class='btn btn-sm btn-info' @onclick="MyClickHandler"><i class="fa fa-eye"></i></button>
 
 @code {
+
     [Parameter]
     public CampaignTemplate Item { get; set; }
 
-    [Parameter]
-    public CGrid<CampaignTemplate> Grid { get; set; }
+    TenantTemplates temp = new TenantTemplates();
 
-    private void MyClickHandler(MouseEventArgs e)
-    {
-        //string gridState = Grid.GetState();
-        //string returnUrl = (string)Object;
-        //NavigationManager.NavigateTo($"/tenant-templates-config/{Item.Id}");
-        TenantTemplates.OnPreviewClick(Item);
-    }
+    private void MyClickHandler(MouseEventArgs e) => temp.OnPreviewClick(Item);
 }
