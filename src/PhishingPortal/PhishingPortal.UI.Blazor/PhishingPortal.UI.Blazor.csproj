@@ -68,7 +68,6 @@
 	  <None Include="wwwroot\custom\assets\js\analytics.js" />
 	  <None Include="wwwroot\custom\assets\js\bootstrap-select.js" />
 	  <None Include="wwwroot\custom\assets\js\bootstrap-select.min.js" />
-	  <None Include="wwwroot\custom\assets\js\editor.js" />
 	  <None Include="wwwroot\custom\assets\js\horizontal-menu.js" />
 	  <None Include="wwwroot\custom\assets\js\menu-setting.min.js" />
 	  <None Include="wwwroot\custom\assets\js\pages\ac-alert.js" />
@@ -119,7 +118,6 @@
 	  <None Include="wwwroot\custom\assets\js\pages\TweenMax.min.js" />
 	  <None Include="wwwroot\custom\assets\js\pages\widget-data.js" />
 	  <None Include="wwwroot\custom\assets\js\pcoded.min.js" />
-	  <None Include="wwwroot\custom\assets\js\plugins\apexcharts.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\bootstrap-maxlength.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\bootstrap-notify.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\bootstrap-slider.min.js" />
@@ -129,8 +127,6 @@
 	  <None Include="wwwroot\custom\assets\js\plugins\buttons.colVis.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\buttons.html5.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\buttons.print.min.js" />
-	  <None Include="wwwroot\custom\assets\js\plugins\Chart.min.js" />
-	  <None Include="wwwroot\custom\assets\js\plugins\ckeditor.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\clipboard.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\cropper.min.js" />
 	  <None Include="wwwroot\custom\assets\js\plugins\dataTables.bootstrap4.min.js" />
@@ -174,7 +170,6 @@
 	  <None Include="wwwroot\custom\assets\js\plugins\trumbowyg.min.js" />
 	  <None Include="wwwroot\custom\assets\js\responsive-all.min.js" />
 	  <None Include="wwwroot\custom\assets\js\script.js" />
-	  <None Include="wwwroot\custom\assets\js\summernote.js" />
 	  <None Include="wwwroot\custom\assets\js\waves.min.js" />
 	  <None Include="wwwroot\summernote\font\summernote.woff2" />
 	  <None Include="wwwroot\summernote\jquery-3.4.1.slim.min.js" />

@@ -37,14 +37,17 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
                     if (email != null)
                     {
                                 var EmailSubject = $"PhishSims Demo Request";  
-                                var EmailContent = $"{cmpny}";  
+                                var EmailContent = "Your Demo Request has been Submitted successfully!<br/>We'll get back to you soon...<br/><br/> Thank you<br/>Team PhishSims";  
                                 var EmailFrom = "info@phishsims.com";  
                                 var EmailRecipient = email;  
                                 var db = ConnectionManager.GetContext();
                                 await EmailSender.SendEmailAsync(EmailRecipient, EmailSubject, EmailContent, true, Guid.NewGuid().ToString(), EmailFrom);
 
                                 Logger.LogInformation($"Requestor with Email: [{email}] Company: [{cmpny}] notified");
-                    }  
+                                ConnectionManager.SetContext(db);
+                      
+                    }
+                    
 
                 }
                 catch (Exception ex)

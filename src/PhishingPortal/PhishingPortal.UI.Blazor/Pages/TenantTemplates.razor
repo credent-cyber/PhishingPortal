@@ -89,8 +89,7 @@
         </div>
     </div>
 
-
-<DialogTemplate Show="showPreview" Title="Template Preview">
+<DialogTemplate Show="showPreview"  Title="Template Preview">
     <br/>
     @if(sms is true)
     {
@@ -105,23 +104,20 @@
 
 </DialogTemplate>
 
+
 @code {
     bool showPreview = false;
-    bool showNewDialog = false;
     string content = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
+    bool Rendered = false;
     
 
     string text = "";
     bool sms = false;
     MarkupString previewContent => (MarkupString)content;
-
     List<CampaignTemplate> Templates;
-    CampaignType? type = null;
-    CampaignTemplate model;
-
 
     protected override async Task OnInitializedAsync()
     {

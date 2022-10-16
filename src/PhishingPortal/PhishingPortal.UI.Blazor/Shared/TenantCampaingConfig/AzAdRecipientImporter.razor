@@ -8,9 +8,9 @@
     {
         <div class="form-group " id="divUploadUsers">
 
-            <div class="input-group">
-                <label class="form-label">Choose Active Directory Group Name</label>
-                <select id="AzAdGrp" @bind="seletedAdGroup" class="form-control" @oninput="@OnChangeRecipientAdGrp">
+            <div class="input-group" style="margin-top:10px;">
+                <label class="form-label" style="margin-top:8px; margin-right:30px; font-weight:700;">Choose Active Directory Group Name</label>
+                <select id="AzAdGrp" @bind="seletedAdGroup" class="form-control col-md-8" @oninput="@OnChangeRecipientAdGrp">
                     @foreach (var val in LstAzAdGroups)
                     {
                         <option value="@val.Key">@val.Value</option>
@@ -40,7 +40,7 @@
             <div class="row">
                 <div class="col">
                     <button @onclick="OnSave"
-                        class="btn btn-secondary" type="button">
+                        class="btn btn-success" type="button">
                         Import
                     </button>
 
