@@ -117,14 +117,9 @@
                 else
                 {
                     Logger.LogWarning($"Sending emails is disabled at moment");
-                    Logger.LogWarning($"--------------------------------------------------------------------------------------------");
-                    Logger.LogInformation("Mail Content Goest like below :");
-                    Logger.LogInformation($"MailSubject:{message.Subject}");
-                    Logger.LogInformation($"To:{message.To.ToString()}");
-                    Logger.LogInformation($"Body:{message.Body}");
-                    Logger.LogWarning($"--------------------------------------------------------------------------------------------");
+                    LogMailContents(message);
                 }
-                    
+
 
                 Logger.LogInformation($"Mail with correlation id: {correlationId} is send successfully");
 
@@ -137,5 +132,14 @@
             await Task.CompletedTask;
         }
 
+        private void LogMailContents(MailMessage message)
+        {
+            Logger.LogWarning($"--------------------------------------------------------------------------------------------");
+            Logger.LogInformation("Mail Content Goest like below :");
+            Logger.LogInformation($"MailSubject:{message.Subject}");
+            Logger.LogInformation($"To:{message.To.ToString()}");
+            Logger.LogInformation($"Body:{message.Body}");
+            Logger.LogWarning($"--------------------------------------------------------------------------------------------");
+        }
     }
 }
