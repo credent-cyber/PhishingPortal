@@ -15,7 +15,8 @@
         <div class="card-header">
             <h5>Settings</h5>
         </div>
-        <div class="card-body">
+        <AuthorizeView Roles="tenantadmin">
+            <div class="card-body">
             <h6>Azure App Configurations</h6>
             <EditForm Model="model" OnValidSubmit="OnSave">
                 <div class="card-body">
@@ -44,6 +45,7 @@
                 </div>
             </EditForm>
         </div>
+        </AuthorizeView>
     </div>
 
 
