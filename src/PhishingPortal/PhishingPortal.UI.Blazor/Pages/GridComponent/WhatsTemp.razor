@@ -41,8 +41,8 @@ else
         c.Add(o => o.Type).SetWidth("50px").Css("table-bordered").Titled("Template Type");
         c.Add(o => o.Version).SetWidth("50px").Css("table-bordered");
         //c.Add().RenderComponentAs(typeof(TenantTemplates)).Titled("View").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>();
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempView>();
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>();
     };
 
     protected override async Task OnParametersSetAsync()

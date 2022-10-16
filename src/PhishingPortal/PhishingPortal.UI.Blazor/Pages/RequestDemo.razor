@@ -3,6 +3,7 @@
 @using PhishingPortal.UI.Blazor.Models
 @using PhishingPortal.UI.Blazor.Shared
 @using PhishingPortal.Dto;
+@using PhishingPortal.Common;
 @using PhishingPortal.UI.Blazor.Client;
 @using System.Text.RegularExpressions
 @inject NavigationManager NavManager
@@ -183,13 +184,18 @@
         {
             var formate = Regex.IsMatch(@Model.Email, @".+@.+\..+");
             var email = Model.Email.Split("@")[1];
-            if(email.Contains("gmail")||email.Contains("yahoo")||email.Contains("outlook"))
+            var restrictMail = AppConfig.restrictEmail;
+            foreach (var mail in restrictMail)
             {
-                isSucess = false;
-                isError = true;
-                message = "Please provide your Company Email!";
-                return;
+                if (email.Contains(mail))
+                {
+                    isSucess = false;
+                    isError = true;
+                    message = "Please provide your Company Email!";
+                    return;
+                }
             }
+           
             if (!formate)
             {
                 isSucess = false;

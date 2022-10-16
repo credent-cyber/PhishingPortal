@@ -86,38 +86,38 @@
 
          
             </div>
-        </div>
+        </div>  
     </div>
 
-<DialogTemplate Show="showPreview"  Title="Template Preview">
-    <br/>
-    @if(sms is true)
+<DialogTemplate Show="showPreview" Title="Template Preview">
+    <br />
+    @if (sms is true)
     {
-         <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text"  disabled />                                                                         
-        
-        
+        <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" disabled />
+
     }
-    else{ @previewContent}
-   
-    <br/>
+    else
+    {
+        @previewContent
+    }
+
+    <br />
     <button class="btn btn-warning col-md-12" @onclick="OnClosePreview">Close</button>
 
 </DialogTemplate>
 
 
+
 @code {
-    bool showPreview = false;
+    public bool showPreview = false;
     string content = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
-    bool loading = false;
-    bool Rendered = false;
-    
 
     string text = "";
     bool sms = false;
     MarkupString previewContent => (MarkupString)content;
-    List<CampaignTemplate> Templates;
+    //List<CampaignTemplate> Templates;
 
     protected override async Task OnInitializedAsync()
     {
