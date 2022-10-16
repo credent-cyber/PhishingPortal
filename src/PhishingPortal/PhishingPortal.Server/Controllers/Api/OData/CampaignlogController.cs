@@ -1,34 +1,31 @@
 ﻿using Microsoft.AspNet.OData.Routing;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using PhishingPortal.Server.Services.Interfaces;
+using System.Web.Http;
 
-namespace PhishingPortal.Server.Controllers.Api
+namespace PhishingPortal.Server.Controllers.Api.OData
 {
-    public class TemplateController : ODataController
+    public class CampaignlogController : ODataController
     {
-        public ILogger<TemplateController> Logger { get; }
+        public ILogger<CampaignlogController> Logger { get; }
         public TenantDbContext DbContext { get; }
-
-        public TemplateController(ILogger<TemplateController> logger, ITenantDbResolver tenantDbResolver)
+        public CampaignlogController(ILogger<CampaignlogController> logger, ITenantDbResolver tenantDbResolver)
         {
             Logger = logger;
             DbContext = tenantDbResolver.TenantDbCtx;
         }
 
         [EnableQuery]
-        public IQueryable<CampaignTemplate> Get()
+
+        public IQueryable<CampaignLog> Get()
         {
-            return DbContext.CampaignTemplates.AsQueryable();
+            return DbContext.CampaignLogs.AsQueryable();
         }
-        
 
     }
 }

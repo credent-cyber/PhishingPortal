@@ -3,7 +3,7 @@ using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using PhishingPortal.Server.Services.Interfaces;
 
-namespace PhishingPortal.Server.Controllers.Api
+namespace PhishingPortal.Server.Controllers.Api.Abstraction
 {
     public class BaseTenantController : BaseApiController
     {

@@ -4,6 +4,7 @@ namespace PhishingPortal.DataContext
 {
     using Duende.IdentityServer.EntityFramework.Options;
     using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Options;
     using PhishingPortal.Domain;
@@ -40,4 +41,15 @@ namespace PhishingPortal.DataContext
 
     }
 
+
+    public class PhishingPortalDbContext2 : IdentityDbContext<PhishingPortalUser>
+    {
+        static bool _recreateDb = false;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public PhishingPortalDbContext2(DbContextOptions<PhishingPortalDbContext2> options) : base(options) { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+        public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<TenantDomain> TenantDomain { get; set; }
+    }
 }

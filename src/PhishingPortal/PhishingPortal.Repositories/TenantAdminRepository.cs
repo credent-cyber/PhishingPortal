@@ -9,14 +9,14 @@ namespace PhishingPortal.Repositories
     public class TenantAdminRepository : BaseRepository, ITenantAdminRepository
     {
 
-        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext centralDbContext, TenantAdminRepoConfig config)
+        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext2 centralDbContext, TenantAdminRepoConfig config)
             : base(logger)
         {
             CentralDbContext = centralDbContext;
             Config = config;
         }
 
-        public PhishingPortalDbContext CentralDbContext { get; }
+        public PhishingPortalDbContext2 CentralDbContext { get; }
         public TenantAdminRepoConfig Config { get; }
 
 

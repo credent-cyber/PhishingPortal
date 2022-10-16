@@ -1,0 +1,17 @@
+﻿@using PhishingPortal.UI.Blazor.Models
+@inherits LayoutComponentBase
+
+<div class="blur-bg-images"></div>
+<div class="auth-wrapper">
+    <div class="auth-content">
+        <CascadingValue TValue="AlertModel" Value="alert">
+            <div class="card text-center">
+                @Body
+            </div>
+        </CascadingValue>
+    </div>
+</div>
+
+@code {
+    private AlertModel alert = new();
+}

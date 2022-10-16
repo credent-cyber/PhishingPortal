@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Services;
+using PhishingPortal.Server.Controllers.Api.Abstraction;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
