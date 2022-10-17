@@ -34,8 +34,8 @@ builder.Services.AddLogging((builder) =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers()
-    .AddNewtonsoftJson()
-    .AddODataControllers();
+    .AddODataControllers()
+    .AddNewtonsoftJson();
 
 builder.Services.AddSwaggerGen(c =>
 {
