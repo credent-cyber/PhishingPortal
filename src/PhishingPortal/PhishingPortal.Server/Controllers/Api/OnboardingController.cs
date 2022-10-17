@@ -13,6 +13,7 @@ using PhishingPortal.Repositories;
 namespace PhishingPortal.Server.Controllers
 {
     using Microsoft.AspNetCore.Identity.UI.Services;
+    using PhishingPortal.Server.Controllers.Api.Abstraction;
 
     [Route("api/[controller]")]
     [ApiController]

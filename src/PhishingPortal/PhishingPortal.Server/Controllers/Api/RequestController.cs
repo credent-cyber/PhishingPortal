@@ -9,6 +9,7 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
+using PhishingPortal.Server.Controllers.Api.Abstraction;
 
 namespace PhishingPortal.Server.Controllers.Api
 {

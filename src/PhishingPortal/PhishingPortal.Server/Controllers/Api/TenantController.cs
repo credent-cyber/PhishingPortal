@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Services;
+using PhishingPortal.Server.Controllers.Api.Abstraction;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -373,7 +374,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
         {
-            var result = await _tenantRepository.UpsertSettings(settings, HttpContext.GetCurrentUser());
+            var result = await _tenantRepository.UpsertSettings(settings, HttpContextAccessor?.HttpContext?.GetCurrentUser());
 
             return result;
         }

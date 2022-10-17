@@ -3,6 +3,7 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
 using PhishingPortal.Server.Services.Interfaces;
+using System.Security.Claims;
 
 namespace PhishingPortal.Server.Services
 {
@@ -25,7 +26,7 @@ namespace PhishingPortal.Server.Services
 
                 if (isAuthenticated.HasValue && isAuthenticated.Value)
                 {
-                    var email = usr.Claims.FirstOrDefault(o => o.Type == "name");
+                    var email = usr.Claims.FirstOrDefault(o => o.Type == ClaimTypes.Name);
                     var domain = email?.Value.Split("@")[1];
 
                     if (domain == null)

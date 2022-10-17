@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Server;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Cryptography.X509Certificates;
 using PhishingPortal.Repositories;
 using PhishingPortal.Core;
 using PhishingPortal.Server.Services;
@@ -11,24 +8,15 @@ using PhishingPortal.Domain;
 using PhishingPortal.Common;
 using IdentityUIServices = Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Pomelo.EntityFrameworkCore.MySql;
 using Serilog;
-using System;
 using PhishingPortal.Server.Services.Interfaces;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.OData;
 using PhishingPortal.Server.Intrastructure;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var rsaCertificate = new X509Certificate2(
-//Path.Combine(builder.Environment.ContentRootPath, "rsaCert.pfx"), "1234");
-
-// Add services to the container.
 builder.Configuration.AddEnvironmentVariables(prefix: "ASPNETCORE_");
+
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true);
 
@@ -45,11 +33,9 @@ builder.Services.AddLogging((builder) =>
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddControllersWithViews()
-    .AddODataControllers();
-
-builder.Services.AddRazorPages()
-    .AddRazorRuntimeCompilation();
+builder.Services.AddControllers()
+    .AddODataControllers()
+    .AddNewtonsoftJson();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -63,7 +49,7 @@ var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
 
 if (useSqlLite)
 {
-    builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+    builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
         options.UseSqlite(conString));
 }
 else
@@ -79,7 +65,7 @@ else
     {
         case "mysql":
 
-            builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+            builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
             {
                 options.UseMySql(conString, ServerVersion.AutoDetect(conString));
             });
@@ -89,7 +75,7 @@ else
 
         case "mssql":
 
-            builder.Services.AddDbContext<PhishingPortalDbContext>(options =>
+            builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
             {
                 options.UseSqlServer(conString);
             });
@@ -102,51 +88,27 @@ else
     #endregion
 }
 
-builder.Services.AddDefaultIdentity<PhishingPortalUser>(options =>
+builder.Services.AddIdentity<PhishingPortalUser, IdentityRole>()
+    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
+    .AddTokenProvider<DataProtectorTokenProvider<PhishingPortalUser>>(TokenOptions.DefaultProvider);
+
+builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.SignIn.RequireConfirmedAccount = true;
-})
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<PhishingPortalDbContext>();
+    options.Cookie.HttpOnly = false;
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+});
 
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
-var dataProtectPath = "./App_Data/";
-
-//builder.Services.AddDataProtection()
-//    .PersistKeysToFileSystem(new DirectoryInfo($"{dataProtectPath}"));
-
-builder.Services.AddIdentityServer(options =>
-{
- 
-    options.KeyManagement.KeyPath = $"{dataProtectPath}";
-    options.KeyManagement.RotationInterval = TimeSpan.FromDays(30);
-    options.KeyManagement.PropagationTime = TimeSpan.FromDays(2);
-    options.KeyManagement.RetentionDuration = TimeSpan.FromDays(7);
-})
-    //.AddSigningCredential(rsaCertificate)
-    .AddApiAuthorization<PhishingPortalUser, PhishingPortalDbContext>(options =>
-    {
-        options.IdentityResources["openid"].UserClaims.Add("name");
-        options.ApiResources.Single().UserClaims.Add("name");
-
-        options.IdentityResources["openid"].UserClaims.Add("role");
-        options.ApiResources.Single().UserClaims.Add("role");
-
-        options.IdentityResources["openid"].UserClaims.Add("tenant");
-        options.ApiResources.Single().UserClaims.Add("tenant");
-
-    });
-
-
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
-
 builder.Services.AddAuthentication()
-    .AddIdentityServerJwt();
+    .AddCookie();
 
-// services and custom dependencies
-builder.Services.AddSingleton<WeatherForecastService>();
+
 builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
@@ -164,7 +126,7 @@ logger.LogInformation($"SqlProvider: {sqlProvider}");
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<PhishingPortalDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<PhishingPortalDbContext2>();
     if (db.Database.EnsureCreated())
     {
         // seed data if a single tenant application
@@ -190,20 +152,21 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-
 app.UseRouting();
 
+
+
 app.UseAuthentication();
-app.UseIdentityServer();
+
 app.UseAuthorization();
 
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
+
     endpoints.MapFallbackToFile("index.html");
 });
 
-app.MapPhishingApi();
-app.MapRazorPages();
+
 app.Run();
