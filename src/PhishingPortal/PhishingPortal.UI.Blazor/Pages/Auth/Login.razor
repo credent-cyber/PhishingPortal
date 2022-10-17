@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using PhishingPortal.Dto.Auth
+@using PhishingPortal.UI.Blazor.Models
 @layout AuthLayout
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
@@ -8,9 +9,9 @@
     <div class="card-body">
         <img src="custom/assets/images/ps.png" alt="" class="img-fluid mb-4">
         <h3 class="mb-3">Welcome to <br /><span class="text-c-blue">Phish Sims</span></h3>
-        
+
         <DataAnnotationsValidator />
-        
+        <UiAlerts Model="Alerts"></UiAlerts>
         <div class="toggle-block">
             <div class="input-group mb-2 has-validation">
                 <div class="input-group-prepend">
@@ -37,32 +38,37 @@
                 Forgot password?
                 <span @onclick="ResetPasswordClick" class="f-w-400 font-weight-bold" style="cursor: pointer">Reset</span>
             </p>
+
+           
         </div>
     </div>
 
 </EditForm>
 
 @code {
+    [CascadingParameter]
+    public AlertModel Alerts { get; set; } = new();
+
     LoginRequest loginRequest { get; set; } = new LoginRequest();
-    
-    private string error = string.Empty;
 
-
-    private void ResetPasswordClick(){
+    private void ResetPasswordClick()
+    {
         navigationManager.NavigateTo("forgetpassword");
-    }   
+    }
 
     private async Task OnSubmit()
     {
-        error = null;
         try
         {
+            Alerts.Clear();
+
             await authStateProvider.Login(loginRequest);
+
             navigationManager.NavigateTo("/Index");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            error = ex.Message;
+            Alerts.SetError("Couldn't login, please check your credentials are correct");
         }
     }
 }
