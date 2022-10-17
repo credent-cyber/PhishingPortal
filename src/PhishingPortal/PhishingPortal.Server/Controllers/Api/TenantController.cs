@@ -370,7 +370,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
         {
-            var result = await _tenantRepository.UpsertSettings(settings, HttpContext.GetCurrentUser());
+            var result = await _tenantRepository.UpsertSettings(settings, HttpContextAccessor?.HttpContext?.GetCurrentUser());
 
             return result;
         }

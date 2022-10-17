@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Server;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Cryptography.X509Certificates;
 using PhishingPortal.Repositories;
 using PhishingPortal.Core;
 using PhishingPortal.Server.Services;
@@ -11,14 +8,8 @@ using PhishingPortal.Domain;
 using PhishingPortal.Common;
 using IdentityUIServices = Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Pomelo.EntityFrameworkCore.MySql;
 using Serilog;
-using System;
 using PhishingPortal.Server.Services.Interfaces;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.OData;
 using PhishingPortal.Server.Intrastructure;
 using Microsoft.OpenApi.Models;
 
@@ -43,11 +34,8 @@ builder.Services.AddLogging((builder) =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers()
-    .AddNewtonsoftJson();
-    //.AddODataControllers();
-
-//builder.Services.AddRazorPages()
-//    .AddRazorRuntimeCompilation();
+    .AddNewtonsoftJson()
+    .AddODataControllers();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -117,43 +105,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
-//var dataProtectPath = "./App_Data/";
-
-//builder.Services.AddDataProtection()
-//    .PersistKeysToFileSystem(new DirectoryInfo($"{dataProtectPath}"));
-
-//builder.Services.AddIdentityServer(options =>
-//{
-
-//    options.KeyManagement.KeyPath = $"{dataProtectPath}";
-//    options.KeyManagement.RotationInterval = TimeSpan.FromDays(30);
-//    options.KeyManagement.PropagationTime = TimeSpan.FromDays(2);
-//    options.KeyManagement.RetentionDuration = TimeSpan.FromDays(7);
-//})
-//    //.AddSigningCredential(rsaCertificate)
-//    .AddApiAuthorization<PhishingPortalUser, PhishingPortalDbContext>(options =>
-//    {
-//        options.IdentityResources["openid"].UserClaims.Add("name");
-//        options.ApiResources.Single().UserClaims.Add("name");
-
-//        options.IdentityResources["openid"].UserClaims.Add("role");
-//        options.ApiResources.Single().UserClaims.Add("role");
-
-//        options.IdentityResources["openid"].UserClaims.Add("tenant");
-//        options.ApiResources.Single().UserClaims.Add("tenant");
-
-//    });
-
-
-//JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
-
 builder.Services.AddAuthentication()
     .AddCookie();
-//    .AddJwtBearer();
-    //.AddIdentityServerJwt();
 
-// services and custom dependencies
-builder.Services.AddSingleton<WeatherForecastService>();
+
 builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
@@ -199,17 +154,15 @@ app.UseRouting();
 
 
 app.UseAuthentication();
-//app.UseIdentityServer();
+
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 
-  //  endpoints.MapRazorPages();
     endpoints.MapFallbackToFile("index.html");
 });
 
-//app.MapPhishingApi();
-//app.MapRazorPages();
+
 app.Run();
