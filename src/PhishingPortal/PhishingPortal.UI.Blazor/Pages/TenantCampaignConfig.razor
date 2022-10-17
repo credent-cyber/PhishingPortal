@@ -28,7 +28,7 @@
 }
 else
 {
-    <div class="pcoded-content" style="padding-top: 10px;">
+    <div class="pcoded-content" style="padding:10px 10px">
 
         <div class="row">
             <div class="col-md-12">
@@ -47,7 +47,7 @@ else
                             <div class="row">
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
-                                        <div class="card" style="margin-bottom: 0;">
+                                        <div class="card">
 
                                             <div class="card-body">
                                                 <div class="form-group row">
@@ -59,14 +59,14 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                    <select @bind="CheckSelected" class="form-control" id="CampaignType" >
-                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                                            {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                    </select>
+                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" >
+                                                                @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                                                {
+                                                                <option value="@val">@val</option>
+                                                                }
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            </div>
 
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Select Template </label>
@@ -280,16 +280,17 @@ else
                                                     </InputSelect>
                                                 </div>
                                             </div>
-                                            <div class="btn-group col-12">
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                @if (model.Id == 0 && fileimport is null)
+                                            
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                    <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
+                                                    @if (model.Id == 0 && fileimport is null)
                                                     {
-                                                        <button type="button" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Show Recipients</button>
+                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
                                                     }
                                                     else
                                                     {
-                                                        <button type="button" class="btn btn-dark" @onclick="OnShowRecipientClickk">Show Recipients</button>
+                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
                                                     }
                                                     @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                     {
@@ -301,14 +302,16 @@ else
                                                         <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
                                                     }
                                                 </div>
+                                                <br/>
                                             </div>
                                         </div>
                                     </EditForm>
+                                   
                                 </div>
 
-                                <div class="col-md-6" style="padding: 0;">
+                                <div class="col-md-6">
                                     <div class="card" style="margin-bottom: 0;">
-                                        <div class="card-body">
+                                        <div class="card-body" style="max-height: 850px; overflow-y: scroll;">
                                             @if (model.Detail.CampaignTemplateId.Equals(null))
                                             {
                                                 <p style="margin-top:50%; text-align:center;">No Template Selected!</p>
@@ -322,8 +325,8 @@ else
                                                 }
                                                 else
                                                 {
-                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                  
-                                                    @previewContent                                              
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                                                                      
+                                                    @previewContent 
                                                 }
                                                 
                                             }
@@ -497,7 +500,7 @@ else
             message = "Please fill all the required field";
             return;
         }
-        @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
+    @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
         {
             var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
             if (!formate)
@@ -521,7 +524,7 @@ else
             IsError = true;
             message = "Error while updating";
         }
-        @if (recipients.Count() > 0)
+    @if (recipients.Count() > 0)
         {
             await OnImportRecipientClick();
         }

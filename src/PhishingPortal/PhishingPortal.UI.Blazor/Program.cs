@@ -1,20 +1,20 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using PhishingPortal.UI.Blazor;
 using PhishingPortal.UI.Blazor.Client;
+using PhishingPortal.UI.Blazor.Services;
+using PhishingPortal.UI.Blazor.Pages;
 using Serilog;
+
 
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-});
 
 var config = (IConfiguration)builder.Configuration;
 
@@ -29,23 +29,16 @@ builder.Services.AddLogging((builder) =>
 //builder.Services.AddOptions();
 //builder.Services.AddAuthorizationCore();
 
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<CustomStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<CustomStateProvider>());
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<AuthState>();
-
-builder.Services.AddHttpClient<WeatherClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-
-builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-
-builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-
-
-builder.Services.AddApiAuthorization<PhishingPortalAuthState>(options =>
-{
-    options.AuthenticationPaths.LogOutSucceededPath = "";
-}).AddAccountClaimsPrincipalFactory<PhishingPortalAuthState, UserFactory>();
-
+builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

@@ -9,14 +9,14 @@ namespace PhishingPortal.Repositories
     public class TenantAdminRepository : BaseRepository, ITenantAdminRepository
     {
 
-        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext centralDbContext, TenantAdminRepoConfig config)
+        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext2 centralDbContext, TenantAdminRepoConfig config)
             : base(logger)
         {
             CentralDbContext = centralDbContext;
             Config = config;
         }
 
-        public PhishingPortalDbContext CentralDbContext { get; }
+        public PhishingPortalDbContext2 CentralDbContext { get; }
         public TenantAdminRepoConfig Config { get; }
 
 
@@ -260,6 +260,22 @@ namespace PhishingPortal.Repositories
 
             return await Task.FromResult(tenant);
 
+        }
+        
+        public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
+        {
+            try
+            {
+
+                CentralDbContext.DemoRequestor.Add(demoRequestor);
+                CentralDbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return demoRequestor;
         }
     }
 }

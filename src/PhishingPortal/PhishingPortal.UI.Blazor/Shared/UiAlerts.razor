@@ -5,12 +5,14 @@
         @Model.Message
     </div>
 }
-else if (Model.IsError && !string.IsNullOrEmpty(Model.Message))
+
+else if(Model.IsError && !string.IsNullOrEmpty(Model.Message))
 {
     <div class="alert alert-warning" role="alert">
         @Model.Message
     </div>
 }
+
 @code {
 
     [Parameter]

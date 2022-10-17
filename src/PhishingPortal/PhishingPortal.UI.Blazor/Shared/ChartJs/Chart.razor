@@ -37,6 +37,9 @@
     [Parameter] 
     public EventCallback<int> OnChartClick { get; set; }
 
+    [Parameter]
+    public bool IsClickable { get; set; } = true;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Here we create an anonymous type with all the options
@@ -63,7 +66,7 @@
                                     Ticks = new {  BeginAtZero = true}, 
                                     Stacked = true 
                                 }
-                    }
+                }
                     },
 
 
@@ -102,11 +105,15 @@
     [JSInvokable]
     public async Task ChartClick(string label, string id)
     {
+
+        if (!IsClickable)
+            return;
+
         Console.WriteLine($"Received click {label} id = {id}");
         var Camp = await client.GetCampaingByName(label);
         var CampId = Camp.Id;
 
-        NavManager.NavigateTo($"/layout/{CampId}");
+        NavManager.NavigateTo($"/report/{CampId}");
 
     }
     [JSInvokable]

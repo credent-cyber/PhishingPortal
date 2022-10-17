@@ -33,7 +33,7 @@
                 <div class="card-body">
                     <div style="width: 100%;">
                         <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
-                               Labels="@BarChart1Labels" IsStacked="false">
+                               Labels="@BarChart1Labels" IsStacked="false" IsClickable="false">
                         </Chart>
                     </div>
                 </div>
@@ -114,14 +114,15 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        string url = $"odata/campaignlog?t={authState.TenantIdentifier}";
+        string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
 
         var query = new QueryDictionary<StringValues>();
 
         if (Id > 0)
             query.Add("grid-filter", $"Camp.Id__1__{Id}");
 
-        var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
+        try{
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
             .Sortable()
             .ChangePageSize(true)
             .Filterable()
@@ -132,12 +133,17 @@
             .Searchable(true, false, false)
             .SetExcelExport(true, "Report.xlsx")
             .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+            //.SetTableLayout(TableLayout.Fixed, "1200px", "400px")
             .AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
 
 
-        _grid = client.Grid;
+            _grid = client.Grid;
 
-        _task = client.UpdateGrid();
+            _task = client.UpdateGrid();
+        }
+        catch(Exception ex){
+            logger.LogCritical(ex, ex.Message);
+        }
 
         await _task.ContinueWith(async (st) =>
         {

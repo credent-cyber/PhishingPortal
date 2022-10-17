@@ -32,7 +32,7 @@
 }
         else
         {
-              <div class="pcoded-content" style="padding-top: 10px;">
+              <div class="pcoded-content" style="padding:10px 10px">
 
                     <div class="row">
 
@@ -52,7 +52,7 @@
                                          <div class="row">
                                              <div class="col-md-5">
                                                 <EditForm Model="@model" OnValidSubmit="@OnSave">
-                                                    <div class="card" style="margin-bottom: 0;">
+                                                    <div class="card" >
                                                         <div class="card-body">
                                                             <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Template</label>
@@ -99,7 +99,7 @@
                                                                     }
                                                                 </div>
                                                             </div>
-                                                            @if(model.Type==CampaignType.Email)
+                                                            @if(model.Type==CampaignType.Email || model.Type==CampaignType.Whatsapp)
                                                             {
                                                              <div class="form-group row">
                                                                 <label for="" class="col-form-label col-md-3">Is Html</label>
@@ -154,9 +154,11 @@
                                                                             <label for="" class="col-form-label col-md-3">Template</label>
                                                                             <div class="col-md-9">
                                                                                 <div class="input-group">
-                                                                                        <InputFile OnChange="@LoadFiles" class="form-control" accept=".html"/>
-                                                                                        @*<button class="btn btn-info" @onclick="LoadTempl">Upload</button>*@
+                                                                                    @if(model.Type==CampaignType.Sms){ <InputFile OnChange="@LoadFiles" class="form-control" accept=".txt"/>  }
+                                                                                     else{ <InputFile OnChange="@LoadFiles" class="form-control" accept=".html"/>  }                                                                                                                                                                                                                                          
                                                                                 </div>
+                                                                                <p style="color:red; font-size:8px; padding-top:3px;">Choose Html file for Email, Whatsapp Template Type
+                                                                                    <br />Choose Text file for Sms Template Type </p>
                                                                             </div>
                                                                         </div>
 
@@ -177,7 +179,7 @@
 
 
 
-                                                         <div class="btn-group col-12" >
+                                                        <div style="text-align:center;">    
                                                             <button type="submit" class="btn btn-primary">Save</button>
                                                             <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
                                                           
@@ -187,9 +189,9 @@
                                                   
                                                 </EditForm>
                                              </div>
-                                             <div class="col-md-7" style="padding: 0;">
+                                             <div class="col-md-7">
                                                     <div class="card" style="margin-bottom: 0;">
-                                                        <div class="card-body">
+                                                        <div class="card-body ">
                                                             <div class="mb-3">
                                                                 <label for="Content" class="form-label">Template Content</label>
                                                                
@@ -202,8 +204,10 @@
                                                                 }
                                                                 else
                                                                 {
+                                                                    <div class="overflow-auto">
                                                                     <!-- Rich text editor -->
                                                                     <BlazingComponents.Summernote.Editor />
+                                                                     </div>
                                                                 }
 
                                                             </div>
@@ -279,7 +283,7 @@
             model.Version = "1";
 
         }
-  
+
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -322,26 +326,41 @@
     protected async Task OnSave()
     {
         loading = true;
-
+        IsError = false;
+        IsSuccess = false;
+        message = string.Empty;
         try
         {
+            
             if (model.Id > 0)
-            {               
+            {
+                if (model.Name is null || model.Type == 0)
+                {
+                    IsError = true;
+                    message = "Template Name, Template Type can't be null!";
+                    return;
+                }
                 Message = "Successfully Updated";
                 model.ModifiedOn = DateTime.Now;
             }
             else
             {
+                if (model.Name is null || model.Type == 0)
+                {
+                    IsError = true;
+                    message = "Template Name, Template Type can't be null!";
+                    return;
+                }
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }
-         
+
             if(model.Type==CampaignType.Email){ 
                 contents = await GetSummerNoteContent();
                 model.Content = contents;
             }
             if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp){ model.Content = text;}
-           
+
             model = await client.UpsertCampaignTemplate(model);
 
             IsSuccess = true;
@@ -418,8 +437,10 @@
         //    }
         // }
 
-
-        contents = result;
+        if (model.Type == CampaignType.Sms)
+            text = result;
+        else
+            contents = result;
 
     }
 

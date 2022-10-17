@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
 
 @inject NavigationManager Navigation
-@inject SignOutSessionStateManager SignOutManager
+@inject CustomStateProvider StateProvider
 
 
 <div class="d-flex">
@@ -14,32 +15,26 @@
         <Authorized>
             <div class="dropdown">
                 <img height="24px" width="24px" src="img/user.png" />
-                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" style="line-height:22px; !important;"
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" style="line-height:22px !important;"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     @context.User.Identity.Name.Split('@')[0].ToUpper()
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="authentication/profile">Profile</a></li>
+                   @* <li><a class="dropdown-item" href="authentication/profile">Profile</a></li>*@
                     <li><a @onclick="BeginSignOut" class="dropdown-item" href="#">Logout</a></li>
                 </ul>
             </div>
         </Authorized>
         <NotAuthorized>
-
-
             <div class=container>
                 <img height="24px" width="24px" src="img/user.png" />
-                <a class="btn btn-secondary btn-outline-warning" href="authentication/login">Already Have Account</a>
-                <a class="btn btn-secondary btn-outline-info" href="request_demo">Request Demo</a>
+                <a class="btn btn-secondary btn-outline-warning" style="color:#fff" href="login">Already Have Account</a>
+                <a class="btn btn-secondary btn-outline-info" style="color:#fff" href="request_demo">Request Demo</a>
             </div>
-
-
         </NotAuthorized>
     </AuthorizeView>
 </div>
 </div>
-
-
 
 @code {
 
@@ -49,9 +44,9 @@
         base.OnInitialized();
     }
 
-    async Task BeginSignOut()
+    private async Task BeginSignOut()
     {
-        await SignOutManager.SetSignOutState();
-        Navigation.NavigateTo("authentication/logout");
+        await StateProvider.Logout();
+        Navigation.NavigateTo("/");
     }
 }

@@ -5,17 +5,14 @@
 <div class="page">
 
     <AuthorizeView Roles="superadmin">
-        <Admin_topbar />
+        <Admin_topnav />
     </AuthorizeView>
 
     <AuthorizeView Roles="tenantadmin">
-        <Topbar />
+        <Topnav />
     </AuthorizeView>
 
     <main>
-
-
-
 
         @*<div class="top-row px-4">
         <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
@@ -24,23 +21,23 @@
 
         <AuthorizeView>
             <NotAuthorized>
-                <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-info">
+                <nav class="navbar navbar-expand-lg navbar-dark" style=" background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">             
                     <div class="m-header">
 
                         <a href="#!" class="b-brand" style="margin-left:-40px">
                             <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-responsive"
-                                 width="220" height="45">
+                                 width="210" height="40">
                         </a>
 
                     </div>
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <div style="float:right; marrgin-right:1%">
+                            <div style="float:right;">
                                 <LoginDisplay />
                             </div>
                         </li>
                     </ul>
-                </header>
+                </nav>
 
 
 
@@ -93,7 +90,7 @@
         
         <article class="content px-4">
             <CascadingValue TValue="AlertModel" Value="alerts">
-                <div style="margin-top:100px">
+                <div style="margin-top:0px">
                     @Body
                 </div>
             </CascadingValue>

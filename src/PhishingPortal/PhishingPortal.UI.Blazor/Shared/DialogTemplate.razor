@@ -1,6 +1,4 @@
-﻿
-
-@if (Show)
+﻿@if (Show)
 {
 
     <div class="dialog-container" style="width:100%; height:100vh">
@@ -37,10 +35,11 @@
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
-
+    public bool ready = false;
 
     public void onClose()
     {
         Show = false;
     }
+
 }

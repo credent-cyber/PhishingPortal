@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Services;
+using PhishingPortal.Server.Controllers.Api.Abstraction;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -292,9 +293,13 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpGet]
         [Route("az-ad-groups")]
 
-        public async Task<Dictionary<string, string>> GetAzureAdUserGroups()
+        public async Task<Dictionary<string, string>?> GetAzureAdUserGroups()
         {
-            return await _adImportClient.GetAllUserGroups();
+            var data = _adImportClient.GetAllUserGroups();
+            if (data.Result is null)
+                return null;
+            else
+                return await _adImportClient.GetAllUserGroups();
         }
 
         [HttpGet]
@@ -369,10 +374,10 @@ namespace PhishingPortal.Server.Controllers.Api
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
         {
-            var result = await _tenantRepository.UpsertSettings(settings, HttpContext.GetCurrentUser());
+            var result = await _tenantRepository.UpsertSettings(settings, HttpContextAccessor?.HttpContext?.GetCurrentUser());
 
             return result;
         }
-
+        
     }
 }

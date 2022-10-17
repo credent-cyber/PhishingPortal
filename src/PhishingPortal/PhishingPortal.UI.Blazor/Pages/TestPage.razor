@@ -4,6 +4,7 @@
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthState authState;
@@ -16,7 +17,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="col-md-12" style="padding: 0;">
-                        <GridComponent T="CampaignTemplate" Grid="@_grid"></GridComponent>
+                        <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
                     </div>
                 </div>
             </div>
@@ -28,33 +29,40 @@
         <p><em>Loading...</em></p>
     }
 
-    @code
+@code
 {
-    private CGrid<CampaignTemplate> _grid;
+    private CGrid<Campaign> _grid;
     private Task _task;
 
-    Action<IGridColumnCollection<CampaignTemplate>> columns = c =>
+    Action<IGridColumnCollection<Campaign>> columns = c =>
     {
     //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px");
         c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.CreatedOn).Css("table-bordered");
         c.Add(o => o.Name).Css("table-bordered");
+        c.Add(o => o.Description).Css("table-bordered");
+        c.Add(o => o.Schedule.ScheduleType).Css("table-bordered").Titled("Schedule Type");
+        c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info");
+        c.Add(o => o.State).Css("table-bordered").Titled("Status");
         c.Add(o => o.IsActive).Css("table-bordered");
-        c.Add(o => o.Type).Css("table-bordered");
+        c.Add(o => o.Detail.Type).Css("table-bordered");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampEdit>();
     };
 
     protected override async Task OnParametersSetAsync()
     {
-        string url = $"odata/template?t={authState.TenantIdentifier}";
+        string url = $"odata/campaign?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-
-        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable().SetStriped(true)
-            .Filterable().SetRowCssClasses(x => (x.Id)%2 == 1 ? "gridEcolor" : "gridOcolor")
+        query.Add("grid-filter", "Detail.Type__1__Sms");
+        var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+            .Sortable(true)
+            .Filterable(true)
+            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
+            .SetExcelExport(true, "Report.xlsx")
+            .ChangePageSize(true)
             .Searchable(true, false, false);
 
         _grid = client.Grid;
