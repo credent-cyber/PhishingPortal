@@ -22,11 +22,20 @@ namespace PhishingPortal.Dto.Dashboard
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int TotalCampaigns { get; set; }
+        public int TotalSmsCampaigns { get; set; }
+        public int TotalWhatsappCampaigns { get; set; }
         public List<PhisingPronePercentEntry> Entries { get; set; }
-        // public List<DepartmentWiseCnt> DepartEntries { get; set; }
+        public List<PhisingPronePercentEntry> SmsEntries { get; set; }
+        public List<PhisingPronePercentEntry> WhatsappEntries { get; set; }
         public Dictionary<string, decimal> CategoryClickRatioDictionary { get; set; }
+        public Dictionary<string, decimal> SmsCategoryClickRatioDictionary { get; set; }
+        public Dictionary<string, decimal> WhatsappCategoryClickRatioDictionary { get; set; }
         public Dictionary<string, decimal> DepartEntries { get; set; }
+        public Dictionary<string, decimal> SmsDepartEntries { get; set; }
+        public Dictionary<string, decimal> WhatsappDepartEntries { get; set; }
         public Dictionary<string, decimal> TemplateClickEntries { get; set; }
+        public Dictionary<string, decimal> SmsTemplateClickEntries { get; set; }
+        public Dictionary<string, decimal> WhatsappTemplateClickEntries { get; set; }
 
 
     }

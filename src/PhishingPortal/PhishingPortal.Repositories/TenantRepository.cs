@@ -265,9 +265,20 @@ namespace PhishingPortal.Repositories
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
 
             data.Entries = new List<PhisingPronePercentEntry>();
+            data.SmsEntries = new List<PhisingPronePercentEntry>();
+            data.WhatsappEntries = new List<PhisingPronePercentEntry>();
+
             data.CategoryClickRatioDictionary = new Dictionary<string, decimal>();
+            data.SmsCategoryClickRatioDictionary = new Dictionary<string, decimal>();
+            data.WhatsappCategoryClickRatioDictionary = new Dictionary<string, decimal>();
+
             data.DepartEntries = new Dictionary<string, decimal>();
+            data.SmsDepartEntries = new Dictionary<string, decimal>();
+            data.WhatsappDepartEntries = new Dictionary<string, decimal>();
+
             data.TemplateClickEntries = new Dictionary<string, decimal>();
+            data.SmsTemplateClickEntries = new Dictionary<string, decimal>();
+            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();
 
             try
             {
@@ -279,7 +290,7 @@ namespace PhishingPortal.Repositories
                 var phishtestWithRecipients = from log in totatPhishingTests
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
-                var depatwiseCnt = phishtestWithRecipients.ToList().GroupBy(i => i.Department, (key, entries) => new
+                var depatwiseCnt = phishtestWithRecipients.Where(a=>a.logEntry.Camp.Detail.Type==CampaignType.Email).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
@@ -308,7 +319,7 @@ namespace PhishingPortal.Repositories
                                         join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
                                         select new { logEntry = log, template = ctem.Name };
 
-                var tempwiseCnt = phishtestWithTemp.ToList().GroupBy(i => i.template, (key, tentries) => new
+                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
@@ -329,7 +340,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
 
-                var campaignGroup = totatPhishingTests.ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -385,6 +396,208 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
+
+                //Ext for sms
+                var SmscampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                {
+                    CampaignId = key,
+                    Total = entries.Count(),
+                    TotalHits = entries.Count(i => i.IsHit),
+                    TotalReported = entries.Count(i => i.IsReported),
+                });
+
+                foreach (var c in SmscampaignGroup)
+                {
+                    var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
+
+                    if (campaign == null)
+                        continue;
+
+                    var entry = new PhisingPronePercentEntry()
+                    {
+                        Campaign = campaign,
+                        Count = c.Total,
+                        Hits = c.TotalHits,
+                        Reported = c.TotalReported,
+                    };
+
+                    data.SmsEntries.Add(entry);
+                }
+                data.SmsEntries = data.SmsEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
+                data.TotalSmsCampaigns = data.SmsEntries.Sum(i => i.Count);
+                //**************************Department for Sms camp**************************************************
+                var SmsdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.Department, (key, entries) => new
+                {
+                    Department = key ?? "UNKNOWN",
+                    Total = entries.Count(),
+                    Hits = entries.Count(o => o.logEntry.IsHit),
+                    Reported = entries.Count(o => o.logEntry.IsReported),
+                });
+                var SmsDtotalHits = SmsdepatwiseCnt.Sum(o => o.Hits);
+
+                foreach (var dep in SmsdepatwiseCnt)
+                {
+                    if (dep.Total > 0)
+                    {
+                        var equivDep = CalcEquivalentPercent(dep.Hits, SmsDtotalHits);
+
+                        if (!data.SmsDepartEntries.ContainsKey(dep.Department))
+                        {
+                            data.SmsDepartEntries.Add(dep.Department, equivDep);
+                        }
+
+
+                    }
+                }
+                //*************************Sms Template wise**********************************
+                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.template, (key, tentries) => new
+                {
+                    template = key,
+                    TTotal = tentries.Count(),
+                    THits = tentries.Count(o => o.logEntry.IsHit)
+                });
+                var SmsTemptotalHits = SmstempwiseCnt.Sum(o => o.THits);
+
+                foreach (var tem in SmstempwiseCnt)
+                {
+                    if (tem.TTotal > 0)
+                    {
+                        var equivTemp = CalcEquivalentPercent(tem.THits, SmsTemptotalHits);
+
+                        if (!data.SmsTemplateClickEntries.ContainsKey(tem.template))
+                        {
+                            data.SmsTemplateClickEntries.Add(tem.template, equivTemp);
+                        }
+                    }
+                }
+                //*************************** Sms category wise********************************************
+                var SmscategoryWiseGrp = data.SmsEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                {
+                    Category = key,
+                    Count = values.Sum(o => o.Count),
+                    HitCount = values.Sum(o => o.Hits),
+                    ReportedCount = values.Sum(o => o.Reported),
+                });
+
+                var SmstotalHits = SmscategoryWiseGrp.Sum(o => o.HitCount);
+
+                // calc phishing percentage out of total hits
+                foreach (var category in SmscategoryWiseGrp)
+                {
+                    if (category.Count > 0 && data.TotalSmsCampaigns > 0)
+                    {
+                        var equivalenPp = CalcEquivalentPercent(category.HitCount, SmstotalHits);
+
+                        if (!data.SmsCategoryClickRatioDictionary.ContainsKey(category.Category))
+                        {
+                            data.SmsCategoryClickRatioDictionary.Add(category.Category, equivalenPp);
+                        }
+
+
+                    }
+                }
+
+                //Ext for Whatsapp
+                var WhatsappcampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                {
+                    CampaignId = key,
+                    Total = entries.Count(),
+                    TotalHits = entries.Count(i => i.IsHit),
+                    TotalReported = entries.Count(i => i.IsReported),
+                });
+
+                foreach (var c in WhatsappcampaignGroup)
+                {
+                    var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
+
+                    if (campaign == null)
+                        continue;
+
+                    var entry = new PhisingPronePercentEntry()
+                    {
+                        Campaign = campaign,
+                        Count = c.Total,
+                        Hits = c.TotalHits,
+                        Reported = c.TotalReported,
+                    };
+
+                    data.WhatsappEntries.Add(entry);
+                }
+                data.WhatsappEntries = data.WhatsappEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
+                data.TotalWhatsappCampaigns = data.WhatsappEntries.Sum(i => i.Count);
+                //**************************Department for Whatsapp camp**************************************************
+                var WhatsappdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.Department, (key, entries) => new
+                {
+                    Department = key ?? "UNKNOWN",
+                    Total = entries.Count(),
+                    Hits = entries.Count(o => o.logEntry.IsHit),
+                    Reported = entries.Count(o => o.logEntry.IsReported),
+                });
+                var WhatsappDtotalHits = WhatsappdepatwiseCnt.Sum(o => o.Hits);
+
+                foreach (var dep in WhatsappdepatwiseCnt)
+                {
+                    if (dep.Total > 0)
+                    {
+                        var equivDep = CalcEquivalentPercent(dep.Hits, WhatsappDtotalHits);
+
+                        if (!data.WhatsappDepartEntries.ContainsKey(dep.Department))
+                        {
+                            data.WhatsappDepartEntries.Add(dep.Department, equivDep);
+                        }
+
+
+                    }
+                }
+                //*************************Whatsapp Template wise**********************************
+                var WhatsapptempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.template, (key, tentries) => new
+                {
+                    template = key,
+                    TTotal = tentries.Count(),
+                    THits = tentries.Count(o => o.logEntry.IsHit)
+                });
+                var WhatsappTemptotalHits = WhatsapptempwiseCnt.Sum(o => o.THits);
+
+                foreach (var tem in WhatsapptempwiseCnt)
+                {
+                    if (tem.TTotal > 0)
+                    {
+                        var equivTemp = CalcEquivalentPercent(tem.THits, WhatsappTemptotalHits);
+
+                        if (!data.WhatsappTemplateClickEntries.ContainsKey(tem.template))
+                        {
+                            data.WhatsappTemplateClickEntries.Add(tem.template, equivTemp);
+                        }
+                    }
+                }
+
+                //*************************** Whatsapp category wise********************************************
+                var WhatsappcategoryWiseGrp = data.WhatsappEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                {
+                    Category = key,
+                    Count = values.Sum(o => o.Count),
+                    HitCount = values.Sum(o => o.Hits),
+                    ReportedCount = values.Sum(o => o.Reported),
+                });
+
+                var WhatsapptotalHits = WhatsappcategoryWiseGrp.Sum(o => o.HitCount);
+
+                // calc phishing percentage out of total hits
+                foreach (var category in WhatsappcategoryWiseGrp)
+                {
+                    if (category.Count > 0 && data.TotalWhatsappCampaigns > 0)
+                    {
+                        var equivalenPp = CalcEquivalentPercent(category.HitCount, WhatsapptotalHits);
+
+                        if (!data.WhatsappCategoryClickRatioDictionary.ContainsKey(category.Category))
+                        {
+                            data.WhatsappCategoryClickRatioDictionary.Add(category.Category, equivalenPp);
+                        }
+
+
+                    }
+                }
+
             }
             catch (Exception ex)
             {
