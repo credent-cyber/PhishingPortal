@@ -27,6 +27,7 @@ else
     </div>
 }
 
+
 @code
 {
     private CGrid<CampaignTemplate> _grid;
@@ -34,7 +35,7 @@ else
 
     Action<IGridColumnCollection<CampaignTemplate>> columns = c =>
     {
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").ThenSortByDescending(o => o.Id);
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Name).Css("table-bordered").Titled("Template Name");
         c.Add(o => o.IsActive).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.IsHtml).SetWidth("50px").Css("table-bordered");
@@ -50,16 +51,17 @@ else
         string url = $"odata/template?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-filter", "Type__1__Email");
+        //query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable(true)
-            .Filterable(true)
+        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
+            .Sortable()
+            .Filterable()
             .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, "EmailTemplateList.xlsx")
             .ChangePageSize(true)
             .EmptyText("-")
             .SetKeyboard(true)
@@ -72,6 +74,5 @@ else
         _task = client.UpdateGrid();
         await _task;
     }
-
 
 }
