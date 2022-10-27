@@ -32,29 +32,22 @@ namespace PhishingPortal.Services.Notification.Helper
         {
             lock (this)
             {
-
-                    _logger.LogInformation($"Dbcontext not found in the dictionary");
-
-                    var demoReq = centralDbContext.DemoRequestor.FirstOrDefault();
-
+                    var demoReq = centralDbContext.DemoRequestor.Where(o=>o.isNotified==false).FirstOrDefault();
                     if (demoReq == null)
-                        throw new InvalidDataException();
-                    //var demoReqData = "server=localhost;port=3306;database=phishsim;OldGuids=True;uid=root;password=Zxcv*963;AllowZeroDateTime=True";
-                    //var dbCtxOptions = SetupDbContextBuilder(demoReq, demoReqData);
+                        _logger.LogInformation($"No new Demo Requestor found!!!");
 
                 return demoReq;
             }
         }
         public bool SetContext(DemoRequestor dm)
         {
-            lock (this)
-            {
                 try
                 {
                     dm.isNotified = true;
                     dm.ModifiedBy = "DemoRequestHandler";
                     dm.ModifiedOn = DateTime.Now;
                     centralDbContext.DemoRequestor.Update(dm);
+                    centralDbContext.SaveChanges();
                     _logger.LogInformation($"DemoRequestor Notified");
                     return true;
                 }
@@ -63,7 +56,7 @@ namespace PhishingPortal.Services.Notification.Helper
                     _logger.LogInformation("DemoRequestor Notify failed!");
                     return false;
                 }
-            }
+            
         }
         public DbContextOptionsBuilder<PhishingPortalDbContext> SetupDbContextBuilder(DemoRequestor requestor, string connString)
         {

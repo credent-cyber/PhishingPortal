@@ -85,8 +85,8 @@
             </div>
         </div>
     </div>*@
-<div class="auth-wrapper" style="background:white !important;">
-        <div style="width:600px; margin-top:9vh">
+<div class="auth-wrapper" style="background:white !important; margin-bottom: 20px;">
+        <div style="width:500px; margin-top:3vh">
             <div class="card text-center">
 
                 <div>
@@ -98,35 +98,35 @@
                    @if(isError){ <div class="alert alert-warning" role="alert"> @message </div>}
                    @if(isSucess){ <div class="alert alert-success" role="alert"> @message </div>}
                 </div>       
-                <div class="card-body" >
+                <div class="card-body" style="padding:0 15px !important">
                    <EditForm Model="@Model" OnInvalidSubmit="@OnValidSubmit">
                       <DataAnnotationsValidator/>
                       <div class="form-group row">
-                        <label for="colFormLabel" class="col-sm-4 col-form-label">Your Name</label>
+                        <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Your Name</label>
                         <div class="col-sm-8">
                           <InputText @bind-Value="@Model.FullName" class="form-control" id="name" placeholder="Name" required></InputText>
                         </div>
                       </div>
                       <div class="form-group row">
-                        <label for="colFormLabel" class="col-sm-4 col-form-label">Company Name</label>
+                        <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Company Name</label>
                         <div class="col-sm-8">
                            <InputText class="form-control" id="company" name="company" placeholder="Company" @bind-Value="@Model.Company" required></InputText>
                         </div>
                       </div>
                       <div class="form-group row">
-                        <label for="colFormLabel" class="col-sm-4 col-form-label">Email</label>
+                        <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Email</label>
                         <div class="col-sm-8">
                           <InputText type="email" class="form-control" id="email" name="email" placeholder="example@email.com" required @bind-Value="@Model.Email"></InputText>
                         </div>
                       </div>
                       <div class="form-group row">
-                        <label for="colFormLabel" class="col-sm-4 col-form-label">Mobile No.</label>
+                        <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Mobile No.</label>
                         <div class="col-sm-8">
                           <InputNumber  class="form-control" id="contactno" name="contactno"  placeholder="Contact Number" @bind-Value="@Model.ContactNumber"> </InputNumber>
                         </div>
                       </div>
                       <div class="form-group row">
-                           <label for="colFormLabel" class="col-sm-4 col-form-label">Message</label>
+                        <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Message</label>
                             <div class="col-sm-8">     
                                <InputTextArea class="form-control" placeholder="..." @bind-Value="@Model.Messages" style="height:100px;"></InputTextArea>
                             </div>
@@ -143,7 +143,7 @@
                     }
                    </div>
 
-                   <div style="text-align:center;"><a href="authentication/login">Already have login credential?</a></div>
+                   <div style="text-align:center;"><a href="/login">Already have login credential?</a></div>
                 </div>
             </div>
         </div>

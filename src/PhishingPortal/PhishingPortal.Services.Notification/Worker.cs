@@ -72,7 +72,6 @@ namespace PhishingPortal.Services.Notification
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _demoRequestHandler.Start();
-            _demoRequestHandler.Execute();
             _campaignExecutor.Start();
             _smsExecutor.Start();
            // _whatsappCampaignExecutor.Start();
@@ -140,6 +139,7 @@ namespace PhishingPortal.Services.Notification
                     }
                     _logger.LogInformation($"Worker reset _isProcessing=false, for the next cycle");
                     _isprocessing = false;
+                    _demoRequestHandler.Execute();
 
                     await Task.Delay(_settings.WaitIntervalInMinutes * 1000 * 60, stoppingToken); 
                 }
@@ -151,5 +151,6 @@ namespace PhishingPortal.Services.Notification
 
             _campaignExecutor.Stop();
         }
+
     }
 }

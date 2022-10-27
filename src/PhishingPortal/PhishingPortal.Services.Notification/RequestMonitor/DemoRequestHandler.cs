@@ -36,7 +36,6 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
         public void Start()
         {
             Logger.LogInformation($"DemoRequestHandler has started");
- 
         }
 
         public void Stop()
@@ -48,9 +47,12 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
         {
             DemoRequestor demo;
             var data = ConnectionManager.GetContext();
+            if(data is null)
+                return;
             demo = data;
             if (!data.Email.Equals(string.Empty))
             {
+                Logger.LogInformation($"New Demo requestor found, Preparing to sent confirmation Email...");
                 var name = data.FullName;
                 var ID = data.Id;
                 var responce = requestEmailSender.ExecuteTask(data.Email, data.Company);
