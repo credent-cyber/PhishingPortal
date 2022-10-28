@@ -1,4 +1,5 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using PhishingPortal.UI.Blazor.Pages
+@inject NavigationManager NavigationManager
 
 @if (Show)
 {
@@ -37,12 +38,12 @@
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
-
+    TenantCampaignConfig campaignConfig=new TenantCampaignConfig();
 
     public void onClose()
     {
         Show = false;
-        NavigationManager.NavigateTo($"/tenant-templates");
+        if (Title == "Template Preview") { NavigationManager.NavigateTo($"/tenant-templates"); }
     }
 
 }
