@@ -89,7 +89,7 @@
         </div>  
     </div>
 
-<DialogTemplate Show="showPreview" Title="Template Preview">
+    <DialogTemplate Show="showPreview" Title="Template Preview">
     <br />
     @if (sms is true)
     {
@@ -109,7 +109,8 @@
 
 
 @code {
-    public bool showPreview = false;
+
+    bool showPreview = false;
     string content = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
@@ -117,25 +118,24 @@
     string text = "";
     bool sms = false;
     MarkupString previewContent => (MarkupString)content;
-    //List<CampaignTemplate> Templates;
 
     protected override async Task OnInitializedAsync()
     {
-        //Templates = await client.GetTemplatesByType(type);
         Tab = await oLocalStore.GetItemAsync<int>("tTab");
         if (Tab == 0)
             Tab = 1;
     }
 
+
+
     public void OnPreviewClick(CampaignTemplate template)
-    {
-        showPreview = true;
+    {   
 
         if(template.Type==CampaignType.Email)
         {
 
             sms = false;
-            content = template.Content;           
+            content = template.Content;
         }
         if(template.Type==CampaignType.Sms)
         {
@@ -143,16 +143,17 @@
             text = template.Content;           
         }
 
+        showPreview = true;
+        //InvokeAsync(StateHasChanged);
         //InvokeAsync(() => StateHasChanged());
-    }
 
+    }
 
     protected void OnClosePreview()
     {
         content = string.Empty;
         showPreview = false;
     }
-
    
     public int Tab = 1;
     public async void SaveSession()
@@ -163,4 +164,6 @@
     public void Smst() { Tab = 2; SaveSession(); }
     public void Whatsappt() { Tab = 3; SaveSession(); }
 
+
+    
 }

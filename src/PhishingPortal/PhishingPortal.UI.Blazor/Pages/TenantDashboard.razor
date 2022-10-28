@@ -9,37 +9,133 @@
 @inject ILogger<TenantDashboard> logger;
 @inject IJSRuntime JSRuntime;
 
-<div class="pcoded-content">
-    <h5><span style="color:orange">Dashboard</span></h5>
+<div class="pcoded-content" style=" padding:0 !important">
+@*    <h5><span style="color:orange">Dashboard</span></h5>*@
     <div class="row">
-        <div class="col-md-6 col-xl-3">
-            <div class="card bg-c-blue order-card">
-                <div class="card-body">
-                    <a href="#!">
-                        <div class="row align-items-center m-b-0">
-                            <div class="col" style="padding: 0">
-                                <h6 class="m-b-5 text-white">Sent on Last Campaign</h6>
-                            </div>
-                            <div class="col-auto">
-                                @* <h3 style="color:black">@TotalPhishingTests</h3> *@
-                                <ConsolidatedPhishingStat Type="PhishingStatsType.Total" Data="stats"></ConsolidatedPhishingStat>
-                            </div>
+        
+        <div class="col-xl-3 col-md-6">
+            <div class="card proj-t-card">
+                <div class="card-body" style="background: ">
+                    <div class="row align-items-center m-b-30">
+                        <div class="col-auto">
+                            <i class="fas fa-paper-plane text-c-green f-30"></i>
                         </div>
-                    </a>
+                        <div class="col p-l-0">
+                            <h6 class="m-b-0 text-c-green"><span style="font-size:16px">Sent in Last Compaign</span></h6>
+                           @* <h6 class="m-b-5">Sent in Last Compaign</h6>
+                            <h6 class="m-b-0 text-c-green">Update</h6>*@
+                        </div>
+                    </div>
+                    <div class="row align-items-center text-center fa-lg">
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email" style="vertical-align: 0"></i> @stats.Email.Total</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms" style="vertical-align: 0"></i> @stats.Sms.Total</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp" style="vertical-align: 0"></i> @stats.Whatsapp.Total</h6>
+                        </div>
+                    </div>
+                    <h6 class="pt-badge badge-light-success"></h6>
                 </div>
             </div>
         </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card proj-t-card">
+                <div class="card-body">
+                    <div class="row align-items-center m-b-30">
+                        <div class="col-auto">
+                            <i class="fas fa-bug text-c-red f-30"></i>
+                        </div>
+                        <div class="col p-l-0">
+                            <h6 class="m-b-0 text-c-red"><span style="font-size:16px">Total Clicked</span></h6>
+                            @*<h6 class="m-b-5 ">Total Clicked</h6>
+                            <h6 class="m-b-0 text-c-red">Update</h6>*@
+                        </div>
+                    </div>
+                    <div class="row align-items-center text-center fa-lg">
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> @stats.Email.TotalHits</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> @stats.Sms.TotalHits</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> @stats.Whatsapp.TotalHits</h6>
+                        </div>
+                    </div>
+                    <h6 class="pt-badge badge-light-danger"></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card proj-t-card">
+                <div class="card-body">
+                    <div class="row align-items-center m-b-30">
+                        <div class="col-auto">
+                            <i class="fas fa-lightbulb text-c-yellow f-30"></i>
+                        </div>
+                        <div class="col p-l-0">
+                            <h6 class="m-b-0 text-c-yellow"><span style="font-size:16px">Not Clicked</span></h6>
+                            @*<h6 class="m-b-5">Not Clicked</h6>
+                            <h6 class="m-b-0 text-c-yellow">Update</h6>*@
+                        </div>
+                    </div>
+                    <div class="row align-items-center text-center fa-lg">
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> @(stats.Email.Total - stats.Email.TotalHits) </h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> @(stats.Sms.Total - stats.Sms.TotalHits) </h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> @(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</h6>
+                        </div>
+                    </div>
+                    <h6 class="pt-badge badge-light-warning"></h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card proj-t-card">
+                <div class="card-body">
+                    <div class="row align-items-center m-b-30">
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-check text-info f-30"></i>
+                        </div>
+                        <div class="col p-l-0">
+                            <h6 class="m-b-0 text-info"><span style="font-size:16px">Phish Prone%</span></h6>
+                            @*<h6 class="m-b-5">Phish Prone%</h6>
+                            <h6 class="m-b-0 text-info">Update</h6>*@
+                        </div>
+                    </div>
+                    <div class="row align-items-center text-center fa-lg">
+                        <div class="col" style="padding-left:0 !important;">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> @stats.Email.PronePercent</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> @stats.Sms.PronePercent</h6>
+                        </div>|
+                        <div class="col">
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> @stats.Whatsapp.PronePercent</h6>
+                        </div>
+                    </div>
+                    <h6 class="pt-badge badge-light-info"></h6>
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-6 col-xl-3">
-            <div class="card bg-c-red order-card">
+            <div class="card bg-facebook order-card">
                 <div class="card-body">
                     <a href="#!">
                         <div class="row align-items-center m-b-0">
                             <div class="col" style="padding: 0">
-                                <h6 class=" m-b-5 text-white">Total Clicks</h6>
+                                <h6 class="m-b-5 text-white">Total Training Assign</h6>
                             </div>
                             <div class="col-auto">
-                                @* <h3 style="color:black">@TotalClicks</h3> *@
-                                <ConsolidatedPhishingStat Type="PhishingStatsType.Hits" Data="stats"></ConsolidatedPhishingStat>
+                                <h3 style="color:black">@totalTraining</h3>
                             </div>
                         </div>
                     </a>
@@ -52,45 +148,42 @@
                     <a href="#!">
                         <div class="row align-items-center m-b-0">
                             <div class="col" style="padding: 0">
-                                <h6 class="m-b-5 text-white">Not Clicked</h6>
+                                <h6 class="m-b-5 text-white">Completed</h6>
                             </div>
                             <div class="col-auto">
-                                @*<h3 style="color:black"> @NotClicked</h3> *@
-                                <ConsolidatedPhishingStat Type="PhishingStatsType.NoClicks" Data="stats"></ConsolidatedPhishingStat>
+                                <h3 style="color:black">@trainingCompleted</h3>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
-        @*<div class="col-md-6 col-xl-2">
-        <div class="card bg-c-purple order-card">
-        <div class="card-body">
-        <a href="#!">
-        <div class="row align-items-center m-b-0">
-        <div class="col">
-        <h6 class="m-b-5 text-white">Shared Details</h6>
-        </div>
-        <div class="col-auto">
-        <h3 style="color:black">@TotalClicks</h3>
-        </div>
-        </div>
-        </a>
-        </div>
-        </div>
-        </div>*@
         <div class="col-md-6 col-xl-3">
-            <div class="card bg-c-yellow order-card">
+            <div class="card bg-danger order-card">
                 <div class="card-body">
                     <a href="#!">
                         <div class="row align-items-center m-b-0">
                             <div class="col" style="padding: 0">
-                                <h6 class="m-b-5 text-white">Phish Prone</h6>
+                                <h6 class="m-b-5 text-white">Incomplete/Not Attempt</h6>
                             </div>
                             <div class="col-auto">
-                                @*  <h3 style="color:black">@PronePercent%</h3> *@
-
-                                <ConsolidatedPhishingStat Type="PhishingStatsType.PronePercent" Data="stats"></ConsolidatedPhishingStat>
+                                <h3 style="color:black">@trainingIncomplete</h3>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-c-purple order-card">
+                <div class="card-body">
+                    <a href="#!">
+                        <div class="row align-items-center m-b-0">
+                            <div class="col" style="padding: 0">
+                                <h6 class="m-b-5 text-white">Compromised after Training</h6>
+                            </div>
+                            <div class="col-auto">
+                                <h3 style="color:black">@compromised%</h3>
                             </div>
                         </div>
                     </a>
@@ -99,97 +192,333 @@
         </div>
 
 
+        <div class="card-body" style="padding: 15px !important;">
+                    <h6 class="mb-3">Report Tabs</h6>
+                    <ul class="nav nav-tabs mb-3" id="emailTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active text-uppercase" id="email-tab" data-toggle="tab"
+                               href="#email" role="tab" aria-controls="email" aria-selected="true">Email</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="sms-tab" data-toggle="tab"
+                               href="#sms" role="tab" aria-controls="sms"
+                               aria-selected="false">Sms</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="whatsapp-tab" data-toggle="tab"
+                               href="#whatsapp" role="tab" aria-controls="whatsapp"
+                               aria-selected="false">Whatsapp</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="training-tab" data-toggle="tab"
+                               href="#training" role="tab" aria-controls="training"
+                               aria-selected="false">Training</a>
+                        </li>
+                    </ul>
 
-                <div class="col-xl-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Recent five Email Campaigns </h5>
-                        </div>
-                        <div class="card-body">
-                            <div style="width: 100%;" >
-                                <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
-                                       Labels="@BarChart3Labels" IsStacked="false">
-                                </Chart>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="email" role="tabpanel" aria-labelledby="email-tab">
+                            <div class="row" >
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Recent five Email Campaigns </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
+                                                       Labels="@BarChart3Labels" IsStacked="false">
+                                                </Chart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Trend of Clicks % on Email per Campaign</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data"
+                                                       Labels="@BarChart3Labels" IsStacked="false">
+                                                </Chart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                           
+                            <div class="row">
 
-                <div class="col-xl-6 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5>Trend of Clicks % on Email per Campaign</h5>
-                        </div>
-                        <div class="card-body">
-                           <div style="width: 100%;">
-                                <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data"
-                                       Labels="@BarChart1Labels" IsStacked="false">
-                                </Chart>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Clicks % by Department </h5>
+                                        </div>
+                                        <div class="card-body">
+                                                <PieChart Id="donut1" Type="@ChartType.doughnut" Responsive="true"
+                                                          Data="@(Donut1Data.ToArray())"
+                                                          BackgroundColor="@(Donut1Background.ToArray())"
+                                                          Labels="@(Donut1Labels.ToArray())">
+                                                </PieChart>
+                                        </div>
+                                    </div>
+                                </div>
+                             
+                            
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Category Wise Failure %</h5>
+                                        </div>
+                                        <div class="card-body">
+
+                                                <PieChart Id="pie1" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(PieChart1Data.ToArray())"
+                                                          BackgroundColor="@(PieChart1Background.ToArray())"
+                                                          Labels="@(PieChart1Labels.ToArray())">
+                                                </PieChart>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Percentage of Email Campaign Template</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="TempPolar" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(Polar1Data.ToArray())"
+                                                          BackgroundColor="@(Polar1Background.ToArray())"
+                                                          Labels="@(Polar1Labels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                </div>
                             </div>
+                            
+                        </div>
+                        <div class="tab-pane fade" id="sms" role="tabpanel" aria-labelledby="sms-tab">
+                            <p class="mb-0">
+                                <div class="row">
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Recent five Sms Report</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    <Chart Id="SmsBar" Type="@ChartType.bar" Datasets="@SmsBarChartData"
+                                                           Labels="@SmsBarChartLabels" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Trend of Click Percentege</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    <Chart Id="SmsLine" Type="@ChartType.line" Datasets="@SmsLineChartData"
+                                                           Labels="@SmsLineChartLabels" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Clicks % by Department </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="SmsDonut" Type="@ChartType.doughnut" Responsive="true"
+                                                          Data="@(SmsDonutData.ToArray())"
+                                                          BackgroundColor="@(SmsDonutBackground.ToArray())"
+                                                          Labels="@(SmsDonutLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Category Wise Failure %</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="SmsPie" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(SmsPieChartData.ToArray())"
+                                                          BackgroundColor="@(SmsPieChartBackground.ToArray())"
+                                                          Labels="@(SmsPieChartLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Percentage of Sms Campaign Template</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="SmsPolar" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(SmsPolarData.ToArray())"
+                                                          BackgroundColor="@(SmsPolarBackground.ToArray())"
+                                                          Labels="@(SmsPolarLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </p>
+                        </div>
+                        <div class="tab-pane fade" id="whatsapp" role="tabpanel" aria-labelledby="whatsapp-tab">
+                            <p class="mb-0">
+                                <div class="row">
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Recent five Whatsapp Report</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    <Chart Id="WhatsappBar" Type="@ChartType.bar" Datasets="@WhatsappBarChartData"
+                                                           Labels="@WhatsappBarChartLabels" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Trend of Click Percentege</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    <Chart Id="WhatsappLine" Type="@ChartType.line" Datasets="@WhatsappLineChartData"
+                                                           Labels="@WhatsappLineChartLabels" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Clicks % by Department </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="WhatsappDonut" Type="@ChartType.doughnut" Responsive="true"
+                                                          Data="@(WhatsappDonutData.ToArray())"
+                                                          BackgroundColor="@(WhatsappDonutBackground.ToArray())"
+                                                          Labels="@(WhatsappDonutLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Category Wise Failure %</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="WhatsappPie" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(WhatsappPieChartData.ToArray())"
+                                                          BackgroundColor="@(WhatsappPieChartBackground.ToArray())"
+                                                          Labels="@(WhatsappPieChartLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header" style="text-align:center">
+                                                <h5>Percentage of Whatsapp Campaign Template</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <PieChart Id="WhatsappPolar" Type="@ChartType.pie" Responsive="true"
+                                                          Data="@(WhatsappPolarData.ToArray())"
+                                                          BackgroundColor="@(WhatsappPolarBackground.ToArray())"
+                                                          Labels="@(WhatsappPolarLabels.ToArray())">
+                                                </PieChart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
+                        </div>
+                        <div class="tab-pane fade" id="training" role="tabpanel" aria-labelledby="training-tab">
+                            <p class="mb-0">
+                                <div class="row">
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Recent 5 Months Training Report</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    @*<Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
+                                                           Labels="@TrainingBarChartLabels" IsStacked="false">
+                                                    </Chart>*@
+                                                    <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
+                                                        Labels="@(new[] { "Oct","Setp","Aug","July","Jun" })" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Trend of Training Completion Percentege</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                    @*<Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
+                                                           Labels="@TrainingLineChartLabels" IsStacked="false">
+                                                    </Chart>*@
+                                                    <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
+                                                        Labels="@(new[] { "Oct","Setp","Aug","July","Jun" })" IsStacked="false">
+                                                    </Chart>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-12 col-md-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>Data Table</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div style="width: 100%;">
+                                                   <DummyTable/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
                         </div>
                     </div>
                 </div>
-
-        <div class="col-xl-4 col-md-6">
-            <div class="row">
-             
-                <div class="col-xl-12 col-md-12">
-                    <div class="card">
-                        <div class="card-header" style="text-align:center">
-                            <h5>Clicks % by Department </h5>
-                        </div>
-                        <div class="card-body">
-                            <PieChart Id="donut1" Type="@ChartType.doughnut" Responsive="true"
-                                      Data="@(Donut1Data.ToArray())"
-                                      BackgroundColor="@(Donut1Background.ToArray())"
-                                      Labels="@(Donut1Labels.ToArray())">
-                            </PieChart>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-8 col-md-6">
-            <div class="row">
-             
-                <div class="col-xl-6 col-md-12">
-                    <div class="card">
-                        <div class="card-header" style="text-align:center">
-                            <h5>Category Wise Failure %</h5>
-                        </div>
-                        <div class="card-body">
-
-                            <PieChart Id="pie1" Type="@ChartType.pie" Responsive="true"
-                                      Data="@(PieChart1Data.ToArray())"
-                                      BackgroundColor="@(PieChart1Background.ToArray())"
-                                      Labels="@(PieChart1Labels.ToArray())">
-                            </PieChart>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-6 col-md-12">
-                    <div class="card">
-                        <div class="card-header" style="text-align:center">
-                            <h5>Percentage of Email Campaign Template</h5>
-                        </div>
-                        <div class="card-body">
-                            <PieChart Id="TempPolar" Type="@ChartType.pie" Responsive="true"
-                                      Data="@(Polar1Data.ToArray())"
-                                      BackgroundColor="@(Polar1Background.ToArray())"
-                                      Labels="@(Polar1Labels.ToArray())">
-                            </PieChart>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
 @code {
-    public bool test = false;
 
     public int TotalPhishingTests { get; set; }
     public int TotalClicks { get; set; }
@@ -203,10 +532,14 @@
     public bool IsError { get; set; }
     public string Message { get; set; } = string.Empty;
 
+    public int totalTraining = 30;
+    public int trainingIncomplete = 10;
+    public int trainingCompleted = 20;
+    public decimal compromised = 15;
 
-    // Barchart1 datasets
-    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
-    public string[] BarChart1Labels { get; set; }
+    //Email Chart Data
+    //public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    //public string[] BarChart1Labels { get; set; }
 
     public List<ChartJsDataset> BarChart2Data { get; set; } = new List<ChartJsDataset>();
 
@@ -214,47 +547,69 @@
     public string[] BarChart3Labels { get; set; }
 
     public List<string> PieChart1Data { get; set; } = new List<string>();
-    public List<string> PieChart1Background { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> PieChart1Background { get; set; } = new List<string>() { "#CCD1D1", "#DE3163", "#E6B0AA", "#D7BDE2", "#A9CCE3", "#82E0AA ", "#40E0D0", "#FF7F50", "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> PieChart1Labels { get; set; } = new List<string>();
 
     public List<string> Donut1Data { get; set; } = new List<string>();
-    public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#E6B0AA", "#D7BDE2", "#A9CCE3", "#82E0AA ", "#CCD1D1", "#DE3163", "#40E0D0", "#FF7F50", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Donut1Labels { get; set; } = new List<string>();
 
     public List<string> Polar1Data { get; set; } = new List<string>();
-    public List<string> Polar1Background { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Polar1Background { get; set; } = new List<string>() { "#A9CCE3", "#82E0AA ", "#DE3163", "#40E0D0", "#FF7F50", "#E6B0AA", "#D7BDE2", "#CCD1D1", "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Polar1Labels { get; set; } = new List<string>();
 
+    //Sms Chart Data
+    public List<ChartJsDataset> SmsBarChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] SmsBarChartLabels { get; set; }
 
+    public List<ChartJsDataset> SmsLineChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] SmsLineChartLabels { get; set; }
 
+    public List<string> SmsPieChartData { get; set; } = new List<string>();
+    public List<string> SmsPieChartBackground { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> SmsPieChartLabels { get; set; } = new List<string>();
 
+    public List<string> SmsDonutData { get; set; } = new List<string>();
+    public List<string> SmsDonutBackground { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> SmsDonutLabels { get; set; } = new List<string>();
 
+    public List<string> SmsPolarData { get; set; } = new List<string>();
+    public List<string> SmsPolarBackground { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> SmsPolarLabels { get; set; } = new List<string>();
+
+    //Whatsapp Chart Data
+    public List<ChartJsDataset> WhatsappBarChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] WhatsappBarChartLabels { get; set; }
+
+    public List<ChartJsDataset> WhatsappLineChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] WhatsappLineChartLabels { get; set; }
+
+    public List<string> WhatsappPieChartData { get; set; } = new List<string>();
+    public List<string> WhatsappPieChartBackground { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> WhatsappPieChartLabels { get; set; } = new List<string>();
+
+    public List<string> WhatsappDonutData { get; set; } = new List<string>();
+    public List<string> WhatsappDonutBackground { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> WhatsappDonutLabels { get; set; } = new List<string>();
+
+    public List<string> WhatsappPolarData { get; set; } = new List<string>();
+    public List<string> WhatsappPolarBackground { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> WhatsappPolarLabels { get; set; } = new List<string>();
+
+    //Training Chart Data
+    public List<ChartJsDataset> TrainingBarChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] TrainingBarChartLabels { get; set; }
+
+    public List<ChartJsDataset> TrainingLineChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] TrainingLineChartLabels { get; set; }
 
     IEnumerable<CampaignRecipient> CampaignRecipients = null;
     IEnumerable<Campaign> campaigns = null;
     ConsolidatedPhishingStats stats = new ConsolidatedPhishingStats();
-    void SomeStartupMethod()
-    {
 
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "scripts/my-chart-js.js");
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/plugins/bootstrap.min.js");
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/responsive-all.min.js");
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/pcoded.min.js");
-
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/pages/dashboard-main.js");
-        //JSRuntime.InvokeAsync<IJSObjectReference>("import","/custom/assets/js/pages/chart.js");
-
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/plugins/Chart.min.js");
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/pages/chart-chart-custom.js");  //2chart
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/plugins/apexcharts.min.js");
-        JSRuntime.InvokeAsync<IJSObjectReference>("import", "/custom/assets/js/pages/chart-apex.js");  //6chart
-
-
-    }
 
     protected override async Task OnInitializedAsync()
     {
-
 
         StartDate = new DateTime(DateTime.Now.Year, 1, 1);
         EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
@@ -275,43 +630,43 @@
             if (data == null)
                 throw new Exception();
 
-            //TotalPhishingTests = stats.Email.Total;
-            //TotalClicks = stats.Email.TotalHits;
-            //NotClicked = TotalPhishingTests - TotalClicks;
-            //PronePercent = Math.Round(((decimal)TotalClicks / (decimal)TotalPhishingTests) * 100, 2);
-
             data2.Entries.Select(o => o.Campaign.Id).ToArray();
 
-            // campaign wise chart
-            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+            // Email campaign wise chart
+            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Email per Campaign
             BarChart3Data.Add(new ChartJsDataset
-                {
+            {
                     Label = "Email Count",
                     Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
-                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count()),
-                });
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count()),
+            });
 
             BarChart3Data.Add(new ChartJsDataset
-                {
+            {
                     Label = "Click Count",
                     Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
-                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count()),
-                });
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data2.Entries.Count()),
+            });
 
             BarChart3Data.Add(new ChartJsDataset
-                {
+            {
                     Label = "Reported",
                     Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
                     BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
-                });
+            });
 
+            BarChart2Data.Add(new ChartJsDataset
+            {
+                    Label = "Phish Prone%",
+                    Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data.Entries.Count()), //Trend of Clicks on Email per Campaign
+            });
 
-
-            // pie chart
+            //Email pie chart
             foreach (var entry in data2.CategoryClickRatioDictionary)
             {
-                if(entry.Value != 0)
-                {                   
+                if (entry.Value != 0)
+                {
                     PieChart1Data.Add(entry.Value.ToString());
                     PieChart1Labels.Add(entry.Key.ToUpper());
                 }
@@ -333,27 +688,162 @@
                     Polar1Labels.Add(entry.Key.ToUpper());
                 }
             }
+            //BarChart1Data.Add(new ChartJsDataset
+            //{
+            //        Label = "No Clicks",
+            //        Data = data.Entries.Select(o => (-1 * (o.TotalCount - o.TotalHits)).ToString()).ToArray(),
+            //        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data.Entries.Count()),
+            //});
 
-            BarChart2Data.Add(new ChartJsDataset
+            //BarChart1Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+
+            //Sms Chart data
+            SmsBarChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Sms per Campaign
+            SmsBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Sms Count",
+                    Data = data2.SmsEntries.Select(o => o.Count.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count()),
+                });
+
+            SmsBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Click Count",
+                    Data = data2.SmsEntries.Select(o => o.Hits.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                });
+
+            SmsBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Reported",
+                    Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                });
+
+            SmsLineChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray();
+            SmsLineChartData.Add(new ChartJsDataset
                 {
                     Label = "Phish Prone%",
-                    //Data = data.Entries.Select(o => o.HitPronePercent.ToString()).ToArray(),
-                    Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data.Entries.Count()),
+                    Data = data2.SmsEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data.Entries.Count()), //Trend of Clicks on Sms per Campaign
                 });
 
-            BarChart1Data.Add(new ChartJsDataset
+            //Sms pie chart
+            foreach (var entry in data2.SmsCategoryClickRatioDictionary)
+            {
+                if (entry.Value != 0)
                 {
-                    Label = "No Clicks",
-                    Data = data.Entries.Select(o => (-1 * (o.TotalCount - o.TotalHits)).ToString()).ToArray(),
-                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data.Entries.Count()),
+                    SmsPieChartData.Add(entry.Value.ToString());
+                    SmsPieChartLabels.Add(entry.Key.ToUpper());
+                }
+            }
+
+            foreach (var entry in data2.SmsDepartEntries)
+            {
+                if (entry.Value != 0)
+                {
+                    SmsDonutData.Add(entry.Value.ToString());
+                    SmsDonutLabels.Add(entry.Key.ToUpper());
+                }
+            }
+            foreach (var entry in data2.SmsTemplateClickEntries)
+            {
+                if (entry.Value != 0)
+                {
+                    SmsPolarData.Add(entry.Value.ToString());
+                    SmsPolarLabels.Add(entry.Key.ToUpper());
+                }
+            }
+            //Whatsapp Chart data
+            WhatsappBarChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Whatsapp per Campaign
+            WhatsappBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Whatsapp Count",
+                    Data = data2.WhatsappEntries.Select(o => o.Count.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count()),
                 });
 
-            //BarChart1Labels = data.Entries.Select(o => o.Month.ToString()).ToArray();
-            BarChart1Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+            WhatsappBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Click Count",
+                    Data = data2.WhatsappEntries.Select(o => o.Hits.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                });
 
-            //CampaignRecipients = await client.GetRecipientByCampaignId();
-            // NEmail = data2.Entries.FirstOrDefault().Count;
+            WhatsappBarChartData.Add(new ChartJsDataset
+                {
+                    Label = "Reported",
+                    Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                });
+            WhatsappLineChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray();
+            WhatsappLineChartData.Add(new ChartJsDataset
+                {
+                    Label = "Phish Prone%",
+                    Data = data2.WhatsappEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Entries.Count()), //Trend of Clicks on Whatsapp per Campaign
+                });
+
+            //Whatsapp pie chart
+            foreach (var entry in data2.WhatsappCategoryClickRatioDictionary)
+            {
+                if (entry.Value != 0)
+                {
+                    WhatsappPieChartData.Add(entry.Value.ToString());
+                    WhatsappPieChartLabels.Add(entry.Key.ToUpper());
+                }
+            }
+
+            foreach (var entry in data2.WhatsappDepartEntries)
+            {
+                if (entry.Value != 0)
+                {
+                    WhatsappDonutData.Add(entry.Value.ToString());
+                    WhatsappDonutLabels.Add(entry.Key.ToUpper());
+                }
+            }
+            foreach (var entry in data2.WhatsappTemplateClickEntries)
+            {
+                if (entry.Value != 0)
+                {
+                    WhatsappPolarData.Add(entry.Value.ToString());
+                    WhatsappPolarLabels.Add(entry.Key.ToUpper());
+                }
+            }
+
+            //Training Chart data
+            TrainingBarChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Recent Training Report
+            TrainingBarChartData.Add(new ChartJsDataset
+            {
+                    Label = "Training Assign",
+                    //Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
+                    Data = (new[] { "12", "14", "16", "51", "13" }),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.DarkBlue, data2.Entries.Count()),
+            });
+
+            TrainingBarChartData.Add(new ChartJsDataset
+            {
+                    Label = "Completed",
+                    //Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
+                    Data = (new[] { "10", "9", "12", "44", "10" }),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Cyan, data2.Entries.Count()),
+            });
+
+            TrainingBarChartData.Add(new ChartJsDataset
+            {
+                    Label = "InCompleted",
+                    //Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
+                    Data = (new[] { "2", "5", "4", "7", "3" }),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Yellow, data2.Entries.Count()),
+            });
+            TrainingLineChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+            TrainingLineChartData.Add(new ChartJsDataset
+            {
+                    Label = "Training Completion%",
+                    //Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
+                    Data = (new[] { "83", "64", "85", "86", "76" }),
+                    BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, data.Entries.Count()), //Trend of Training Completion Percentege
+            });
 
         }
         catch (Exception ex)
@@ -362,6 +852,7 @@
             Message = "Error gathering statistics";
             logger.LogCritical(ex, ex.Message);
         }
+      
     }
 
 }

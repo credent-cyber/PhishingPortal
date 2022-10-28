@@ -51,7 +51,7 @@ else
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-filter", "Type__1__Sms");
 
-        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
              .Sortable(true)
             .Filterable(true)
             .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
@@ -59,7 +59,7 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, "SmsTemplateList.xlsx")
             .ChangePageSize(true)
             .EmptyText("-")
             .SetKeyboard(true)

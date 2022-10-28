@@ -10,6 +10,8 @@ using Moq;
 using System.Net;
 using System.Net.Mail;
 using Castle.Core.Smtp;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
 namespace PhishingPortal.Services.Notification.RequestMonitor
 {
     public class RequestEmailSender: IRequestEmailSender
@@ -18,12 +20,15 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
         public IEmailClient EmailSender { get; }
         public IDbConnManager ConnectionManager { get; }
         bool _stopped;
+        string Notifyemail;
+
         public RequestEmailSender(ILogger<RequestEmailSender> logger, IConfiguration config, IEmailClient emailSender,
            IDbConnManager dbConnManager)
         {
             Logger = logger;
             EmailSender = emailSender;
             ConnectionManager = dbConnManager;
+            Notifyemail = config.GetValue<string>("NotificationEmail");
 
         }
 
@@ -44,8 +49,12 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
                                 await EmailSender.SendEmailAsync(EmailRecipient, EmailSubject, EmailContent, true, Guid.NewGuid().ToString(), EmailFrom);
 
                                 Logger.LogInformation($"Requestor with Email: [{email}] Company: [{cmpny}] notified");
+                                var Email = Notifyemail;
+                                var Content = "New Demo Request for PhishSims recieved <br/> Requestor Details <hr/>" +
+                                              $"Email : {email}<br/> Company Name: {cmpny} <br/>";
+                                await EmailSender.SendEmailAsync(Email, "Demo Request", Content, true, Guid.NewGuid().ToString(), EmailFrom);
+                                Logger.LogInformation($"Requestor with Email: [{email}] Company: [{cmpny}] notified to PhishSims mailbox!");
                                 ConnectionManager.SetContext(db);
-                      
                     }
                     
 

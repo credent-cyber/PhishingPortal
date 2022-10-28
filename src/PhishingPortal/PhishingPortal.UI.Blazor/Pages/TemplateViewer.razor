@@ -1,0 +1,70 @@
+﻿@page "/tenant-templates/{Id:int}"
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Dto
+@using BlazingComponents.Summernote
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
+@using PhishingPortal.UI.Blazor.Pages.GridComponent
+@inject NavigationManager NavigationManager
+@inject TenantClient client
+@inject IJSRuntime JSRuntime
+@inject HttpClient HttpClient
+@inject AuthState authState;
+
+<DialogTemplate Show="showPreview" Title="Template Preview">
+    <br />
+    @if (sms is true)
+    {
+        <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" disabled />
+
+    }
+    else
+    {
+        @previewContent
+    }
+
+    <br />
+    <button class="btn btn-warning col-md-12" @onclick="OnClosePreview">Close</button>
+
+</DialogTemplate>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    bool showPreview = false;
+    string content = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+
+    string text = "";
+    bool sms = false;
+    MarkupString previewContent => (MarkupString)content;
+    CampaignTemplate template;
+
+    protected override async Task OnInitializedAsync()
+    {
+        template = await client.GetTemplateById(Id);
+        if (template.Type == CampaignType.Email)
+        {
+
+            sms = false;
+            content = template.Content;
+        }
+        if (template.Type == CampaignType.Sms)
+        {
+            sms = true;
+            text = template.Content;
+        }
+
+        showPreview = true;
+    }
+
+    protected void OnClosePreview()
+    {
+        content = string.Empty;
+        showPreview = false;
+        NavigationManager.NavigateTo("/tenant-templates");
+    }
+
+}

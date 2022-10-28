@@ -80,16 +80,18 @@
     private bool _eventHooked = false;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
-        c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.Camp.Id).Titled("CampID").SetWidth("30px").Css("table-bordered");
+        //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Id).Titled("ID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
-        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px");
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type");
+        c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID");
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
         c.Add(o => o.Recipient.Email).Css("table-bordered").Titled("Recipient Email");
+        c.Add(o => o.Recipient.Department).Css("table-bordered").Titled("Department");
         c.Add(o => o.IsHit).Css("table-bordered");
         c.Add(o => o.IsReported).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered");
-        // c.Add(o => o.Recipient.Department).Css("table-bordered");
+ 
     };
 
     protected override void OnAfterRender(bool firstRender)

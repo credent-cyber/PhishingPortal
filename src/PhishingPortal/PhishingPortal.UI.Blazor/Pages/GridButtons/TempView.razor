@@ -4,10 +4,12 @@
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Pages.GridComponent
 @implements ICustomGridComponent<CampaignTemplate>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-info' @onclick="MyClickHandler"><i class="fa fa-eye"></i></button>
+
+<button class='btn btn-sm btn-info'  @onclick="MyClickHandler"><i class="fa fa-eye"></i></button>
 
 @code {
 
@@ -15,6 +17,9 @@
     public CampaignTemplate Item { get; set; }
 
     TenantTemplates temp = new TenantTemplates();
+    //EmailTemp temp;
+    private void MyClickHandler(MouseEventArgs e) => NavigationManager.NavigateTo($"/tenant-templates/{Item.Id}");
 
-    private void MyClickHandler(MouseEventArgs e) => temp.OnPreviewClick(Item);
+
+    
 }

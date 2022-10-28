@@ -26,7 +26,8 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         [EnableQuery]
         public IQueryable<CampaignTemplate> Get()
         {
-            return DbContext.CampaignTemplates.AsQueryable();
+            var data = DbContext.CampaignTemplates.OrderByDescending(x => x.Id).AsQueryable();
+            return data;
         }
 
 

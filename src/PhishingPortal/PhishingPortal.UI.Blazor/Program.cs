@@ -9,8 +9,6 @@ using PhishingPortal.UI.Blazor.Services;
 using PhishingPortal.UI.Blazor.Pages;
 using Serilog;
 
-
-
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
@@ -35,10 +33,12 @@ builder.Services.AddScoped<CustomStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<CustomStateProvider>());
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+
 builder.Services.AddScoped<AuthState>();
 builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.AddHttpClient("ServerAPI.NoAuthenticationClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();
