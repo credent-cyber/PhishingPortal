@@ -56,13 +56,13 @@
                     </div>
                     <div class="row align-items-center text-center fa-lg">
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Clicked"></i> @stats.Email.TotalHits</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> @stats.Email.TotalHits</h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Clicked"></i> @stats.Sms.TotalHits</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> @stats.Sms.TotalHits</h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Clicked"></i> @stats.Whatsapp.TotalHits</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> @stats.Whatsapp.TotalHits</h6>
                         </div>
                     </div>
                     <h6 class="pt-badge badge-light-danger"></h6>
@@ -84,13 +84,13 @@
                     </div>
                     <div class="row align-items-center text-center fa-lg">
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Not Clicked"></i> @(stats.Email.Total - stats.Email.TotalHits) </h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> @(stats.Email.Total - stats.Email.TotalHits) </h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Not Clicked"></i> @(stats.Sms.Total - stats.Sms.TotalHits) </h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> @(stats.Sms.Total - stats.Sms.TotalHits) </h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whtasapp Not Clicked"></i> @(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> @(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</h6>
                         </div>
                     </div>
                     <h6 class="pt-badge badge-light-warning"></h6>
@@ -112,13 +112,13 @@
                     </div>
                     <div class="row align-items-center text-center fa-lg">
                         <div class="col" style="padding-left:0 !important;">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Prone%"></i> @stats.Email.PronePercent</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-envelope text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> @stats.Email.PronePercent</h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Prone%"></i> @stats.Sms.PronePercent</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> @stats.Sms.PronePercent</h6>
                         </div>|
                         <div class="col">
-                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Prone%"></i> @stats.Whatsapp.PronePercent</h6>
+                            <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> @stats.Whatsapp.PronePercent</h6>
                         </div>
                     </div>
                     <h6 class="pt-badge badge-light-info"></h6>
@@ -547,15 +547,15 @@
     public string[] BarChart3Labels { get; set; }
 
     public List<string> PieChart1Data { get; set; } = new List<string>();
-    public List<string> PieChart1Background { get; set; } = new List<string>() { "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> PieChart1Background { get; set; } = new List<string>() { "#CCD1D1", "#DE3163", "#E6B0AA", "#D7BDE2", "#A9CCE3", "#82E0AA ", "#40E0D0", "#FF7F50", "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> PieChart1Labels { get; set; } = new List<string>();
 
     public List<string> Donut1Data { get; set; } = new List<string>();
-    public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Donut1Background { get; set; } = new List<string>() { "#FFB64D", "#E6B0AA", "#D7BDE2", "#A9CCE3", "#82E0AA ", "#CCD1D1", "#DE3163", "#40E0D0", "#FF7F50", "#0e9e4a", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Donut1Labels { get; set; } = new List<string>();
 
     public List<string> Polar1Data { get; set; } = new List<string>();
-    public List<string> Polar1Background { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
+    public List<string> Polar1Background { get; set; } = new List<string>() { "#A9CCE3", "#82E0AA ", "#DE3163", "#40E0D0", "#FF7F50", "#E6B0AA", "#D7BDE2", "#CCD1D1", "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Polar1Labels { get; set; } = new List<string>();
 
     //Sms Chart Data

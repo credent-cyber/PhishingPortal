@@ -17,8 +17,8 @@
     public CampaignTemplate Item { get; set; }
 
     TenantTemplates temp = new TenantTemplates();
-
-    private void MyClickHandler(MouseEventArgs e) => temp.OnPreviewClick(Item);
+    //EmailTemp temp;
+    private void MyClickHandler(MouseEventArgs e) => NavigationManager.NavigateTo($"/tenant-templates/{Item.Id}");
 
 
     

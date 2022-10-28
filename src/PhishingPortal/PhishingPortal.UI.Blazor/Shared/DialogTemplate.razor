@@ -1,4 +1,5 @@
-﻿
+﻿@inject NavigationManager NavigationManager
+
 @if (Show)
 {
 
@@ -37,9 +38,11 @@
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
 
+
     public void onClose()
     {
         Show = false;
+        NavigationManager.NavigateTo($"/tenant-templates");
     }
 
 }
