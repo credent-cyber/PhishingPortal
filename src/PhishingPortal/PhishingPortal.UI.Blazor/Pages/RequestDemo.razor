@@ -11,6 +11,7 @@
 @inject ILogger<DemoRequestor> logger
 @layout BlankLayout
 @inject IHttpClientFactory ClientFactory
+@inject HttpClient http
 
 
 
@@ -195,7 +196,7 @@
                     return;
                 }
             }
-           
+
             if (!formate)
             {
                 isSucess = false;
@@ -205,17 +206,20 @@
             }
         }
 
-         // Create a httpClient to use for non-authenticated calls
-          var  NoAuthenticationClient =
-                 ClientFactory.CreateClient(
-                     "ServerAPI.NoAuthenticationClient");
+        // Create a httpClient to use for non-authenticated calls
+        var  NoAuthenticationClient =
+               ClientFactory.CreateClient(
+                   "ServerAPI.NoAuthenticationClient");
 
-   
+
 
         try
         {
-            _ = await NoAuthenticationClient.PostAsJsonAsync($"api/request/upsert_demorequestor", Model);
-          // Model = await AdminClient.UpsertDemoRequestorAsync(Model);
+            //ApiResponse<DemoRequestor> content;
+            //_ = await NoAuthenticationClient.PostAsJsonAsync($"api/request/upsert_demorequestor", Model);
+            var result = await http.PostAsJsonAsync($"api/request/upsert_demorequestor", Model);
+            result.EnsureSuccessStatusCode();
+            // content = await result.Content.ReadFromJsonAsync<ApiResponse<DemoRequestor>>();
             isSucess = true;
             isError = false;
             message = "Saved!";
