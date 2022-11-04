@@ -1,5 +1,5 @@
-﻿@page "/report"
-@page "/report/{id:int}"
+﻿@page "/report/template/{id:int}"
+@page "/report/category/{categ}"
 
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
@@ -51,9 +51,11 @@
 </div>
 
 @code {
-
-    [Parameter] 
+    [Parameter]
     public int Id { get; set; }
+
+    [Parameter]
+    public string categ { get; set; }
 
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
@@ -76,7 +78,6 @@
     private CGrid<CampaignLog> _grid;
     private Task _task;
     private GridODataClient<CampaignLog> _client;
-    CampaignTemplate campaignTemplate;
 
     private bool _eventHooked = false;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
@@ -114,16 +115,23 @@
         await Task.CompletedTask;
     }
 
+    //int count = 0, id1 = 0, id2 = 0, id3 = 0, id4 = 0, id5 = 0;
     protected override async Task OnParametersSetAsync()
     {
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
+        //string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}&$filter=campaignid eq {id1} or campaignid eq {id2} or campaignid eq {id3} or campaignid eq {id4} or campaignid eq {id5}";
 
-        var query = new QueryDictionary<StringValues>();        
+        var query = new QueryDictionary<StringValues>();
+
 
         if (Id > 0)
-            query.Add("grid-filter", $"CampaignId__1__{Id}");
+            query.Add("grid-filter", $"Camp.Detail.CampaignTemplateId__1__{Id}");
 
-        try{
+        else if (!categ.Equals(null))
+            query.Add("grid-filter", $"Camp.Category__2__{categ}");
+
+        try
+        {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
             .Sortable()
             .ChangePageSize(true)
@@ -143,7 +151,8 @@
 
             _task = client.UpdateGrid();
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             logger.LogCritical(ex, ex.Message);
         }
 

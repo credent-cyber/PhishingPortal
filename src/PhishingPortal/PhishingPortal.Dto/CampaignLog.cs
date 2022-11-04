@@ -33,8 +33,8 @@ namespace PhishingPortal.Dto
         public bool IsReplied { get; set; }
 
         public virtual Campaign Camp { get; set; }
-        public virtual Recipient Recipient { get; set; }
-        //public virtual CampaignDetail Detail { get; set; }
+        public virtual CampaignRecipient Recipient { get; set; }
+
 
         /// <summary>
         /// This will record if the campaign email is forwarded to a designated mailbox from the recipient

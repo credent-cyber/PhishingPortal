@@ -17,7 +17,7 @@ window.setup = (id, config, obj) => {
 
     destroyChart(id);
 
-    var chart = new Chart(ctx, config);  
+    var chart = new Chart(ctx, config);
 
     charts.push({ id: id, instance: chart });
 
@@ -27,10 +27,6 @@ window.setup = (id, config, obj) => {
 
         if (array !== undefined && array.length > 0)
 
-           // console.log(config.data.labels[array[0].index]);
-           // console.log(array[0].index);
-           // console.log(config);
-           // rtn = id;
             rtn = config.data.labels[array[0].index];
         dotnetInstance.invokeMethodAsync('ChartClick', rtn, id);
     };
@@ -40,4 +36,3 @@ window.setup = (id, config, obj) => {
     };
 
 }
-

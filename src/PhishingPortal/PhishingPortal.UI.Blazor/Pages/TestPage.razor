@@ -36,7 +36,7 @@
 
     Action<IGridColumnCollection<Campaign>> columns = c =>
     {
-    //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px");
+        //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px");
         c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Name).Css("table-bordered");
         c.Add(o => o.Description).Css("table-bordered");
@@ -52,9 +52,11 @@
     {
         string url = $"odata/campaign?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        query.Add("grid-filter", "Detail.Type__1__Sms");
+        query.Add("grid-sorting", "Id__0__1");
+        //query.Add("grid-filter", "Detail.Type__1__Sms");
+
         var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable(true)
+            .Sortable()
             .Filterable(true)
             .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
@@ -66,8 +68,9 @@
             .Searchable(true, false, false);
 
         _grid = client.Grid;
-
-        // Set new items to grid
+        //var a = _grid.Settings.SortSettings.ColumnName;
+        
+        //Set new items to grid
         _task = client.UpdateGrid();
         await _task;
     }

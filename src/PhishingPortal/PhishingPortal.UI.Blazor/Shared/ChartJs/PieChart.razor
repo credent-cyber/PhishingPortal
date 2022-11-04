@@ -1,11 +1,17 @@
-﻿@using PhishingPortal.Dto.Dashboard
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
+@inject IJSRuntime JSRuntime
+@inject TenantClient client
+@inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
 
 <canvas id="@Id"></canvas>
 
 
 @code {
-    
+
 
     [Parameter]
     public string Id { get; set; }
@@ -31,12 +37,18 @@
     [Parameter]
     public List<ChartJsDataset> Datasets { get; set; }
 
-     protected override async Task OnAfterRenderAsync(bool firstRender)
+    [Parameter]
+    public EventCallback<int> OnChartClick { get; set; }
+
+    [Parameter]
+    public bool IsClickable { get; set; } = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Here we create an anonymous type with all the options
         // that need to be sent to Chart.js
 
-         if (Data == null || Data.Count() == 0)
+        if (Data == null || Data.Count() == 0)
             return;
 
         var config = new
@@ -64,18 +76,38 @@
                 //    }
                 //}
             },
-   
+
             Data = new
             {
                 Datasets = new[]
                                     {
                     new { Data = Data, BackgroundColor = BackgroundColor}
 
-                },
+    },
                 Labels = Labels
             }
         };
-
-        await JSRuntime.InvokeVoidAsync("setup", Id, config);
+        var ObjRef = DotNetObjectReference.Create(this);
+        await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
     }
+
+
+    [JSInvokable]
+    public async Task ChartClick(string label, string id)
+    {
+
+        if (!IsClickable)
+            return;
+
+        if (id.Contains("donut")) { NavManager.NavigateTo($"/report/department/{label}"); }
+        else if (id.Contains("pie")) { NavManager.NavigateTo($"/report/category/{label}"); }
+        else if (id.Contains("Polar")) 
+        {
+            var TemplateId = label.Split(".")[0];
+            NavManager.NavigateTo($"/report/template/{TemplateId}");
+        }
+
+    }
+
+
 }

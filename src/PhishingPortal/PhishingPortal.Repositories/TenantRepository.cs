@@ -30,7 +30,7 @@ namespace PhishingPortal.Repositories
         {
             var result = Enumerable.Empty<Campaign>();
 
-            result = TenantDbCtx.Campaigns.Include(o=>o.Detail).Include(o => o.Schedule).OrderByDescending(o => o.Id)
+            result = TenantDbCtx.Campaigns.Include(o => o.Detail).Include(o => o.Schedule).OrderByDescending(o => o.Id)
                 .Skip(pageIndex * pageSize).Take(pageSize);
 
             return Task.FromResult(result);
@@ -287,43 +287,17 @@ namespace PhishingPortal.Repositories
                   .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
 
 
-                var phishtestWithRecipients = from log in totatPhishingTests
-                                              join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
-                                              select new { logEntry = log, Department = crec.Recipient.Department };
-                var depatwiseCnt = phishtestWithRecipients.Where(a=>a.logEntry.Camp.Detail.Type==CampaignType.Email).ToList().GroupBy(i => i.Department, (key, entries) => new
-                {
-                    Department = key ?? "UNKNOWN",
-                    Total = entries.Count(),
-                    Hits = entries.Count(o => o.logEntry.IsHit),
-                    Reported = entries.Count(o => o.logEntry.IsReported),
-                });
-                var DtotalHits = depatwiseCnt.Sum(o => o.Hits);
-
-                foreach (var dep in depatwiseCnt)
-                {
-                    if (dep.Total > 0)
-                    {
-                        var equivDep = CalcEquivalentPercent(dep.Hits, DtotalHits);
-
-                        if (!data.DepartEntries.ContainsKey(dep.Department))
-                        {
-                            data.DepartEntries.Add(dep.Department, equivDep);
-                        }
-
-
-                    }
-                }
-
                 var phishtestWithTemp = from log in totatPhishingTests
                                         join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
                                         join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
-                                        select new { logEntry = log, template = ctem.Name };
+                                        select new { logEntry = log, template = ctem.Name, templateId = ctem.Id };
 
-                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.template, (key, tentries) => new
+                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
+
                     TTotal = tentries.Count(),
-                    THits = tentries.Count(o => o.logEntry.IsHit)
+                    THits = tentries.Count(o => o.logEntry.IsHit),
                 });
                 var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
 
@@ -368,7 +342,54 @@ namespace PhishingPortal.Repositories
                 data.Entries = data.Entries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
 
                 data.TotalCampaigns = data.Entries.Sum(i => i.Count);
+                var ids = data.Entries;
+                
+                //email campaign - department wise data 
+                int count = 0, id1 = 1, id2 = 1, id3 = 1, id4 = 1, id5 = 1;
+                foreach (var id in ids)
+                {
+                    count += 1;
+                    if (count == 1)
+                        id1 = id.Campaign.Id;
+                    if (count == 2)
+                        id2 = id.Campaign.Id;
+                    if (count == 3)
+                        id3 = id.Campaign.Id;
+                    if (count == 4)
+                        id4 = id.Campaign.Id;
+                    if (count == 5)
+                        id5 = id.Campaign.Id;
+                }
+                var filterData = TenantDbCtx.CampaignLogs
+                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
+                var phishtestWithRecipients = from log in filterData
+                                              join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                              select new { logEntry = log, Department = crec.Recipient.Department };
 
+                var depatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.Department, (key, entries) => new
+                {
+                    Department = key ?? "UNKNOWN",
+                    Total = entries.Count(),
+                    Hits = entries.Count(o => o.logEntry.IsHit),
+                    Reported = entries.Count(o => o.logEntry.IsReported),
+                });
+                var DtotalHits = depatwiseCnt.Sum(o => o.Hits);
+
+                foreach (var dep in depatwiseCnt)
+                {
+                    // var depart = data.Entries.Where(o=>o);
+                    if (dep.Total > 0)
+                    {
+                        var equivDep = CalcEquivalentPercent(dep.Hits, DtotalHits);
+
+                        if (!data.DepartEntries.ContainsKey(dep.Department))
+                        {
+                            data.DepartEntries.Add(dep.Department, equivDep);
+                        }
+
+
+                    }
+                }
 
                 // create category wise phish prone %
                 var categoryWiseGrp = data.Entries.GroupBy(o => o.Campaign.Category, (key, values) => new
@@ -450,7 +471,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Sms Template wise**********************************
-                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.template, (key, tentries) => new
+                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
@@ -550,7 +571,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Whatsapp Template wise**********************************
-                var WhatsapptempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.template, (key, tentries) => new
+                var WhatsapptempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
@@ -634,15 +655,15 @@ namespace PhishingPortal.Repositories
                 .OrderByDescending(c => c.ModifiedOn)
                 .FirstOrDefault();
 
-            if(lastEmailCmpgn != null)
+            if (lastEmailCmpgn != null)
             {
-               var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastEmailCmpgn.Id 
-                            && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
+                var logs = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == lastEmailCmpgn.Id
+                             && (o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString()));
 
                 outcome.Email.Total = logs.Count();
                 outcome.Email.TotalHits = logs.Count(o => o.IsHit);
                 outcome.Email.TotalReported = logs.Count(o => o.IsReported);
-                if(outcome.Email.Total > 0)
+                if (outcome.Email.Total > 0)
                 {
                     outcome.Email.PronePercent = Math.Round(((decimal)outcome.Email.TotalHits / outcome.Email.Total) * 100, 2);
                 }
@@ -836,7 +857,7 @@ namespace PhishingPortal.Repositories
                     if (rm == null)
                     {
                         TenantDbCtx.Add(new RecipientGroupMapping { GroupId = grp.Id, RecipientId = recipient.Id });
-                        
+
                     }
                 }
 
@@ -904,7 +925,7 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-      
+
 
     }
 }

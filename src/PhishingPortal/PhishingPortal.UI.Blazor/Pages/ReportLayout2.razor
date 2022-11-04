@@ -1,5 +1,4 @@
-﻿@page "/report"
-@page "/report/{id:int}"
+﻿@page "/report/department/{depart}"
 
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
@@ -52,8 +51,8 @@
 
 @code {
 
-    [Parameter] 
-    public int Id { get; set; }
+    [Parameter]
+    public string depart { get; set; }
 
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
@@ -76,7 +75,6 @@
     private CGrid<CampaignLog> _grid;
     private Task _task;
     private GridODataClient<CampaignLog> _client;
-    CampaignTemplate campaignTemplate;
 
     private bool _eventHooked = false;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
@@ -114,16 +112,20 @@
         await Task.CompletedTask;
     }
 
+
     protected override async Task OnParametersSetAsync()
     {
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
 
-        var query = new QueryDictionary<StringValues>();        
+        var query = new QueryDictionary<StringValues>();
 
-        if (Id > 0)
-            query.Add("grid-filter", $"CampaignId__1__{Id}");
 
-        try{
+        if (!depart.Equals(null))
+            query.Add("grid-filter", $"Recipient.Recipient.Department__2__{depart}");
+
+
+        try
+        {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
             .Sortable()
             .ChangePageSize(true)
@@ -143,7 +145,8 @@
 
             _task = client.UpdateGrid();
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             logger.LogCritical(ex, ex.Message);
         }
 
