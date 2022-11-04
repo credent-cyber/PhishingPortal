@@ -33,7 +33,7 @@ Describe and show how to build your code and run the tests.
 	1. Create template 
 	2. Check preview button
 	3. check template edit button
-	4. Ckeck filters on data table
+	4. Check filters on data table
 
 4. Setting
 	1. Add redirect url and remove
