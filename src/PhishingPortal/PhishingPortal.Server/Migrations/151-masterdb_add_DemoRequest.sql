@@ -1,8 +1,7 @@
 ﻿use phishsim;
 CREATE TABLE demorequestor (
   Id int NOT NULL auto_increment UNIQUE,
-  FirstName varchar(45) NOT NULL,
-  LastName varchar(45),
+  FullName varchar(45) NOT NULL,
   Email varchar(45) NOT NULL,
   ContactNumber int,
   Company varchar(45),
