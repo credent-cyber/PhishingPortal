@@ -40,7 +40,9 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
 
         public void Stop()
         {
-            Logger.LogInformation($"DemoRequestHandler Stopped");
+            Logger.LogInformation($"DemoRequestHandler Stopping...");
+            ConnectionManager.Dispose();
+            Logger.LogInformation($"DemoRequestHandler stoppped");
         }
 
         public void Execute()
