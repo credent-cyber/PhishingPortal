@@ -37,7 +37,7 @@ Describe and show how to build your code and run the tests.
 
 4. Setting
 	1. Add redirect url and remove
-	2. try to remove, re-add AD setting
+	2. try to remove then re-add AD setting
 	
 5. Report
 	1. Ckeck filters on data table
