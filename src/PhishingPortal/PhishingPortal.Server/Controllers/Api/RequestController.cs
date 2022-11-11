@@ -19,34 +19,12 @@ namespace PhishingPortal.Server.Controllers.Api
     public class RequestController : BaseApiController
     {
 
-        private class OnboardingConfig
-        {
-            public string TestEmailRecipient { get; set; } = "malay.pandey@credentinfotech.com";
-            public string EmailContent { get; set; } = "Confirmation Email Content ###CONFIRM_LINK###";
-
-        }
-
-
-        public RequestController(ILogger<RequestController> logger, IConfiguration config, ITenantAdminRepository tenantAdminRepo, INsLookupHelper nsLookup,
-            IEmailSender emailSender,
-            UserManager<PhishingPortalUser> userManager) : base(logger)
+        public RequestController(ILogger<RequestController> logger, IConfiguration config, ITenantAdminRepository tenantAdminRepo) : base(logger)
         {
             tenatAdminRepo = tenantAdminRepo;
-            NsLookup = nsLookup;
-            EmailSender = emailSender;
-            UserManager = userManager;
-            _config = new OnboardingConfig();
-            config.GetSection("OnboardingConfig").Bind(_config);
         }
 
-        OnboardingConfig _config;
-
         public ITenantAdminRepository tenatAdminRepo { get; }
-        public INsLookupHelper NsLookup { get; }
-        public IEmailSender EmailSender { get; }
-        public UserManager<PhishingPortalUser> UserManager { get; }
-
-
 
         [HttpPost]
         [Route("upsert_demorequestor")]

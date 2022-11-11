@@ -30,13 +30,18 @@ namespace PhishingPortal.Services.Notification.Helper
 
         public DemoRequestor GetContext()
         {
-            lock (this)
+            try
             {
                     var demoReq = centralDbContext.DemoRequestor.Where(o=>o.isNotified==false).FirstOrDefault();
                     if (demoReq == null)
                         _logger.LogInformation($"No new Demo Requestor found!!!");
 
                 return demoReq;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation("Error : Unable to Get DemoRequestor");
+                return null;
             }
         }
         public bool SetContext(DemoRequestor dm)

@@ -73,9 +73,17 @@ else
                                                     <div class="col-md-9">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
                                                             @foreach (var val in Templates.OrderBy(o=>o.Name).Where(o=>o.Type==model.Detail.Type))
+                                                            {   
+                                                                if(val.Id.Equals(0))
                                                                 {
-                                                                <option value="@val.Id">@val.Name</option>
+                                                                    <option>- Not Available -</option>                                                                 
                                                                 }
+                                                                else
+                                                                {
+                                                                    <option value="@val.Id">@val.Name</option>
+                                                                }
+                                                                    
+                                                            }
                                                         </InputSelect>
                                                     </div>
                                                 </div>
@@ -312,9 +320,9 @@ else
                                 <div class="col-md-6">
                                     <div class="card" style="margin-bottom: 0;">
                                         <div class="card-body" style="max-height: 850px; overflow-y: scroll;">
-                                            @if (model.Detail.CampaignTemplateId.Equals(null))
+                                            @if (model.Detail.CampaignTemplateId.Equals(0))
                                             {
-                                                <p style="margin-top:50%; text-align:center;">No Template Selected!</p>
+                                                <p style="margin-top:50%; text-align:center;">No Template Available!</p>
                                             }
                                             else
                                             {
@@ -902,13 +910,38 @@ else
             var a = e.Value.ToString();
             if(a=="Sms")
             { 
-                model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id;
-                OnShowPreview(model.Detail.CampaignTemplateId);
+                var count = Templates.Where(o => o.Type == CampaignType.Sms).Count();
+                if (count.Equals(0))
+                {
+                    model.Detail.CampaignTemplateId = 0;
+                    model.Detail.Type = CampaignType.Sms;
+                }
+                else
+                {
+                    model.Detail.Type = CampaignType.Sms; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Sms).FirstOrDefault().Id;
+                    OnShowPreview(model.Detail.CampaignTemplateId);
+                }
             }
             else if(a=="Email")
-            { model.Detail.Type = CampaignType.Email; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;}
+            {
+                model.Detail.Type = CampaignType.Email;            
+                model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
+            }
             else if(a=="Whatsapp")
-            { model.Detail.Type = CampaignType.Whatsapp; model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;}
+            {
+
+                var count = Templates.Where(o => o.Type == CampaignType.Whatsapp).Count();
+                if (count.Equals(0)) 
+                {
+                    model.Detail.CampaignTemplateId = 0;
+                    model.Detail.Type = CampaignType.Whatsapp;
+                }
+                else
+                {
+                    model.Detail.Type = CampaignType.Whatsapp; 
+                    model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;
+                }
+            }
 
         }
 

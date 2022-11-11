@@ -5,6 +5,7 @@ CREATE TABLE demorequestor (
   LastName varchar(45),
   Email varchar(45) NOT NULL,
   ContactNumber int,
+  Company varchar(45),
   Messages varchar(255),
   IsNotified boolean DEFAULT false,
   CreatedBy varchar(45),
