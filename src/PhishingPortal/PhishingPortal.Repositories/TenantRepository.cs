@@ -260,6 +260,7 @@ namespace PhishingPortal.Repositories
         /// <param name="end"></param>
         /// <returns></returns>
 
+        
         public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
         {
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
@@ -279,6 +280,8 @@ namespace PhishingPortal.Repositories
             data.TemplateClickEntries = new Dictionary<string, decimal>();
             data.SmsTemplateClickEntries = new Dictionary<string, decimal>();
             data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();
+            
+            data.CompleteLogs = new List<CompleteLogReport>();
 
             try
             {
@@ -298,6 +301,7 @@ namespace PhishingPortal.Repositories
 
                     TTotal = tentries.Count(),
                     THits = tentries.Count(o => o.logEntry.IsHit),
+                   
                 });
                 var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
 
@@ -313,6 +317,33 @@ namespace PhishingPortal.Repositories
                         }
                     }
                 }
+                //............................................................................
+                var campaignlogGroup = totatPhishingTests.ToList().GroupBy(i => i.Id, (key, entries) => new
+                {
+                    Id = key,
+                    Total = entries.Count(),
+                    TotalHits = entries.Count(i => i.IsHit),
+                    TotalReported = entries.Count(i => i.IsReported),
+                });
+
+                foreach (var c in campaignlogGroup)
+                {
+                    var campaignlog = TenantDbCtx.CampaignLogs.Find(c.Id);
+
+                    if (campaignlog == null)
+                        continue;
+
+                    var logentry = new CompleteLogReport()
+                    {
+                        campaignLog = campaignlog,
+                        Total = c.Total,
+                        TotalClicks = c.TotalHits,
+                        Reported = c.TotalReported,
+                    };
+
+                    data.CompleteLogs.Add(logentry);
+                }
+                //............................................................................
 
                 var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
@@ -343,8 +374,9 @@ namespace PhishingPortal.Repositories
 
                 data.TotalCampaigns = data.Entries.Sum(i => i.Count);
                 var ids = data.Entries;
-                
+
                 //email campaign - department wise data 
+
                 int count = 0, id1 = 1, id2 = 1, id3 = 1, id4 = 1, id5 = 1;
                 foreach (var id in ids)
                 {
@@ -359,7 +391,9 @@ namespace PhishingPortal.Repositories
                         id4 = id.Campaign.Id;
                     if (count == 5)
                         id5 = id.Campaign.Id;
+
                 }
+                
                 var filterData = TenantDbCtx.CampaignLogs
                  .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
                 var phishtestWithRecipients = from log in filterData
@@ -925,7 +959,6 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-
-
+       
     }
 }

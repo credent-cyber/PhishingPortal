@@ -227,7 +227,7 @@
                                         <div class="card-body">
                                             <div style="width: 100%;">
                                                 <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data"
-                                                       Labels="@BarChart3Labels" IsStacked="false">
+                                                    Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
                                                 </Chart>
                                             </div>
                                         </div>
@@ -241,7 +241,7 @@
                                         <div class="card-body">
                                             <div style="width: 100%;">
                                                 <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data"
-                                                       Labels="@BarChart3Labels" IsStacked="false">
+                                                    Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
                                                 </Chart>
                                             </div>
                                         </div>
@@ -292,7 +292,8 @@
                                                 <PieChart Id="TempPolar" Type="@ChartType.pie" Responsive="true"
                                                           Data="@(Polar1Data.ToArray())"
                                                           BackgroundColor="@(Polar1Background.ToArray())"
-                                                          Labels="@(Polar1Labels.ToArray())">
+                                                          Labels="@(Polar1Labels.ToArray())"
+                                                          Ids="@Polar1Ids.ToArray()">
                                                 </PieChart>
                                             </div>
                                         </div>
@@ -311,7 +312,7 @@
                                             <div class="card-body">
                                                 <div style="width: 100%;">
                                                     <Chart Id="SmsBar" Type="@ChartType.bar" Datasets="@SmsBarChartData"
-                                                           Labels="@SmsBarChartLabels" IsStacked="false">
+                                                           Labels="@SmsBarChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
                                                     </Chart>
                                                 </div>
                                             </div>
@@ -325,7 +326,7 @@
                                             <div class="card-body">
                                                 <div style="width: 100%;">
                                                     <Chart Id="SmsLine" Type="@ChartType.line" Datasets="@SmsLineChartData"
-                                                           Labels="@SmsLineChartLabels" IsStacked="false">
+                                                           Labels="@SmsLineChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
                                                     </Chart>
                                                 </div>
                                             </div>
@@ -391,7 +392,7 @@
                                             <div class="card-body">
                                                 <div style="width: 100%;">
                                                     <Chart Id="WhatsappBar" Type="@ChartType.bar" Datasets="@WhatsappBarChartData"
-                                                           Labels="@WhatsappBarChartLabels" IsStacked="false">
+                                                           Labels="@WhatsappBarChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
                                                     </Chart>
                                                 </div>
                                             </div>
@@ -405,7 +406,7 @@
                                             <div class="card-body">
                                                 <div style="width: 100%;">
                                                     <Chart Id="WhatsappLine" Type="@ChartType.line" Datasets="@WhatsappLineChartData"
-                                                           Labels="@WhatsappLineChartLabels" IsStacked="false">
+                                                           Labels="@WhatsappLineChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
                                                     </Chart>
                                                 </div>
                                             </div>
@@ -545,6 +546,7 @@
 
     public List<ChartJsDataset> BarChart3Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart3Labels { get; set; }
+    public int[] BarChart3Ids { get; set; }
 
     public List<string> PieChart1Data { get; set; } = new List<string>();
     public List<string> PieChart1Background { get; set; } = new List<string>() { "#CCD1D1", "#DE3163", "#E6B0AA", "#D7BDE2", "#A9CCE3", "#82E0AA ", "#40E0D0", "#FF7F50", "#0e9e4a", "#FFB64D", "#FF5370", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
@@ -557,10 +559,12 @@
     public List<string> Polar1Data { get; set; } = new List<string>();
     public List<string> Polar1Background { get; set; } = new List<string>() { "#A9CCE3", "#82E0AA ", "#DE3163", "#40E0D0", "#FF7F50", "#E6B0AA", "#D7BDE2", "#CCD1D1", "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> Polar1Labels { get; set; } = new List<string>();
+    public List<string> Polar1Ids { get; set; } = new List<string>();
 
     //Sms Chart Data
     public List<ChartJsDataset> SmsBarChartData { get; set; } = new List<ChartJsDataset>();
     public string[] SmsBarChartLabels { get; set; }
+    public int[] SmsBarChartIds { get; set; }
 
     public List<ChartJsDataset> SmsLineChartData { get; set; } = new List<ChartJsDataset>();
     public string[] SmsLineChartLabels { get; set; }
@@ -580,6 +584,7 @@
     //Whatsapp Chart Data
     public List<ChartJsDataset> WhatsappBarChartData { get; set; } = new List<ChartJsDataset>();
     public string[] WhatsappBarChartLabels { get; set; }
+    public int[] WhatsappBarChartIds { get; set; }
 
     public List<ChartJsDataset> WhatsappLineChartData { get; set; } = new List<ChartJsDataset>();
     public string[] WhatsappLineChartLabels { get; set; }
@@ -633,7 +638,8 @@
             data2.Entries.Select(o => o.Campaign.Id).ToArray();
 
             // Email campaign wise chart
-            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Email per Campaign
+            BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Recent five Email Campaigns
+            BarChart3Ids = data2.Entries.Select(o => o.Campaign.Id).ToArray();
             BarChart3Data.Add(new ChartJsDataset
             {
                     Label = "Email Count",
@@ -685,7 +691,8 @@
                 if (entry.Value != 0)
                 {
                     Polar1Data.Add(entry.Value.ToString());
-                    Polar1Labels.Add(entry.Key.ToUpper());
+                    Polar1Labels.Add(entry.Key.Split(".")[1]);
+                    Polar1Ids.Add(entry.Key.Split(".")[0]);
                 }
             }
             //BarChart1Data.Add(new ChartJsDataset
@@ -699,6 +706,7 @@
 
             //Sms Chart data
             SmsBarChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Sms per Campaign
+            SmsBarChartIds = data2.SmsEntries.Select(o => o.Campaign.Id).ToArray();
             SmsBarChartData.Add(new ChartJsDataset
                 {
                     Label = "Sms Count",
@@ -752,10 +760,12 @@
                 {
                     SmsPolarData.Add(entry.Value.ToString());
                     SmsPolarLabels.Add(entry.Key.ToUpper());
+
                 }
             }
             //Whatsapp Chart data
             WhatsappBarChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Whatsapp per Campaign
+            WhatsappBarChartIds = data2.WhatsappEntries.Select(o => o.Campaign.Id).ToArray();
             WhatsappBarChartData.Add(new ChartJsDataset
                 {
                     Label = "Whatsapp Count",

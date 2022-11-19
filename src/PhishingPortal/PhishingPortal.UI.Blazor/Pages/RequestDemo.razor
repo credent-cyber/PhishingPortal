@@ -50,7 +50,7 @@
                       <div class="form-group row">
                         <label for="colFormLabel" class="col-sm-4 col-form-label" style="font-weight:700">Mobile No.</label>
                         <div class="col-sm-8">
-                          <InputNumber  class="form-control" id="contactno" name="contactno"  placeholder="Contact Number" @bind-Value="@Model.ContactNumber"> </InputNumber>
+                            <InputText class="form-control" id="contactno" name="contactno" placeholder="Contact Number" @bind-Value="@Model.ContactNumber"> </InputText>
                         </div>
                       </div>
                       <div class="form-group row">
@@ -66,7 +66,7 @@
                        <button @onclick="Close" class="btn btn-secondary">Close</button>
                     }
                     else{
-                          <button  @onclick="OnValidSubmit" class="btn btn-primary" >Submit</button>                       
+                          <button @onclick="OnValidSubmit" class="btn btn-primary" >Submit</button>                       
                           <button @onclick="Close" class="btn btn-secondary">Close</button>
                     }
                    </div>

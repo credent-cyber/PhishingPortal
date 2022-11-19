@@ -26,6 +26,9 @@
     public string[] Labels { get; set; }
 
     [Parameter]
+    public int[] Ids { get; set; }
+
+    [Parameter]
     public bool Responsive { get; set; } = true;
 
     [Parameter]
@@ -75,13 +78,14 @@
                 Data = new
                 {
                     Labels = Labels,
-
+                    Ids = Ids,
                     Datasets = Datasets.Select(o => new
                     {
                         Label = o.Label,
                         Data = o.Data,
                         Tension = 0.4,
                         BackgroundColor = o.BackgroundColor,
+
                         //Fill : true
                         //Urls = o.Data.Select(o=>string.Concat("https://phishsims.com/report/",o))
                     })
@@ -95,30 +99,18 @@
             };
             var ObjRef = DotNetObjectReference.Create(this);
 
-            //await JSRuntime.InvokeVoidAsync("setup", Id, config);
             await JSRuntime.InvokeVoidAsync("setup", Id, config, ObjRef);
 
         }
 
     }
 
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-
     [JSInvokable]
-    public async Task ChartClick(string label, string id)
+    public async Task ChartClick(int CampId, string ChartId)
     {
-
         if (!IsClickable)
             return;
-
-        StartDate = new DateTime(DateTime.Now.Year, 1, 1);
-        EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
-        var data2 = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
-        var Camp = data2.Entries.Where(o => o.Campaign.Name == label).ToList();
-        var CampId = Camp.Select(o => o.Campaign).First().Id;
         NavManager.NavigateTo($"/report/{CampId}");
-
     }
     [JSInvokable]
     public static async Task ChartHover()

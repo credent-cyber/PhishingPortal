@@ -16,7 +16,7 @@ namespace PhishingPortal.Dto
         [RegularExpression(pattern: AppConfig.EmailRegex, ErrorMessage = "Please specify a valid email id")]
         public string Email { get; set; }
       
-        public int ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
         public string Company { get; set; }
         public string Messages { get; set; }
         

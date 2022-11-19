@@ -27,6 +27,9 @@
 
     [Parameter]
     public string[] Labels { get; set; }
+    
+    [Parameter]
+    public string[] Ids { get; set; }
 
     [Parameter]
     public bool Responsive { get; set; } = true;
@@ -84,7 +87,8 @@
                     new { Data = Data, BackgroundColor = BackgroundColor}
 
     },
-                Labels = Labels
+                Labels = Labels,
+                Ids = Ids,
             }
         };
         var ObjRef = DotNetObjectReference.Create(this);
@@ -103,7 +107,7 @@
         else if (id.Contains("pie")) { NavManager.NavigateTo($"/report/category/{label}"); }
         else if (id.Contains("Polar")) 
         {
-            var TemplateId = label.Split(".")[0];
+            var TemplateId = label;
             NavManager.NavigateTo($"/report/template/{TemplateId}");
         }
 

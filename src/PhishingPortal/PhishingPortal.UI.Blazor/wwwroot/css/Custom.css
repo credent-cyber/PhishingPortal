@@ -61,3 +61,6 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
             margin-top: 0 !important;
             
         }*/
+table.striped > tbody > tr.grid-row:nth-of-type(odd) {
+    background-color: #dee2e6 !important;
+}

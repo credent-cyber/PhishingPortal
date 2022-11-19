@@ -26,7 +26,7 @@
 
 	<ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EntityFrameworkVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>

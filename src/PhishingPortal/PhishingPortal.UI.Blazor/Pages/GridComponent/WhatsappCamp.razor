@@ -55,7 +55,7 @@ else
         var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
              .Sortable(true)
             .Filterable(true)
-            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+            //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
