@@ -30,6 +30,9 @@
 
     [Parameter]
     public bool Responsive { get; set; } = true;
+    
+    [Parameter]
+    public bool AspectRatio { get; set; } = true;
 
     [Parameter]
     public bool IsStacked { get; set; }
@@ -59,6 +62,7 @@
                 Options = new
                 {
                     Responsive = Responsive,
+                    maintainAspectRatio = AspectRatio,
                     Scales = new
                     {
 

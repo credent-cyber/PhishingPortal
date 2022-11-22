@@ -51,7 +51,7 @@ else
         string url = $"odata/template?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-filter", "Type__1__Email");
-        //query.Add("grid-sorting", "Id__1__1");
+        query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
             .Sortable()

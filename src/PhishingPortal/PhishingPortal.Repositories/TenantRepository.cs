@@ -289,60 +289,32 @@ namespace PhishingPortal.Repositories
                 var totatPhishingTests = TenantDbCtx.CampaignLogs
                   .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
 
-
-                var phishtestWithTemp = from log in totatPhishingTests
-                                        join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
-                                        join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
-                                        select new { logEntry = log, template = ctem.Name, templateId = ctem.Id };
-
-                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
-                {
-                    template = key,
-
-                    TTotal = tentries.Count(),
-                    THits = tentries.Count(o => o.logEntry.IsHit),
-                   
-                });
-                var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
-
-                foreach (var tem in tempwiseCnt)
-                {
-                    if (tem.TTotal > 0)
-                    {
-                        var equivTemp = CalcEquivalentPercent(tem.THits, TemptotalHits);
-
-                        if (!data.TemplateClickEntries.ContainsKey(tem.template))
-                        {
-                            data.TemplateClickEntries.Add(tem.template, equivTemp);
-                        }
-                    }
-                }
                 //............................................................................
-                var campaignlogGroup = totatPhishingTests.ToList().GroupBy(i => i.Id, (key, entries) => new
-                {
-                    Id = key,
-                    Total = entries.Count(),
-                    TotalHits = entries.Count(i => i.IsHit),
-                    TotalReported = entries.Count(i => i.IsReported),
-                });
+                //var campaignlogGroup = totatPhishingTests.ToList().GroupBy(i => i.Id, (key, entries) => new
+                //{
+                //    Id = key,
+                //    Total = entries.Count(),
+                //    TotalHits = entries.Count(i => i.IsHit),
+                //    TotalReported = entries.Count(i => i.IsReported),
+                //});
 
-                foreach (var c in campaignlogGroup)
-                {
-                    var campaignlog = TenantDbCtx.CampaignLogs.Find(c.Id);
+                //foreach (var c in campaignlogGroup)
+                //{
+                //    var campaignlog = TenantDbCtx.CampaignLogs.Find(c.Id);
 
-                    if (campaignlog == null)
-                        continue;
+                //    if (campaignlog == null)
+                //        continue;
 
-                    var logentry = new CompleteLogReport()
-                    {
-                        campaignLog = campaignlog,
-                        Total = c.Total,
-                        TotalClicks = c.TotalHits,
-                        Reported = c.TotalReported,
-                    };
+                //    var logentry = new CompleteLogReport()
+                //    {
+                //        campaignLog = campaignlog,
+                //        Total = c.Total,
+                //        TotalClicks = c.TotalHits,
+                //        Reported = c.TotalReported,
+                //    };
 
-                    data.CompleteLogs.Add(logentry);
-                }
+                //    data.CompleteLogs.Add(logentry);
+                //}
                 //............................................................................
 
                 var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
@@ -396,6 +368,7 @@ namespace PhishingPortal.Repositories
                 
                 var filterData = TenantDbCtx.CampaignLogs
                  .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
+                
                 var phishtestWithRecipients = from log in filterData
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
@@ -422,6 +395,34 @@ namespace PhishingPortal.Repositories
                         }
 
 
+                    }
+                }
+                // Percentage of Email Campaign Template report
+                var phishtestWithTemp = from log in totatPhishingTests
+                                        join cdet in TenantDbCtx.CampaignDetails on log.CampaignId equals cdet.CampaignId
+                                        join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
+                                        select new { logEntry = log, template = ctem.Name, templateId = ctem.Id };
+
+                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+                {
+                    template = key,
+
+                    TTotal = tentries.Count(),
+                    THits = tentries.Count(o => o.logEntry.IsHit),
+
+                });
+                var TemptotalHits = tempwiseCnt.Sum(o => o.THits);
+
+                foreach (var tem in tempwiseCnt)
+                {
+                    if (tem.TTotal > 0)
+                    {
+                        var equivTemp = CalcEquivalentPercent(tem.THits, TemptotalHits);
+
+                        if (!data.TemplateClickEntries.ContainsKey(tem.template))
+                        {
+                            data.TemplateClickEntries.Add(tem.template, equivTemp);
+                        }
                     }
                 }
 
