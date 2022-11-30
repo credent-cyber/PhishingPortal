@@ -3,6 +3,8 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
+using Org.BouncyCastle.Asn1.X509;
+using System.Linq;
 
 namespace PhishingPortal.Repositories
 {
@@ -279,43 +281,13 @@ namespace PhishingPortal.Repositories
 
             data.TemplateClickEntries = new Dictionary<string, decimal>();
             data.SmsTemplateClickEntries = new Dictionary<string, decimal>();
-            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();
-            
-            data.CompleteLogs = new List<CompleteLogReport>();
+            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();            
 
             try
             {
 
                 var totatPhishingTests = TenantDbCtx.CampaignLogs
                   .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
-
-                //............................................................................
-                //var campaignlogGroup = totatPhishingTests.ToList().GroupBy(i => i.Id, (key, entries) => new
-                //{
-                //    Id = key,
-                //    Total = entries.Count(),
-                //    TotalHits = entries.Count(i => i.IsHit),
-                //    TotalReported = entries.Count(i => i.IsReported),
-                //});
-
-                //foreach (var c in campaignlogGroup)
-                //{
-                //    var campaignlog = TenantDbCtx.CampaignLogs.Find(c.Id);
-
-                //    if (campaignlog == null)
-                //        continue;
-
-                //    var logentry = new CompleteLogReport()
-                //    {
-                //        campaignLog = campaignlog,
-                //        Total = c.Total,
-                //        TotalClicks = c.TotalHits,
-                //        Reported = c.TotalReported,
-                //    };
-
-                //    data.CompleteLogs.Add(logentry);
-                //}
-                //............................................................................
 
                 var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
@@ -960,6 +932,32 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-       
+        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query)
+        {
+            var result = Enumerable.Empty<CampaignLog>();
+            var results = Enumerable.Empty<CampaignLog>();
+            var data = query.ToList();
+            var logdata = TenantDbCtx.CampaignLogs.Include(o=>o.Recipient.Recipient).Include(o=>o.Camp).Include(o => o.Camp.Detail.Template);
+            if (data.Count > 0)
+            {
+                for(int i=0; i < data.Count; i++)
+                {
+                    var id = Convert.ToInt16(data[i]);
+                    if (i == 0)
+                    {
+                        results = logdata.Where(o => o.CampaignId == id);
+                    }
+                    else
+                    {
+                        result = logdata.Where(o => o.CampaignId == id);
+                        results = results.Concat(result);
+                    }
+                }
+            }
+            else
+                results = TenantDbCtx.CampaignLogs;
+
+            return Task.FromResult(results);
+        }
     }
 }

@@ -96,6 +96,8 @@
     private GridODataClient<CampaignLog> _client;
 
     private bool _eventHooked = false;
+    private bool _lock = false;
+    private bool _reload = true;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
@@ -114,17 +116,81 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
+        if (!firstRender && _lock == false){
+            List<string> filterIds = new List<string>();
+            if (depart != null || categ != null || TempId > 0)
+            {
+                filterIds.Add(id1.ToString()); filterIds.Add(id2.ToString()); filterIds.Add(id3.ToString()); filterIds.Add(id4.ToString()); filterIds.Add(id5.ToString());
+                Filter(filterIds); 
+            }
+            else if (Id > 0)
+            {
+                filterIds.Add(Id.ToString());
+                Filter(filterIds);
+            }
+            else{
+                if (_reload) { Filter(filterIds); _reload = false; }
+                _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
+            }
+            _lock = true;
+        }
     }
 
+
+    public async void Filter(List<string> filterId)
+    {
+        IEnumerable<CampaignLog> logs;
+
+        logs = await client.GetCampaignLog(filterId);
+        if (depart != null){
+            logs = logs.Where(o => o.Recipient.Recipient.Department.Equals(depart, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        }
+        else if (categ != null){
+            logs = logs.Where(o => o.Camp.Category.Equals(categ, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        }
+        else if(TempId > 0)
+        {
+            logs = logs.Where(o => o.Camp.Detail.CampaignTemplateId == TempId).ToList();
+        }
+
+
+        total = logs.Count();
+        hits = logs.Count(o => o.IsHit);
+        reported = logs.Count(o => o.IsReported);
+        if (total > 0)
+            pronePercent = Math.Round(((decimal)hits / total) * 100, 2);
+
+
+
+        StateHasChanged();
+    }
     private async Task AfterRefreshGrid()
     {
+        List<string> filterId = new List<string>(); 
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
+        // var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values.ElementAt(0);
+        var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values;
+        if(fdata.Count>0){
+            foreach (var item in fdata.ElementAt(0))
+            {
+                if (item.Contains("CampaignId") && item.Split("__")[1] == "1")
+                {
+                    var a = item.Split("__")[2];
+                    filterId.Add(a);
+                }
+            }
+        }
+        _lock = false;
+
         if (grid != null)
         {
             Calculate(grid);
-            StateHasChanged();
+            if (grid.Items.ToList().Count() > 0)
+                Filter(filterId);
+            else
+                total = 0; hits = 0; reported = 0; pronePercent = 0; StateHasChanged();
         }
+
 
         await Task.CompletedTask;
     }
@@ -196,9 +262,9 @@
     private void Calculate(CGrid<CampaignLog> grid)
     {
         CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
-        total = CampaignLogs.Count();
-        hits = CampaignLogs.Count(o => o.IsHit);
-        reported = CampaignLogs.Count(o => o.IsReported);
+        //total = CampaignLogs.Count();
+        //hits = CampaignLogs.Count(o => o.IsHit);
+        //reported = CampaignLogs.Count(o => o.IsReported);
 
         if (total > 0)
         {

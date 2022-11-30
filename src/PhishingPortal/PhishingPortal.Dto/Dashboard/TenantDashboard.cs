@@ -38,8 +38,6 @@ namespace PhishingPortal.Dto.Dashboard
         public Dictionary<string, decimal> SmsTemplateClickEntries { get; set; }
         public Dictionary<string, decimal> WhatsappTemplateClickEntries { get; set; }
 
-        public List<CompleteLogReport> CompleteLogs { get; set; }
-
     }
 
     /// <summary>
@@ -167,23 +165,5 @@ namespace PhishingPortal.Dto.Dashboard
 
     }
 
-    public class CompleteLogReport
-    {
-        public CampaignLog campaignLog { get; set; }
-        public int Total { get; set; }
-        public int TotalClicks { get; set; }
-        public int Reported { get; set; }
-        public decimal PronePercentage
-        {
-            get
-            {
-                if (Total == 0)
-                    return 0;
-                var prone = Math.Round(((decimal)TotalClicks / Total) * 100, 2);
-                return prone;
-            }
-        }
-
-    }
 }
 
