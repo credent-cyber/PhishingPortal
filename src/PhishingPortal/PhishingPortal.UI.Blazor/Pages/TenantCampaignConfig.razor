@@ -280,12 +280,24 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">State</label>
                                                     <div class="col-md-9">
+                                                    @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
+                                                    {
+                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                                @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
+                                                                {
+                                                                <option value="@val">@val</option>
+                                                                }
+                                                        </InputSelect>
+                                                    }
+                                                    else
+                                                    {
                                                         <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
-                                                            @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
-                                                            {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                    </InputSelect>
+                                                                @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
+                                                                {
+                                                                <option value="@val">@val</option>
+                                                                }
+                                                        </InputSelect>
+                                                    }
                                                 </div>
                                             </div>
                                             

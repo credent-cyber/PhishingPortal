@@ -102,13 +102,34 @@
 
         if (!IsClickable)
             return;
+        
+        int count = 0, id1 = 0, id2 = 0, id3 = 0, id4 = 0, id5 = 0;
+        var StartDate = new DateTime(DateTime.Now.Year, 1, 1);
+        var EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
+        var data = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
+        var Ids = data.Entries;
+            foreach (var iid in Ids)
+            {
+                count += 1;
+                if (count == 1)
+                    id1 = iid.Campaign.Id;
+                if (count == 2)
+                    id2 = iid.Campaign.Id;
+                if (count == 3)
+                    id3 = iid.Campaign.Id;
+                if (count == 4)
+                    id4 = iid.Campaign.Id;
+                if (count == 5)
+                    id5 = iid.Campaign.Id;
+            }
 
-        if (id.Contains("donut")) { NavManager.NavigateTo($"/report/department/{label}"); }
-        else if (id.Contains("pie")) { NavManager.NavigateTo($"/report/category/{label}"); }
+        var ids = id1 + "a" + id2 + "a" + id3 + "a" + id4 + "a" + id5 ;
+        if (id.Contains("donut")) { NavManager.NavigateTo($"/report/{ids}/department/{label}"); }
+        else if (id.Contains("pie")) { NavManager.NavigateTo($"/report/{ids}/category/{label}"); }
         else if (id.Contains("Polar")) 
         {
             var TemplateId = label;
-            NavManager.NavigateTo($"/report/template/{TemplateId}");
+            NavManager.NavigateTo($"/report/{ids}/template/{TemplateId}");
         }
 
     }

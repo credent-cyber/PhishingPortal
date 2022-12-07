@@ -125,7 +125,7 @@ namespace PhishingPortal.Services.Notification.Email
                                 CreatedBy = "system",
                                 CreatedOn = timestamp,
                                 ReturnUrl = returnUrl,
-                                RecipientId = r.Id,
+                                RecipientId = r.Recipient.Id,
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,

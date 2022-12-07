@@ -17,6 +17,7 @@
                 option.Select();
                 option.Expand();
                 option.Filter();
+                option.OrderBy();
                 option.Count();
                 option.SetMaxTop(100);
                 option.SkipToken();

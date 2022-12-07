@@ -35,7 +35,7 @@ else
     Action<IGridColumnCollection<Campaign>> columns = c =>
     {
         // c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true).SortInitialDirection(GridSortDirection.Descending).ThenSortByDescending(o => o.Id);
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true);
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Name).Css("table-bordered");
         c.Add(o => o.Description).Css("table-bordered");
         c.Add(o => o.Detail.Type).Titled("Type").SetWidth("50px").Css("table-bordered");
@@ -51,6 +51,7 @@ else
         string url = $"odata/campaign?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-filter", "Detail.Type__1__Whatsapp");
+        query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
              .Sortable(true)
