@@ -1,5 +1,8 @@
 ﻿@page "/report"
 @page "/report/{id:int}"
+@page "/report/department/{depart}"
+@page "/report/category/{categ}"
+@page "/report/template/{tempid:int}"
 
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
@@ -23,9 +26,9 @@
 @inject AuthState authState;
 
 <div class="pcoded-content">
-    <h5><span style="color:orange;">Report Details</span></h5>
+    @*<h5><span style="color:orange;">Report Details</span></h5>*@
     <div class="row">
-        <div class="col-md-6 col-sm-12 col-xl-6 ">
+        <div class="col-xl-6 col-md-6">
             <div class="card" style="width:30rem;">
                 <div class="card-header">
                     <h5>Statistics</h5>
@@ -39,10 +42,11 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-12 col-md-6 col-xl-6">
-            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
-            </DrillDown_Summary>
+        <div class="col-xl-6 col-md-6">
+            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent" />
         </div>
+       
+
     </div>
 </div>
 
@@ -54,6 +58,12 @@
 
     [Parameter] 
     public int Id { get; set; }
+    [Parameter]
+    public string depart { get; set; }
+    [Parameter]
+    public string categ { get; set; }
+    [Parameter]
+    public int TempId { get; set; }
 
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
@@ -81,17 +91,17 @@
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.Camp.Id).Titled("ID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
         c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type");
         c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID");
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
-        c.Add(o => o.Recipient.Email).Css("table-bordered").Titled("Recipient Email");
-        c.Add(o => o.Recipient.Department).Css("table-bordered").Titled("Department");
+        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email");
+        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department");
         c.Add(o => o.IsHit).Css("table-bordered");
         c.Add(o => o.IsReported).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered");
- 
+
     };
 
     protected override void OnAfterRender(bool firstRender)
@@ -102,26 +112,30 @@
     private async Task AfterRefreshGrid()
     {
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
+        var griddd = _gridComponent.Grid;
 
         if (grid != null)
         {
             Calculate(grid);
-
             StateHasChanged();
         }
 
         await Task.CompletedTask;
     }
 
-
     protected override async Task OnParametersSetAsync()
     {
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
-
-        var query = new QueryDictionary<StringValues>();
+        var query = new QueryDictionary<StringValues>();        
 
         if (Id > 0)
-            query.Add("grid-filter", $"Camp.Id__1__{Id}");
+            query.Add("grid-filter", $"CampaignId__1__{Id}");
+        else if (categ != null)
+            query.Add("grid-filter", $"Camp.Category__2__{categ}");
+        else if(depart != null)
+            query.Add("grid-filter", $"Recipient.Recipient.Department__2__{depart}");
+        else if (TempId > 0)
+            query.Add("grid-filter", $"Camp.Detail.CampaignTemplateId__1__{TempId}");
 
         try{
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
@@ -134,13 +148,11 @@
             .WithGridItemsCount()
             .Searchable(true, false, false)
             .SetExcelExport(true, "Report.xlsx")
-            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             //.SetTableLayout(TableLayout.Fixed, "1200px", "400px")
             .AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
 
 
             _grid = client.Grid;
-
             _task = client.UpdateGrid();
         }
         catch(Exception ex){

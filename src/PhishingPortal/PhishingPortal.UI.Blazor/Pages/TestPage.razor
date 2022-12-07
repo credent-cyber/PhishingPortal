@@ -1,10 +1,14 @@
 ﻿@page "/gridsample"
 
+@using GridBlazor.Columns
 @using GridShared
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.UI.Blazor.Pages.GridButtons
+@using System.Globalization
+@inject TenantClient client
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthState authState;
@@ -36,8 +40,9 @@
 
     Action<IGridColumnCollection<Campaign>> columns = c =>
     {
-    //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px");
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
+        //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px").SortInitialDirection(GridShared.Sorting.GridSortDirection.Descending);
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").SortInitialDirection(GridShared.Sorting.GridSortDirection.Descending)
+                    .ThenSortByDescending(o => o.Id); 
         c.Add(o => o.Name).Css("table-bordered");
         c.Add(o => o.Description).Css("table-bordered");
         c.Add(o => o.Schedule.ScheduleType).Css("table-bordered").Titled("Schedule Type");
@@ -49,27 +54,50 @@
     };
 
     protected override async Task OnParametersSetAsync()
-    {
+    {   
+        var locale = CultureInfo.CurrentCulture;
         string url = $"odata/campaign?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        query.Add("grid-filter", "Detail.Type__1__Sms");
-        var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable(true)
+        //query.AddParameter("grid-filter", "Id__1__1");
+        //query.Add("grid-filter", "Id__1__1");
+        //query.AddOrSet("grid-filter", "Id__9__2");
+        //query.AddOrSet("grid-filter", "Id__1__5");
+        // query.Add("grid-sorting", "Id__1__1");
+        //query.Add("grid-filter", "Detail.Type__1__Sms");
+
+        var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10, locale)
+            .Sortable()
             .Filterable(true)
-            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+            //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
             .SetExcelExport(true, "Report.xlsx")
             .ChangePageSize(true)
+            .WithGridItemsCount()
+            //.ExtSortable(true)
             .Searchable(true, false, false);
 
         _grid = client.Grid;
-
-        // Set new items to grid
+        //Set new items to grid
         _task = client.UpdateGrid();
+
         await _task;
+    }
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        ExtractIds();
+        return base.OnAfterRenderAsync(firstRender);
+    }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+    public async void ExtractIds()
+    {
+        StartDate = new DateTime(DateTime.Now.Year, 1, 1);
+        EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
+        var datalog = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
+        var data = datalog.CompleteLogs.ToList();
     }
 
 
