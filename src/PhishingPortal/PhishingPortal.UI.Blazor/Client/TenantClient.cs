@@ -457,7 +457,7 @@ namespace PhishingPortal.UI.Blazor.Client
         #endregion
 
 
-        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(List<string> query)
+        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(Dictionary<string, List<string>> query)
         {
             IEnumerable<CampaignLog> campaignlog;
             try

@@ -4,7 +4,9 @@
 @page "/report/{data}/category/{categ}"
 @page "/report/{data}/template/{tempid:int}"
 
+@using GridShared.Columns;
 @using GridShared.Events
+@using GridShared.Filtering;
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.Dto
 @using System.Drawing
@@ -26,7 +28,22 @@
 @inject AuthState authState;
 
 <div class="pcoded-content" style="padding: 0 20px !important;">
-    @*<h5><span style="color:orange;">Report Details</span></h5>*@
+    @if (!(depart != null || categ != null || TempId > 0 || Id >0))
+    {
+        <div class="form-group row">
+            <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
+            <div class="col-md-10">
+                @*<select @bind-value="Year" @onchange="DateFilter" @bind-value:event="oninput" class="form-select" aria-label="Default select example">*@
+                <select value="@Year" @onchange="ChangeYear" class="form-select" aria-label="Default select example">
+                    <option selected>@Year</option>
+                    @foreach (var year in Years)
+                    {
+                        <option value="@year">@year</option>
+                    }
+                </select>
+            </div>
+        </div>
+    }
     <div class="row">
         <div class="col-xl-6 col-md-6">
             <div class="card">
@@ -55,7 +72,8 @@
 
     </div>
 </div>
-
+@Year
+@_ref
 <div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
     <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
 </div>
@@ -82,6 +100,22 @@
     private int reported;
     private decimal pronePercent;
 
+    //public string Year { get; set; } = DateTime.Now.Year.ToString();
+    public string Year { get; set; } = "2022";
+    public string[] Years = {"2019","2020","2021","2022"};
+
+    [Parameter]
+    public IGridColumn Column { get; set; }
+    public FilterCollection filters { get; set; }
+ 
+    void ChangeYear(ChangeEventArgs e)
+    {
+        Year = e.Value.ToString();
+        _gridComponent.AddFilter(Column, filters);
+        _gridComponent.RemoveFilter(Column);
+        _ref = 1;
+    }
+
     public string[] GetBackgroundColors(Color color, int arraySize)
     {
         var colors = new List<string>();
@@ -98,11 +132,13 @@
     private bool _eventHooked = false;
     private bool _lock = false;
     private bool _reload = true;
+    private int _ref = 0;
+
+
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
-        //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
+        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name");
         c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type");
         c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID");
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
@@ -116,43 +152,123 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender && _lock == false){
-            List<string> filterIds = new List<string>();
+        Dictionary<string, List<string>> filterIds = new Dictionary<string, List<string>>();
+        if (!filterIds.ContainsKey("Year"))
+            filterIds.Add("Year", new List<string>());
+
+        if (!firstRender && _lock == false)
+        {
+            filterIds["Year"].Add(Year);
+            if (!filterIds.ContainsKey("x"))
+                filterIds.Add("x", new List<string>());
+
             if (depart != null || categ != null || TempId > 0)
             {
-                filterIds.Add(id1.ToString()); filterIds.Add(id2.ToString()); filterIds.Add(id3.ToString()); filterIds.Add(id4.ToString()); filterIds.Add(id5.ToString());
-                Filter(filterIds); 
+                //filterIds.Add(id1.ToString()); filterIds.Add(id2.ToString()); filterIds.Add(id3.ToString()); filterIds.Add(id4.ToString()); filterIds.Add(id5.ToString());
+                if (!filterIds.ContainsKey("CampaignId"))
+                    filterIds.Add("CampaignId", new List<string>());
+
+                filterIds["CampaignId"].Add("1__" + id1.ToString()); filterIds["CampaignId"].Add("1__" + id2.ToString()); filterIds["CampaignId"].Add("1__" + id3.ToString());
+                filterIds["CampaignId"].Add("1__" + id4.ToString()); filterIds["CampaignId"].Add("1__" + id5.ToString());
+                Filter(filterIds);
             }
             else if (Id > 0)
             {
-                filterIds.Add(Id.ToString());
+                //filterIds.Add(Id.ToString());
+                if (!filterIds.ContainsKey("x"))
+                    filterIds.Add("x", new List<string>());
+                if (!filterIds.ContainsKey("CampaignId"))
+                    filterIds.Add("CampaignId", new List<string>());
+                filterIds["CampaignId"].Add("1__" + Id.ToString());
                 Filter(filterIds);
             }
-            else{
-                if (_reload) { Filter(filterIds); _reload = false; }
+            else
+            {
+                if (_reload)
+                { Filter(filterIds); _reload = false; }
                 _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
             }
             _lock = true;
         }
+        else if (!firstRender && _lock && _ref == 0) { _ref++; }
+        else if (!firstRender && _lock && _ref == 1)
+        { filterIds["Year"].Add(Year); Filter(filterIds); _ref++; }
+
     }
 
 
-    public async void Filter(List<string> filterId)
+    //public async void Filter(List<string> filterId)
+    //{
+    //    IEnumerable<CampaignLog> logs;
+
+    //    logs = await client.GetCampaignLog(filterId);
+    //    if (depart != null){
+    //        logs = logs.Where(o => o.Recipient.Recipient.Department.Equals(depart, StringComparison.InvariantCultureIgnoreCase)).ToList();
+    //    }
+    //    else if (categ != null){
+    //        logs = logs.Where(o => o.Camp.Category.Equals(categ, StringComparison.InvariantCultureIgnoreCase)).ToList();
+    //    }
+    //    else if(TempId > 0)
+    //    {
+    //        logs = logs.Where(o => o.Camp.Detail.CampaignTemplateId == TempId).ToList();
+    //    }
+
+    //    total = logs.Count();
+    //    hits = logs.Count(o => o.IsHit);
+    //    reported = logs.Count(o => o.IsReported);
+    //    if (total > 0)
+    //        pronePercent = Math.Round(((decimal)hits / total) * 100, 2);
+
+    //    StateHasChanged();
+    //}
+    //private async Task AfterRefreshGrid()
+    //{
+    //    List<string> filterId = new List<string>(); 
+    //    var grid = _gridComponent.Grid as CGrid<CampaignLog>;
+    //    // var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values.ElementAt(0);
+    //    var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values;
+    //    if(fdata.Count>0){
+    //        foreach (var item in fdata.ElementAt(0))
+    //        {
+    //            if (item.Contains("CampaignId") && item.Split("__")[1] == "1")
+    //            {
+    //                var a = item.Split("__")[2];
+    //                filterId.Add(a);
+    //            }
+    //        }
+    //    }
+    //    _lock = false;
+
+    //    if (grid != null)
+    //    {
+    //        Calculate(grid);
+    //        if (grid.Items.ToList().Count() > 0)
+    //            Filter(filterId);
+    //        else
+    //            total = 0; hits = 0; reported = 0; pronePercent = 0; StateHasChanged();
+    //    }
+
+
+    //    await Task.CompletedTask;
+    //}
+
+    public async void Filter(Dictionary<string,List<string>> filterId)
     {
         IEnumerable<CampaignLog> logs;
 
         logs = await client.GetCampaignLog(filterId);
-        if (depart != null){
+        if (depart != null)
+        {
             logs = logs.Where(o => o.Recipient.Recipient.Department.Equals(depart, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
-        else if (categ != null){
+        else if (categ != null)
+        {
             logs = logs.Where(o => o.Camp.Category.Equals(categ, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
-        else if(TempId > 0)
+        else if (TempId > 0)
         {
             logs = logs.Where(o => o.Camp.Detail.CampaignTemplateId == TempId).ToList();
         }
-
 
         total = logs.Count();
         hits = logs.Count(o => o.IsHit);
@@ -160,23 +276,124 @@
         if (total > 0)
             pronePercent = Math.Round(((decimal)hits / total) * 100, 2);
 
-
-
         StateHasChanged();
     }
+
     private async Task AfterRefreshGrid()
     {
-        List<string> filterId = new List<string>(); 
+        Dictionary<string, List<string>> dictionaryId = new Dictionary<string, List<string>>();
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
-        // var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values.ElementAt(0);
         var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values;
-        if(fdata.Count>0){
+        if (!dictionaryId.ContainsKey("Year"))
+            dictionaryId.Add("Year", new List<string>()); dictionaryId["Year"].Add(Year);
+
+
+
+        if (fdata.Count > 0)
+        {
             foreach (var item in fdata.ElementAt(0))
             {
-                if (item.Contains("CampaignId") && item.Split("__")[1] == "1")
+                if (item.Contains("CampaignId") && item.Split("__")[1] != "9")
                 {
-                    var a = item.Split("__")[2];
-                    filterId.Add(a);
+                    var value = item.Split("__")[1] +"__"+ item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CampaignId"))
+                        dictionaryId.Add("CampaignId", new List<string>());
+
+                    if(!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CampaignId"].Add(value);
+
+
+                }
+                if (item.Contains("Camp.Name") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CampaignName"))
+                        dictionaryId.Add("CampaignName", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CampaignName"].Add(value);
+
+                }
+                if (item.Contains("CampignType") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CampignType"))
+                        dictionaryId.Add("CampignType", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CampignType"].Add(value);
+
+                }
+                if (item.Contains("Camp.Detail.CampaignTemplateId") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CampaignTemplateId"))
+                        dictionaryId.Add("CampaignTemplateId", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CampaignTemplateId"].Add(value);
+
+                }
+                if (item.Contains("Camp.Category") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CampaignCategory"))
+                        dictionaryId.Add("CampaignCategory", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CampaignCategory"].Add(value);
+
+                }
+                if (item.Contains("Recipient.Recipient.Email") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("RecipientEmail"))
+                        dictionaryId.Add("RecipientEmail", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["RecipientEmail"].Add(value);
+
+                }
+                if (item.Contains("Recipient.Recipient.Department") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("RecipientDepartment"))
+                        dictionaryId.Add("RecipientDepartment", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["RecipientDepartment"].Add(value);
+
+                }
+                if (item.Contains("IsHit") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("IsHit"))
+                        dictionaryId.Add("IsHit", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["IsHit"].Add(value);
+
+                }
+                if (item.Contains("IsReported") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("IsReported"))
+                        dictionaryId.Add("IsReported", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["IsReported"].Add(value);
+
+                }
+                if (item.Contains("CreatedOn") && item.Split("__")[1] != "9")
+                {
+                    var value = item.Split("__")[1] + "__" + item.Split("__")[2];
+
+                    if (!dictionaryId.ContainsKey("CreatedOn"))
+                        dictionaryId.Add("CreatedOn", new List<string>());
+                    if (!dictionaryId.Values.SelectMany(lst => lst).Any(i => i == value))
+                        dictionaryId["CreatedOn"].Add(value);
+
                 }
             }
         }
@@ -184,12 +401,13 @@
 
         if (grid != null)
         {
-            Calculate(grid);
+            Calculate(grid); //update bar chart data
             if (grid.Items.ToList().Count() > 0)
-                Filter(filterId);
+                Filter(dictionaryId);
             else
                 total = 0; hits = 0; reported = 0; pronePercent = 0; StateHasChanged();
         }
+
 
 
         await Task.CompletedTask;
@@ -226,7 +444,16 @@
             var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
-
+        else
+        {
+            var year = Int32.Parse(Year);
+            var yearStartDate = new DateTime(year, 1, 1);
+            var start = yearStartDate.Year + "-" + yearStartDate.Month+"-"+yearStartDate.Day;
+            var yearEndDate = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+            var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+            var values = new string[] { $"CreatedOn__7__{start}", "CampaignId__9__2", $"CreatedOn__6__{end}" };
+            query.Add("grid-filter", new StringValues(values));
+        }
         try
         {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
@@ -302,4 +529,5 @@
                 BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Select(o => o.CampaignId).Count()),
             });
     }
+
 }

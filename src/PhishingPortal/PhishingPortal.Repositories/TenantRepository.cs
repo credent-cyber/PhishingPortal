@@ -5,6 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Reflection.Metadata;
+using static Duende.IdentityServer.Models.IdentityResources;
 
 namespace PhishingPortal.Repositories
 {
@@ -879,7 +883,6 @@ namespace PhishingPortal.Repositories
 
             return await Task.FromResult(recipients);
         }
-
         #region Settings
         public async Task<Dictionary<string, string>> GetSettings()
         {
@@ -931,33 +934,173 @@ namespace PhishingPortal.Repositories
             return inserted;
         }
         #endregion
-
-        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query)
+        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(Dictionary<string, List<string>> query)
         {
+
+            var data = query.ToList();
+            var year = Int32.Parse(data[0].Value[0]);
+            var yearStartDate = new DateTime(year, 1, 1);
+            var yearEndDate = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
             var result = Enumerable.Empty<CampaignLog>();
             var results = Enumerable.Empty<CampaignLog>();
-            var data = query.ToList();
-            var logdata = TenantDbCtx.CampaignLogs.Include(o=>o.Recipient.Recipient).Include(o=>o.Camp).Include(o => o.Camp.Detail.Template);
-            if (data.Count > 0)
-            {
-                for(int i=0; i < data.Count; i++)
+            var camp = new CampaignLog();
+            Dictionary<int, string> list = new Dictionary<int, string>();
+
+            try
+            {           
+                var logdata = TenantDbCtx.CampaignLogs.Where(i => i.CreatedOn >= yearStartDate && i.CreatedOn < yearEndDate)
+                    .Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
+
+                if (data.Count > 2)
                 {
-                    var id = Convert.ToInt16(data[i]);
-                    if (i == 0)
+                    for (int i = 2; i < data.Count; i++)
                     {
-                        results = logdata.Where(o => o.CampaignId == id);
-                    }
-                    else
-                    {
-                        result = logdata.Where(o => o.CampaignId == id);
-                        results = results.Concat(result);
+                        var Key = data[i].Key;
+                        var values = data[i].Value;
+                        if (Key == "CampaignId")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                { 
+                                    if (value.Split("__")[0] == "1") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId == id)); }
+                                    else if (value.Split("__")[0] == "5") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId > id)); }
+                                    else if (value.Split("__")[0] == "6") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId < id)); }
+                                    else if (value.Split("__")[0] == "7") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId >= id)); }
+                                    else if (value.Split("__")[0] == "8") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId <= id)); }
+                                    else if (value.Split("__")[0] == "10") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId != id)); }
+                                }
+                            }
+                         
+                            
+
+                        }
+                        else if (Key == "CampaignName")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Name == id)); }
+                                    else if (value.Split("__")[0] == "2") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Name.Contains(id))); }
+                                    else if (value.Split("__")[0] == "3") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Name.StartsWith(id))); }
+                                    else if (value.Split("__")[0] == "4") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Name.EndsWith(id))); }
+                                    else if (value.Split("__")[0] == "10") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Name != id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "CampignType")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.CampignType == id)); }
+                                    else if (value.Split("__")[0] == "2") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.CampignType.Contains(id))); }
+                                    else if (value.Split("__")[0] == "3") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.CampignType.StartsWith(id))); }
+                                    else if (value.Split("__")[0] == "4") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.CampignType.EndsWith(id))); }
+                                    else if (value.Split("__")[0] == "10") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.CampignType != id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "CampaignTemplateId")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId == id)); }
+                                    else if (value.Split("__")[0] == "5") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId > id)); }
+                                    else if (value.Split("__")[0] == "6") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId < id)); }
+                                    else if (value.Split("__")[0] == "7") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId >= id)); }
+                                    else if (value.Split("__")[0] == "8") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId <= id)); }
+                                    else if (value.Split("__")[0] == "10") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.Camp.Detail.CampaignTemplateId == id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "CampaignCategory")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Category == id)); }
+                                    else if (value.Split("__")[0] == "2") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Category.Contains(id))); }
+                                    else if (value.Split("__")[0] == "3") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Category.StartsWith(id))); }
+                                    else if (value.Split("__")[0] == "4") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Category.EndsWith(id))); }
+                                    else if (value.Split("__")[0] == "10") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Camp.Category != id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "RecipientEmail")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Email == id)); }
+                                    else if (value.Split("__")[0] == "2") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Email.Contains(id))); }
+                                    else if (value.Split("__")[0] == "3") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Email.StartsWith(id))); }
+                                    else if (value.Split("__")[0] == "4") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Email.EndsWith(id))); }
+                                    else if (value.Split("__")[0] == "10") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Email != id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "RecipientDepartment")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Department == id)); }
+                                    else if (value.Split("__")[0] == "2") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Department.Contains(id))); }
+                                    else if (value.Split("__")[0] == "3") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Department.StartsWith(id))); }
+                                    else if (value.Split("__")[0] == "4") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Department.EndsWith(id))); }
+                                    else if (value.Split("__")[0] == "10") { var id = value.Split("__")[1]; results = results.Union(logdata.Where(o => o.Recipient.Recipient.Department != id)); }
+                                }
+                            }
+                        }
+                        else if (Key == "IsHit")
+                        {
+                            if (values[0] == "true") { results = results.Union(logdata.Where(o => o.IsHit == true)); }
+                            if (values[0] == "false") { results = results.Union(logdata.Where(o => o.IsHit == false)); }
+                        }
+                        else if (Key == "IsReported")
+                        {
+                            if (values[0] == "true") { results = results.Union(logdata.Where(o => o.IsReported == true)); }
+                            if (values[0] == "false") { results = results.Union(logdata.Where(o => o.IsReported == false)); }
+                        }
+                        else if (Key == "CreatedOn")
+                        {
+                            foreach (var value in values)
+                            {
+                                if (value.Split("__")[0] != "9")
+                                {
+                                    if (value.Split("__")[0] == "1") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Concat(logdata.Where(o => o.CreatedOn == id)); }
+                                    else if (value.Split("__")[0] == "5") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CreatedOn > id)); }
+                                    else if (value.Split("__")[0] == "6") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CreatedOn < id)); }
+                                    else if (value.Split("__")[0] == "7") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CreatedOn >= id)); }
+                                    else if (value.Split("__")[0] == "8") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CreatedOn <= id)); }
+                                    else if (value.Split("__")[0] == "10") { var id = DateTime.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CreatedOn == id)); }
+                                }
+                            }
+                        }
+                        
                     }
                 }
+                else
+                {
+                    results = TenantDbCtx.CampaignLogs.Where(i => i.CreatedOn >= yearStartDate && i.CreatedOn < yearEndDate);
+                }
             }
-            else
-                results = TenantDbCtx.CampaignLogs;
+            catch(Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
 
             return Task.FromResult(results);
         }
+        
     }
 }

@@ -59,7 +59,7 @@ else
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-3">Template Category</label>
                                                     <div class="col-md-9">
-                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" >
+                                                        <select @bind="CheckSelected" class="form-select" id="CampaignType">
                                                                 @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                                 {
                                                                 <option value="@val">@val</option>
