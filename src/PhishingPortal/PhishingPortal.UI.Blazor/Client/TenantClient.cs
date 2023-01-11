@@ -1,5 +1,8 @@
-﻿using PhishingPortal.Dto;
+﻿using Microsoft.AspNetCore.Components;
+using NPOI.SS.Formula.Functions;
+using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using System;
 using System.Net.Http.Json;
 
 namespace PhishingPortal.UI.Blazor.Client
@@ -11,7 +14,9 @@ namespace PhishingPortal.UI.Blazor.Client
         {
 
         }
-
+        [Inject]
+        CustomStateProvider StateProvider { get; }
+        
         public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
             IEnumerable<Campaign> campaigns;
@@ -81,7 +86,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
 
-                res.EnsureSuccessStatusCode(); 
+                res.EnsureSuccessStatusCode();
 
                 templates = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
 
@@ -259,7 +264,11 @@ namespace PhishingPortal.UI.Blazor.Client
         {
             try
             {
+                var result = new MonthlyPhishingBarChart();
                 var res = await HttpClient.GetAsync($"api/tenant/monthly-phishing-bar-chart-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
+
                 res.EnsureSuccessStatusCode();
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyPhishingBarChart>>();
@@ -284,6 +293,8 @@ namespace PhishingPortal.UI.Blazor.Client
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/get-latest-statistics");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
                 res.EnsureSuccessStatusCode();
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<ConsolidatedPhishingStats>>();
@@ -305,6 +316,8 @@ namespace PhishingPortal.UI.Blazor.Client
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/category-wise-phising-test-prone-percent/{startDate.ToString("MM-dd-yyyy")}/{endDate.ToString("MM-dd-yyyy")}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
                 res.EnsureSuccessStatusCode();
 
 
@@ -366,7 +379,7 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return response;
-        } 
+        }
         #endregion
 
         #region Related to Azure Active Directory Integration
@@ -388,7 +401,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 if (json != null)
                     response = json;
-               
+
             }
             catch (Exception ex)
             {
