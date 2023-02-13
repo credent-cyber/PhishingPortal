@@ -1,0 +1,392 @@
+﻿@page "/tenant-training-config"
+@page "/tenant-training-config/{Id:int}"
+@using System.IO
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using System.Text.RegularExpressions
+@using Blazored.TextEditor
+@using PhishingPortal.UI.Blazor.Pages
+@inject NavigationManager NavigationManager
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+@inject IJSRuntime JSRuntime
+@using BlazingComponents.Summernote
+@inject HttpClient Http
+@using PhishingPortal.Common
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration _config
+@attribute [Authorize]
+
+@if (model == null)
+{
+
+    <div class="col-sm-12" style="margin-top:45vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="pcoded-content" style="padding:10px 10px">
+
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="padding:15px !important;">
+                        <h5 class="text-white">@Title</h5>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top: 20px;">
+                        <div class="row">
+                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                        <div class="card">
+                                            <div class="card-body">
+   
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Training</label>
+                                                    <div class="col-md-9">
+                                                        <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-3">Is Active</label>
+                                                    <div class="col-md-5">
+                                                        @if (model.IsActive is false || model.Id == 0)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                @if (model.Id == 0)
+                                                {
+
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3">Import Template</label>
+                                                        <div class="col-md-5">
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
+                                                                <label for="radio-i-temp1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
+                                                                <label for="radio-i-temp2" class="cr">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @if (model.Id == 0 && import is true)
+                                                {
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-3">Template</label>
+                                                        <div class="col-md-9">
+                                                            <div class="input-group">
+                                                                <InputFile OnChange="@LoadFiles" class="form-control" accept=".html" />                          
+                                                            </div>
+                                                            <p style="color:red; font-size:8px; padding-top:3px;">
+                                                                Choose Html file for Email, Whatsapp Template Type
+                                                                <br />Choose Text file for Sms Template Type
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="input-group">
+
+                                                        @* <div class="custom-file">
+                                                <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+                                                <label class="custom-file-label" for="inputFile">Upload Images </label>
+                                                </div>
+                                                <div class="input-group-append">
+                                                <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+                                                </div>*@
+                                                    </div>
+                                                    <h>@message</h>
+                                                }
+
+                                            </div>
+
+
+
+                                            <div style="text-align:center;">
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
+
+                                            </div>
+                                            <br />
+                                        </div>
+
+                                    </EditForm>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="margin-bottom: 0;">
+                                        <div class="card-body ">
+                                            <div class="mb-3">
+                                               <label for="Content" class="form-label">Contents</label>
+                                                    <div class="overflow-auto">
+                                                        <!-- Rich text editor -->
+                                                        <BlazingComponents.Summernote.Editor />
+                                                    </div>                  
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+
+
+
+@code {
+
+
+    [Parameter]
+    public int Id { get; set; }
+    private string contents;
+
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Training" : "Create New Training";
+        }
+    }
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+    bool temp = false;
+    bool import = false;
+    bool showEditButton = true;
+
+    const int MAX_TEXT_COUNT = 160;
+
+    bool showPreview = false;
+    bool showNewDialog = false;
+    string content = string.Empty;
+    MarkupString previewContent => (MarkupString)content;
+
+    List<Training> training;
+    Training model;
+
+    protected override async Task OnInitializedAsync()
+    {
+       // training = await client.GetTemplatesByType(type);
+        if (Id != 0)
+        {
+            Message = string.Empty;
+            model = await client.GetTrainingById(Id);
+            contents = model.Content;
+        }
+        else
+        {
+            Message = string.Empty;
+            model = new Training();
+
+        }
+
+    }
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (model != null)
+            UpdateSummerNoteContent(contents);
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected void OnPreviewClick(CampaignTemplate template)
+    {
+        showPreview = true;
+        content = template.Content;
+    }
+
+    protected void OnClosePreview()
+    {
+        content = string.Empty;
+        showPreview = false;
+    }
+
+
+    protected async Task OnSave()
+    {
+        loading = true;
+        IsError = false;
+        IsSuccess = false;
+        message = string.Empty;
+        try
+        {
+
+            if (model.Id > 0)
+            {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
+                Message = "Successfully Updated";
+                model.ModifiedOn = DateTime.Now;
+            }
+            else
+            {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
+                Message = "Successfully Added";
+                model.CreatedOn = DateTime.Now;
+            }
+            contents = await GetSummerNoteContent();
+            model.Content = contents;
+            
+           model = await client.UpsertTraining(model);
+
+            IsSuccess = true;
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        loading = false;
+
+    }
+
+    protected void onClose()
+    {
+        NavigationManager.NavigateTo("training");
+    }
+    protected void OnActive() { model.IsActive = true; }
+    protected void OnNoActive() { model.IsActive = false; }
+
+    protected void Ytemp() { import = true; }
+    protected void Ntemp() { import = false; }
+
+    string result = "";
+    public async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var singleFile = e.File;
+        var fileStream = e.File.OpenReadStream();
+        var ms = new MemoryStream();
+        await fileStream.CopyToAsync(ms);
+        fileStream.Close();
+        result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+        // const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";
+        //const string section= @"<img src\s*=\s*""(?<pick>(\.{0,2}\/.+))(/.+\.jpg)";
+        //var matches = Regex.Matches(result, section ,RegexOptions.IgnoreCase|RegexOptions.Multiline);
+        //foreach(Match match in matches)
+        //{
+        //    if (match.Success)
+        //    {
+        //        var sdata = match.Groups["pick"].Value;
+        //        if (!string.IsNullOrEmpty(sdata))
+        //        {
+        //            #if DEBUG
+        //            var newResult = Regex.Replace(result,sdata, @"timg/");
+        //            #else
+        //            var newResult = Regex.Replace(result,sdata, @"C:/inetpub/wwwroot/phishing-simulator/wwwroot/timg/");
+        //            #endif
+        //            result = newResult;
+        //        }
+        //    }
+        // }
+
+   
+            contents = result;
+
+    }
+
+    protected void UpdateSummerNoteContent(string content)
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        JSRuntime.InvokeVoidAsync("summernoteEditorHack", content, selector);
+    }
+
+    protected async Task<string> GetSummerNoteContent()
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
+        return result;
+    }
+
+    List<ImageFile> filesBase64 = new List<ImageFile>();
+    string message = "";
+    bool isDisabled = false;
+
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(); // get the files selected by the users
+        foreach (var file in files)
+        {
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // resize the image file
+            var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copy the stream to the buffer
+            }
+            filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name }); // convert to a base64 string!!
+        }
+        message = "Click UPLOAD to continue";
+    }
+
+    async Task Upload()
+    {
+        isDisabled = true;
+        using (var msg = await Http.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64, System.Threading.CancellationToken.None))
+        {
+            isDisabled = false;
+            if (msg.IsSuccessStatusCode)
+            {
+                message = $"{filesBase64.Count} files uploaded";
+                filesBase64.Clear();
+            }
+        }
+    }
+
+}

@@ -262,7 +262,7 @@ namespace PhishingPortal.Repositories
         /// <param name="end"></param>
         /// <returns></returns>
 
-        
+
         public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
         {
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
@@ -281,7 +281,7 @@ namespace PhishingPortal.Repositories
 
             data.TemplateClickEntries = new Dictionary<string, decimal>();
             data.SmsTemplateClickEntries = new Dictionary<string, decimal>();
-            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();            
+            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();
 
             try
             {
@@ -337,10 +337,10 @@ namespace PhishingPortal.Repositories
                         id5 = id.Campaign.Id;
 
                 }
-                
+
                 var filterData = TenantDbCtx.CampaignLogs
                  .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
-                
+
                 var phishtestWithRecipients = from log in filterData
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
@@ -937,10 +937,10 @@ namespace PhishingPortal.Repositories
             var result = Enumerable.Empty<CampaignLog>();
             var results = Enumerable.Empty<CampaignLog>();
             var data = query.ToList();
-            var logdata = TenantDbCtx.CampaignLogs.Include(o=>o.Recipient.Recipient).Include(o=>o.Camp).Include(o => o.Camp.Detail.Template);
+            var logdata = TenantDbCtx.CampaignLogs.Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
             if (data.Count > 0)
             {
-                for(int i=0; i < data.Count; i++)
+                for (int i = 0; i < data.Count; i++)
                 {
                     var id = Convert.ToInt16(data[i]);
                     if (i == 0)
@@ -959,5 +959,41 @@ namespace PhishingPortal.Repositories
 
             return Task.FromResult(results);
         }
+
+        public async Task<Training> UpsertTraining(Training training)
+        {
+            try
+            {
+                if (training.Id > 0)
+                {
+                    TenantDbCtx.Update(training);
+                    TenantDbCtx.SaveChanges();
+                }
+                else
+                {
+                    TenantDbCtx.Add(training);
+                    TenantDbCtx.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return training;
+        }
+        public async Task<Training> GetTrainingById(int id)
+        {
+            Training result = null;
+
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+            result = TenantDbCtx.Training.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return result;
+        }
+
+
+
     }
 }

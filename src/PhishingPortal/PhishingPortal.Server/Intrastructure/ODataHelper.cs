@@ -1,11 +1,11 @@
 ﻿namespace PhishingPortal.Server.Intrastructure
 {
- 
+
     using Microsoft.AspNetCore.OData;
     using Microsoft.OData.Edm;
     using Microsoft.OData.ModelBuilder;
     using PhishingPortal.Dto;
-    
+
 
     public static class ODataHelper
     {
@@ -31,10 +31,11 @@
             builder.EntitySet<CampaignTemplate>("Template");
             builder.EntitySet<CampaignLog>("Campaignlog");
             builder.EntitySet<Campaign>("Campaign");
+            builder.EntitySet<Training>("Training");
             //builder.EntitySet<Category>("Category");
             return builder.GetEdmModel();
         }
     }
 
-    
+
 }

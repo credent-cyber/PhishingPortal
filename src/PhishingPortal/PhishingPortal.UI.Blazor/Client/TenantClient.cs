@@ -16,7 +16,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         [Inject]
         CustomStateProvider StateProvider { get; }
-        
+
         public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
             IEnumerable<Campaign> campaigns;
@@ -490,6 +490,51 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return campaignlog;
         }
+
+
+        public async Task<Training> UpsertTraining(Training training)
+        {
+            Training result;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/upsert-training", training);
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<Training>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<Training> GetTrainingById(int id)
+        {
+            Training result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/training-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<Training>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
+
+
 
     }
 
