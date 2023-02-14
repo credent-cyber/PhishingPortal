@@ -12,7 +12,14 @@ namespace PhishingPortal.Dto
         public string TrainingID { get; set; }
         public string UserID { get; set; }
         public decimal PercentCompleted { get; set; }
-        public string Status { get; set; }
+        public TrainingStatus Status { get; set; }
+
+    }
+    public enum TrainingStatus
+    {
+        Assigned,
+        InProgress,
+        Completed,
 
     }
 }

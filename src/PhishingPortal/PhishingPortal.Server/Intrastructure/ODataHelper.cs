@@ -32,6 +32,7 @@
             builder.EntitySet<CampaignLog>("Campaignlog");
             builder.EntitySet<Campaign>("Campaign");
             builder.EntitySet<Training>("Training");
+            builder.EntitySet<TrainingLog>("Traininglog");
             //builder.EntitySet<Category>("Category");
             return builder.GetEdmModel();
         }

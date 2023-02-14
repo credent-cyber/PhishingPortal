@@ -1,0 +1,74 @@
+﻿@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthState authState;
+
+
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <GridComponent T="TrainingLog" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:5vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
+
+@code
+{
+    private CGrid<TrainingLog> _grid;
+    private Task _task;
+
+    Action<IGridColumnCollection<TrainingLog>> columns = c =>
+    {
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
+        c.Add(o => o.TrainingID).Css("table-bordered");
+        c.Add(o => o.UserID).Css("table-bordered");
+        c.Add(o => o.PercentCompleted).Css("table-bordered");
+        c.Add(o => o.Status).Css("table-bordered");
+        c.Add(o => o.CreatedBy).Titled("CreatedBy").SetWidth("50px").Css("table-bordered");
+        c.Add(o => o.CreatedOn).Css("table-bordered").Titled("CreatedOn");
+        //c.Add(o => o.ModifiedBy).Css("table-bordered").Titled("ModifiedBy");
+        c.Add(o => o.ModifiedOn).Css("table-bordered").Titled("ModifiedOn");
+
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string url = $"odata/Traininglog?t={authState.TenantIdentifier}";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<TrainingLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+            .Sortable()
+            .Filterable(true)
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .SetExcelExport(true, "Report.xlsx")
+            .ChangePageSize(true)
+            .EmptyText("-")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+
+}
