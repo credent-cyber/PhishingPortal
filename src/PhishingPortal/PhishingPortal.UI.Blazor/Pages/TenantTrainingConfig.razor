@@ -4,18 +4,16 @@
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using System.Text.RegularExpressions
-@using Blazored.TextEditor
 @using PhishingPortal.UI.Blazor.Pages
 @inject NavigationManager NavigationManager
+@using PhishingPortal.UI.Blazor.Shared.TenantCampaingConfig
 
 @inject TenantClient client
-@inject ILogger<TenantCampaigns> logger
+@inject ILogger<TenantTraining> logger
 @inject IJSRuntime JSRuntime
 @using BlazingComponents.Summernote
 @inject HttpClient Http
 @using PhishingPortal.Common
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration _config
 @attribute [Authorize]
 
 @if (model == null)
@@ -55,13 +53,13 @@ else
                                             <div class="card-body">
    
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Training</label>
-                                                    <div class="col-md-9">
+                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Name Of Training</label>
+                                                    <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Is Active</label>
+                                                    <label for="" class="col-form-label col-md-4">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -87,52 +85,107 @@ else
                                                         }
                                                     </div>
                                                 </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
+                                                    <div class="col-md-8">     
+                                                        <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
 
-                                                @if (model.Id == 0)
-                                                {
-
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3">Import Template</label>
-                                                        <div class="col-md-5">
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
-                                                                <label for="radio-i-temp1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
-                                                                <label for="radio-i-temp2" class="cr">No</label>
-                                                            </div>
-                                                        </div>
+                                                            <option>-Select-</option>
+                                                            <option value="Category1">Category1</option>
+                                                            <option value="Category2">Category2</option>
+                                                            <option value="Category3">Category3</option>
+                                                
+                                                        </InputSelect>
                                                     </div>
-                                                }
-
-                                                @if (model.Id == 0 && import is true)
-                                                {
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3">Template</label>
-                                                        <div class="col-md-9">
-                                                            <div class="input-group">
-                                                                <InputFile OnChange="@LoadFiles" class="form-control" accept=".html" />                          
-                                                            </div>
-                                                            <p style="color:red; font-size:8px; padding-top:3px;">
-                                                                Choose Html file for Email, Whatsapp Template Type
-                                                                <br />Choose Text file for Sms Template Type
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="input-group">
-
-                                                        @* <div class="custom-file">
-                                                <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
-                                                <label class="custom-file-label" for="inputFile">Upload Images </label>
                                                 </div>
-                                                <div class="input-group-append">
-                                                <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
-                                                </div>*@
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4">Schedule</label>
+                                                    <div class="col-md-5">
+                                                        @if (isScheduled == false)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
                                                     </div>
-                                                    <h>@message</h>
-                                                }
+                                                </div>
+                                                <div class="form-group row" id="divTrainingSchedule">
+                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
+                                                        <div class="col-12">
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                                                            {
+
+                                                            }
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
+                                                            {
+                                                                <label class="form-label">Scheduled Once</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" id="">Date & Time</span>
+                                                                    </div>
+                                                                    <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
+                                                                    <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
+                                                                </div>
+
+                                                            }
+             
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group row" id="UploadTrainingUsers">
+                                                    <label for="" class="col-form-label col-md-4">Import Training Recipients</label>
+                                                    <div class="col-md-8">
+                                                        <div class="input-group">
+                                                            <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
+                                                        </div>
+                                                        <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
+                                                        <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4">Training State</label>
+                                                    <div class="col-md-8">
+                                                        @if (model.Id > 0 && model.State == TrainingState.Completed)
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                        }
+                                                        else
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            
 
                                             </div>
 
@@ -141,6 +194,24 @@ else
                                             <div style="text-align:center;">
                                                 <button type="submit" class="btn btn-primary">Save</button>
                                                 <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
+
+                                                @if (model.Id == 0 && fileimport is null)
+                                                {
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                }
+                                                @if (model.State == TrainingState.Draft && model.Id > 0)
+                                                {
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                }
+
+                                                @if (model.State == TrainingState.Published)
+                                                {
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                }
 
                                             </div>
                                             <br />
@@ -172,6 +243,29 @@ else
 
         </div>
     </div>
+    <div>
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+            @if (showRecipientss)
+            {
+                <Recipients DataList="@recipients"></Recipients>
+                <br />
+                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false;  recipients = new List<RecipientImport>(); }"
+                class="btn btn-secondary" type="button"> Close </button>
+
+            }
+        </DialogTemplate>
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+            @if (recipients?.Count() > 0)
+            {
+                <div style="padding-top: -50%">
+                    <Recipients DataList="@recipients"></Recipients>
+                    <br/>
+                    <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
+                    class="btn btn-secondary" type="button"> Close </button>
+                </div>
+            }
+        </DialogTemplate>
+    </div>
 }
 
 
@@ -199,10 +293,11 @@ else
     bool temp = false;
     bool import = false;
     bool showEditButton = true;
-
-    const int MAX_TEXT_COUNT = 160;
-
+    bool showImportDialog = false;
+    bool showRecipientss = false;
+    bool showAdImportDialog = false;
     bool showPreview = false;
+    bool isScheduled = false;
     bool showNewDialog = false;
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
@@ -212,17 +307,33 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-       // training = await client.GetTemplatesByType(type);
+        // training = await client.GetTemplatesByType(type);
         if (Id != 0)
         {
             Message = string.Empty;
             model = await client.GetTrainingById(Id);
             contents = model.Content;
+            if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
+                TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
+
+            if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                isScheduled = false;
+            else
+            {
+                isScheduled = true;
+            }
         }
         else
         {
             Message = string.Empty;
-            model = new Training();
+            model = new Training()
+            {
+                    TrainingSchedule = new TrainingSchedule
+                    {
+                        ScheduleType = ScheduleTypeEnum.NoSchedule,
+                        WillRepeat = false
+                    }
+            };
 
         }
 
@@ -281,8 +392,13 @@ else
             }
             contents = await GetSummerNoteContent();
             model.Content = contents;
-            
-           model = await client.UpsertTraining(model);
+            UpdateModelScheduleInfo();
+            model = await client.UpsertTraining(model);
+
+            @if (recipients.Count() > 0)
+            {
+                await OnImportRecipientClick();
+            }
 
             IsSuccess = true;
 
@@ -305,42 +421,6 @@ else
     protected void OnActive() { model.IsActive = true; }
     protected void OnNoActive() { model.IsActive = false; }
 
-    protected void Ytemp() { import = true; }
-    protected void Ntemp() { import = false; }
-
-    string result = "";
-    public async Task LoadFiles(InputFileChangeEventArgs e)
-    {
-        var singleFile = e.File;
-        var fileStream = e.File.OpenReadStream();
-        var ms = new MemoryStream();
-        await fileStream.CopyToAsync(ms);
-        fileStream.Close();
-        result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-        // const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";
-        //const string section= @"<img src\s*=\s*""(?<pick>(\.{0,2}\/.+))(/.+\.jpg)";
-        //var matches = Regex.Matches(result, section ,RegexOptions.IgnoreCase|RegexOptions.Multiline);
-        //foreach(Match match in matches)
-        //{
-        //    if (match.Success)
-        //    {
-        //        var sdata = match.Groups["pick"].Value;
-        //        if (!string.IsNullOrEmpty(sdata))
-        //        {
-        //            #if DEBUG
-        //            var newResult = Regex.Replace(result,sdata, @"timg/");
-        //            #else
-        //            var newResult = Regex.Replace(result,sdata, @"C:/inetpub/wwwroot/phishing-simulator/wwwroot/timg/");
-        //            #endif
-        //            result = newResult;
-        //        }
-        //    }
-        // }
-
-   
-            contents = result;
-
-    }
 
     protected void UpdateSummerNoteContent(string content)
     {
@@ -359,33 +439,268 @@ else
     string message = "";
     bool isDisabled = false;
 
-    async Task OnChange(InputFileChangeEventArgs e)
+
+
+
+
+    bool HasHeader = true;
+    bool isloading = false;
+    bool showRecipients = false;
+    List<RecipientImport> recipients = new List<RecipientImport>();
+    List<RecipientImport> fileimport;
+
+    public async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        var files = e.GetMultipleFiles(); // get the files selected by the users
-        foreach (var file in files)
+        var singleFile = e.File;
+        IsError = false;
+        message = string.Empty;
+        isloading = true;
+        Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
+        if (!regex.IsMatch(singleFile.Name))
         {
-            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // resize the image file
-            var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
-            using (var stream = resizedFile.OpenReadStream())
-            {
-                await stream.ReadAsync(buf); // copy the stream to the buffer
-            }
-            filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name }); // convert to a base64 string!!
+            IsError = true;
+            message = "This file format not supported";
         }
-        message = "Click UPLOAD to continue";
+        else
+        {
+            var stream = singleFile.OpenReadStream();
+            MemoryStream ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            stream.Close();
+            var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+            var index = 0;
+
+            foreach (var item in outputFileString.Split(Environment.NewLine))
+            {
+                if (HasHeader && index == 0)
+                {
+                    index++;
+                    continue;
+                }
+                if (item.Equals(string.Empty)) { continue; }
+
+                try
+                {
+
+                    var arr = SplitCSV(item.ToString(), AppConfig.ImportRecipientCsvMinColumns);
+                    if (arr != null)
+                    {
+                        if (!recipients.Any(o => o.Email == arr[1]))
+                        {
+                            var r = new RecipientImport
+                                {
+                                    EmployeeCode = arr[0],
+                                    Name = arr[1],
+                                    Email = arr[2],
+                                    Mobile = arr[3],
+                                    DateOfBirth = arr[4],
+                                    Department = arr[5],
+                                    Branch = arr[6],
+                                    Address = arr[7]
+                                };
+                            r.Validate();
+                            if (r.ValidationErrMsg is not null)
+                            {
+                                IsError = true;
+                                message = r.ValidationErrMsg;
+                                isloading = false;
+                                return;
+                            }
+                            if (!recipients.Any(i => i.Email == r.Email))
+                                recipients.Add(r);
+                        }
+
+
+
+                    }
+
+                    fileimport = recipients;
+                }
+                catch (Exception ex)
+                {
+                    IsError = true;
+                    message = ex.Message;
+
+                }
+                isloading = false;
+
+            }
+
+        }
+        isloading = false;
+        showRecipients = true;
     }
 
-    async Task Upload()
+    private string[] SplitCSV(string input, int colCount)
     {
-        isDisabled = true;
-        using (var msg = await Http.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64, System.Threading.CancellationToken.None))
+        //Excludes commas within quotes
+        Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
+        List<string> list = new List<string>();
+        string curr = null;
+        foreach (Match match in csvSplit.Matches(input))
         {
-            isDisabled = false;
-            if (msg.IsSuccessStatusCode)
+            curr = match.Value;
+            if (0 == curr.Length) list.Add("");
+
+            list.Add(curr.TrimStart(','));
+        }
+
+        if (list.Count() < colCount)
+            throw new Exception("Invalid columns specified in the CSV file");
+
+        return list.ToArray();
+    }
+
+    protected void OnScheduleTypeChange()
+    {
+        isScheduled = true;
+        UpdateModelScheduleInfo();
+    }
+    protected void OffScheduleTypeChange()
+    {
+        isScheduled = false;
+        //UpdateModelScheduleInfo();
+    }
+    OnceOffSchedule TrainingScheduleOff = new();
+    DailySchedule dailySchedule = new("12:00:00");
+    WeeklySchedule weeklySchedule = new("1|12:00:00");
+    private void UpdateModelScheduleInfo()
+    {
+
+        if (isScheduled)
+        {
+            model.TrainingSchedule.ScheduleType = ScheduleTypeEnum.Once;
+        }
+        else
+        {
+            model.TrainingSchedule.ScheduleType = ScheduleTypeEnum.NoSchedule;
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
+        {
+            model.TrainingSchedule.ScheduleInfo = TrainingScheduleOff.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Daily)
+        {
+            model.TrainingSchedule.ScheduleInfo = dailySchedule.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Weekly)
+        {
+            model.TrainingSchedule.ScheduleInfo = weeklySchedule.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+        {
+            model.TrainingSchedule.ScheduleInfo = string.Empty;
+        }
+    }
+
+    protected async Task OnImportRecipientClick()
+    {
+        isloading = true;
+        try
+        {
+            var data = await client.ImportRecipientToTraining(model.Id, recipients);
+            recipients = data;
+            IsSuccess = true;
+            message = "Successfully imported";
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = "Recipient couldn't not be imported, please try again";
+        }
+
+        isloading = false;
+        this.showRecipients = false;
+        this.showAdImportDialog = false;
+    }
+    protected async Task OnShowRecipientClickk()
+    {
+
+        this.showImportDialog = false;
+        this.showRecipientss = true;
+
+        isloading = true;
+        try
+        {
+            if (model.Id > 0)
             {
-                message = $"{filesBase64.Count} files uploaded";
-                filesBase64.Clear();
+                await LoadRecipeints(model.Id);
             }
+            else
+            {
+                recipients = fileimport;
+            }
+            isloading = false;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = ex.Message;
+            showRecipientss = false;
+        }
+    }
+    protected async Task OnShowRecipientClick()
+    {
+
+        this.showImportDialog = false;
+        this.showRecipients = true;
+
+        isloading = true;
+        try
+        {
+            var data = await client.GetRecipientByTrainingId(model.Id);
+           
+
+            recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+
+            isloading = false;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = ex.Message;
+            showRecipients = false;
+        }
+    }
+    private async Task LoadRecipeints(int id)
+    {
+        var data = await client.GetRecipientByTrainingId(id);
+
+        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+    }
+
+    protected async Task OnPublishClick()
+    {
+        await LoadRecipeints(model.Id);
+
+        if (recipients.Count == 0)
+        {
+            IsError = true;
+            message = "Recipients can't be null";
+            return;
+        }
+        else
+        {
+            model.State = TrainingState.Published;
+            await OnSave();
+        }
+    }
+
+    protected async Task OnUnpublish()
+    {
+        if (model.State == TrainingState.Published)
+        {
+            model.State = TrainingState.Draft;
+            await OnSave();
         }
     }
 

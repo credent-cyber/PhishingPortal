@@ -456,5 +456,57 @@ namespace PhishingPortal.Server.Controllers.Api
         {
             return await _tenantRepository.GetTrainingById(id);
         }
+
+
+        [HttpPost]
+        [Route("import-recipients-to-training/{trainingId}")]
+        public async Task<ApiResponse<List<RecipientImport>>> ImportRecipientToTraining([FromRoute] int trainingId, [FromBody] List<RecipientImport> data)
+        {
+            //bool hasChanges = false;
+            var results = await _tenantRepository.ImportTrainingRecipient(trainingId, data);
+
+            var ispartial = data.Any(o => !string.IsNullOrEmpty(o.ValidationErrMsg));
+            var response = new ApiResponse<List<RecipientImport>>
+            {
+                IsSuccess = true,
+                Message = ispartial ? "Imported partially" : "Imported succesfully",
+                Result = data
+            };
+
+            return response;
+
+        }
+
+        [HttpGet]
+        [Route("recipient-by-training/{trainingId}")]
+        public async Task<List<TrainingRecipients>> GetRecipientByTraining(int trainingId)
+        {
+            var result = await _tenantRepository.GetRecipientByTrainingId(trainingId);
+            return await Task.FromResult(result);
+        }
+
+
+        [HttpPost]
+        [Route("training")]
+        [AllowAnonymous]
+        public async Task<ApiResponse<string>> TrainingLink(GenericApiRequest<string> request)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.Traininglink(request.Param);
+                result.IsSuccess = outcome.Item1;
+                result.Message = "Successful";
+                result.Result = outcome.Item2;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while hitting campaign url");
+            }
+
+            return result;
+
+        }
+
     }
 }

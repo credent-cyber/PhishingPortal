@@ -532,12 +532,52 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
+        public async Task<List<RecipientImport>> ImportRecipientToTraining(int trainingId, List<RecipientImport> recipients)
+        {
+            ApiResponse<List<RecipientImport>> result;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/import-recipients-to-training/{trainingId}", recipients);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<ApiResponse<List<RecipientImport>>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result.Result);
+        }
+
+        public async Task<List<TrainingRecipients>> GetRecipientByTrainingId(int trainingId)
+        {
+            List<TrainingRecipients> result = new List<TrainingRecipients>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/recipient-by-training/{trainingId}");
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingRecipients>>();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result);
+        }
 
 
 
 
     }
-
-
-
 }

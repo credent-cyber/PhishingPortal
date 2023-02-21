@@ -30,6 +30,8 @@ namespace PhishingPortal.DataContext
         public DbSet<TenantSetting> Settings { get; set; }
         public DbSet<Training> Training { get; set; }
         public DbSet<TrainingLog> TrainingLog { get; set; }
+        public DbSet<TrainingRecipients> TrainingRecipient { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

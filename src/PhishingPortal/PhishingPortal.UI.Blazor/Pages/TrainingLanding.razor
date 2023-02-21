@@ -1,0 +1,60 @@
+﻿@page "/training/{TenantId}/{Key}/{Url?}"
+
+@attribute [AllowAnonymous]
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@inject TenantClient client
+@inject HttpClient httpClient;
+@inject ILogger<TenantTraining> logger
+@inject NavigationManager navigation
+@layout NoLayout
+
+<h5>trainin page</h5>
+
+
+@code {
+    [Parameter]
+    public string Key { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TenantId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TrainingCategory { get; set; } = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // load campaign data
+        // validate campaign
+        // update campaign hit if valid
+
+        try
+        {
+            var payload = new GenericApiRequest<string>() { Param = Key };
+            var result = await httpClient.PostAsJsonAsync<GenericApiRequest<string>>($"api/tenant/training?t={TenantId}", payload);
+            result.EnsureSuccessStatusCode();
+
+            if (result.IsSuccessStatusCode)
+            {
+                var content = await result.Content.ReadFromJsonAsync<ApiResponse<string>>();
+
+                if (content != null)
+                    TrainingCategory = content.Result;
+            }
+            else
+            {
+                navigation.NavigateTo("/error");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            navigation.NavigateTo("/error");
+        }
+
+        await Task.CompletedTask;
+    }
+
+}

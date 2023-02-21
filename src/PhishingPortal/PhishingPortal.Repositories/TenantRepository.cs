@@ -964,8 +964,13 @@ namespace PhishingPortal.Repositories
         {
             try
             {
+
                 if (training.Id > 0)
                 {
+                    if (training.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                    {
+                        training.TrainingSchedule.ScheduleInfo = String.Empty;
+                    }
                     TenantDbCtx.Update(training);
                     TenantDbCtx.SaveChanges();
                 }
@@ -987,13 +992,112 @@ namespace PhishingPortal.Repositories
             Training result = null;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.Training.FirstOrDefault(o => o.Id == id);
+            result = TenantDbCtx.Training.Include(o => o.TrainingSchedule).FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return result;
         }
 
 
+        public async Task<List<RecipientImport>> ImportTrainingRecipient(int trainingId, List<RecipientImport> data)
+        {
+            var hasChanges = false;
+            foreach (var r in data)
+            {
+                if (!TenantDbCtx.Recipients.Any(o => o.Email == r.Email || o.Mobile == r.Mobile))
+                {
+                    var recipient = new Recipient
+                    {
+                        Email = r.Email,
+                        Mobile = r.Mobile,
+                        Name = r.Name,
+                        WhatsAppNo = r.Mobile,
+                        DateOfBirth = r.DateOfBirth,
+                        Address = r.Address,
+                        Branch = r.Branch,
+                        Department = r.Department,
+                        EmployeeCode = r.EmployeeCode,
+                        IsActive = true
+                    };
+
+                    hasChanges = true;
+
+                    TenantDbCtx.TrainingRecipient.Add(new TrainingRecipients
+                    {
+                        TrainingId = trainingId,
+                        AllTrainingRecipient = recipient,
+                        RecipientGroupId = null,
+                    });
+
+                }
+                else
+                {
+                    var recipient = TenantDbCtx.Recipients
+                        .FirstOrDefault(o => o.Email == r.Email || o.Mobile == r.Mobile);
+
+                    recipient.Mobile = r.Mobile;
+                    recipient.Name = r.Name;
+                    recipient.Email = r.Email;
+
+                    TenantDbCtx.Update(recipient);
+                    hasChanges = true;
+                    if (!TenantDbCtx.TrainingRecipient.Any(o => o.TrainingId == trainingId && o.RecipientId == recipient.Id))
+                    {
+                        TenantDbCtx.TrainingRecipient.Add(new TrainingRecipients
+                        {
+                            TrainingId = trainingId,
+                            AllTrainingRecipient = recipient,
+                            RecipientGroupId = null,
+                        });
+                    }
+                }
+
+            }
+
+            if (hasChanges)
+                TenantDbCtx.SaveChanges();
+            else
+            {
+                throw new InvalidOperationException("No changes");
+            }
+
+            return await Task.FromResult(data);
+        }
+
+        public async Task<List<TrainingRecipients>> GetRecipientByTrainingId(int trainingId)
+        {
+            var result = TenantDbCtx.TrainingRecipient.Include(o => o.AllTrainingRecipient).Where(o => o.TrainingId == trainingId);
+
+            return await Task.FromResult(result.ToList());
+        }
+
+
+
+        public async Task<Tuple<bool, string>> Traininglink(string key)
+        {
+            var status = TrainingStatus.Sent.ToString();
+            var trainingLog = TenantDbCtx.TrainingLog
+                .FirstOrDefault(o => o.SecurityStamp == key
+                    && o.Status == status);
+
+            if (trainingLog == null)
+                throw new Exception("Invalid Url");
+
+            var training = TenantDbCtx.Training.FirstOrDefault(o => o.Id == trainingLog.TrainingID);
+            if (training == null)
+                throw new Exception("Invalid Campaign");
+
+            trainingLog.Status = CampaignLogStatus.Completed.ToString();
+            //trainingLog.PercentCompleted = 0;
+            trainingLog.ModifiedOn = DateTime.Now;
+            trainingLog.ModifiedBy = nameof(Traininglink);
+
+            TenantDbCtx.Update(trainingLog);
+            TenantDbCtx.SaveChanges();
+
+            return await Task.FromResult(new Tuple<bool, string>(true, training.TrainingCategory));
+
+        }
 
     }
 }

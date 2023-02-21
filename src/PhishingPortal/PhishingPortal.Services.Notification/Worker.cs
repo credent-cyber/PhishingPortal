@@ -9,6 +9,8 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.Sms;
     using PhishingPortal.Services.Notification.Whatsapp;
     using PhishingPortal.Services.Notification.RequestMonitor;
+    using PhishingPortal.Services.Notification.Trainings;
+
     public class Worker : BackgroundService
     {
         class WorkerSettings
@@ -22,24 +24,29 @@ namespace PhishingPortal.Services.Notification
 
         public Worker(ILogger<Worker> logger,
             ILogger<EmailCampaignProvider> agentLogger,
+            ILogger<TrainingProvider> trainingLogger,
             IEmailClient emailClient,
             IConfiguration configuration,
             CentralDbContext centralDbContext,
-            IEmailCampaignExecutor campaignExecutor, 
+            IEmailCampaignExecutor campaignExecutor,
             ISmsCampaignExecutor smsExecutor,
             IWhatsappCampaignExecutor whatsappCampaignExecutor,
-            ITenantDbConnManager tenantDbConnManager, 
-            ISmsGatewayClient smsClient, 
+            ITenantDbConnManager tenantDbConnManager,
+            ISmsGatewayClient smsClient,
             IDemoRequestHandler demoRequestHandler,
-            IWhatsappGatewayClient waClient)
+            IWhatsappGatewayClient waClient,
+            ITrainingExecutor trainingExecutor
+            )
+
 
 
         {
             _logger = logger;
             this.providerLogger = agentLogger;
+            this.TrainingProviderLogger = trainingLogger;
             _configuration = configuration;
             _settings = new WorkerSettings(configuration);
-           
+
             this._emailClient = emailClient;
             _configuration = configuration;
             _centralDbContext = centralDbContext;
@@ -50,10 +57,12 @@ namespace PhishingPortal.Services.Notification
             SmsClient = smsClient;
             WaClient = waClient;
             this._demoRequestHandler = demoRequestHandler;
+            this._trainingExecutor = trainingExecutor;
         }
 
         readonly ILogger<Worker> _logger;
         private readonly ILogger<EmailCampaignProvider> providerLogger;
+        private readonly ILogger<TrainingProvider> TrainingProviderLogger;
         readonly WorkerSettings _settings;
         readonly IEmailClient _emailClient;
         readonly IConfiguration _configuration;
@@ -63,18 +72,20 @@ namespace PhishingPortal.Services.Notification
         private readonly IWhatsappCampaignExecutor _whatsappCampaignExecutor;
         bool _isprocessing = false;
         private readonly IDemoRequestHandler _demoRequestHandler;
+        private readonly ITrainingExecutor _trainingExecutor;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
         public ISmsGatewayClient SmsClient { get; }
         public IWhatsappGatewayClient WaClient { get; }
 
-       
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _demoRequestHandler.Start();
             _campaignExecutor.Start();
             _smsExecutor.Start();
-           // _whatsappCampaignExecutor.Start();
+            // _whatsappCampaignExecutor.Start();
+            _trainingExecutor.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -117,6 +128,11 @@ namespace PhishingPortal.Services.Notification
                                      //_waProvider.Subscribe(_whatsappCampaignExecutor);
                                      //await _waProvider.CheckAndPublish(stoppingToken);
 
+                                     //training provider
+                                     var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                     trainingProvider.Subscribe(_trainingExecutor);
+                                     await trainingProvider.CheckAndPublish(stoppingToken);
+
                                      //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
                                      var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
                                      await _reportMonitor.ProcessAsync();
@@ -126,11 +142,11 @@ namespace PhishingPortal.Services.Notification
                                  {
                                      _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
                                  }
-                                
+
                              });
 
                             allTasks.Add(task);
-                        } 
+                        }
                     }
 
                     if (allTasks.Count > 0)
@@ -141,7 +157,7 @@ namespace PhishingPortal.Services.Notification
                     _isprocessing = false;
                     _demoRequestHandler.Execute();
 
-                    await Task.Delay(_settings.WaitIntervalInMinutes * 1000 * 60, stoppingToken); 
+                    await Task.Delay(_settings.WaitIntervalInMinutes * 1000 * 60, stoppingToken);
                 }
                 else
                 {
@@ -150,6 +166,7 @@ namespace PhishingPortal.Services.Notification
             }
 
             _campaignExecutor.Stop();
+            _trainingExecutor.Stop();
         }
 
     }
