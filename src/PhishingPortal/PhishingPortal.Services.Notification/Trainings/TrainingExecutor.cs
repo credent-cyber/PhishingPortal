@@ -80,7 +80,7 @@ namespace PhishingPortal.Services.Notification.Trainings
 
                                 await EmailSender.SendEmailAsync(ecinfo.TrainingRecipients, ecinfo.TrainingSubject, ecinfo.TrainingContent, true, ecinfo.TrainingLogEntry.SecurityStamp, ecinfo.TrainingFrom);
 
-                                Logger.LogInformation($"Email sent");
+                                Logger.LogInformation($"Training sent");
 
                                 ecinfo.TrainingLogEntry.SentOn = DateTime.Now;
                                 db.Add(ecinfo.TrainingLogEntry);

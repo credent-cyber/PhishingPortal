@@ -494,19 +494,21 @@ namespace PhishingPortal.Server.Controllers.Api
             var result = new ApiResponse<string>();
             try
             {
-                var outcome = await _tenantRepository.Traininglink(request.Param);
+                var outcome = await _tenantRepository.Training(request.Param);
                 result.IsSuccess = outcome.Item1;
                 result.Message = "Successful";
                 result.Result = outcome.Item2;
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error while hitting campaign url");
+                Logger.LogError(ex, "Error while hitting training url");
+                result.IsSuccess = false;
+                result.Message = "Error occurred while processing the request";
             }
 
             return result;
-
         }
+
 
     }
 }

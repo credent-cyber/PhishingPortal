@@ -1,4 +1,4 @@
-﻿@page "/training/{TenantId}/{Key}/{Url?}"
+﻿@page "/training/{TenantId}/{Key}"
 
 @attribute [AllowAnonymous]
 @using PhishingPortal.Dto
@@ -10,7 +10,7 @@
 @layout NoLayout
 
 <h5>trainin page</h5>
-
+@TrainingCategory
 
 @code {
     [Parameter]
@@ -19,8 +19,8 @@
     [Parameter]
     public string TenantId { get; set; } = string.Empty;
 
-    [Parameter]
-    public string TrainingCategory { get; set; } = string.Empty;
+
+    public string TrainingCategory  = string.Empty;
 
 
     protected override async Task OnInitializedAsync()

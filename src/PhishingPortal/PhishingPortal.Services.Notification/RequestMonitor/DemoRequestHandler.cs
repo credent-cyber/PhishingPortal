@@ -17,7 +17,7 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
     {
         public ILogger<DemoRequestHandler> Logger { get; }
         private readonly IConfiguration _config;
-        private readonly DemoRequestor _demoRequestor;
+
         private readonly PhishingPortalDbContext phishingPortalDbContext;
         public IRequestEmailSender requestEmailSender;
         public IDbConnManager ConnectionManager { get; set; }
@@ -49,7 +49,7 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
         {
             DemoRequestor demo;
             var data = ConnectionManager.GetContext();
-            if(data is null)
+            if (data is null)
                 return;
             demo = data;
             if (!data.Email.Equals(string.Empty))

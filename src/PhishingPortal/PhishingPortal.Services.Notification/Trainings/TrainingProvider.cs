@@ -18,7 +18,7 @@ namespace PhishingPortal.Services.Notification.Trainings
     {
         private readonly List<IObserver<TraininigInfo>> observers;
 
-        private string BaseUrl = "http://localhost:7081/training";
+        private string TrainingBaseUrl = "http://localhost:7081/training";
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
         public ILogger<ITrainingProvide> Logger { get; }
         public IEmailClient EmailSender { get; }
@@ -33,7 +33,7 @@ namespace PhishingPortal.Services.Notification.Trainings
             EmailSender = emailSender;
             Tenant = tenant;
             ConnManager = connManager;
-            BaseUrl = config.GetValue<string>("BaseUrl");
+            TrainingBaseUrl = config.GetValue<string>("TrainingBaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
         }
@@ -77,18 +77,18 @@ namespace PhishingPortal.Services.Notification.Trainings
             });
         }
 
-        protected async Task Send(Training training, TenantDbContext dbContext, string tenantIdentifier)
+        protected async Task Send(Training training, TenantDbContext DataContext, string tenantIdentifier)
         {
             try
             {
 
-                //  var template = dbContext.CampaignTemplates.Find(campaign.Detail.CampaignTemplateId);
+                //  var template = DataContext.CampaignTemplates.Find(campaign.Detail.CampaignTemplateId);
 
                 //if (template == null)
                 //    throw new Exception("Template not found");
 
 
-                var recipients = dbContext.TrainingRecipient.Include(o => o.AllTrainingRecipient).Where(o => o.TrainingId == training.Id);
+                var recipients = DataContext.TrainingRecipient.Include(o => o.AllTrainingRecipient).Where(o => o.TrainingId == training.Id);
 
                 foreach (var r in recipients)
                 {
@@ -100,7 +100,7 @@ namespace PhishingPortal.Services.Notification.Trainings
 
                         var timestamp = DateTime.Now;
                         var key = $"{training.Id}-{r.AllTrainingRecipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
-                        var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
+                        var returnUrl = $"{TrainingBaseUrl}/{tenantIdentifier}/{key}";
                         var content = training.Content.Replace("###RETURN_URL###", returnUrl);
 
                         // TODO: calculate short urls
@@ -122,7 +122,8 @@ namespace PhishingPortal.Services.Notification.Trainings
                                 ReicipientID = r.AllTrainingRecipient.Id,
                                 TrainingType = training.TrainingCategory,
                                 SentOn = timestamp,
-                                Status = CampaignLogStatus.Sent.ToString()
+                                Status = TrainingStatus.Sent.ToString(),
+                                Url = returnUrl,
                             }
                         };
 
@@ -130,16 +131,16 @@ namespace PhishingPortal.Services.Notification.Trainings
                     }
                 };
 
-                var c = dbContext.Training.Find(training.Id);
+                var c = DataContext.Training.Find(training.Id);
                 c.State = TrainingState.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                DataContext.Update(c);
+                DataContext.SaveChanges();
             }
             catch (Exception ex)
             {
                 training.State = TrainingState.Aborted;
-                dbContext.Update(training);
-                dbContext.SaveChanges();
+                DataContext.Update(training);
+                DataContext.SaveChanges();
                 Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
             }
 

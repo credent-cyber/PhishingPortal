@@ -1073,31 +1073,50 @@ namespace PhishingPortal.Repositories
 
 
 
-        public async Task<Tuple<bool, string>> Traininglink(string key)
+        //public async Task<Tuple<bool, string>> Training(string key)
+        //{
+        //    var status = TrainingStatus.Sent.ToString();
+        //    var trainingLog = TenantDbCtx.TrainingLog.FirstOrDefault(o => o.SecurityStamp == key && o.Status == status);
+
+        //    if (trainingLog == null)
+        //        throw new Exception("Invalid log");
+
+        //    var training = TenantDbCtx.Training.FirstOrDefault(o => o.Id == trainingLog.TrainingID);
+        //    if (training == null)
+        //        throw new Exception("Invalid training");
+
+        //    trainingLog.Status = TrainingState.InProgress.ToString();
+        //    //trainingLog.PercentCompleted = 0;
+        //    //trainingLog.ModifiedOn = DateTime.Now;
+        //    //trainingLog.ModifiedBy = nameof(Traininglink);
+
+        //    TenantDbCtx.Update(trainingLog);
+        //    TenantDbCtx.SaveChanges();
+
+        //    return await Task.FromResult(new Tuple<bool, string>(true, training.TrainingCategory));
+
+        //}
+
+        public async Task<Tuple<bool, string>> Training(string key)
         {
             var status = TrainingStatus.Sent.ToString();
-            var trainingLog = TenantDbCtx.TrainingLog
-                .FirstOrDefault(o => o.SecurityStamp == key
-                    && o.Status == status);
+            var trainingLog = await TenantDbCtx.TrainingLog.FirstOrDefaultAsync(o => o.SecurityStamp == key && o.Status == status);
 
             if (trainingLog == null)
-                throw new Exception("Invalid Url");
+                throw new Exception("Invalid log");
 
-            var training = TenantDbCtx.Training.FirstOrDefault(o => o.Id == trainingLog.TrainingID);
+            var training = await TenantDbCtx.Training.FirstOrDefaultAsync(o => o.Id == trainingLog.TrainingID);
             if (training == null)
-                throw new Exception("Invalid Campaign");
+                throw new Exception("Invalid Training");
 
-            trainingLog.Status = CampaignLogStatus.Completed.ToString();
-            //trainingLog.PercentCompleted = 0;
-            trainingLog.ModifiedOn = DateTime.Now;
-            trainingLog.ModifiedBy = nameof(Traininglink);
+            trainingLog.Status = TrainingState.InProgress.ToString();
 
             TenantDbCtx.Update(trainingLog);
-            TenantDbCtx.SaveChanges();
+            await TenantDbCtx.SaveChangesAsync();
 
-            return await Task.FromResult(new Tuple<bool, string>(true, training.TrainingCategory));
-
+            return new Tuple<bool, string>(true, training.TrainingCategory);
         }
+
 
     }
 }

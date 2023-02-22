@@ -17,10 +17,10 @@ CREATE TABLE Training (
 
 CREATE TABLE TrainingLog (
   Id int NOT NULL auto_increment UNIQUE,
-  TrainingID varchar(45) NOT NULL,
-  UserID varchar(45) NOT NULL,
+  TrainingID int NOT NULL,
+  ReicipientID varchar(45) NOT NULL,
   TrainingType varchar(45),
-  PercentComplete decimal,
+  PercentCompleted decimal,
   Status varchar(45) NOT NULL,
   SecurityStamp LONGTEXT,
   Url LONGTEXT,
