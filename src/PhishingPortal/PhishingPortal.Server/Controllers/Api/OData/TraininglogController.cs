@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNet.OData;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using PhishingPortal.DataContext;
+using PhishingPortal.Repositories;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.Dto;
 using PhishingPortal.Server.Services.Interfaces;
+using System.Linq;
 
 namespace PhishingPortal.Server.Controllers.Api.OData
 {
@@ -21,5 +26,6 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         {
             return DbContext.TrainingLog.AsQueryable();
         }
+
     }
 }

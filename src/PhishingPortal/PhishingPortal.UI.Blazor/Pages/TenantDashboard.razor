@@ -135,10 +135,10 @@
                     <a href="#!">
                         <div class="row align-items-center m-b-0">
                             <div class="col" style="padding: 0">
-                                <h6 class="m-b-5 text-white">Total Training Assign</h6>
+                                <h6 class="m-b-5 text-white">Latest Assigned Training </h6>
                             </div>
                             <div class="col-auto">
-                                <h3 style="color:black">@totalTraining</h3>
+                                <h3 style="color:black">@trainingStats.TotalTrainingAssign</h3>
                             </div>
                         </div>
                     </a>
@@ -154,7 +154,7 @@
                                 <h6 class="m-b-5 text-white">Completed</h6>
                             </div>
                             <div class="col-auto">
-                                <h3 style="color:black">@trainingCompleted</h3>
+                                <h3 style="color:black">@trainingStats.TrainingCompleted</h3>
                             </div>
                         </div>
                     </a>
@@ -170,7 +170,7 @@
                                 <h6 class="m-b-5 text-white">Incomplete/Not Attempt</h6>
                             </div>
                             <div class="col-auto">
-                                <h3 style="color:black">@trainingIncomplete</h3>
+                                <h3 style="color:black">@trainingStats.TrainingNotAttampt</h3>
                             </div>
                         </div>
                     </a>
@@ -186,7 +186,7 @@
                                 <h6 class="m-b-5 text-white">Compromised after Training</h6>
                             </div>
                             <div class="col-auto">
-                                <h3 style="color:black">@compromised%</h3>
+                                <h3 style="color:black">@trainingStats.TrainingCompromised%</h3>
                             </div>
                         </div>
                     </a>
@@ -469,15 +469,13 @@
                             <div class="col-xl-6 col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>Recent 5 Months Training Report</h5>
+                                        <h5>Monthwise Training Report</h5>
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
-                                            @*<Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
-                                            Labels="@TrainingBarChartLabels" IsStacked="false">
-                                            </Chart>*@
+
                                             <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
-                                                   Labels="@(new[] { "Oct","Setp","Aug","July","Jun" })" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -490,11 +488,9 @@
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
-                                            @*<Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
-                                            Labels="@TrainingLineChartLabels" IsStacked="false">
-                                            </Chart>*@
+                
                                             <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
-                                                   Labels="@(new[] { "Oct","Setp","Aug","July","Jun" })" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -505,12 +501,12 @@
                             <div class="col-xl-12 col-md-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>Data Table</h5>
+                                        <h5 style="color:coral;">Recent TrainingLogs <i class="fa fa-database" aria-hidden="true"></i></h5>
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
                                             @*<DummyTable />*@
-                                            <Traininglogs />
+                                            <Traininglogs Desc="true" />
                                         </div>
                                     </div>
                                 </div>
@@ -536,11 +532,6 @@
 
     public bool IsError { get; set; }
     public string Message { get; set; } = string.Empty;
-
-    public int totalTraining = 30;
-    public int trainingIncomplete = 10;
-    public int trainingCompleted = 20;
-    public decimal compromised = 15;
 
     //Email Chart Data
     //public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
@@ -608,13 +599,16 @@
     //Training Chart Data
     public List<ChartJsDataset> TrainingBarChartData { get; set; } = new List<ChartJsDataset>();
     public string[] TrainingBarChartLabels { get; set; }
+    public int[] TrainingBarChartIds { get; set; }
 
     public List<ChartJsDataset> TrainingLineChartData { get; set; } = new List<ChartJsDataset>();
     public string[] TrainingLineChartLabels { get; set; }
 
     IEnumerable<CampaignRecipient> CampaignRecipients = null;
     IEnumerable<Campaign> campaigns = null;
+
     ConsolidatedPhishingStats stats = new ConsolidatedPhishingStats();
+    TrainingStatics trainingStats = new TrainingStatics();
 
 
     protected override async Task OnInitializedAsync()
@@ -633,6 +627,8 @@
         try
         {
             stats = await client.GetLatestStats();
+            trainingStats = await client.GetLatestTrainingStats();
+            var TrainingData = await client.GetMonthwiseTrainingData(DateTime.Now.Year);
             var data = await client.GetMonthlyBarChartEntires(DateTime.Now.Year);
             var data2 = await client.GetCategoryWisePhishingTestData(StartDate, EndDate);
 
@@ -642,7 +638,7 @@
             {
                 data2.Entries.Select(o => o.Campaign.Id).ToArray();
 
-                // Email campaign wise chart
+                #region Email campaign wise chart
                 BarChart3Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Recent five Email Campaigns
                 BarChart3Ids = data2.Entries.Select(o => o.Campaign.Id).ToArray();
                 BarChart3Data.Add(new ChartJsDataset
@@ -708,8 +704,9 @@
                 //});
 
                 //BarChart1Labels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+                #endregion
 
-                //Sms Chart data
+                #region Sms Chart data
                 SmsBarChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Sms per Campaign
                 SmsBarChartIds = data2.SmsEntries.Select(o => o.Campaign.Id).ToArray();
                 SmsBarChartData.Add(new ChartJsDataset
@@ -768,7 +765,9 @@
 
                     }
                 }
-                //Whatsapp Chart data
+                #endregion
+
+                #region Whatsapp Chart data
                 WhatsappBarChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray(); //Trend of Clicks on Whatsapp per Campaign
                 WhatsappBarChartIds = data2.WhatsappEntries.Select(o => o.Campaign.Id).ToArray();
                 WhatsappBarChartData.Add(new ChartJsDataset
@@ -825,40 +824,39 @@
                         WhatsappPolarLabels.Add(entry.Key.ToUpper());
                     }
                 }
+                #endregion
 
-                //Training Chart data
-                TrainingBarChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray(); //Recent Training Report
+                #region Training Chart data
+                TrainingBarChartLabels = TrainingData.MonthwiseTrainingEntry.Select(o => o.Month.ToString()).ToArray(); //Recent Training Report
                 TrainingBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Training Assign",
-                        //Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
-                        Data = (new[] { "12", "14", "16", "51", "13" }),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.DarkBlue, data2.Entries.Count()),
+                        Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.TotalTraining.ToString()).ToArray(),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.DarkBlue, TrainingData.MonthwiseTrainingEntry.Count()),
                     });
 
                 TrainingBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Completed",
-                        //Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
-                        Data = (new[] { "10", "9", "12", "44", "10" }),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Cyan, data2.Entries.Count()),
+                        Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.Completed.ToString()).ToArray(),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Cyan, TrainingData.MonthwiseTrainingEntry.Count()),
                     });
 
                 TrainingBarChartData.Add(new ChartJsDataset
                     {
                         Label = "InProgress",
-                        //Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
-                        Data = (new[] { "2", "5", "4", "7", "3" }),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Yellow, data2.Entries.Count()),
+                        Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.Inprogress.ToString()).ToArray(),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Yellow, TrainingData.MonthwiseTrainingEntry.Count()),
                     });
                 TrainingLineChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
                 TrainingLineChartData.Add(new ChartJsDataset
                     {
                         Label = "Training Completion%",
-                        //Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        Data = (new[] { "83", "64", "85", "86", "76" }),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, data.Entries.Count()), //Trend of Training Completion Percentege
+                        Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.CompletionPercent.ToString()).ToArray(),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, TrainingData.MonthwiseTrainingEntry.Count()), //Trend of Training Completion Percentege
                     });
+
+                    #endregion
             }
         }
         catch (Exception ex)

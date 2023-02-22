@@ -1071,32 +1071,6 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(result.ToList());
         }
 
-
-
-        //public async Task<Tuple<bool, string>> Training(string key)
-        //{
-        //    var status = TrainingStatus.Sent.ToString();
-        //    var trainingLog = TenantDbCtx.TrainingLog.FirstOrDefault(o => o.SecurityStamp == key && o.Status == status);
-
-        //    if (trainingLog == null)
-        //        throw new Exception("Invalid log");
-
-        //    var training = TenantDbCtx.Training.FirstOrDefault(o => o.Id == trainingLog.TrainingID);
-        //    if (training == null)
-        //        throw new Exception("Invalid training");
-
-        //    trainingLog.Status = TrainingState.InProgress.ToString();
-        //    //trainingLog.PercentCompleted = 0;
-        //    //trainingLog.ModifiedOn = DateTime.Now;
-        //    //trainingLog.ModifiedBy = nameof(Traininglink);
-
-        //    TenantDbCtx.Update(trainingLog);
-        //    TenantDbCtx.SaveChanges();
-
-        //    return await Task.FromResult(new Tuple<bool, string>(true, training.TrainingCategory));
-
-        //}
-
         public async Task<Tuple<bool, string>> Training(string key)
         {
             var status = TrainingStatus.Sent.ToString();
@@ -1116,6 +1090,126 @@ namespace PhishingPortal.Repositories
 
             return new Tuple<bool, string>(true, training.TrainingCategory);
         }
+
+        public async Task<MonthlyTrainingBarChart> GetTrainingReportData(int year)
+        {
+            MonthlyTrainingBarChart data = new MonthlyTrainingBarChart();
+            data.MonthwiseTrainingEntry = new List<MonthlyTrainingReportData>();
+            data.Year = year;
+            var start = new DateTime(year, 1, 1);
+            var end = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+
+            try
+            {
+                var Traininglogs = TenantDbCtx.TrainingLog
+                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+
+                #region
+                //var trainingGroup = Trainings.ToList().GroupBy(i => i.TrainingID, (key, entries) => new
+                //{
+                //    TrainingID = key,
+                //    TotalTraining = entries.Count(),
+                //    Completed = entries.Where(i => i.Equals(TrainingStatus.Completed)).Count(),
+                //    Inprogress = entries.Where(i => i.Equals(TrainingStatus.InProgress)).Count()
+                //});
+                //foreach (var c in trainingGroup)
+                //{
+                //    var training = TenantDbCtx.Training.Find(c.TrainingID);
+
+                //    if (training == null)
+                //        continue;
+
+                //    var entry = new TrainingCountsEntry()
+                //    {
+                //        Training = training,
+                //        TotalTrainingAssign = c.TotalTraining,
+                //        TrainingCompleted = c.Completed,
+                //        TrainingInprogess = c.Inprogress,
+                //    };
+
+                //    TRData.TrainingCountEntries.Add(entry);
+                //}
+                //TRData.TrainingCountEntries = TRData.TrainingCountEntries.OrderByDescending(o => o.Training.ModifiedOn).Take(5).ToList();
+                #endregion
+
+
+                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.CreatedOn.Month, (key, entries) => new
+                {
+                    Month = (Months)key,
+                    TotalTraining = entries.Count(),
+                    Completed = entries.Count(i => i.Status == (TrainingStatus.Completed).ToString()),
+                    Inprogress = entries.Count(i => i.Status == (TrainingStatus.InProgress).ToString()),
+
+                });
+
+
+                foreach (Months month in Enum.GetValues(typeof(Months)))
+                {
+
+                    var log = trainingGroup.FirstOrDefault(i => i.Month == month);
+
+                    var entry = new MonthlyTrainingReportData
+                    {
+                        Month = month,
+                    };
+
+                    if (log != null)
+                    {
+                        entry.TotalTraining = log.TotalTraining;
+                        entry.Completed = log.Completed;
+                        entry.Inprogress = log.Inprogress;
+                        if (entry.TotalTraining > 0)
+                        {
+                            entry.CompletionPercent = Math.Round(((decimal)entry.Completed / entry.TotalTraining) * 100, 2);
+                        }
+
+                    }
+
+
+                    data.MonthwiseTrainingEntry.Add(entry);
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+            return await Task.FromResult(data);
+        }
+
+        public async Task<TrainingStatics> GetLastTrainingStatics()
+        {
+            var outcome = new TrainingStatics();
+
+            var lastTraining = TenantDbCtx.Training.Where(o => o.State == TrainingState.Completed)
+                .OrderByDescending(c => c.ModifiedOn)
+                .FirstOrDefault();
+
+            if (lastTraining != null)
+            {
+                var logs = TenantDbCtx.TrainingLog.Where(o => o.TrainingID == lastTraining.Id
+                             && (o.Status == TrainingStatus.Sent.ToString() || o.Status == TrainingStatus.Completed.ToString()));
+
+                outcome.TotalTrainingAssign = logs.Count();
+                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingStatus.Completed.ToString());
+                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingStatus.InProgress.ToString());
+                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingStatus.Sent.ToString());
+
+                if (outcome.TotalTrainingAssign > 0)
+                {
+                    outcome.TrainingCompromised = Math.Round(((decimal)outcome.TrainingNotAttampt / outcome.TotalTrainingAssign) * 100, 2);
+                }
+            }
+
+
+            return await Task.FromResult(outcome);
+        }
+
+
+
 
 
     }

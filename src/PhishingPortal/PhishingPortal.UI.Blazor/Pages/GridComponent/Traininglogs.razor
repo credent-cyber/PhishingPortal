@@ -32,6 +32,9 @@ else
     private CGrid<TrainingLog> _grid;
     private Task _task;
 
+    [Parameter]
+    public bool Desc { get; set; } = false;
+
     Action<IGridColumnCollection<TrainingLog>> columns = c =>
     {
         c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
@@ -50,7 +53,9 @@ else
     {
         string url = $"odata/Traininglog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        query.Add("grid-sorting", "Id__1__1");
+        
+        if(Desc == true)
+            query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<TrainingLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
             .Sortable()
@@ -69,6 +74,5 @@ else
         _task = client.UpdateGrid();
         await _task;
     }
-
 
 }

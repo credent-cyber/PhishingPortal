@@ -577,7 +577,54 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
 
+        public async Task<MonthlyTrainingBarChart?> GetMonthwiseTrainingData(int year)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/monthwise-training-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
+                res.EnsureSuccessStatusCode();
 
 
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyTrainingBarChart>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
+        }
+
+        public async Task<TrainingStatics> GetLatestTrainingStats()
+        {
+            var result = new TrainingStatics();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/get-training-statistics");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingStatics>>();
+
+                if (json != null)
+                    result = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
     }
 }

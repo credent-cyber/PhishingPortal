@@ -509,6 +509,53 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
+        [HttpGet]
+        [Route("monthwise-training-data/{year}")]
+        public async Task<ApiResponse<MonthlyTrainingBarChart>> GetMonthwiseTrainingData(int year)
+        {
+            var result = new ApiResponse<MonthlyTrainingBarChart>();
+            try
+            {
+                var data = await _tenantRepository.GetTrainingReportData(year);
+                result.Result = data;
+                result.IsSuccess = true;
+                result.Message = String.Empty;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("get-training-statistics")]
+        public async Task<ApiResponse<TrainingStatics>> GetTrainingStatistics()
+        {
+            var result = new ApiResponse<TrainingStatics>();
+
+            try
+            {
+                var data = await _tenantRepository.GetLastTrainingStatics();
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
 
     }
 }
