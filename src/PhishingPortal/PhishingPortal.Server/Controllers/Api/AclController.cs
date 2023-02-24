@@ -54,13 +54,20 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("currentUserInfo")]
         public CurrentUser CurrentUserInfo()
         {
-            return new CurrentUser
+            var user = new CurrentUser
             {
                 IsAuthenticated = User?.Identity?.IsAuthenticated ?? false,
                 UserName = User?.Identity?.Name ?? "guest",
                 Claims = User?.Claims?
                               .ToDictionary(c => c.Type, c => c.Value)
             };
+
+            if (!user.Claims.Any())
+            {
+                user.Claims.Add("role", "trainee");
+            }
+
+            return user;
         }
 
         [Route("forgetpassword")]

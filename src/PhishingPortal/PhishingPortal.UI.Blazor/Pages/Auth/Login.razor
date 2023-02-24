@@ -1,9 +1,11 @@
 ﻿@page "/login"
+
 @using PhishingPortal.Dto.Auth
 @using PhishingPortal.UI.Blazor.Models
 @layout AuthLayout
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
+
 
 <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="loginRequest">
     <div class="card-body">
@@ -34,6 +36,7 @@
                 </div>
             </div>
             <button class="btn  btn-primary mb-4" type="submit">Signin</button>
+            <a class="btn  btn-primary mb-4" href="/oidc/challenge?returnUrl=/&provider=Microsoft">Office265 Login</a>
             <p class="mb-2 text-muted">
                 Forgot password?
                 <span @onclick="ResetPasswordClick" class="f-w-400 font-weight-bold" style="cursor: pointer">Reset</span>
@@ -46,6 +49,10 @@
 </EditForm>
 
 @code {
+
+    [Parameter]
+    public string Oidc { get; set; }
+
     [CascadingParameter]
     public AlertModel Alerts { get; set; } = new();
 
