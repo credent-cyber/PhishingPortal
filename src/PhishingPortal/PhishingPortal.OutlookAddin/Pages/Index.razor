@@ -1,0 +1,126 @@
+﻿@page "/"
+
+<header class="d-flex align-items-center justify-content-center">
+    <img src="Images/parker-ms.svg" />
+    <h5>
+        <span style="color:brown">Phish</span><span style="color:darkblue">Sims</span> <span style="color:green; font-family:cursive">Report Service</span>
+    </h5>
+    <br />
+</header>
+<br />
+<div style="background:red">
+    <div style="margin-left: 32%;">
+        <a @onclick="Forward" style="cursor:pointer; color:white; font-weight:600;">Report as Spam</a>
+    </div>
+</div>
+<br />
+<button @onclick="XXX" style="cursor:pointer; color:white; font-weight:600;">xxx</button>
+
+@if (EmailForward)
+{
+
+    <div>
+        <div class="row">
+            <div class="col-sm-5 col-md-5">
+                @if (Responce is true)
+                {
+                    <div class="alert alert-success">
+                        <span><i class="fa fa-check" aria-hidden="true"></i></span> <strong>Great!</strong>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                        <hr class="message-inner-separator">
+                        <p>
+                            You have successfully reported this mail as spam.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                        <hr class="message-inner-separator">
+                        <p>
+                            Something went wrong while submitting request.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+
+}
+
+@ItemId
+@HtmlBody
+
+@if (EmailForward = false)
+{
+    <section class="samples ms-font-m">
+
+        @if (MailReadData is not null)
+        {
+            <div class="row">
+                <h3>Current Email Properties</h3>
+            </div>
+            <dl class="row">
+                <dt class="col-sm-3">Subject</dt>
+                <dd class="col-sm-9">@MailReadData.Subject</dd>
+
+                <dt class="col-sm-3">Id</dt>
+                <dd class="col-sm-9">@MailReadData.AttachmentId</dd>
+
+                <dt class="col-sm-3">ItemId</dt>
+                <dd class="col-sm-9">@ItemId</dd>
+
+                <dt class="col-sm-3">First Attachment Name</dt>
+                <dd class="col-sm-9">@MailReadData.AttachmentName</dd>
+
+                <dt class="col-sm-3">AttachmentType</dt>
+                <dd class="col-sm-9">@MailReadData.AttachmentType</dd>
+
+                <dt class="col-sm-3">Inline</dt>
+                <dd class="col-sm-9">@MailReadData.Inline</dd>
+
+                <dt class="col-sm-3">Base64 Attachment Data</dt>
+                <dd class="col-sm-9">
+                    @if (!String.IsNullOrEmpty(MailReadData.AttachmentImageURL))
+                    {
+                        <img src="@MailReadData.AttachmentImageURL" width="50" />
+                    }
+                    else if (!String.IsNullOrEmpty(MailReadData.AttachmentBase64Data))
+                    {
+                        @*Just show some of the base64 data*@
+                        @MailReadData.AttachmentBase64Data
+                    }
+                    else
+                    {
+                        <div>N/A</div>
+                    }
+                </dd>
+            </dl>
+        }
+        else
+        {
+            <div class="row">
+                <h3>Unable to read email and attachment data</h3>
+            </div>
+        }
+    </section>
+}
+<footer class="d-flex align-items-center justify-content-center">
+    <div class="row">
+        @TrademarkMessage1
+    </div>
+    <div class="row">
+        @TrademarkMessage2
+    </div>
+    <div class="row">
+        @*Powered by: @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription*@  
+    </div>
+</footer>
+
