@@ -8,7 +8,7 @@ namespace PhishingPortal.DataContext
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public TenantDbContext(DbContextOptions<TenantDbContext> options, bool ensureCreated = true) : base(options)
         {
-            if(ensureCreated)
+            if (ensureCreated)
                 Database.EnsureCreated();
         }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -28,6 +28,10 @@ namespace PhishingPortal.DataContext
         public DbSet<RecipientGroup> RecipientGroups { get; set; }
         public DbSet<RecipientGroupMapping> RecipientGroupMappings { get; set; }
         public DbSet<TenantSetting> Settings { get; set; }
+        public DbSet<Training> Training { get; set; }
+        public DbSet<TrainingLog> TrainingLog { get; set; }
+        public DbSet<TrainingRecipients> TrainingRecipient { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

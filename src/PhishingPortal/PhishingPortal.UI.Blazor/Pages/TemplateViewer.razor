@@ -10,6 +10,7 @@
 @inject IJSRuntime JSRuntime
 @inject HttpClient HttpClient
 @inject AuthState authState;
+@attribute [Authorize]
 
 <TemplatePreviewDialog Show="showPreview" Title="Template Preview">
     <br />

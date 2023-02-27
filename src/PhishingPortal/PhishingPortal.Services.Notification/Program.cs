@@ -8,6 +8,7 @@ using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Services.Notification.Sms;
 using PhishingPortal.Services.Notification.Whatsapp;
 using PhishingPortal.Services.Notification.RequestMonitor;
+using PhishingPortal.Services.Notification.Trainings;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -74,8 +75,9 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         services.AddSingleton<IEmailClient, SmtpEmailClient>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
+        services.AddSingleton<ITrainingExecutor, TrainingExecutor>();
         services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
-       
+
         services.AddSingleton<AmyntraSmsGatewayConfig>();
         services.AddSingleton<ISmsCampaignExecutor, SmsCampaignExecutor>();
         services.AddSingleton<ISmsGatewayClient, DefaultSmsGatewayClient>();
@@ -83,10 +85,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<WhatsappGatewayConfig>();
         services.AddSingleton<IWhatsappCampaignExecutor, WhatsappCampaignExecutor>();
         services.AddSingleton<IWhatsappGatewayClient, WhatsappMateGatewayClient>();
-          
-        services.AddSingleton<IDbConnManager ,DbConnManager>();
-        services.AddSingleton<IDemoRequestHandler ,DemoRequestHandler>();
-        services.AddSingleton<IRequestEmailSender ,RequestEmailSender>();
+
+        services.AddSingleton<IDbConnManager, DbConnManager>();
+        services.AddSingleton<IDemoRequestHandler, DemoRequestHandler>();
+        services.AddSingleton<IRequestEmailSender, RequestEmailSender>();
 
         services.AddHostedService<Worker>();
 

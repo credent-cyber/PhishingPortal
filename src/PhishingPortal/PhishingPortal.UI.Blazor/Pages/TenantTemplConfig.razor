@@ -17,7 +17,7 @@
 @using PhishingPortal.Common
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration _config
-
+@attribute [Authorize]
 
 @if (model == null)
 {
@@ -441,11 +441,6 @@
             text = result;
         else
             contents = result;
-
-    }
-
-    public void LoadTempl()
-    {
 
     }
 

@@ -12,16 +12,17 @@
 @inject HttpClient HttpClient
 @inject AuthState authState;
 @inject Blazored.LocalStorage.ILocalStorageService oLocalStore
+@attribute [Authorize]
 
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header" style="padding:25px 25px 0px;">
-                    <h5>All Templates</h5>
-                    <a class="btn btn-primary" href="tenant-templates-config" ><span class="oi oi-plus"></span></a>    
-                     <div style="float:right">
+                <h5 style="top:-4px">All Templates</h5>
+                <a href="tenant-templates-config"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Template"></i></a>
+                <div style="float:right">
                         <ol class="breadcrumb float-sm-right">
-                          <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
                           <li class="breadcrumb-item active">Templates</li>
                         </ol>
                      </div>
@@ -89,7 +90,7 @@
         </div>  
     </div>
 
-    <DialogTemplate Show="showPreview" Title="Template Preview">
+<DialogTemplate Show="showPreview" Title="Template Preview">
     <br />
     @if (sms is true)
     {

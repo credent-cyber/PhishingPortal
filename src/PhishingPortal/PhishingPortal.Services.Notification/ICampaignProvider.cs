@@ -7,5 +7,6 @@ namespace PhishingPortal.Services.Notification
     public interface ICampaignProvider
     {
         Task CheckAndPublish(CancellationToken stopppingToken);
+
     }
 }
