@@ -42,8 +42,7 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
-                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
-
+                            @*<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>*@
 
                             <div class="row">
                                 <div class="col-md-6">
@@ -52,107 +51,105 @@ else
 
                                             <div class="card-body">
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Campaign Name<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
+                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaign Name</label>
+                                                    <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Template Category</label>
-                                                    <div class="col-md-9">
-                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" >
-                                                                @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                                                {
+                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Category</label>
+                                                    <div class="col-md-8">
+                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType">
+                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                                            {
                                                                 <option value="@val">@val</option>
-                                                                }
+                                                            }
                                                         </select>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Select Template </label>
-                                                    <div class="col-md-9">
+                                                    <label  class="col-form-label col-md-4 bold-font">Select Template </label>
+                                                    <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                                                            @foreach (var val in Templates.OrderBy(o=>o.Name).Where(o=>o.Type==model.Detail.Type))
-                                                            {   
-                                                                if(val.Id.Equals(0))
+                                                            @foreach (var val in Templates.OrderBy(o => o.Name).Where(o => o.Type == model.Detail.Type))
+                                                            {
+                                                                if (val.Id.Equals(0))
                                                                 {
-                                                                    <option>- Not Available -</option>                                                                 
+                                                                    <option>- Not Available -</option>
                                                                 }
                                                                 else
                                                                 {
                                                                     <option value="@val.Id">@val.Name</option>
                                                                 }
-                                                                    
+
                                                             }
                                                         </InputSelect>
                                                     </div>
                                                 </div>
                                                 @if (model.Detail.Type == CampaignType.Email)
-                                                {                                                  
+                                                {
                                                     <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender(Phishing) Email</label>
+                                                        <div class="col-md-8">
                                                             <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
                                                         </div>
                                                     </div>
                                                 }
                                                 else
                                                 {
-                                                     <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
+                                                        <div class="col-md-8">
                                                             <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
                                                         </div>
                                                     </div>
                                                 }
                                                 <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                             <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
-                                                        @foreach (var val in _returnUrlList.OrderBy(o => o))
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                            @foreach (var val in _returnUrlList.OrderBy(o => o))
                                                             {
-                                                            <option value="@val">@val</option>
+                                                                <option value="@val">@val</option>
                                                             }
-                                                    </InputSelect>
-                                                        </div>
+                                                        </InputSelect>
                                                     </div>
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
-                                                        <div class="col-md-9">
-                                                             <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
-                                                      @* <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
-                                                       <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
-                                                       <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
-
-                                                                <option>-Select-</option>
-                                                                <option value="Clicks">Clicks</option>
-                                                                <option value="Offers">Offers</option>
-                                                                <option value="ITServices">IT Services</option>
-                                                                <option value="Banking">Banking</option>
-                                                                <option value="Finance">Finance</option>
-                                                                <option value="Finance">Verification</option>
-
-                                                    </InputSelect>
                                                 </div>
-                                            </div>
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
+                                                    <div class="col-md-8">
+                                                        <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
+                                                    <div class="col-md-8">
+                                                        <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Category</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
+
+                                                            <option>-Select-</option>
+                                                            <option value="Clicks">Clicks</option>
+                                                            <option value="Offers">Offers</option>
+                                                            <option value="ITServices">IT Services</option>
+                                                            <option value="Banking">Banking</option>
+                                                            <option value="Finance">Finance</option>
+                                                            <option value="Finance">Verification</option>
+
+                                                        </InputSelect>
+                                                    </div>
+                                                </div>
 
 
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3">Schedule</label>
-                                                <div class="col-md-5">
-                                                    @if (isScheduled == false)
+                                                <div class="form-group row">
+                                                    <label  class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                    <div class="col-md-5">
+                                                        @if (isScheduled == false)
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
                                                                 <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
@@ -177,7 +174,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row" id="divSchedule">
-                                                    <div class="col-md-9 offset-md-3 row" style="padding: 0;">
+                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
 
                                                         <div class="col-12">
                                                             @if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
@@ -186,10 +183,10 @@ else
                                                             }
                                                             @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
                                                             {
-                                                                <label class="form-label">Scheduled Once</label>
+                                                                @*<label class="form-label">Scheduled Once</label>*@
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span class="input-group-text" id="">Date & Time</span>
+                                                                        <span class="input-group-text" id="">Date</span>
                                                                     </div>
                                                                     <InputDate @bind-Value="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></InputDate>
                                                                     <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
@@ -230,26 +227,26 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="txtImportUsers" class="col-form-label col-md-3">Import Users</label>
-                                                    <div class="col-md-9">
+                                                    <label for="txtImportUsers" class="col-form-label col-md-4 bold-font">Import Users</label>
+                                                    <div class="col-md-8">
                                                         <div class="input-group">
-                                                        <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">                                                         
-                                                            @foreach (var val in Enum.GetValues<RecipientSources>())
+                                                            <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">
+                                                                @foreach (var val in Enum.GetValues<RecipientSources>())
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                            @if (sources == RecipientSources.Csv)
                                                             {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                        </InputSelect>   
-                                                            @if(sources == RecipientSources.Csv)
-                                                            {                                                                
                                                                 <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
                                                             }
                                                         </div>
-                                                        <br/>
+                                                        <br />
                                                         @if (sources == RecipientSources.Csv)
                                                         {
                                                             <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Has Header Row</label>
-                                                                <div class="col-md-5">
+                                                                <label  class="col-form-label col-md-4"> Has Header</label>
+                                                                <div class="col-md-8">
                                                                     <div class="radio radio-info radio-fill d-inline">
                                                                         <input type="radio" name="radio-i-in-3" id="chkHasHeader" @onclick="Header" checked>
                                                                         <label for="chkHasHeader" class="cr">Yes</label>
@@ -262,7 +259,7 @@ else
                                                             </div>
 
                                                             <div class="form-group row" id="divUploadUsers">
-                                                                <label for="" class="col-form-label col-md-3">Select File</label>
+                                                                <label  class="col-form-label col-md-3">File</label>
                                                                 <div class="col-md-9">
                                                                     <div class="input-group">
                                                                         <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -279,29 +276,29 @@ else
 
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">State</label>
-                                                    <div class="col-md-9">
-                                                    @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
-                                                    {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                    <label  class="col-form-label col-md-4 bold-font">State</label>
+                                                    <div class="col-md-8">
+                                                        @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
                                                                 @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                                 {
-                                                                <option value="@val">@val</option>
+                                                                    <option value="@val">@val</option>
                                                                 }
-                                                        </InputSelect>
-                                                    }
-                                                    else
-                                                    {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                            </InputSelect>
+                                                        }
+                                                        else
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
                                                                 @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                                 {
-                                                                <option value="@val">@val</option>
+                                                                    <option value="@val">@val</option>
                                                                 }
-                                                        </InputSelect>
-                                                    }
+                                                            </InputSelect>
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            
+
                                                 <div style="text-align:center;">
                                                     <button type="submit" class="btn btn-primary">Save</button>
                                                     <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
@@ -323,11 +320,11 @@ else
                                                         <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
                                                     }
                                                 </div>
-                                                <br/>
+                                                <br />
                                             </div>
                                         </div>
                                     </EditForm>
-                                   
+
                                 </div>
 
                                 <div class="col-md-6">
@@ -339,17 +336,17 @@ else
                                             }
                                             else
                                             {
-                                                if(model.Detail.Type == CampaignType.Sms)
+                                                if (model.Detail.Type == CampaignType.Sms)
                                                 {
                                                     OnShowPreview(model.Detail.CampaignTemplateId);
-                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text"  disabled />
+                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" disabled />
                                                 }
                                                 else
                                                 {
-                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                                                                      
-                                                    @previewContent 
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);
+                                                    @previewContent
                                                 }
-                                                
+
                                             }
                                         </div>
                                     </div>
@@ -367,7 +364,7 @@ else
 
     </div>
     <div>
-        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="recipients"></Recipients>
@@ -379,7 +376,7 @@ else
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
@@ -395,6 +392,15 @@ else
         <AzAdRecipientImporter ShowDialog="showAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></AzAdRecipientImporter>
 
     </div>
+
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <div style="text-align:center;">
+                Thank you!
+            </div>
+        }
+    </Dailog>
 }
 
 
@@ -402,6 +408,7 @@ else
 
     [Parameter]
     public int Id { get; set; }
+    private bool show = false;
 
     List<RecipientImport> fileimport;
     Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
@@ -426,7 +433,7 @@ else
 
     public bool sms = false;
     string text = "";
-   
+
 
     public string Title
     {
@@ -472,7 +479,7 @@ else
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
-            
+
 
             _selectReturnUrl = model.ReturnUrl;
 
@@ -521,7 +528,7 @@ else
             message = "Please fill all the required field";
             return;
         }
-    @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
+        @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
         {
             var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
             if (!formate)
@@ -682,16 +689,16 @@ else
                                     Department = arr[5],
                                     Branch = arr[6],
                                     Address = arr[7]
-                            };
+                                };
                             r.Validate();
-                            if(r.ValidationErrMsg is not null)
+                            if (r.ValidationErrMsg is not null)
                             {
                                 IsError = true;
                                 message = r.ValidationErrMsg;
                                 isloading = false;
                                 return;
                             }
-                            if(!recipients.Any(i => i.Email == r.Email))
+                            if (!recipients.Any(i => i.Email == r.Email))
                                 recipients.Add(r);
                         }
 
@@ -865,15 +872,15 @@ else
         var template = Templates.FirstOrDefault(o => o.Id == id);
         showPreview = true;
         //content = template.Content;
-        if(template.Type==CampaignType.Email ||template.Type==CampaignType.Whatsapp)
+        if (template.Type == CampaignType.Email || template.Type == CampaignType.Whatsapp)
         {
             sms = false;
-            content = template.Content;           
+            content = template.Content;
         }
-        if(template.Type==CampaignType.Sms)
+        if (template.Type == CampaignType.Sms)
         {
             sms = true;
-            text = template.Content;           
+            text = template.Content;
         }
     }
     protected void onClose()
@@ -916,13 +923,13 @@ else
             updt(selectedEventArgs);
         }
     }
-    public void updt(ChangeEventArgs e) 
+    public void updt(ChangeEventArgs e)
     {
         if (e.Value.ToString() != string.Empty)
         {
             var a = e.Value.ToString();
-            if(a=="Sms")
-            { 
+            if (a == "Sms")
+            {
                 var count = Templates.Where(o => o.Type == CampaignType.Sms).Count();
                 if (count.Equals(0))
                 {
@@ -935,23 +942,23 @@ else
                     OnShowPreview(model.Detail.CampaignTemplateId);
                 }
             }
-            else if(a=="Email")
+            else if (a == "Email")
             {
-                model.Detail.Type = CampaignType.Email;            
+                model.Detail.Type = CampaignType.Email;
                 model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
             }
-            else if(a=="Whatsapp")
+            else if (a == "Whatsapp")
             {
 
                 var count = Templates.Where(o => o.Type == CampaignType.Whatsapp).Count();
-                if (count.Equals(0)) 
+                if (count.Equals(0))
                 {
                     model.Detail.CampaignTemplateId = 0;
                     model.Detail.Type = CampaignType.Whatsapp;
                 }
                 else
                 {
-                    model.Detail.Type = CampaignType.Whatsapp; 
+                    model.Detail.Type = CampaignType.Whatsapp;
                     model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;
                 }
             }
@@ -959,4 +966,21 @@ else
         }
 
     }
+
+    private void ResetForm()
+    {
+        show = false;
+        if (message.Contains("Successfully Added"))
+        {
+            //model = new Training();
+            //contents = string.Empty;
+            //model.Content = null;
+        }
+    }
+    private void CloseDailogBox()
+    {
+        showRecipients = false;
+        showRecipientss = false;
+    }
+
 }

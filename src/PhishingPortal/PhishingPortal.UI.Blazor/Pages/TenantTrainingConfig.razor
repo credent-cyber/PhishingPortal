@@ -14,6 +14,7 @@
 @using BlazingComponents.Summernote
 @inject HttpClient Http
 @using PhishingPortal.Common
+@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 @if (model == null)
@@ -43,7 +44,7 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
-                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+                            @*<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>*@
 
 
                             <div class="row">
@@ -53,13 +54,13 @@ else
                                             <div class="card-body">
    
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Name Of Training</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Is Active</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -86,11 +87,11 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Training Category</label>
                                                     <div class="col-md-8">     
                                                         <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
 
-                                                            <option>-Select-</option>
+                                                            <option>- Select -</option>
                                                             <option value="Category1">Category1</option>
                                                             <option value="Category2">Category2</option>
                                                             <option value="Category3">Category3</option>
@@ -99,7 +100,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Schedule</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
                                                     <div class="col-md-5">
                                                         @if (isScheduled == false)
                                                         {
@@ -152,7 +153,7 @@ else
 
 
                                                 <div class="form-group row" id="UploadTrainingUsers">
-                                                    <label for="" class="col-form-label col-md-4">Import Training Recipients</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field">Import Training Recipients</label>
                                                     <div class="col-md-8">
                                                         <div class="input-group">
                                                             <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -163,7 +164,7 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Training State</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
                                                     <div class="col-md-8">
                                                         @if (model.Id > 0 && model.State == TrainingState.Completed)
                                                         {
@@ -244,7 +245,7 @@ else
         </div>
     </div>
     <div>
-        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="@recipients"></Recipients>
@@ -254,7 +255,7 @@ else
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
@@ -266,11 +267,20 @@ else
             }
         </DialogTemplate>
     </div>
+
+    <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <div style="text-align:center;">
+                Thank you!
+            </div>
+        }
+    </Dailog>
+
 }
-
-
-
-
+@show
+@showRecipientss
+@showRecipients
 
 @code {
 
@@ -278,6 +288,7 @@ else
     [Parameter]
     public int Id { get; set; }
     private string contents;
+    private bool show = false;
 
     public string Title
     {
@@ -365,6 +376,7 @@ else
         IsError = false;
         IsSuccess = false;
         message = string.Empty;
+        show = true;
         try
         {
 
@@ -656,7 +668,7 @@ else
         try
         {
             var data = await client.GetRecipientByTrainingId(model.Id);
-           
+
 
             recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
 
@@ -704,4 +716,19 @@ else
         }
     }
 
+    private void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Added"))
+        {
+            //model = new Training();
+            //contents = string.Empty;
+            //model.Content = null;
+        }
+    }
+    private void CloseDailogBox()
+    {
+        showRecipients = false;
+        showRecipientss = false;
+    }
 }
