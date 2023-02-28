@@ -47,11 +47,12 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
-                            @*<Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>*@
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                        <DataAnnotationsValidator />
+                                        @*<ValidationSummary />*@
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="form-group row">

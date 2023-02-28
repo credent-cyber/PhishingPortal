@@ -1,10 +1,7 @@
 ﻿using PhishingPortal.Common;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhishingPortal.Dto
 {
@@ -15,11 +12,12 @@ namespace PhishingPortal.Dto
         [Required]
         [RegularExpression(pattern: AppConfig.EmailRegex, ErrorMessage = "Please specify a valid email id")]
         public string Email { get; set; }
-      
+
         public string ContactNumber { get; set; }
+        [Required]
         public string Company { get; set; }
         public string Messages { get; set; }
-        
+
         public Boolean isNotified { get; set; }
 
     }
