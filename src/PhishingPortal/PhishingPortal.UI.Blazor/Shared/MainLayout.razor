@@ -12,15 +12,19 @@
         <Topnav />
     </AuthorizeView>
 
+    <AuthorizeView Roles="tenantuser">
+        <Authorized>
+            <FrontPage IsTrainingLanding="true"></FrontPage>
+        </Authorized>
+    </AuthorizeView>
+
     <main>
+    <AuthorizeView>
+        <NotAuthorized>
+            <FrontPage></FrontPage>
+        </NotAuthorized>
+    </AuthorizeView>
 
-        <AuthorizeView>
-            <NotAuthorized>
-              <FrontPage></FrontPage>
-            </NotAuthorized>
-        </AuthorizeView>
-
-        
         <article class="content px-4">
             <CascadingValue TValue="AlertModel" Value="alerts">
                 <div style="margin-top:0px">

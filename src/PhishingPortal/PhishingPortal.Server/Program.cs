@@ -128,6 +128,7 @@ builder.Services.AddIdentityCore<PhishingPortalUser>()
 builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
     .AddMicrosoftAccount(options =>
     {
+        options.SignInScheme = IdentityConstants.ExternalScheme;
         options.ClientId = aadClientId;
         options.ClientSecret = aadClientSecret;
         options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
