@@ -251,7 +251,8 @@ namespace PhishingPortal.Services.Notification.Monitoring
                     if (Guid.TryParse(id, out Guid guid))
                     {
                         _logger.LogInformation($"Found message key - {id}");
-                        correlationIDs.Add(guid.ToString(), msg.From.EmailAddress.Address);
+                       // correlationIDs.Add(guid.ToString(), msg.From.EmailAddress.Address);
+                        correlationIDs.Add(id.ToString(), msg.From.EmailAddress.Address);
                     }
                 }
                 catch (Exception ex)

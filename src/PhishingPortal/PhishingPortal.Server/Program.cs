@@ -81,9 +81,20 @@ else
     {
         case "mysql":
 
+            //builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
+            //{
+            //    options.UseMySql(conString, ServerVersion.AutoDetect(conString));
+            //});
             builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
             {
-                options.UseMySql(conString, ServerVersion.AutoDetect(conString));
+                options.UseMySql(conString, ServerVersion.AutoDetect(conString),
+                    mySqlOptions =>
+                    {
+                        mySqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    });
             });
 
 

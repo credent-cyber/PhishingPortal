@@ -220,7 +220,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 result.Message = "Success";
                 result.Result = data;
 
-            }   
+            }
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
@@ -323,7 +323,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
             var adUsers = new List<Microsoft.Graph.User>();
 
-            if(adRecipientGroup.Uid == "all-users")
+            if (adRecipientGroup.Uid == "all-users")
             {
                 adUsers = await _adImportClient.GetAdUsers();
             }
@@ -349,9 +349,9 @@ namespace PhishingPortal.Server.Controllers.Api
                     WhatsAppNo = o.MobilePhone
                 }).ToList();
 
-                var result =  await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
-                
-                
+                var result = await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
+
+
                 response.IsSuccess = true;
                 response.Result = result;
             }
@@ -364,7 +364,7 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpGet]
         [Route("settings")]
 
-        public async Task<Dictionary<string,string>> GetSettings()
+        public async Task<Dictionary<string, string>> GetSettings()
         {
             var result = await _tenantRepository.GetSettings();
 
@@ -372,7 +372,7 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [HttpPost]
-        [Route("upsert-settings")] 
+        [Route("upsert-settings")]
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
         {
@@ -405,5 +405,157 @@ namespace PhishingPortal.Server.Controllers.Api
                 throw;
             }
         }
+
+
+        [HttpPost]
+        [Route("upsert-training")]
+        public async Task<Training> UpsertTraining(Training training)
+        {
+            var htmlDoc = new HtmlDocument();
+
+            htmlDoc.LoadHtml(training.Content);
+
+            foreach (var childNode in htmlDoc.DocumentNode.Descendants(2))
+            {
+                try
+                {
+                    if (childNode.Name != "img")
+                        continue;
+
+                    var src = childNode.Attributes["src"].Value;
+                    var alt = childNode.Attributes["alt"]?.Value;
+
+                    if (!src.StartsWith("data:image"))
+                        continue;
+                    var type = src.Split(";")[0];
+
+                    var encoded_value = src.Split(";")[1];
+                    var code = encoded_value.Split(",")[0];
+                    var base64Content = encoded_value.Split(",")[1];
+                    var bytes = Convert.FromBase64String(base64Content);
+                    var ext = "jpeg";
+                    var nm = $"{Guid.NewGuid().ToString()}.{ext}";
+                    System.IO.File.WriteAllBytes(Path.Combine(_templateImageRootPath, nm), bytes);
+
+                    childNode.SetAttributeValue("src", $"img/email/{nm}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, ex.Message);
+                }
+            }
+
+            training.Content = htmlDoc.DocumentNode.WriteTo();
+
+            return await _tenantRepository.UpsertTraining(training);
+        }
+
+        [HttpGet]
+        [Route("training-by-id/{id}")]
+        public async Task<Training> GetTrainingById(int id)
+        {
+            return await _tenantRepository.GetTrainingById(id);
+        }
+
+
+        [HttpPost]
+        [Route("import-recipients-to-training/{trainingId}")]
+        public async Task<ApiResponse<List<RecipientImport>>> ImportRecipientToTraining([FromRoute] int trainingId, [FromBody] List<RecipientImport> data)
+        {
+            //bool hasChanges = false;
+            var results = await _tenantRepository.ImportTrainingRecipient(trainingId, data);
+
+            var ispartial = data.Any(o => !string.IsNullOrEmpty(o.ValidationErrMsg));
+            var response = new ApiResponse<List<RecipientImport>>
+            {
+                IsSuccess = true,
+                Message = ispartial ? "Imported partially" : "Imported succesfully",
+                Result = data
+            };
+
+            return response;
+
+        }
+
+        [HttpGet]
+        [Route("recipient-by-training/{trainingId}")]
+        public async Task<List<TrainingRecipients>> GetRecipientByTraining(int trainingId)
+        {
+            var result = await _tenantRepository.GetRecipientByTrainingId(trainingId);
+            return await Task.FromResult(result);
+        }
+
+
+        [HttpPost]
+        [Route("training")]
+        [AllowAnonymous]
+        public async Task<ApiResponse<string>> TrainingLink(GenericApiRequest<string> request)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.Training(request.Param);
+                result.IsSuccess = outcome.Item1;
+                result.Message = "Successful";
+                result.Result = outcome.Item2;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while hitting training url");
+                result.IsSuccess = false;
+                result.Message = "Error occurred while processing the request";
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("monthwise-training-data/{year}")]
+        public async Task<ApiResponse<MonthlyTrainingBarChart>> GetMonthwiseTrainingData(int year)
+        {
+            var result = new ApiResponse<MonthlyTrainingBarChart>();
+            try
+            {
+                var data = await _tenantRepository.GetTrainingReportData(year);
+                result.Result = data;
+                result.IsSuccess = true;
+                result.Message = String.Empty;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("get-training-statistics")]
+        public async Task<ApiResponse<TrainingStatics>> GetTrainingStatistics()
+        {
+            var result = new ApiResponse<TrainingStatics>();
+
+            try
+            {
+                var data = await _tenantRepository.GetLastTrainingStatics();
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
     }
 }

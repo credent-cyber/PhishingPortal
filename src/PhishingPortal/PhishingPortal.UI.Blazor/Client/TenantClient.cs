@@ -1,5 +1,8 @@
-﻿using PhishingPortal.Dto;
+﻿using Microsoft.AspNetCore.Components;
+using NPOI.SS.Formula.Functions;
+using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using System;
 using System.Net.Http.Json;
 
 namespace PhishingPortal.UI.Blazor.Client
@@ -11,6 +14,8 @@ namespace PhishingPortal.UI.Blazor.Client
         {
 
         }
+        [Inject]
+        CustomStateProvider StateProvider { get; }
 
         public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
@@ -81,7 +86,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
 
-                res.EnsureSuccessStatusCode(); 
+                res.EnsureSuccessStatusCode();
 
                 templates = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
 
@@ -259,7 +264,11 @@ namespace PhishingPortal.UI.Blazor.Client
         {
             try
             {
+                var result = new MonthlyPhishingBarChart();
                 var res = await HttpClient.GetAsync($"api/tenant/monthly-phishing-bar-chart-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
+
                 res.EnsureSuccessStatusCode();
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyPhishingBarChart>>();
@@ -284,6 +293,8 @@ namespace PhishingPortal.UI.Blazor.Client
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/get-latest-statistics");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
                 res.EnsureSuccessStatusCode();
 
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<ConsolidatedPhishingStats>>();
@@ -305,6 +316,8 @@ namespace PhishingPortal.UI.Blazor.Client
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/category-wise-phising-test-prone-percent/{startDate.ToString("MM-dd-yyyy")}/{endDate.ToString("MM-dd-yyyy")}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
                 res.EnsureSuccessStatusCode();
 
 
@@ -366,7 +379,7 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return response;
-        } 
+        }
         #endregion
 
         #region Related to Azure Active Directory Integration
@@ -388,7 +401,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 if (json != null)
                     response = json;
-               
+
             }
             catch (Exception ex)
             {
@@ -478,8 +491,140 @@ namespace PhishingPortal.UI.Blazor.Client
             return campaignlog;
         }
 
+
+        public async Task<Training> UpsertTraining(Training training)
+        {
+            Training result;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/upsert-training", training);
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<Training>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<Training> GetTrainingById(int id)
+        {
+            Training result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/training-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<Training>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<List<RecipientImport>> ImportRecipientToTraining(int trainingId, List<RecipientImport> recipients)
+        {
+            ApiResponse<List<RecipientImport>> result;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/import-recipients-to-training/{trainingId}", recipients);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<ApiResponse<List<RecipientImport>>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result.Result);
+        }
+
+        public async Task<List<TrainingRecipients>> GetRecipientByTrainingId(int trainingId)
+        {
+            List<TrainingRecipients> result = new List<TrainingRecipients>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/recipient-by-training/{trainingId}");
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingRecipients>>();
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return await Task.FromResult(result);
+        }
+
+
+        public async Task<MonthlyTrainingBarChart?> GetMonthwiseTrainingData(int year)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/monthwise-training-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
+                res.EnsureSuccessStatusCode();
+
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyTrainingBarChart>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
+        }
+
+        public async Task<TrainingStatics> GetLatestTrainingStats()
+        {
+            var result = new TrainingStatics();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/get-training-statistics");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingStatics>>();
+
+                if (json != null)
+                    result = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
     }
-
-
-
 }

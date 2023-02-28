@@ -1,0 +1,707 @@
+﻿@page "/tenant-training-config"
+@page "/tenant-training-config/{Id:int}"
+@using System.IO
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using System.Text.RegularExpressions
+@using PhishingPortal.UI.Blazor.Pages
+@inject NavigationManager NavigationManager
+@using PhishingPortal.UI.Blazor.Shared.TenantCampaingConfig
+
+@inject TenantClient client
+@inject ILogger<TenantTraining> logger
+@inject IJSRuntime JSRuntime
+@using BlazingComponents.Summernote
+@inject HttpClient Http
+@using PhishingPortal.Common
+@attribute [Authorize]
+
+@if (model == null)
+{
+
+    <div class="col-sm-12" style="margin-top:45vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="pcoded-content" style="padding:10px 10px">
+
+        <div class="row" >
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="padding:15px !important;">
+                        <h5 class="text-white">@Title</h5>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top: 20px;">
+                        <div class="row">
+                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                        <div class="card">
+                                            <div class="card-body">
+   
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Name Of Training</label>
+                                                    <div class="col-md-8">
+                                                        <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4">Is Active</label>
+                                                    <div class="col-md-5">
+                                                        @if (model.IsActive is false || model.Id == 0)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
+                                                    <div class="col-md-8">     
+                                                        <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
+
+                                                            <option>-Select-</option>
+                                                            <option value="Category1">Category1</option>
+                                                            <option value="Category2">Category2</option>
+                                                            <option value="Category3">Category3</option>
+                                                
+                                                        </InputSelect>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4">Schedule</label>
+                                                    <div class="col-md-5">
+                                                        @if (isScheduled == false)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" id="divTrainingSchedule">
+                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
+                                                        <div class="col-12">
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                                                            {
+
+                                                            }
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
+                                                            {
+                                                                <label class="form-label">Scheduled Once</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" id="">Date & Time</span>
+                                                                    </div>
+                                                                    <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
+                                                                    <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
+                                                                </div>
+
+                                                            }
+             
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group row" id="UploadTrainingUsers">
+                                                    <label for="" class="col-form-label col-md-4">Import Training Recipients</label>
+                                                    <div class="col-md-8">
+                                                        <div class="input-group">
+                                                            <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
+                                                        </div>
+                                                        <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
+                                                        <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4">Training State</label>
+                                                    <div class="col-md-8">
+                                                        @if (model.Id > 0 && model.State == TrainingState.Completed)
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                        }
+                                                        else
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            
+
+                                            </div>
+
+
+
+                                            <div style="text-align:center;">
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
+
+                                                @if (model.Id == 0 && fileimport is null)
+                                                {
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                }
+                                                @if (model.State == TrainingState.Draft && model.Id > 0)
+                                                {
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                }
+
+                                                @if (model.State == TrainingState.Published)
+                                                {
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                }
+
+                                            </div>
+                                            <br />
+                                        </div>
+
+                                    </EditForm>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="margin-bottom: 0;">
+                                        <div class="card-body ">
+                                            <div class="mb-3">
+                                               <label for="Content" class="form-label">Contents</label>
+                                                    <div class="overflow-auto">
+                                                        <!-- Rich text editor -->
+                                                        <BlazingComponents.Summernote.Editor />
+                                                    </div>                  
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div>
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+            @if (showRecipientss)
+            {
+                <Recipients DataList="@recipients"></Recipients>
+                <br />
+                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false;  recipients = new List<RecipientImport>(); }"
+                class="btn btn-secondary" type="button"> Close </button>
+
+            }
+        </DialogTemplate>
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+            @if (recipients?.Count() > 0)
+            {
+                <div style="padding-top: -50%">
+                    <Recipients DataList="@recipients"></Recipients>
+                    <br/>
+                    <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
+                    class="btn btn-secondary" type="button"> Close </button>
+                </div>
+            }
+        </DialogTemplate>
+    </div>
+}
+
+
+
+
+
+@code {
+
+
+    [Parameter]
+    public int Id { get; set; }
+    private string contents;
+
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Training" : "Create New Training";
+        }
+    }
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+    bool temp = false;
+    bool import = false;
+    bool showEditButton = true;
+    bool showImportDialog = false;
+    bool showRecipientss = false;
+    bool showAdImportDialog = false;
+    bool showPreview = false;
+    bool isScheduled = false;
+    bool showNewDialog = false;
+    string content = string.Empty;
+    MarkupString previewContent => (MarkupString)content;
+
+    List<Training> training;
+    Training model;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // training = await client.GetTemplatesByType(type);
+        if (Id != 0)
+        {
+            Message = string.Empty;
+            model = await client.GetTrainingById(Id);
+            contents = model.Content;
+            if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
+                TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
+
+            if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                isScheduled = false;
+            else
+            {
+                isScheduled = true;
+            }
+        }
+        else
+        {
+            Message = string.Empty;
+            model = new Training()
+            {
+                    TrainingSchedule = new TrainingSchedule
+                    {
+                        ScheduleType = ScheduleTypeEnum.NoSchedule,
+                        WillRepeat = false
+                    }
+            };
+
+        }
+
+    }
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (model != null)
+            UpdateSummerNoteContent(contents);
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    protected void OnPreviewClick(CampaignTemplate template)
+    {
+        showPreview = true;
+        content = template.Content;
+    }
+
+    protected void OnClosePreview()
+    {
+        content = string.Empty;
+        showPreview = false;
+    }
+
+
+    protected async Task OnSave()
+    {
+        loading = true;
+        IsError = false;
+        IsSuccess = false;
+        message = string.Empty;
+        try
+        {
+
+            if (model.Id > 0)
+            {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
+                Message = "Successfully Updated";
+                model.ModifiedOn = DateTime.Now;
+            }
+            else
+            {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
+                Message = "Successfully Added";
+                model.CreatedOn = DateTime.Now;
+            }
+            contents = await GetSummerNoteContent();
+            model.Content = contents;
+            UpdateModelScheduleInfo();
+            model = await client.UpsertTraining(model);
+
+            @if (recipients.Count() > 0)
+            {
+                await OnImportRecipientClick();
+            }
+
+            IsSuccess = true;
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        loading = false;
+
+    }
+
+    protected void onClose()
+    {
+        NavigationManager.NavigateTo("training");
+    }
+    protected void OnActive() { model.IsActive = true; }
+    protected void OnNoActive() { model.IsActive = false; }
+
+
+    protected void UpdateSummerNoteContent(string content)
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        JSRuntime.InvokeVoidAsync("summernoteEditorHack", content, selector);
+    }
+
+    protected async Task<string> GetSummerNoteContent()
+    {
+        var selector = "div[id^=BlazingSummerNote]";
+        var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
+        return result;
+    }
+
+    List<ImageFile> filesBase64 = new List<ImageFile>();
+    string message = "";
+    bool isDisabled = false;
+
+
+
+
+
+    bool HasHeader = true;
+    bool isloading = false;
+    bool showRecipients = false;
+    List<RecipientImport> recipients = new List<RecipientImport>();
+    List<RecipientImport> fileimport;
+
+    public async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var singleFile = e.File;
+        IsError = false;
+        message = string.Empty;
+        isloading = true;
+        Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
+        if (!regex.IsMatch(singleFile.Name))
+        {
+            IsError = true;
+            message = "This file format not supported";
+        }
+        else
+        {
+            var stream = singleFile.OpenReadStream();
+            MemoryStream ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            stream.Close();
+            var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+            var index = 0;
+
+            foreach (var item in outputFileString.Split(Environment.NewLine))
+            {
+                if (HasHeader && index == 0)
+                {
+                    index++;
+                    continue;
+                }
+                if (item.Equals(string.Empty)) { continue; }
+
+                try
+                {
+
+                    var arr = SplitCSV(item.ToString(), AppConfig.ImportRecipientCsvMinColumns);
+                    if (arr != null)
+                    {
+                        if (!recipients.Any(o => o.Email == arr[1]))
+                        {
+                            var r = new RecipientImport
+                                {
+                                    EmployeeCode = arr[0],
+                                    Name = arr[1],
+                                    Email = arr[2],
+                                    Mobile = arr[3],
+                                    DateOfBirth = arr[4],
+                                    Department = arr[5],
+                                    Branch = arr[6],
+                                    Address = arr[7]
+                                };
+                            r.Validate();
+                            if (r.ValidationErrMsg is not null)
+                            {
+                                IsError = true;
+                                message = r.ValidationErrMsg;
+                                isloading = false;
+                                return;
+                            }
+                            if (!recipients.Any(i => i.Email == r.Email))
+                                recipients.Add(r);
+                        }
+
+
+
+                    }
+
+                    fileimport = recipients;
+                }
+                catch (Exception ex)
+                {
+                    IsError = true;
+                    message = ex.Message;
+
+                }
+                isloading = false;
+
+            }
+
+        }
+        isloading = false;
+        showRecipients = true;
+    }
+
+    private string[] SplitCSV(string input, int colCount)
+    {
+        //Excludes commas within quotes
+        Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
+        List<string> list = new List<string>();
+        string curr = null;
+        foreach (Match match in csvSplit.Matches(input))
+        {
+            curr = match.Value;
+            if (0 == curr.Length) list.Add("");
+
+            list.Add(curr.TrimStart(','));
+        }
+
+        if (list.Count() < colCount)
+            throw new Exception("Invalid columns specified in the CSV file");
+
+        return list.ToArray();
+    }
+
+    protected void OnScheduleTypeChange()
+    {
+        isScheduled = true;
+        UpdateModelScheduleInfo();
+    }
+    protected void OffScheduleTypeChange()
+    {
+        isScheduled = false;
+        //UpdateModelScheduleInfo();
+    }
+    OnceOffSchedule TrainingScheduleOff = new();
+    DailySchedule dailySchedule = new("12:00:00");
+    WeeklySchedule weeklySchedule = new("1|12:00:00");
+    private void UpdateModelScheduleInfo()
+    {
+
+        if (isScheduled)
+        {
+            model.TrainingSchedule.ScheduleType = ScheduleTypeEnum.Once;
+        }
+        else
+        {
+            model.TrainingSchedule.ScheduleType = ScheduleTypeEnum.NoSchedule;
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
+        {
+            model.TrainingSchedule.ScheduleInfo = TrainingScheduleOff.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Daily)
+        {
+            model.TrainingSchedule.ScheduleInfo = dailySchedule.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Weekly)
+        {
+            model.TrainingSchedule.ScheduleInfo = weeklySchedule.ToString();
+        }
+
+        if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+        {
+            model.TrainingSchedule.ScheduleInfo = string.Empty;
+        }
+    }
+
+    protected async Task OnImportRecipientClick()
+    {
+        isloading = true;
+        try
+        {
+            var data = await client.ImportRecipientToTraining(model.Id, recipients);
+            recipients = data;
+            IsSuccess = true;
+            message = "Successfully imported";
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = "Recipient couldn't not be imported, please try again";
+        }
+
+        isloading = false;
+        this.showRecipients = false;
+        this.showAdImportDialog = false;
+    }
+    protected async Task OnShowRecipientClickk()
+    {
+
+        this.showImportDialog = false;
+        this.showRecipientss = true;
+
+        isloading = true;
+        try
+        {
+            if (model.Id > 0)
+            {
+                await LoadRecipeints(model.Id);
+            }
+            else
+            {
+                recipients = fileimport;
+            }
+            isloading = false;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = ex.Message;
+            showRecipientss = false;
+        }
+    }
+    protected async Task OnShowRecipientClick()
+    {
+
+        this.showImportDialog = false;
+        this.showRecipients = true;
+
+        isloading = true;
+        try
+        {
+            var data = await client.GetRecipientByTrainingId(model.Id);
+           
+
+            recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+
+            isloading = false;
+
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            message = ex.Message;
+            showRecipients = false;
+        }
+    }
+    private async Task LoadRecipeints(int id)
+    {
+        var data = await client.GetRecipientByTrainingId(id);
+
+        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+    }
+
+    protected async Task OnPublishClick()
+    {
+        await LoadRecipeints(model.Id);
+
+        if (recipients.Count == 0)
+        {
+            IsError = true;
+            message = "Recipients can't be null";
+            return;
+        }
+        else
+        {
+            model.State = TrainingState.Published;
+            await OnSave();
+        }
+    }
+
+    protected async Task OnUnpublish()
+    {
+        if (model.State == TrainingState.Published)
+        {
+            model.State = TrainingState.Draft;
+            await OnSave();
+        }
+    }
+
+}

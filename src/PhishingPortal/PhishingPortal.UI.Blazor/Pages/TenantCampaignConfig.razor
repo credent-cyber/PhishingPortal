@@ -14,6 +14,7 @@
 @inject NavigationManager NavigationManager
 @using NPOI.SS.UserModel
 @using NPOI.XSSF.UserModel
+@attribute [Authorize]
 
 @if (model == null || isloading)
 {
@@ -30,7 +31,7 @@ else
 {
     <div class="pcoded-content" style="padding:10px 10px">
 
-        <div class="row">
+        <div class="row" style="margin-left:-10px; margin-right:-40px">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header bg-info" style="padding:15px !important;">
@@ -544,7 +545,7 @@ else
             IsError = true;
             message = "Error while updating";
         }
-    @if (recipients.Count() > 0)
+        @if (recipients.Count() > 0)
         {
             await OnImportRecipientClick();
         }
