@@ -72,6 +72,7 @@
     private string _nUri = string.Empty;
     private List<string> urls = new List<string>();
 
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -120,31 +121,43 @@
 
     protected async Task Add()
     {
-        bool isUri = Uri.IsWellFormedUriString(_nUri, UriKind.RelativeOrAbsolute);
-        if (isUri)
-        {
+        alert?.Clear();
+        bool isUri = Uri.TryCreate(_nUri, UriKind.Absolute, out Uri? uriResult) && (uriResult?.Scheme == Uri.UriSchemeHttp || uriResult?.Scheme == Uri.UriSchemeHttps);
 
-            if (!urls.Select(o => o.ToLower()).Contains(_nUri.ToLower()))
+        if (!isUri)
+        {
+            alert?.SetError("Invalid URL format");
+            return;
+        }
+
+        if (!urls.Select(o => o.ToLower()).Contains(_nUri.ToLower()))
+        {
+            if (string.IsNullOrWhiteSpace(_nUri))
             {
-                if(_nUri.Equals(string.Empty))
-                {
-                    alert?.SetError("Url Can't be Empty!");
-                    return;
-                }
-                urls.Add(_nUri);
-                await TrySave();
+                alert?.SetError("URL can't be empty!");
+                return;
+            }
+            urls.Add(_nUri);
+            bool saved = await TrySave();
+            if (saved)
+            {
                 _nUri = string.Empty;
                 alert?.SetSuccess("Successfully Saved!");
-
             }
             else
             {
-                alert?.SetError("Website link already exist!!");
+                alert?.SetError("Error while saving");
             }
 
         }
+        else
+        {
+            alert?.SetError("Website link already exists!!");
+        }
 
     }
+
+
 
     private async Task<bool> TrySave()
     {

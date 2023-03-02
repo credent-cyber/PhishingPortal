@@ -53,7 +53,7 @@ else
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
-             .Sortable()
+            //.Sortable()
             //.Filterable()
             //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)

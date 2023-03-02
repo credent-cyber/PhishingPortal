@@ -1,5 +1,5 @@
 ﻿@page "/report"
-@page "/report/{id:int}"
+@page "/report/{id:int}/{Label?}"
 @page "/report/{data}/department/{depart}"
 @page "/report/{data}/category/{categ}"
 @page "/report/{data}/template/{tempid:int}"
@@ -73,6 +73,8 @@
     public int TempId { get; set; }
     [Parameter]
     public string data { get; set; }
+    [Parameter]
+    public string Label { get; set; }
 
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
@@ -102,16 +104,16 @@
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
-        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type");
-        c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID");
-        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
-        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email");
-        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department");
-        c.Add(o => o.IsHit).Css("table-bordered");
-        c.Add(o => o.IsReported).Css("table-bordered");
-        c.Add(o => o.CreatedOn).Css("table-bordered");
+        c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered").Filterable(true);
+        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name").Filterable(true);
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type").Filterable(true);
+        c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID").Filterable(true);
+        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").Filterable(true);
+        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email").Filterable(true);
+        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department").Filterable(true);
+        c.Add(o => o.IsHit).Css("table-bordered").Filterable(true);
+        c.Add(o => o.IsReported).Css("table-bordered").Filterable(true);
+        c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(true);
 
     };
 
@@ -214,7 +216,11 @@
         var query = new QueryDictionary<StringValues>();
 
         if (Id > 0)
+        {
+            var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
+            query.Add("grid-filter", new StringValues(values));
             query.Add("grid-filter", $"CampaignId__1__{Id}");
+        }
         else if (categ != null){
             var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
@@ -231,9 +237,9 @@
         try
         {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
-            .Sortable()
+             //.Sortable()
             .ChangePageSize(true)
-            .Filterable()
+            //.Filterable()
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()

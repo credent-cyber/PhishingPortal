@@ -24,7 +24,7 @@
 }
 
 table.grid-table .grid-header > .grid-header-group > .grid-header-title > button {
-    color: #007bff;
+    color: #0056b3 !important;
     font-size: 16px !important;
 }
 
@@ -33,6 +33,10 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
     background-color: transparent !important;
     font-size: large !important;
     cursor: pointer;
+}
+
+table.grid-table .grid-header {
+    color: #00264e !important;
 }
 /*.table thead th {
             border: 1px solid black !important;
@@ -106,10 +110,11 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
     font-size: large !important;
     cursor: pointer;
 }
-/*.table thead th {
-            border: 1px solid black !important;
-            background: aliceblue !important;
-        }*/
+
+.table thead th {
+    background: #bec7ea;
+}
+
 .table-bordered td, .table-bordered th {
     border: 1px solid #e2e5e8;
 }

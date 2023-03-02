@@ -22,8 +22,9 @@ window.setup = (id, config, obj) => {
     charts.push({ id: id, instance: chart });
 
     var dotnetInstance = obj;
-    chart.options.onClick = function(event, array ) {
-        var rtn;
+
+    chart.options.onClick = function (event, array) {
+        var rtn, lbl;
 
         if (array !== undefined && array.length > 0) {
 
@@ -33,10 +34,15 @@ window.setup = (id, config, obj) => {
             }
             else {
                 rtn = config.data.ids[array[0].index];
-                dotnetInstance.invokeMethodAsync('ChartClick', rtn, id);
+                var datasetIndex = array[0].datasetIndex;
+                var dataIndex = array[0].index;
+                var label = config.data.labels[dataIndex];
+                var datasetLabel = config.data.datasets[datasetIndex].label;
+                lbl = datasetLabel;
+                dotnetInstance.invokeMethodAsync('ChartClick', rtn, lbl, id);
             }
 
-            
+
         }
 
     };

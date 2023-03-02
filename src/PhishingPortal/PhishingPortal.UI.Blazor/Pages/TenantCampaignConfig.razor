@@ -52,7 +52,7 @@ else
 
                                             <div class="card-body">
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaign Name</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaign Name</label>
                                                     <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
                                                     </div>
@@ -70,7 +70,7 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font">Select Template </label>
+                                                    <label class="col-form-label col-md-4 bold-font">Select Template </label>
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
                                                             @foreach (var val in Templates.OrderBy(o => o.Name).Where(o => o.Type == model.Detail.Type))
@@ -124,7 +124,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
                                                     <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
                                                     </div>
@@ -148,7 +148,7 @@ else
 
 
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                    <label class="col-form-label col-md-4 bold-font">Schedule</label>
                                                     <div class="col-md-5">
                                                         @if (isScheduled == false)
                                                         {
@@ -246,7 +246,7 @@ else
                                                         @if (sources == RecipientSources.Csv)
                                                         {
                                                             <div class="form-group row">
-                                                                <label  class="col-form-label col-md-4"> Has Header</label>
+                                                                <label class="col-form-label col-md-4"> Has Header</label>
                                                                 <div class="col-md-8">
                                                                     <div class="radio radio-info radio-fill d-inline">
                                                                         <input type="radio" name="radio-i-in-3" id="chkHasHeader" @onclick="Header" checked>
@@ -260,7 +260,7 @@ else
                                                             </div>
 
                                                             <div class="form-group row" id="divUploadUsers">
-                                                                <label  class="col-form-label col-md-3">File</label>
+                                                                <label class="col-form-label col-md-3">File</label>
                                                                 <div class="col-md-9">
                                                                     <div class="input-group">
                                                                         <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -277,7 +277,7 @@ else
 
 
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font">State</label>
+                                                    <label class="col-form-label col-md-4 bold-font">State</label>
                                                     <div class="col-md-8">
                                                         @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
                                                         {
@@ -467,7 +467,6 @@ else
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
 
-
     protected override async Task OnInitializedAsync()
     {
         //Templates = await client.GetCampaignTemplates();
@@ -514,8 +513,11 @@ else
                     {
                         ScheduleType = ScheduleTypeEnum.NoSchedule,
                         WillRepeat = false
-                    }
+                    },
+
                 };
+            scheduleOnceOff.Date = DateTime.Now.Date;
+            //scheduleOnceOff.Time = DateTime.Now;
         }
     }
 

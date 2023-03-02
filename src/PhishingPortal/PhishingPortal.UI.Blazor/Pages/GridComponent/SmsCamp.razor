@@ -12,7 +12,7 @@
 {
     <div class="row">
         <div class="col-sm-12">
-             <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
+            <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
@@ -54,7 +54,7 @@ else
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-             .Sortable(true)
+            //.Sortable(true)
             //.Filterable(true)
             //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
