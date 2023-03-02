@@ -20,14 +20,15 @@
                 <InputText id="inputUsername" class="form-control" @bind-Value="loginRequest.UserName" autofocus placeholder="Email address" autocomplete="username" />
                 <ValidationMessage For="@(() => loginRequest.UserName)" />
             </div>
-            <div class="input-group mb-4">
+            <div class="input-group has-validation">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="feather icon-lock"></i></span>
                 </div>
                 <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="loginRequest.Password" autocomplete="current-password" />
-                <ValidationMessage For="@(() => loginRequest.Password)" />
             </div>
-            <div class="form-group text-left">
+            <ValidationMessage style="text-align: left" For="@(() => loginRequest.Password)" />
+
+            <div class="form-group text-left mt-3">
                 <div class="checkbox checkbox-primary d-inline">
                     <InputCheckbox id="checkbox-fill-a1" @bind-Value="@loginRequest.RememberMe" />
                     <label for="checkbox-fill-a1" class="cr"> Save credentials</label>
@@ -39,7 +40,7 @@
                 <span @onclick="ResetPasswordClick" class="f-w-400 font-weight-bold" style="cursor: pointer">Reset</span>
             </p>
 
-           
+
         </div>
     </div>
 
