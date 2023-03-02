@@ -79,6 +79,8 @@
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
 
+    static bool filter = true;
+
     private List<CampaignLog> CampaignLogs = new List<CampaignLog>();
     private int total;
     private int hits;
@@ -104,16 +106,17 @@
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
-        c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered").Filterable(true);
-        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name").Filterable(true);
-        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type").Filterable(true);
-        c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID").Filterable(true);
-        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").Filterable(true);
-        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email").Filterable(true);
-        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department").Filterable(true);
-        c.Add(o => o.IsHit).Css("table-bordered").Filterable(true);
-        c.Add(o => o.IsReported).Css("table-bordered").Filterable(true);
-        c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(true);
+        c.Add(o => o.CampaignId).Titled("ID").SetWidth("30px").Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name").Filterable(filter);
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").Titled("Camp Type").Filterable(filter);
+        c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID").Filterable(filter);
+        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").Filterable(filter);
+        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email").Filterable(filter);
+        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department").Filterable(filter);
+
+        c.Add(o => o.IsHit).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.IsReported).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(filter);
 
     };
 
@@ -214,22 +217,40 @@
         if (depart != null || categ != null || TempId > 0) { ExtractIds(); }
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
+        filter = true;
 
         if (Id > 0)
         {
-            var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
-            query.Add("grid-filter", new StringValues(values));
-            query.Add("grid-filter", $"CampaignId__1__{Id}");
+            filter = false;
+            if(Label == "Click Count")
+            {
+                var values = new string[] { $"CampaignId__1__{Id}", $"IsHit__1__true" };
+                query.Add("grid-filter", new StringValues(values));   
+            }
+
+            else if (Label == "Reported")
+            {
+                var values = new string[] { $"CampaignId__1__{Id}", $"IsReported__1__true" };
+                query.Add("grid-filter", new StringValues(values));
+            }
+            else
+            {
+                var values = new string[] { $"CampaignId__1__{Id}"};
+                query.Add("grid-filter", new StringValues(values));
+            }
         }
         else if (categ != null){
+            filter = false;
             var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
         else if (depart != null){
+            filter = false;
             var values = new string[] { $"Recipient.Recipient.Department__2__{depart}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
         else if (TempId > 0){
+            filter = false;
             var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
@@ -239,8 +260,7 @@
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
              //.Sortable()
             .ChangePageSize(true)
-            //.Filterable()
-            .ClearFiltersButton(true)
+            .ClearFiltersButton(filter)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()

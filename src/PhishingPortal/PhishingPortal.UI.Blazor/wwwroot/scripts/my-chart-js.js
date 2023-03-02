@@ -39,7 +39,10 @@ window.setup = (id, config, obj) => {
                 var label = config.data.labels[dataIndex];
                 var datasetLabel = config.data.datasets[datasetIndex].label;
                 lbl = datasetLabel;
-                dotnetInstance.invokeMethodAsync('ChartClick', rtn, lbl, id);
+                if (lbl == undefined)
+                    dotnetInstance.invokeMethodAsync('ChartClick', rtn, id);
+                else
+                    dotnetInstance.invokeMethodAsync('ChartClick', rtn, lbl, id);
             }
 
 
