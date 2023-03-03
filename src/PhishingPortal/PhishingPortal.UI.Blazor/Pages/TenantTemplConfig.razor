@@ -59,6 +59,7 @@ else
                                                     <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                                                        <ValidationMessage For="() => model.Name" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -73,6 +74,7 @@ else
                                                                 <option value="@val">@val</option>
                                                             }
                                                         </InputSelect>
+                                                        <ValidationMessage For="() => model.Type" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">

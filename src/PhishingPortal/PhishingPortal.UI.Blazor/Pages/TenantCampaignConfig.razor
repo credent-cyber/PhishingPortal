@@ -16,15 +16,13 @@
 @using NPOI.XSSF.UserModel
 @attribute [Authorize]
 
-@if (model == null || isloading)
+@if (model == null)
 {
 
-    <div class="col-sm-12" style="margin-top:45vh">
-
+    <div class="col-sm-12" style="margin-top:45vh; background-color: transparent;">
         <div class="card-header">
             <div class="loading-bar"></div>
         </div>
-
     </div>
 }
 else
@@ -55,6 +53,7 @@ else
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaign Name</label>
                                                     <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
+                                                        <ValidationMessage For="() => model.Name" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -94,6 +93,7 @@ else
                                                         <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender(Phishing) Email</label>
                                                         <div class="col-md-8">
                                                             <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.FromEmail" />
                                                         </div>
                                                     </div>
                                                 }
@@ -103,6 +103,7 @@ else
                                                         <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
                                                         <div class="col-md-8">
                                                             <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.FromEmail" />
                                                         </div>
                                                     </div>
                                                 }
@@ -115,18 +116,21 @@ else
                                                                 <option value="@val">@val</option>
                                                             }
                                                         </InputSelect>
+                                                        <ValidationMessage For="() => model.ReturnUrl" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
                                                     <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                        <ValidationMessage For="() => model.Subject" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
                                                     <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                        <ValidationMessage For="() => model.Description" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -143,6 +147,7 @@ else
                                                             <option value="Finance">Verification</option>
 
                                                         </InputSelect>
+                                                        <ValidationMessage For="() => model.Category" />
                                                     </div>
                                                 </div>
 
@@ -234,7 +239,10 @@ else
                                                             <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">
                                                                 @foreach (var val in Enum.GetValues<RecipientSources>())
                                                                 {
-                                                                    <option value="@val">@val</option>
+                                                                    @*if (val != RecipientSources.Imported)*@
+                                                                    {
+                                                                        <option value="@val">@val</option>
+                                                                    }
                                                                 }
                                                             </InputSelect>
                                                             @if (sources == RecipientSources.Csv)
@@ -301,11 +309,11 @@ else
                                                 </div>
 
                                                 <div style="text-align:center;">
-                                                    <button type="submit" class="btn btn-primary">Save</button>
+                                                    <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
                                                     <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                    @if (model.Id == 0 && fileimport is null)
+                                                    @if ((model.Id == 0 && fileimport is null) ||(model.Id>0 && recipients.Count()==0))
                                                     {
-                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
                                                     else
                                                     {
@@ -313,12 +321,12 @@ else
                                                     }
                                                     @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                     {
-                                                        <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                        <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
                                                     }
 
                                                     @if (model.State == CampaignStateEnum.Published)
                                                     {
-                                                        <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                        <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
                                                     }
                                                 </div>
                                                 <br />
@@ -453,7 +461,6 @@ else
 
     }
 
-    //IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
     List<CampaignTemplate> Templates;
     CampaignType? type = null;
 
@@ -466,10 +473,28 @@ else
 
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
+    public void Init()
+    {
+        model = new Campaign()
+            {
+                State = CampaignStateEnum.Draft,
+                Detail = new CampaignDetail
+                {
+                    CampaignTemplateId = Templates.FirstOrDefault().Id,
+                    Type = CampaignType.Email,
+                },
+                Schedule = new CampaignSchedule
+                {
+                    ScheduleType = ScheduleTypeEnum.NoSchedule,
+                    WillRepeat = false
+                },
 
+            };
+        scheduleOnceOff.Date = DateTime.Now.Date;
+        //scheduleOnceOff.Time = DateTime.Now;
+    }
     protected override async Task OnInitializedAsync()
     {
-        //Templates = await client.GetCampaignTemplates();
         Templates = await client.GetTemplatesByType(type);
 
         #region Bind Return urls
@@ -479,8 +504,11 @@ else
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
-
-
+            await LoadRecipeints(model.Id);
+            if (fileimport.Count() > 0)
+            {
+                sources = RecipientSources.Imported;
+            }
             _selectReturnUrl = model.ReturnUrl;
 
             if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
@@ -501,52 +529,31 @@ else
         }
         else
         {
-            model = new Campaign()
-                {
-                    State = CampaignStateEnum.Draft,
-                    Detail = new CampaignDetail
-                    {
-                        CampaignTemplateId = Templates.FirstOrDefault().Id,
-                        Type = CampaignType.Email,
-                    },
-                    Schedule = new CampaignSchedule
-                    {
-                        ScheduleType = ScheduleTypeEnum.NoSchedule,
-                        WillRepeat = false
-                    },
-
-                };
-            scheduleOnceOff.Date = DateTime.Now.Date;
-            //scheduleOnceOff.Time = DateTime.Now;
+            Init();
         }
     }
 
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
-
-        if (@model.Name is null || @model.Subject is null || @model.FromEmail is null || @model.Category is null || @model.ReturnUrl is null)
-        {
-            IsError = true;
-            message = "Please fill all the required field";
-            return;
-        }
-        @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
-        {
-            var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
-            if (!formate)
-            {
-                IsError = true;
-                message = "Invalid Phishing Email!";
-                return;
-            }
-        }
-
         isloading = true;
+        IsError = false;
+        IsSuccess = false;
+        show = true;
         UpdateModelScheduleInfo();
 
         try
         {
+            if (model.Id > 0)
+            {
+                message = "Successfully Updated";
+                model.ModifiedOn = DateTime.Now;
+            }
+            else
+            {
+                message = "Successfully Added";
+                model.CreatedOn = DateTime.Now;
+            }
             model = await client.UpsertCampaignAsync(model);
         }
         catch (Exception ex)
@@ -560,8 +567,6 @@ else
             await OnImportRecipientClick();
         }
         isloading = false;
-        IsSuccess = true;
-        message = "Updated successfully";
     }
 
     //protected void OnScheduleTypeChange(ChangeEventArgs e)
@@ -763,8 +768,8 @@ else
         {
             var data = await client.ImportRecipientToCampaign(model.Id, recipients);
             recipients = data;
-            IsSuccess = true;
-            message = "Successfully imported";
+            //IsSuccess = true;
+            //message = "Successfully imported";
         }
         catch (Exception ex)
         {
@@ -782,7 +787,7 @@ else
     {
         var data = await client.GetRecipientByCampaignId(id);
 
-        recipients = data.Select(o => new RecipientImport(o.Recipient)).ToList();
+        fileimport = recipients = data.Select(o => new RecipientImport(o.Recipient)).ToList();
     }
 
     protected async Task OnShowRecipientClickk()
@@ -796,7 +801,8 @@ else
         {
             if (model.Id > 0)
             {
-                await LoadRecipeints(model.Id);
+                //await LoadRecipeints(model.Id);
+                recipients = fileimport;
             }
             else
             {
@@ -841,7 +847,7 @@ else
     protected async Task OnPublishClick()
     {
         await LoadRecipeints(model.Id);
-
+        show = true;
         if (recipients.Count == 0)
         {
             IsError = true;
@@ -975,9 +981,7 @@ else
         show = false;
         if (message.Contains("Successfully Added"))
         {
-            //model = new Training();
-            //contents = string.Empty;
-            //model.Content = null;
+            Init();
         }
     }
     private void CloseDailogBox()

@@ -57,6 +57,7 @@ else
                                                     <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
                                                         <InputText id="TrainingName" @bind-Value="model.TrainingName" class="form-control" />
+                                                        <ValidationMessage For="() => model.TrainingName" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -97,6 +98,7 @@ else
                                                             <option value="Category3">Category3</option>
 
                                                         </InputSelect>
+                                                        <ValidationMessage For="() => model.TrainingCategory" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -193,12 +195,12 @@ else
 
 
                                             <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
                                                 <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
 
-                                                @if (model.Id == 0 && fileimport is null)
+                                                @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
                                                 {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                 }
                                                 else
                                                 {
@@ -206,12 +208,12 @@ else
                                                 }
                                                 @if (model.State == TrainingState.Draft && model.Id > 0)
                                                 {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
                                                 }
 
                                                 @if (model.State == TrainingState.Published)
                                                 {
-                                                    <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
                                                 }
 
                                             </div>
@@ -227,7 +229,7 @@ else
                                                 <label for="Content" class="form-label">Contents</label>
                                                 <div class="overflow-auto">
                                                     <!-- Rich text editor -->
-                                                    <BlazingComponents.Summernote.Editor />
+                                                    <BlazingComponents.Summernote.Editor/>
                                                 </div>
                                             </div>
                                         </div>
@@ -325,6 +327,12 @@ else
         {
             Message = string.Empty;
             model = await client.GetTrainingById(Id);
+            await LoadRecipeints(model.Id);
+            //if (fileimport.Count() > 0)
+            //{
+            //    sources = RecipientSources.Imported;
+            //}
+
             contents = model.Content;
             if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
                 TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
@@ -384,23 +392,11 @@ else
 
             if (model.Id > 0)
             {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
                 Message = "Successfully Updated";
                 model.ModifiedOn = DateTime.Now;
             }
             else
             {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }
@@ -618,8 +614,8 @@ else
         {
             var data = await client.ImportRecipientToTraining(model.Id, recipients);
             recipients = data;
-            IsSuccess = true;
-            message = "Successfully imported";
+            //IsSuccess = true;
+            //message = "Successfully imported";
         }
         catch (Exception ex)
         {
@@ -643,7 +639,8 @@ else
         {
             if (model.Id > 0)
             {
-                await LoadRecipeints(model.Id);
+                //await LoadRecipeints(model.Id);
+                recipients = fileimport;
             }
             else
             {
@@ -689,7 +686,7 @@ else
     {
         var data = await client.GetRecipientByTrainingId(id);
 
-        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+        fileimport = recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
     }
 
     protected async Task OnPublishClick()
