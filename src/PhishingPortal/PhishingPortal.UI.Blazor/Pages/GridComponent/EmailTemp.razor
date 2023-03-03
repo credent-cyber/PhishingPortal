@@ -41,7 +41,6 @@ else
         c.Add(o => o.IsHtml).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Type).Css("table-bordered").Titled("Template Type");
         c.Add(o => o.Version).SetWidth("50px").Css("table-bordered");
-        //c.Add().RenderComponentAs(typeof(TenantTemplates)).Titled("View").Css("table-bordered");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempView>();
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>();
     };
@@ -56,7 +55,6 @@ else
         var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
             .Sortable()
             .Filterable()
-            //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
@@ -66,11 +64,8 @@ else
             .EmptyText("-")
             .SetKeyboard(true)
             .Searchable(true, false, false);
-        //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
 
         _grid = client.Grid;
-
-        // Set new items to grid
         _task = client.UpdateGrid();
         await _task;
     }

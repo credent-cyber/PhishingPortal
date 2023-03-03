@@ -1,100 +1,129 @@
 ﻿@page "/gridsample"
-
-@using GridBlazor.Columns
+@using GridShared.Events
+@using Newtonsoft.Json.Linq
+@using PhishingPortal.Dto
+@using System.Drawing
 @using GridShared
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
-@using PhishingPortal.Dto
+
 @using PhishingPortal.UI.Blazor.Client
-@using PhishingPortal.UI.Blazor.Pages.GridButtons
-@using System.Globalization
+@using PhishingPortal.UI.Blazor.Helpers
+@using PhishingPortal.UI.Blazor.Models
+@using PhishingPortal.UI.Blazor.Shared.Components.Reports
+
 @inject TenantClient client
-@inject NavigationManager NavigationManager
+@inject ILogger<TenantDashboard> logger
 @inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 @inject AuthState authState;
 
+<div class="pcoded-content">
+    <div class="row">   
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
+            </DrillDown_Summary>
+        </div>
+    </div>
+</div>
 
-    @if (_task.IsCompleted)
-    {
-      <div class="row">
-         <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="col-md-12" style="padding: 0;">
-                        <GridComponent T="Campaign" Grid="@_grid"></GridComponent>
-                    </div>
-                </div>
-            </div>
-         </div>
-      </div>
-    }
-    else
-    {
-        <p><em>Loading...</em></p>
-    }
+<div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
+    <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
+</div>
 
-@code
-{
-    private CGrid<Campaign> _grid;
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    private List<CampaignLog> CampaignLogs = new List<CampaignLog>();
+    private int total;
+    private int hits;
+    private int reported;
+    private decimal pronePercent;
+
+    private GridComponent<CampaignLog> _gridComponent;
+    private CGrid<CampaignLog> _grid;
     private Task _task;
+    private GridODataClient<CampaignLog> _client;
+    private bool _eventHooked = false;
 
-    Action<IGridColumnCollection<Campaign>> columns = c =>
+    Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
-        //c.Add(o => o.Id).Css("gridtitle").SetWidth("50px").SortInitialDirection(GridShared.Sorting.GridSortDirection.Descending);
-        // c.Add(o => o.Id).Css("table-bordered").SortInitialDirection(GridShared.Sorting.GridSortDirection.Descending).ThenSortByDescending(o => o.Id);            
-        c.Add(o => o.Id).Css("table-bordered");
-        c.Add(o => o.Name).Css("table-bordered");
-        c.Add(o => o.Description).Css("table-bordered");
-        c.Add(o => o.Schedule.ScheduleType).Css("table-bordered").Titled("Schedule Type");
-        c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info");
-        c.Add(o => o.State).Css("table-bordered").Titled("Status");
-        c.Add(o => o.IsActive).Css("table-bordered");
-        c.Add(o => o.Detail.Type).Css("table-bordered");
-        //c.Add(o => o.CreatedOn, "CreateDate").Css("table-bordered").SortInitialDirection(GridShared.Sorting.GridSortDirection.Descending).ThenSortByDescending(o => o.Id);
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampEdit>();
+        c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Id).Titled("CampID").SetWidth("30px").Css("table-bordered");
+        c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px");
+        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
+        c.Add(o => o.IsHit).Css("table-bordered");
+        c.Add(o => o.IsReported).Css("table-bordered");
+        c.Add(o => o.CreatedOn).Css("table-bordered");
+
     };
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
+    }
+
+    private async Task AfterRefreshGrid()
+    {
+        var grid = _gridComponent.Grid as CGrid<CampaignLog>;
+
+        if (grid != null)
+        {
+            Calculate(grid);
+
+            StateHasChanged();
+        }
+
+        await Task.CompletedTask;
+    }
+
 
     protected override async Task OnParametersSetAsync()
-    {   
-        var locale = CultureInfo.CurrentCulture;
-        string url = $"odata/campaign?t={authState.TenantIdentifier}";
+    {
+        string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        //query.AddParameter("grid-filter", "Id__1__1");
-        //query.Add("grid-filter", "Id__1__1");
-        //query.AddOrSet("grid-filter", "Id__9__2");
-        //query.AddOrSet("grid-filter", "Id__1__5");
-        //query.Add("grid-sorting", "Id__1__1");
-        //query.Add("grid-filter", "Detail.Type__1__Sms");
-        string id = "7";
-        var values = new string[] {
-        "Id__9__2",
-        "Id__1__2",
-        "Id__1__4",
-        $"Id__1__{id}",
-    };
-        //query.Add("grid-filter", new StringValues(values));
-        query.Add("grid-sorting", "Name__1__1");
-
-
-        var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10, locale)
-            .Sortable()
-            .Filterable(true)
-            //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+        try
+        {
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
+            .ChangePageSize(true)
+            .Filterable()
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
-            .ChangePageSize(true)
-            .WithGridItemsCount()
-            //.ExtSortable(true)
             .Searchable(true, false, false);
 
-        _grid = client.Grid;
-        //Set new items to grid
-        _task = client.UpdateGrid();
-        var aa = _task;
-        await _task;
+            _grid = client.Grid;
+
+            _task = client.UpdateGrid();
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, ex.Message);
+        }
+
+        await _task.ContinueWith(async (st) =>
+        {
+            Calculate(_grid);
+            await Task.CompletedTask;
+        });
+
     }
 
+    private void Calculate(CGrid<CampaignLog> grid)
+    {
+        CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
+        total = CampaignLogs.Count();
+        hits = CampaignLogs.Count(o => o.IsHit);
+        reported = CampaignLogs.Count(o => o.IsReported);
+
+        if (total > 0)
+        {
+            pronePercent = Math.Round((decimal)hits / total * 100, 2);
+        }
+    }
 }
+
