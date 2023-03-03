@@ -26,7 +26,7 @@
 @inject AuthState authState;
 @attribute [Authorize]
 
-<div class="pcoded-content" style="padding: 0 20px !important;">
+<div class="pcoded-content" style="padding: 0 0px !important;">
     @*<h5><span style="color:orange;">Report Details</span></h5>*@
     <div class="row">
         <div class="col-xl-6 col-md-6">
@@ -122,19 +122,21 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender && _lock == false){
+        if (!firstRender && _lock == false)
+        {
             List<string> filterIds = new List<string>();
             if (depart != null || categ != null || TempId > 0)
             {
                 filterIds.Add(id1.ToString()); filterIds.Add(id2.ToString()); filterIds.Add(id3.ToString()); filterIds.Add(id4.ToString()); filterIds.Add(id5.ToString());
-                Filter(filterIds); 
+                Filter(filterIds);
             }
             else if (Id > 0)
             {
                 filterIds.Add(Id.ToString());
                 Filter(filterIds);
             }
-            else{
+            else
+            {
                 if (_reload) { Filter(filterIds); _reload = false; }
                 _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
             }
@@ -148,13 +150,15 @@
         IEnumerable<CampaignLog> logs;
 
         logs = await client.GetCampaignLog(filterId);
-        if (depart != null){
+        if (depart != null)
+        {
             logs = logs.Where(o => o.Recipient.Recipient.Department.Equals(depart, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
-        else if (categ != null){
+        else if (categ != null)
+        {
             logs = logs.Where(o => o.Camp.Category.Equals(categ, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
-        else if(TempId > 0)
+        else if (TempId > 0)
         {
             logs = logs.Where(o => o.Camp.Detail.CampaignTemplateId == TempId).ToList();
         }
@@ -172,11 +176,12 @@
     }
     private async Task AfterRefreshGrid()
     {
-        List<string> filterId = new List<string>(); 
+        List<string> filterId = new List<string>();
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
         // var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values.ElementAt(0);
         var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values;
-        if(fdata.Count>0){
+        if (fdata.Count > 0)
+        {
             foreach (var item in fdata.ElementAt(0))
             {
                 if (item.Contains("CampaignId") && item.Split("__")[1] == "1")
@@ -222,10 +227,10 @@
         if (Id > 0)
         {
             filter = false;
-            if(Label == "Click Count")
+            if (Label == "Click Count")
             {
                 var values = new string[] { $"CampaignId__1__{Id}", $"IsHit__1__true" };
-                query.Add("grid-filter", new StringValues(values));   
+                query.Add("grid-filter", new StringValues(values));
             }
 
             else if (Label == "Reported")
@@ -235,21 +240,24 @@
             }
             else
             {
-                var values = new string[] { $"CampaignId__1__{Id}"};
+                var values = new string[] { $"CampaignId__1__{Id}" };
                 query.Add("grid-filter", new StringValues(values));
             }
         }
-        else if (categ != null){
+        else if (categ != null)
+        {
             filter = false;
             var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
-        else if (depart != null){
+        else if (depart != null)
+        {
             filter = false;
             var values = new string[] { $"Recipient.Recipient.Department__2__{depart}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
-        else if (TempId > 0){
+        else if (TempId > 0)
+        {
             filter = false;
             var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
@@ -258,16 +266,16 @@
         try
         {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
-             //.Sortable()
+            //.Sortable()
             .ChangePageSize(true)
             .ClearFiltersButton(filter)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
             .Searchable(true, false, false)
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, "Report.xlsx");
             //.SetTableLayout(TableLayout.Fixed, "1200px", "400px")
-            .AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
+            //.AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
 
 
             _grid = client.Grid;
@@ -328,5 +336,17 @@
                 Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
                 BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Select(o => o.CampaignId).Count()),
             });
+    }
+
+    protected async Task PrintAsPdf()
+    {
+        var element = await JSRuntime.InvokeAsync<IJSObjectReference>("eval", "document.getElementById('myContent')");
+
+        // Create a new html2pdf instance
+        var pdf = await JSRuntime.InvokeAsync<IJSObjectReference>("html2pdf", element, new { filename = "PhishSim-Report.pdf" });
+
+        // Download the PDF file
+        var data = await pdf.InvokeAsync<string>("output", "datauristring");
+        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "my-file.pdf", data);
     }
 }
