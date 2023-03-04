@@ -96,17 +96,18 @@ header {
 #logo:hover #logo-s {
     color: #00a7ff; /* blue */
 }
+
 .sign {
     float: right;
     line-height: 60px;
     margin-right: 40px;
 }
 
-.sign a {
-    color: #ffcf53;
-    font-weight: bold;
-    text-decoration: none;
-}
+    .sign a {
+        color: #ffcf53;
+        font-weight: bold;
+        text-decoration: none;
+    }
 
 .act {
     border: 2px solid #ffcf53;
@@ -351,10 +352,9 @@ imgs {
             font-size: 12px;
         }
 }
+
 .bcontent {
     /*margin-top: 10px;*/
-   
-
 }
 
 .carousel-inner img {
@@ -364,10 +364,10 @@ imgs {
 
 .para {
     text-align: left;
-    font-family:cursive;
-    font-size:20px;
+    font-family: cursive;
+    font-size: 20px;
 }
-@media only screen and (max-width: 900px) {
+/*@media only screen and (max-width: 900px) {
     .para {
         text-align: left;
         font-family: cursive;
@@ -382,4 +382,4 @@ imgs {
         font-size: 14px;
     }
 
-}
+}*/
