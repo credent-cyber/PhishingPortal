@@ -97,28 +97,6 @@ header {
     color: #00a7ff; /* blue */
 }
 
-.sign {
-    float: right;
-    line-height: 60px;
-    margin-right: 40px;
-}
-
-    .sign a {
-        color: #ffcf53;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
-.act {
-    border: 2px solid #ffcf53;
-    border-radius: 50px;
-    padding: 6px 15px;
-}
-
-.sign a:hover {
-    color: #00a7ff; /* blue */
-    border-color: #00a7ff; /* blue */
-}
 
 /* 2 */
 .slider {
@@ -153,29 +131,13 @@ header {
     right: 0;
 }
 
-.dotsbox {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%);
-    bottom: 20px;
-    cursor: pointer;
-}
 
-.dot {
-    display: inline-block;
-    width: 15px;
-    height: 15px;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    margin: 0 10px;
-    cursor: pointer;
-}
-    /* /2 */
 
-    /* javascript */
-    .active, .dot:hover {
-        border-color: #00a7ff; /* blue */
-    }
+
+/* javascript */
+.active, .dot:hover {
+    border-color: #00a7ff; /* blue */
+}
 /* /javascript */
 
 /* muslide add fade */
@@ -337,25 +299,6 @@ imgs {
 }
 /* /5 */
 
-/* 6 */
-@media screen and (max-width: 520px) {
-    .txt h1 {
-        font-size: 30px;
-        margin-bottom: 20px;
-    }
-
-    .sign {
-        margin-right: 20px;
-    }
-
-        .sign a {
-            font-size: 12px;
-        }
-}
-
-.bcontent {
-    /*margin-top: 10px;*/
-}
 
 .carousel-inner img {
     width: 100%;
@@ -367,19 +310,3 @@ imgs {
     font-family: cursive;
     font-size: 20px;
 }
-/*@media only screen and (max-width: 900px) {
-    .para {
-        text-align: left;
-        font-family: cursive;
-        font-size: 13px;
-
-    }
-}
-@media only screen and (max-width: 700px) {
-    .para {
-        text-align: left;
-        font-family: cursive;
-        font-size: 14px;
-    }
-
-}*/
