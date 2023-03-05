@@ -14,7 +14,6 @@
     </div>
 </div>
 <br />
-<button @onclick="XXX" style="cursor:pointer; color:white; font-weight:600;">xxx</button>
 
 @if (EmailForward)
 {
@@ -31,6 +30,7 @@
                         </div>
                         <hr class="message-inner-separator">
                         <p>
+                            Hi <span style="font-weight:bold; color:brown">@DisplayName,</span><br />
                             You have successfully reported this mail as spam.
                         </p>
                     </div>
@@ -54,7 +54,7 @@
 
 
 }
-
+@DisplayName
 @ItemId
 @HtmlBody
 
@@ -120,7 +120,7 @@
         @TrademarkMessage2
     </div>
     <div class="row">
-        @*Powered by: @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription*@  
+        @*Powered by: @System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription*@
     </div>
 </footer>
 

@@ -16,6 +16,8 @@ namespace PhishingPortal.OutlookAddin.Pages
         public string ItemId { get; set; }
         public string HtmlBody { get; set; }
 
+        public string DisplayName { get; set; }
+
         public bool EmailForward = false;
 
         public bool Responce = false;
@@ -51,7 +53,8 @@ namespace PhishingPortal.OutlookAddin.Pages
 
                 MailReadData = await GetEmailData();
                 ItemId = await GetItemId();
-                //var HtmlBody = await GetHtmlBody();
+                HtmlBody = await GetHtmlBody();
+                DisplayName = await GetDisplayName();
 
 
                 if (string.IsNullOrEmpty(MailReadData?.AttachmentBase64Data) == false)
@@ -87,8 +90,13 @@ namespace PhishingPortal.OutlookAddin.Pages
 
         private async Task<string> GetHtmlBody()
         {
-            var mailreaditem = await JSModule.InvokeAsync<string>("getEmailHtmlBody");
-            return mailreaditem;
+            var html = await JSModule.InvokeAsync<string>("getEmailHtmlBody");
+            return html;
+        }
+        private async Task<string> GetDisplayName()
+        {
+            var user = await JSModule.InvokeAsync<string>("getDisplayName");
+            return user;
         }
 
         public async void Forward()
@@ -136,19 +144,13 @@ namespace PhishingPortal.OutlookAddin.Pages
             EmailForward = false;
         }
 
-        //private void sendMail(MailItem mail)
-        //{
-        //    MailItem newmail = Application.CreateItem(Outlook.OlItemType.olMailItem) as Outlook.MailItem;
-
-        //    newmail = mail.Forward();
-        //    newmail.Recipients.Add("myemailid@gmail.com");
-        //    newmail.Send();
-        //}
-
-        public async void XXX()
+        public async Task<string> GetHtmlBody(string itemId)
         {
-            var HtmlBody = await GetHtmlBody();
-            var aa = HtmlBody;
+            return await JSRuntime.InvokeAsync<string>(
+                "getEmailHtmlBody",
+                itemId,
+                (string html) => { /* do something with html */ });
         }
+
     }
 }
