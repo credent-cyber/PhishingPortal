@@ -111,6 +111,7 @@ else
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                            <option>- Select -</option>
                                                             @foreach (var val in _returnUrlList.OrderBy(o => o))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -138,7 +139,7 @@ else
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
 
-                                                            <option>-Select-</option>
+                                                            <option>- Select -</option>
                                                             <option value="Clicks">Clicks</option>
                                                             <option value="Offers">Offers</option>
                                                             <option value="ITServices">IT Services</option>

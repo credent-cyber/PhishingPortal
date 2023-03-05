@@ -7,7 +7,7 @@ namespace PhishingPortal.Dto
         [Required(ErrorMessage = "The Template Name is required.")]
         public string Name { get; set; }
         [Required(ErrorMessage = "Template Type is required.")]
-        public CampaignType Type { get; set; }
+        public CampaignType? Type { get; set; }
         public bool IsHtml { get; set; }
         public bool IsActive { get; set; }
         public string Content { get; set; }
