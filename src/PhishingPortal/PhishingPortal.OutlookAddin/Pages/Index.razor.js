@@ -57,6 +57,17 @@ export function getDisplayName() {
     }
 }
 
+function extractLinksFromHtml(html) {
+    const regex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/g;
+    const links = [];
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+        links.push(match[2]);
+    }
+    return links;
+}
+
+
 function getFileExtension(fileName) {
     var a = fileName.split(".");
     if (a.length === 1 || (a[0] === "" && a.length === 2)) {

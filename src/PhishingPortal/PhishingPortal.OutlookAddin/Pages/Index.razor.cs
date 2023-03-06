@@ -15,7 +15,7 @@ namespace PhishingPortal.OutlookAddin.Pages
         public MailRead? MailReadData { get; set; }
         public string ItemId { get; set; }
         public string HtmlBody { get; set; }
-
+        public string Link { get; set; }
         public string DisplayName { get; set; }
 
         public bool EmailForward = false;
@@ -144,13 +144,6 @@ namespace PhishingPortal.OutlookAddin.Pages
             EmailForward = false;
         }
 
-        public async Task<string> GetHtmlBody(string itemId)
-        {
-            return await JSRuntime.InvokeAsync<string>(
-                "getEmailHtmlBody",
-                itemId,
-                (string html) => { /* do something with html */ });
-        }
 
     }
 }
