@@ -67,7 +67,8 @@
     }
 
     private async Task AfterRefreshGrid()
-    {
+    {  
+
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
 
         if (grid != null)
@@ -83,6 +84,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
+       // var years = await client.GetCampaignLogYears();
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         try

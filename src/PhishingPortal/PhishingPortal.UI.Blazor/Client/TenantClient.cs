@@ -81,7 +81,7 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/CampaignTemplates");
 
-                res.EnsureSuccessStatusCode(); 
+                res.EnsureSuccessStatusCode();
 
                 templates = await res.Content.ReadFromJsonAsync<List<CampaignTemplate>>();
 
@@ -366,7 +366,7 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return response;
-        } 
+        }
         #endregion
 
         #region Related to Azure Active Directory Integration
@@ -388,7 +388,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
                 if (json != null)
                     response = json;
-               
+
             }
             catch (Exception ex)
             {
@@ -476,6 +476,24 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return campaignlog;
+        }
+
+        public async Task<List<int>> GetCampaignLogYears()
+        {
+            List<int> years = new List<int>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetYearsfromCampaignlog");
+                res.EnsureSuccessStatusCode();
+                years = await res.Content.ReadFromJsonAsync<List<int>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return years;
         }
 
     }

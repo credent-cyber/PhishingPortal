@@ -220,7 +220,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 result.Message = "Success";
                 result.Result = data;
 
-            }   
+            }
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
@@ -323,7 +323,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
             var adUsers = new List<Microsoft.Graph.User>();
 
-            if(adRecipientGroup.Uid == "all-users")
+            if (adRecipientGroup.Uid == "all-users")
             {
                 adUsers = await _adImportClient.GetAdUsers();
             }
@@ -349,9 +349,9 @@ namespace PhishingPortal.Server.Controllers.Api
                     WhatsAppNo = o.MobilePhone
                 }).ToList();
 
-                var result =  await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
-                
-                
+                var result = await _tenantRepository.ImportAdGroupMembers(adRecipientGroup, recipients);
+
+
                 response.IsSuccess = true;
                 response.Result = result;
             }
@@ -364,7 +364,7 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpGet]
         [Route("settings")]
 
-        public async Task<Dictionary<string,string>> GetSettings()
+        public async Task<Dictionary<string, string>> GetSettings()
         {
             var result = await _tenantRepository.GetSettings();
 
@@ -372,7 +372,7 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [HttpPost]
-        [Route("upsert-settings")] 
+        [Route("upsert-settings")]
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings)
         {
@@ -396,5 +396,14 @@ namespace PhishingPortal.Server.Controllers.Api
                 throw;
             }
         }
+
+        [HttpGet]
+        [Route("GetYearsfromCampaignlog")]
+        public async Task<List<int>> GetYearListfromCampaignLog()
+        {
+            var result = await _tenantRepository.GetYearList();
+            return result.ToList();
+        }
+
     }
 }

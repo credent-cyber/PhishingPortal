@@ -266,7 +266,7 @@ namespace PhishingPortal.Repositories
         /// <param name="end"></param>
         /// <returns></returns>
 
-        
+
         public async Task<CategoryWisePhishingTestData> GetCategoryWisePhishingReport(DateTime start, DateTime end)
         {
             CategoryWisePhishingTestData data = new CategoryWisePhishingTestData();
@@ -285,7 +285,7 @@ namespace PhishingPortal.Repositories
 
             data.TemplateClickEntries = new Dictionary<string, decimal>();
             data.SmsTemplateClickEntries = new Dictionary<string, decimal>();
-            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();            
+            data.WhatsappTemplateClickEntries = new Dictionary<string, decimal>();
 
             try
             {
@@ -341,10 +341,10 @@ namespace PhishingPortal.Repositories
                         id5 = id.Campaign.Id;
 
                 }
-                
+
                 var filterData = TenantDbCtx.CampaignLogs
                  .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
-                
+
                 var phishtestWithRecipients = from log in filterData
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
@@ -947,7 +947,7 @@ namespace PhishingPortal.Repositories
             Dictionary<int, string> list = new Dictionary<int, string>();
 
             try
-            {           
+            {
                 var logdata = TenantDbCtx.CampaignLogs.Where(i => i.CreatedOn >= yearStartDate && i.CreatedOn < yearEndDate)
                     .Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
 
@@ -962,7 +962,7 @@ namespace PhishingPortal.Repositories
                             foreach (var value in values)
                             {
                                 if (value.Split("__")[0] != "9")
-                                { 
+                                {
                                     if (value.Split("__")[0] == "1") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId == id)); }
                                     else if (value.Split("__")[0] == "5") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId > id)); }
                                     else if (value.Split("__")[0] == "6") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId < id)); }
@@ -971,8 +971,8 @@ namespace PhishingPortal.Repositories
                                     else if (value.Split("__")[0] == "10") { var id = Int32.Parse(value.Split("__")[1]); results = results.Union(logdata.Where(o => o.CampaignId != id)); }
                                 }
                             }
-                         
-                            
+
+
 
                         }
                         else if (Key == "CampaignName")
@@ -1085,7 +1085,7 @@ namespace PhishingPortal.Repositories
                                 }
                             }
                         }
-                        
+
                     }
                 }
                 else
@@ -1093,7 +1093,7 @@ namespace PhishingPortal.Repositories
                     results = TenantDbCtx.CampaignLogs.Where(i => i.CreatedOn >= yearStartDate && i.CreatedOn < yearEndDate);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
                 throw;
@@ -1101,6 +1101,13 @@ namespace PhishingPortal.Repositories
 
             return Task.FromResult(results);
         }
-        
+
+        public async Task<List<int>> GetYearList()
+        {
+            var years = TenantDbCtx.CampaignLogs.Select(c => c.CreatedOn.Year).Distinct().ToList();
+            return await Task.FromResult(years);
+        }
+
+
     }
 }
