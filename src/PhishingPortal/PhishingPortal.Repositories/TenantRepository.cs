@@ -1208,7 +1208,11 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(outcome);
         }
 
-
+        public async Task<List<int>> GetYearList()
+        {
+            var years = TenantDbCtx.CampaignLogs.Select(c => c.CreatedOn.Year).Distinct().ToList();
+            return await Task.FromResult(years);
+        }
 
 
 

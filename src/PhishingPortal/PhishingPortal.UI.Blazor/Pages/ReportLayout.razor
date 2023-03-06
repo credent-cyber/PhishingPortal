@@ -26,40 +26,68 @@
 @inject AuthState authState;
 @attribute [Authorize]
 
-<div class="pcoded-content" style="padding: 0 0px !important;">
-    @*<h5><span style="color:orange;">Report Details</span></h5>*@
-    <div class="row">
-        <div class="col-xl-6 col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Statistics</h5>
-                </div>
-                <div class="card-body">
-                    <div style="width: 100%;">
-                        <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
-                               Labels="@BarChart1Labels" IsStacked="false" IsClickable="false" AspectRatio=false>
-                        </Chart>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-6 col-md-6">
-            <div class="card">
-                <div class="card-body" style="padding:9px !important">
-                    <div style="width: 100%;">
-                        <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent" />
-                    </div>
-                </div>
-            </div>
-        </div>
 
-
+<div class="form-group row">
+    <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
+    <div class="col-sm-12 col-md-10 d-flex">
+        <select onchange="@ChangeYear" class="form-select" aria-label="Default select example">
+            @if (Years != null)
+            {
+                foreach (var year in Years.OrderByDescending(y => y))
+                {
+                    if (year == Year)
+                    {
+                        <option value="@year" selected>@year</option>
+                    }
+                    else
+                    {
+                        <option value="@year">@year</option>
+                    }
+                }
+            }
+        </select>
+        <button class="btn btn-outline-warning ms-3" style="background:#950f0f; border-radius:5px" @onclick="PrintAsPdf" title="Print this page as pdf">
+            <span class='oi oi-print' aria-hidden='false'> </span>
+        </button>
     </div>
 </div>
 
-<div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
-    <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
+
+<div id="myContent">
+    <div class="pcoded-content" style="padding: 0 0px !important;">
+        <div class="row">
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%;">
+                            <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
+                                   Labels="@BarChart1Labels" IsStacked="false" IsClickable="false" AspectRatio=false>
+                            </Chart>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-body" style="padding:9px !important">
+                        <div style="width: 100%;">
+                            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
+        <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
+    </div>
 </div>
+
 
 @code {
 
@@ -76,10 +104,14 @@
     [Parameter]
     public string Label { get; set; }
 
+    private List<int> Years;
+    public int Year { get; set; } = DateTime.Now.Year;
+
     public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
     public string[] BarChart1Labels { get; set; }
 
     static bool filter = true;
+
 
     private List<CampaignLog> CampaignLogs = new List<CampaignLog>();
     private int total;
@@ -292,6 +324,7 @@
             await Task.CompletedTask;
         });
 
+        Years = await client.GetCampaignLogYears();
     }
 
     private void Calculate(CGrid<CampaignLog> grid)
@@ -340,6 +373,9 @@
 
     protected async Task PrintAsPdf()
     {
+        // Call StateHasChanged() to ensure the chart is fully rendered before generating the PDF
+        StateHasChanged();
+
         var element = await JSRuntime.InvokeAsync<IJSObjectReference>("eval", "document.getElementById('myContent')");
 
         // Create a new html2pdf instance
@@ -347,6 +383,15 @@
 
         // Download the PDF file
         var data = await pdf.InvokeAsync<string>("output", "datauristring");
-        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "my-file.pdf", data);
+        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "PhishSim-Report.pdf", data);
+    }
+
+
+    void ChangeYear(ChangeEventArgs e)
+    {
+        Year = Convert.ToInt32(e.Value);
+        //_gridComponent.AddFilter(Column, filters);
+        //_gridComponent.RemoveFilter(Column);
+        //_ref = 1;
     }
 }
