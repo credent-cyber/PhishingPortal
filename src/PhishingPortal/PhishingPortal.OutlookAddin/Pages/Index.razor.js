@@ -48,6 +48,18 @@ export async function getEmailHtmlBody() {
     }
 }
 
+
+export async function extractLinksFromHtml(html) {
+    const regex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/g;
+    const links = [];
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+        links.push(match[2]);
+    }
+    console.log("links---", links);
+    return links;
+}
+
 export function getDisplayName() {
     try {
         return Office.context.mailbox.userProfile.displayName;
@@ -56,17 +68,6 @@ export function getDisplayName() {
         return "";
     }
 }
-
-function extractLinksFromHtml(html) {
-    const regex = /<a\s+(?:[^>]*?\s+)?href=(["'])(.*?)\1/g;
-    const links = [];
-    let match;
-    while ((match = regex.exec(html)) !== null) {
-        links.push(match[2]);
-    }
-    return links;
-}
-
 
 function getFileExtension(fileName) {
     var a = fileName.split(".");

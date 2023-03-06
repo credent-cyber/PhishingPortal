@@ -6,6 +6,7 @@ namespace PhishingPortal.Repositories
     public interface ITenantRepository
     {
         Task<Tuple<bool,string>> CampaignHit(string key);
+        Task<Tuple<bool,string>> CampaignSpamReport(string key);
         Task<IEnumerable<Campaign>> GetAllCampaigns(int pageIndex, int pageSize);
         Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0, int pageSize = 10);
         Task<List<CampaignTemplate>> GetAllTemplates(CampaignType? type);

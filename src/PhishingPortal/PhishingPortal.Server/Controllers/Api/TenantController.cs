@@ -206,6 +206,28 @@ namespace PhishingPortal.Server.Controllers.Api
 
         }
 
+        [HttpPost]
+        [Route("campaign-spam-report")]
+        [AllowAnonymous]
+        public async Task<ApiResponse<string>> CampignLinkReport(GenericApiRequest<string> request)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.CampaignSpamReport(request.Param);
+                result.IsSuccess = outcome.Item1;
+                result.Message = "Successful";
+                result.Result = outcome.Item2;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while reporting spam campaign url");
+            }
+
+            return result;
+
+        }
+
         [HttpGet]
         [Route("get-latest-statistics")]
         public async Task<ApiResponse<ConsolidatedPhishingStats>> GetLatestStatistics()

@@ -253,7 +253,31 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(new Tuple<bool, string>(true, campaign.ReturnUrl));
 
         }
+        public async Task<Tuple<bool, string>> CampaignSpamReport(string key)
+        {
+            var status = CampaignLogStatus.Sent.ToString();
+            var campaignLog = TenantDbCtx.CampaignLogs
+                .FirstOrDefault(o => o.SecurityStamp == key
+                                    && o.IsReported == false && o.Status == status);
 
+            if (campaignLog == null)
+                throw new Exception("Invalid Url");
+
+            var campaign = TenantDbCtx.Campaigns.FirstOrDefault(o => o.Id == campaignLog.CampaignId);
+            if (campaign == null)
+                throw new Exception("Invalid Campaign");
+
+            campaignLog.Status = CampaignLogStatus.Completed.ToString();
+            campaignLog.IsReported = true;
+            campaignLog.ModifiedOn = DateTime.Now;
+            campaignLog.ModifiedBy = nameof(CampaignSpamReport);
+
+            TenantDbCtx.Update(campaignLog);
+            TenantDbCtx.SaveChanges();
+
+            return await Task.FromResult(new Tuple<bool, string>(true, campaign.ReturnUrl));
+
+        }
 
         /// <summary
         /// Phsihing prone percentage - group by phishing category

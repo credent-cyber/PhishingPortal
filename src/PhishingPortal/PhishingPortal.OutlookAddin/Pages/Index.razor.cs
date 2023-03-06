@@ -1,7 +1,12 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Runtime.Serialization;
+using System.Text.Json;
+using System.Text;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using PhishingPortal.OutlookAddin.Model;
+using PhishingPortal.OutlookAddin.Client;
 
 namespace PhishingPortal.OutlookAddin.Pages
 {
@@ -12,10 +17,13 @@ namespace PhishingPortal.OutlookAddin.Pages
 
         public IJSObjectReference JSModule { get; set; } = default!;
 
+        [Inject]
+        protected IConfiguration Configuration { get; set; }
+
         public MailRead? MailReadData { get; set; }
         public string ItemId { get; set; }
         public string HtmlBody { get; set; }
-        public string Link { get; set; }
+        public string WebLink { get; set; }
         public string DisplayName { get; set; }
 
         public bool EmailForward = false;
@@ -24,21 +32,12 @@ namespace PhishingPortal.OutlookAddin.Pages
         public string TrademarkMessage1 { get; set; } = "Copyright © " + @DateTime.Now.Year + " PhishSims.";
         public string TrademarkMessage2 { get; set; } = "All rights reserved.";
 
-        /// <summary>
-        /// NOTE: This can also go in the @code block in Index.razor
-        /// </summary>
-        /// <param name = "firstRender" ></ param >
-        /// < returns ></ returns >
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            //NOTE: This fires after Index.razor.OnInitialized()
             Console.WriteLine($"Index.razor.cs (OnAfterRenderAsync): firstRender: {firstRender}");
 
             if (firstRender)
             {
-                //NOTE: JSRuntime.InvokeAsync invokes OutlookBlazorWasmApp.Client.lib.module.js(afterStarted), then Index.razor.js(Office.onReady) but only when hosted in full browser instance outside of the Outlook Task pane. When in Outlook, the order after this event completes is:
-                //OutlookBlazorWasmApp.Client.lib.module.js(Office.onReady) - after beforeStart has already fired() and triggered Index.razor.OnInitialized()
-                //Index.razor.js(Office.onReady) 
 
                 Console.WriteLine($"firstRender: Importing Index.razor.js...");
 
@@ -53,8 +52,21 @@ namespace PhishingPortal.OutlookAddin.Pages
 
                 MailReadData = await GetEmailData();
                 ItemId = await GetItemId();
-                HtmlBody = await GetHtmlBody();
                 DisplayName = await GetDisplayName();
+                HtmlBody = await GetHtmlBody();
+                if (HtmlBody != "")
+                {
+                    var Links = await ExtractLinks(HtmlBody);
+                    foreach (var Link in Links)
+                    {
+                        if (Link.Contains("phishsims.com") || Link.Contains("localhost:7018"))
+                        {
+                            WebLink = Link;
+                            break;
+                        }
+                    }
+                }
+
 
 
                 if (string.IsNullOrEmpty(MailReadData?.AttachmentBase64Data) == false)
@@ -98,44 +110,54 @@ namespace PhishingPortal.OutlookAddin.Pages
             var user = await JSModule.InvokeAsync<string>("getDisplayName");
             return user;
         }
+        private async Task<string[]> ExtractLinks(string html)
+        {
+            var links = await JSModule.InvokeAsync<string[]>("extractLinksFromHtml", html);
+            return links;
+        }
+
 
         public async void Forward()
         {
-            //var toRecipients = new List<Recipient>()
-            //         {
-            //             new Recipient
-            //             {
-            //                 EmailAddress = new EmailAddress
-            //                 {
-            //                     Name = "PhishSims",
-            //                     Address = "phishing-mail@credentinfotech.com"
-            //                 }
-            //             }
-            //         };
+            // var input = "https://phishsims.com/cmpgn/PhishSim-T-20220908134615/7794bb787c99639457ff50136e40f9b7";
+            var input = "https://localhost:7018/cmpgn/T-20220619003439/78d49cb73871d59b32119b8b9db47e3d";
 
-            //var comment = "spam";
+            //  string parts = input.Split("https://phishsims.com/cmpgn/")[1];
+            string parts = input.Split("https://localhost:7018/cmpgn/")[1];
+            string TenantId = parts.Split('/')[0];
+            string Key = parts.Split('/')[1];
+            //////////
+            var BaseUrl = "https://phishsims.com/";
+            var BaseUrl1 = "https://localhost:7018/";
+            //var BaseUrl = Configuration.GetValue<string>("ApiBaseUrl");
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(BaseUrl1);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            //GraphServiceClient graphClient = new GraphServiceClient(authProvider);
+            var request = new GenericApiRequest<string> { Param = Key };
+            var json = JsonSerializer.Serialize(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            //await graphClient.Me.Messages[ItemId]
-            //.Forward(toRecipients, null, comment)
-            //.Request()
-            //.PostAsync();
+            var response = await client.PostAsync($"api/tenant/campaign-spam-report?t={TenantId}", content);
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ApiResponse<string>>(responseJson);
 
-            //Outlook._Application _Application = new Outlook.Application();
-            //Outlook.MailItem mail = (Outlook.MailItem)_Application.CreateItem(Outlook.OlItemType.olMailItem);
-            //mail.To = "<Email address>";
-            //mail.Subject = "Test e-mail from Addin";
-            //mail.Body = "This is a test email";
-            //mail.Importance = Outlook.OlImportance.olImportanceNormal;
-            //((Outlook._MailItem)mail).Send();
+            if (result.IsSuccess)
+            {
+                Responce = true;
+            }
+            else
+            {
+                Responce = true;
+            }
 
+            ///////////
 
+            //var a = true;
+            //Responce = a == true ? true : false;
 
-            //var a = await client.OutlookReport(ItemId);
-            var a = true;
             EmailForward = true;
-            Responce = a == true ? true : false;
             StateHasChanged();
 
         }
@@ -147,3 +169,5 @@ namespace PhishingPortal.OutlookAddin.Pages
 
     }
 }
+
+

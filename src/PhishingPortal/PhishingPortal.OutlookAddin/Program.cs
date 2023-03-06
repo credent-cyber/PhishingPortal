@@ -6,6 +6,26 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+
+builder.Services.AddSingleton(sp =>
+    new HttpClient
+    {
+        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    });
+
+
+//builder.Configuration.AddJsonFile("appsettings.json");
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+
+// Add the configuration
 await builder.Build().RunAsync();
+
+
+
+
+
+
+
+
