@@ -19,6 +19,28 @@
 @inject NavigationManager NavigationManager
 @inject AuthState authState;
 
+<div class="form-group row">
+    <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
+    <div class="col-md-10">
+        <select onchange="@ChangeYear" class="form-select" aria-label="Default select example">
+            @if (Years != null)
+            {
+                foreach (var year in Years.OrderByDescending(y => y))
+                {
+                    if (year == Year)
+                    {
+                        <option value="@year" selected>@year</option>
+                    }
+                    else
+                    {
+                        <option value="@year">@year</option>
+                    }
+                }
+            }
+        </select>
+
+    </div>
+</div>
 <div class="pcoded-content">
     <div class="row">   
         <div class="col-sm-12 col-md-12 col-xl-12">
@@ -47,6 +69,8 @@
     private Task _task;
     private GridODataClient<CampaignLog> _client;
     private bool _eventHooked = false;
+    private List<int> Years;
+    public int Year { get; set; } = DateTime.Now.Year;
 
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
@@ -84,7 +108,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-       // var years = await client.GetCampaignLogYears();
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         try
@@ -112,7 +135,7 @@
             Calculate(_grid);
             await Task.CompletedTask;
         });
-
+        Years = await client.GetCampaignLogYears();
     }
 
     private void Calculate(CGrid<CampaignLog> grid)
@@ -126,6 +149,14 @@
         {
             pronePercent = Math.Round((decimal)hits / total * 100, 2);
         }
+    }
+
+    void ChangeYear(ChangeEventArgs e)
+    {
+        Year = Convert.ToInt32(e.Value);
+        //_gridComponent.AddFilter(Column, filters);
+        //_gridComponent.RemoveFilter(Column);
+        //_ref = 1;
     }
 }
 
