@@ -83,13 +83,14 @@
         var query = new QueryDictionary<StringValues>();
         try
         {
-            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns)
-                .Filterable()
-                .ClearFiltersButton(true)
-                .SetStriped(true)
-                .WithMultipleFilters()
-                .WithGridItemsCount()
-                .Searchable(true, false, false);
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
+            .ChangePageSize(true)
+            .Filterable()
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .Searchable(true, false, false);
 
             _grid = client.Grid;
             _task = client.UpdateGrid();
@@ -99,7 +100,12 @@
             logger.LogCritical(ex, ex.Message);
         }
 
-        StateHasChanged();
+        await _task.ContinueWith(async (st) =>
+        {
+            // Calculate(_grid);
+            await Task.CompletedTask;
+        });
+        Years = await client.GetCampaignLogYears();
     }
 
 
