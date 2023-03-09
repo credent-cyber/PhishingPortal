@@ -1,4 +1,4 @@
-﻿@page "/gridsamplee"
+﻿@page "/gridsample"
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.Dto
@@ -19,36 +19,6 @@
 @inject NavigationManager NavigationManager
 @inject AuthState authState;
 
-<div class="form-group row">
-    <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
-    <div class="col-md-10">
-        <select onchange="@ChangeYear" class="form-select" aria-label="Default select example">
-            @if (Years != null)
-            {
-                foreach (var year in Years.OrderByDescending(y => y))
-                {
-                    if (year == Year)
-                    {
-                        <option value="@year" selected>@year</option>
-                    }
-                    else
-                    {
-                        <option value="@year">@year</option>
-                    }
-                }
-            }
-        </select>
-
-    </div>
-</div>
-<div class="pcoded-content">
-    <div class="row">   
-        <div class="col-sm-12 col-md-12 col-xl-12">
-            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
-            </DrillDown_Summary>
-        </div>
-    </div>
-</div>
 
 <div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
     <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
@@ -91,13 +61,14 @@
     }
 
     private async Task AfterRefreshGrid()
-    {  
+    {
 
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
 
         if (grid != null)
         {
-            Calculate(grid);
+            //Calculate(grid);
+            var c = GetTotalIsHits();
 
             StateHasChanged();
         }
@@ -112,14 +83,13 @@
         var query = new QueryDictionary<StringValues>();
         try
         {
-            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
-            .ChangePageSize(true)
-            .Filterable()
-            .ClearFiltersButton(true)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            .Searchable(true, false, false);
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns)
+                .Filterable()
+                .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                .Searchable(true, false, false);
 
             _grid = client.Grid;
             _task = client.UpdateGrid();
@@ -129,34 +99,71 @@
             logger.LogCritical(ex, ex.Message);
         }
 
-        await _task.ContinueWith(async (st) =>
-        {
-            Calculate(_grid);
-            await Task.CompletedTask;
-        });
-        Years = await client.GetCampaignLogYears();
+        StateHasChanged();
     }
 
-    private void Calculate(CGrid<CampaignLog> grid)
-    {
-        CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
-        total = CampaignLogs.Count();
-        hits = CampaignLogs.Count(o => o.IsHit);
-        reported = CampaignLogs.Count(o => o.IsReported);
 
-        if (total > 0)
+    //private void Calculate(CGrid<CampaignLog> grid)
+    //{
+    //    CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
+    //    total = CampaignLogs.Count();
+    //    hits = CampaignLogs.Count(o => o.IsHit);
+    //    reported = CampaignLogs.Count(o => o.IsReported);
+
+    //    if (total > 0)
+    //    {
+    //        pronePercent = Math.Round((decimal)hits / total * 100, 2);
+    //    }
+    //}
+
+
+    private async Task<int> GetTotalIsHits()
+    {
+        int page = 1;
+        int pageSize = 50;
+        int totalHits = 0;
+        bool hasMoreData = true;
+
+        while (hasMoreData)
         {
-            pronePercent = Math.Round((decimal)hits / total * 100, 2);
+            string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}&$skip={(page - 1) * pageSize}&$top={pageSize}";
+            var response = await HttpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
+
+                if (data.Any())
+                {
+                    totalHits += data.Count(x => x.IsHit);
+                    page++;
+                }
+                else
+                {
+                    hasMoreData = false;
+                }
+            }
+            else
+            {
+                hasMoreData = false;
+            }
         }
+
+        return totalHits;
     }
 
-    void ChangeYear(ChangeEventArgs e)
-    {
-        Year = Convert.ToInt32(e.Value);
-        //_gridComponent.AddFilter(Column, filters);
-        //_gridComponent.RemoveFilter(Column);
-        //_ref = 1;
 
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
-
