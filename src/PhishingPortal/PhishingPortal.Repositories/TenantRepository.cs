@@ -61,12 +61,7 @@ namespace PhishingPortal.Repositories
 
             return result;
         }
-        //public async Task<CampaignLog> GetCamplogByCampId(int id)
-        //{
-        //    CampaignLog result = null;
-        //    result = TenantDbCtx.CampaignLogs.Include();
-        //    return result;
-        //}
+
         public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
             Campaign result = null;

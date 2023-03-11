@@ -30,9 +30,8 @@ namespace PhishingPortal.Repositories
         Task<Tuple<bool, string>> Training(string key);
         Task<MonthlyTrainingBarChart> GetTrainingReportData(int year);
         Task<TrainingStatics> GetLastTrainingStatics();
-
-
-
+        Task<Campaign> GetCampaignByName(string name);
+        Task<List<int>> GetYearList();
 
 
     }
