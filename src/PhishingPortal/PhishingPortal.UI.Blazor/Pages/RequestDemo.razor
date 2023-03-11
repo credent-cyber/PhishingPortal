@@ -105,7 +105,13 @@
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
-
+        if (@Model.FullName is null || @Model.Company is null || @Model.Email is null)
+        {
+            isError = true;
+            isSucess = false;
+            message = "Name, Company and Email can't be empty!";
+            return;
+        }
         if (@Model.Email is not null)
         {
             var formate = Regex.IsMatch(@Model.Email, @".+@.+\..+");
