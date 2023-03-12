@@ -37,7 +37,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 
             try
             {
-                var uri = $"{Config.BaseUrl}/send.php?number={to}&type=media&message={message}";
+                var uri = $"{Config.BaseUrl}/api/send.php?number={to}&type=media&message={message}";
 
                 if (!string.IsNullOrEmpty(mediaUrl))
                 {

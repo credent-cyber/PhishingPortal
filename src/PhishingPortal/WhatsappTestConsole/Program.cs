@@ -1,64 +1,24 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.Net.Http;
-using System.Net.Http.Json;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-using Twilio.Rest.Api.V2010.Account.AvailablePhoneNumberCountry;
-using Twilio.Types;
+﻿Console.WriteLine("DealSms Testing");
 
-Console.WriteLine("Whatsapp Test Console");
+var httpClient = new HttpClient();
+httpClient.BaseAddress = new Uri("http://bhashsms.com/");
 
+var response = await httpClient.GetAsync($"/api/sendmsg.php?user=success&pass=sms@2023&sender=BHAINF&phone=8826171494&text=api  test2 BHASHSMS&priority=ndnd&stype=normal");
+response.EnsureSuccessStatusCode();
 
+var content = await response.Content.ReadAsStringAsync();
 
-var accountSid = "AC30aca7a273ea35c66119424ad28f3c11";
-var authToken = "e2d847aaa187462e3000ecfc8d07f8ed";
-TwilioClient.Init(accountSid, authToken);
+Console.WriteLine("Sms Response");
+Console.WriteLine($"StatusCode : {response.StatusCode}");
+Console.WriteLine(content);
 
-var mobile = MobileResource.Read(pathCountryCode: "IN", limit: 20);
+httpClient = new HttpClient();
+httpClient.BaseAddress = new Uri("https://dealsms.in");
 
-foreach (var record in mobile)
-{
-    Console.WriteLine(record.FriendlyName);
-}
+response = await httpClient.GetAsync($"/api/send.php?number=918826171494&type=media&message=test%20message&media_url=https://drjsharanlab.com/report/1560260_9430152159.pdf&filename=rahul.pdf&instance_id=63E5F247D7D9D&access_token=783c698eef4306a2d370c9de3862744c");
+response.EnsureSuccessStatusCode();
+content = await response.Content.ReadAsStringAsync();
 
-//var client = new HttpClient();
-//client.BaseAddress = new Uri("http://142.132.202.49/");
-
-//var key = "68bf86afef99416898e5fbe7ecf5364d";
-//var mobile = "8826171494";
-//var msg = "Hi";
-
-//var options = Environment.GetCommandLineArgs();
-
-//if(options.Length >= 2)
-//{
-//    key = options[1];
-//}
-
-//if (options.Length >= 3)
-//{
-//    mobile = options[2];
-//}
-
-//if(options.Length >= 4)
-//{
-//    msg = options[3];
-//}
-
-//var uri = $"/wapp/api/send?apikey={key}&mobile={mobile}&msg={msg}";
-
-//Console.WriteLine(uri);
-
-//var response  = await client.PostAsJsonAsync<object>(uri, new { });
-
-//response.EnsureSuccessStatusCode();
-
-//if (response.IsSuccessStatusCode)
-//    Console.WriteLine("Success :)");
-//else
-//{
-//    Console.WriteLine("Failed :(");
-//}
-
-
-
+Console.WriteLine("Whatsapp Response");
+Console.WriteLine($"StatusCode : {response.StatusCode}");
+Console.WriteLine(content);

@@ -2,7 +2,7 @@
 {
     public class DealSmsGatewayClient : ISmsGatewayClient
     {
-        private const string SmsUri = "sendmsg.php";
+        private const string SmsUri = "/api/sendmsg.php";
         private readonly HttpClient _httpClient;
 
         public DealSmsGatewayClient(ILogger<DealSmsGatewayClient> logger, DealSmsGatewayConfig config)

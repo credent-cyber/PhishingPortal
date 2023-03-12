@@ -2,7 +2,7 @@
 {
     public class DealSmsGatewayConfig
     {
-        public string BaseUrl { get; set; } = "https://dealsms.in/api/";
+        public string BaseUrl { get; set; } = "http://bhashsms.com/";
         public string Username { get; set; } = "success";
         public string Password { get; set; } = "sms@2023";
         public string Sender { get; set; } = "BHAINF";
