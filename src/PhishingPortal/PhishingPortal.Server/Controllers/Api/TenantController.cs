@@ -564,6 +564,63 @@ namespace PhishingPortal.Server.Controllers.Api
             return result.ToList();
         }
 
+        [HttpGet]
+        [Route("GetCampaignsNames")]
+        public async Task<List<Campaign>> GetCompaignNames()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetCampaignsName();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+        [HttpPost]
+        [Route("TrainingCampIdMap")]
+        public async Task<ApiResponse<string>> TrainingCampIdMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.UpsertTrainingCampaignMap(dict);
+                result.Message = "Successful";
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("getTrainingCampaignIds/{trainingId}")]
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int trainingId)
+        {
+            var result = await _tenantRepository.GetTrainingCampaignsId(trainingId);
+            return await Task.FromResult(result);
+        }
+
+
+        [HttpGet]
+        [Route("GetTrainingVideo")]
+        public async Task<IEnumerable<TrainingVideo>> GetTrainingVideo()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetTrainingVideos();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
 
     }
 }

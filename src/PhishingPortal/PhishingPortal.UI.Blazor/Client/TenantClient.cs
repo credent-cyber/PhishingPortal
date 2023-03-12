@@ -644,5 +644,85 @@ namespace PhishingPortal.UI.Blazor.Client
             }
             return years;
         }
+
+        public async Task<List<Campaign>> GetCampaignsNames()
+        {
+            List<Campaign> campaigns;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetCampaignsNames");
+
+                res.EnsureSuccessStatusCode();
+
+                campaigns = await res.Content.ReadFromJsonAsync<List<Campaign>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return campaigns;
+        }
+
+        public async Task<bool> UpsertTRainingCampIDsMap(Dictionary<int, List<int>> dict)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/TrainingCampIdMap", dict);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return false;
+        }
+
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignIDs(int id)
+        {
+            List<TrainingCompaignMapping> Trainingcampaign = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/getTrainingCampaignIds/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCompaignMapping>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return Trainingcampaign;
+        }
+
+        public async Task<IEnumerable<TrainingVideo>> GetTrainigVideo()
+        {
+            IEnumerable<TrainingVideo> trainigVideo;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetTrainingVideo");
+
+                res.EnsureSuccessStatusCode();
+
+                trainigVideo = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingVideo>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return trainigVideo;
+        }
     }
 }

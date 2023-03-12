@@ -1209,7 +1209,82 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(years);
         }
 
+        public async Task<List<Campaign>> GetCampaignsName()
+        {
+            int currentYear = DateTime.Now.Year;
+            int previousYear = currentYear - 1;
+            var result = Enumerable.Empty<Campaign>();
+            //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
+            result = TenantDbCtx.Campaigns.OrderByDescending(o => o.Id).ToList();
+            return (List<Campaign>)result;
+        }
 
+        public async Task<bool> UpsertTrainingCampaignMap(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var trainingId = kvp.Key;
+                var campaignIds = kvp.Value;
 
+                var existingCampaignIds = await TenantDbCtx.TrainingCompaignMapping
+                    .Where(tcm => tcm.TrainingId == trainingId)
+                    .Select(tcm => tcm.CampaignId)
+                    .ToListAsync();
+
+                var campaignIdsToAdd = campaignIds.Except(existingCampaignIds);
+                var campaignIdsToRemove = existingCampaignIds.Except(campaignIds);
+                var campaignIdsToKeep = campaignIds.Intersect(existingCampaignIds);
+
+                if (campaignIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await TenantDbCtx.TrainingCompaignMapping
+                        .Where(tcm => tcm.TrainingId == trainingId && campaignIdsToRemove.Contains(tcm.CampaignId))
+                        .ToListAsync();
+                    TenantDbCtx.RemoveRange(mappingsToRemove);
+                }
+
+                if (campaignIdsToAdd.Any())
+                {
+                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCompaignMapping
+                    {
+                        TrainingId = trainingId,
+                        CampaignId = c
+                    });
+                    TenantDbCtx.AddRange(mappingsToAdd);
+                }
+
+                await TenantDbCtx.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int id)
+        {
+            var compaignIds = TenantDbCtx.TrainingCompaignMapping.Where(o => o.TrainingId == id);
+            return compaignIds.ToList();
+        }
+
+        public Task<IEnumerable<TrainingVideo>> GetTrainingVideos()
+        {
+            var result = Enumerable.Empty<TrainingVideo>();
+            result = TenantDbCtx.TrainingVideoPath.OrderByDescending(o => o.Id);
+            return Task.FromResult(result);
+        }
+        public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
+        {
+            try
+            {
+                TenantDbCtx.Add(trainingVideo);
+                TenantDbCtx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return await Task.FromResult(trainingVideo);
+        }
     }
+
 }
