@@ -8,6 +8,7 @@ namespace PhishingPortal.Dto.Auth
         public string Code { get; set; }
 
         [Required]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         public string Email { get; set; }
 
         [Required]

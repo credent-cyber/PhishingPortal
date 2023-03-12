@@ -52,7 +52,7 @@ else
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<Training>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable()
+            //.Sortable()
             .Filterable(true)
             .ClearFiltersButton(true)
             .SetStriped(true)
