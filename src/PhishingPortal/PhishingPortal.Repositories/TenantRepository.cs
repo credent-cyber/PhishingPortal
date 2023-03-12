@@ -61,12 +61,7 @@ namespace PhishingPortal.Repositories
 
             return result;
         }
-        //public async Task<CampaignLog> GetCamplogByCampId(int id)
-        //{
-        //    CampaignLog result = null;
-        //    result = TenantDbCtx.CampaignLogs.Include();
-        //    return result;
-        //}
+
         public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
             Campaign result = null;
@@ -1208,7 +1203,11 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(outcome);
         }
 
-
+        public async Task<List<int>> GetYearList()
+        {
+            var years = TenantDbCtx.CampaignLogs.Select(c => c.CreatedOn.Year).Distinct().ToList();
+            return await Task.FromResult(years);
+        }
 
 
 

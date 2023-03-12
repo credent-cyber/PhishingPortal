@@ -14,6 +14,7 @@
 @using BlazingComponents.Summernote
 @inject HttpClient Http
 @using PhishingPortal.Common
+@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 @if (model == null)
@@ -31,7 +32,7 @@ else
 {
     <div class="pcoded-content" style="padding:10px 10px">
 
-        <div class="row" >
+        <div class="row">
 
             <div class="col-md-12">
                 <div class="card">
@@ -43,23 +44,24 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
-                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
-
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                        <DataAnnotationsValidator />
+                                        @*<ValidationSummary />*@
                                         <div class="card">
                                             <div class="card-body">
-   
+
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Name Of Training</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
-                                                        <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
+                                                        <InputText id="TrainingName" @bind-Value="model.TrainingName" class="form-control" />
+                                                        <ValidationMessage For="() => model.TrainingName" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Is Active</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -86,20 +88,21 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
-                                                    <div class="col-md-8">     
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Training Category</label>
+                                                    <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
 
-                                                            <option>-Select-</option>
+                                                            <option>- Select -</option>
                                                             <option value="Category1">Category1</option>
                                                             <option value="Category2">Category2</option>
                                                             <option value="Category3">Category3</option>
-                                                
+
                                                         </InputSelect>
+                                                        <ValidationMessage For="() => model.TrainingCategory" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Schedule</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
                                                     <div class="col-md-5">
                                                         @if (isScheduled == false)
                                                         {
@@ -144,7 +147,7 @@ else
                                                                 </div>
 
                                                             }
-             
+
                                                         </div>
 
                                                     </div>
@@ -152,7 +155,7 @@ else
 
 
                                                 <div class="form-group row" id="UploadTrainingUsers">
-                                                    <label for="" class="col-form-label col-md-4">Import Training Recipients</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
                                                     <div class="col-md-8">
                                                         <div class="input-group">
                                                             <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -163,7 +166,7 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Training State</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
                                                     <div class="col-md-8">
                                                         @if (model.Id > 0 && model.State == TrainingState.Completed)
                                                         {
@@ -185,19 +188,19 @@ else
                                                         }
                                                     </div>
                                                 </div>
-                                            
+
 
                                             </div>
 
 
 
                                             <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
                                                 <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
 
-                                                @if (model.Id == 0 && fileimport is null)
+                                                @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
                                                 {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                 }
                                                 else
                                                 {
@@ -205,12 +208,12 @@ else
                                                 }
                                                 @if (model.State == TrainingState.Draft && model.Id > 0)
                                                 {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
                                                 }
 
                                                 @if (model.State == TrainingState.Published)
                                                 {
-                                                    <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
                                                 }
 
                                             </div>
@@ -223,11 +226,11 @@ else
                                     <div class="card" style="margin-bottom: 0;">
                                         <div class="card-body ">
                                             <div class="mb-3">
-                                               <label for="Content" class="form-label">Contents</label>
-                                                    <div class="overflow-auto">
-                                                        <!-- Rich text editor -->
-                                                        <BlazingComponents.Summernote.Editor />
-                                                    </div>                  
+                                                <label for="Content" class="form-label">Contents</label>
+                                                <div class="overflow-auto">
+                                                    <!-- Rich text editor -->
+                                                    <BlazingComponents.Summernote.Editor/>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -244,32 +247,43 @@ else
         </div>
     </div>
     <div>
-        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="@recipients"></Recipients>
                 <br />
                 <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false;  recipients = new List<RecipientImport>(); }"
-                class="btn btn-secondary" type="button"> Close </button>
+                class="btn btn-secondary" type="button">
+                    Close
+                </button>
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
                     <Recipients DataList="@recipients"></Recipients>
-                    <br/>
+                    <br />
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
-                    class="btn btn-secondary" type="button"> Close </button>
+                    class="btn btn-secondary" type="button">
+                        Close
+                    </button>
                 </div>
             }
         </DialogTemplate>
     </div>
+
+    <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <div style="text-align:center;">
+                Thank you!
+            </div>
+        }
+    </Dailog>
+
 }
-
-
-
 
 
 @code {
@@ -278,6 +292,7 @@ else
     [Parameter]
     public int Id { get; set; }
     private string contents;
+    private bool show = false;
 
     public string Title
     {
@@ -312,6 +327,12 @@ else
         {
             Message = string.Empty;
             model = await client.GetTrainingById(Id);
+            await LoadRecipeints(model.Id);
+            //if (fileimport.Count() > 0)
+            //{
+            //    sources = RecipientSources.Imported;
+            //}
+
             contents = model.Content;
             if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
                 TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
@@ -327,13 +348,13 @@ else
         {
             Message = string.Empty;
             model = new Training()
-            {
+                {
                     TrainingSchedule = new TrainingSchedule
                     {
                         ScheduleType = ScheduleTypeEnum.NoSchedule,
                         WillRepeat = false
                     }
-            };
+                };
 
         }
 
@@ -365,28 +386,17 @@ else
         IsError = false;
         IsSuccess = false;
         message = string.Empty;
+        show = true;
         try
         {
 
             if (model.Id > 0)
             {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
                 Message = "Successfully Updated";
                 model.ModifiedOn = DateTime.Now;
             }
             else
             {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }
@@ -604,8 +614,8 @@ else
         {
             var data = await client.ImportRecipientToTraining(model.Id, recipients);
             recipients = data;
-            IsSuccess = true;
-            message = "Successfully imported";
+            //IsSuccess = true;
+            //message = "Successfully imported";
         }
         catch (Exception ex)
         {
@@ -629,7 +639,8 @@ else
         {
             if (model.Id > 0)
             {
-                await LoadRecipeints(model.Id);
+                //await LoadRecipeints(model.Id);
+                recipients = fileimport;
             }
             else
             {
@@ -656,7 +667,7 @@ else
         try
         {
             var data = await client.GetRecipientByTrainingId(model.Id);
-           
+
 
             recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
 
@@ -675,7 +686,7 @@ else
     {
         var data = await client.GetRecipientByTrainingId(id);
 
-        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+        fileimport = recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
     }
 
     protected async Task OnPublishClick()
@@ -704,4 +715,19 @@ else
         }
     }
 
+    private void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Added"))
+        {
+            //model = new Training();
+            //contents = string.Empty;
+            //model.Content = null;
+        }
+    }
+    private void CloseDailogBox()
+    {
+        showRecipients = false;
+        showRecipientss = false;
+    }
 }

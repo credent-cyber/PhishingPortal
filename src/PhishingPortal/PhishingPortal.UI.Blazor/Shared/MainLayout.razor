@@ -1,29 +1,29 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using PhishingPortal.UI.Blazor.Models
 @inherits LayoutComponentBase
+@using PhishingPortal.UI.Blazor.Pages
+
 
 <div class="page">
-
-    <AuthorizeView Roles="superadmin">
-        <Admin_topnav />
-    </AuthorizeView>
-
-    <AuthorizeView Roles="tenantadmin">
-        <Topnav />
-    </AuthorizeView>
-
-    <AuthorizeView Roles="tenantuser">
-        <Authorized>
-            <FrontPage IsTrainingLanding="true"></FrontPage>
-        </Authorized>
-    </AuthorizeView>
-
     <main>
-    <AuthorizeView>
-        <NotAuthorized>
-            <FrontPage></FrontPage>
-        </NotAuthorized>
-    </AuthorizeView>
+        <AuthorizeView Roles="superadmin">
+            <Admin_topnav />
+        </AuthorizeView>
+
+        <AuthorizeView Roles="tenantadmin">
+            <Topnav />
+        </AuthorizeView>
+
+        <AuthorizeView Roles="tenantuser">
+            <UserPage IsTrainingLanding="true"></UserPage>
+        </AuthorizeView>
+
+        <AuthorizeView>
+            <NotAuthorized>
+                <LoginDisplay />
+                <SlideShow />
+            </NotAuthorized>
+        </AuthorizeView>
 
         <article class="content px-4">
             <CascadingValue TValue="AlertModel" Value="alerts">
@@ -32,6 +32,7 @@
                 </div>
             </CascadingValue>
         </article>
+
     </main>
 </div>
 

@@ -45,6 +45,8 @@
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 1500;
 
     private AzureRegistrationSettings model = new AzureRegistrationSettings();
 
@@ -92,6 +94,16 @@
                 alert?.SetError("Error while saving!");
                 logger.LogError(ex, ex.Message);
             }
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         }
     }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+
 }

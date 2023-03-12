@@ -5,7 +5,7 @@ namespace PhishingPortal.Repositories
 {
     public interface ITenantRepository
     {
-        Task<Tuple<bool,string>> CampaignHit(string key);
+        Task<Tuple<bool, string>> CampaignHit(string key);
         Task<IEnumerable<Campaign>> GetAllCampaigns(int pageIndex, int pageSize);
         Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0, int pageSize = 10);
         Task<List<CampaignTemplate>> GetAllTemplates(CampaignType? type);
@@ -21,6 +21,18 @@ namespace PhishingPortal.Repositories
         Task<List<RecipientImport>> ImportRecipientAsync(int campaignId, List<RecipientImport> data);
         Task<Campaign> UpsertCampaign(Campaign campaign);
         Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template);
+
+        Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query);
+        Task<Training> UpsertTraining(Training training);
+        Task<Training> GetTrainingById(int id);
+        Task<List<RecipientImport>> ImportTrainingRecipient(int trainingId, List<RecipientImport> data);
+        Task<List<TrainingRecipients>> GetRecipientByTrainingId(int trainingId);
+        Task<Tuple<bool, string>> Training(string key);
+        Task<MonthlyTrainingBarChart> GetTrainingReportData(int year);
+        Task<TrainingStatics> GetLastTrainingStatics();
+        Task<Campaign> GetCampaignByName(string name);
+        Task<List<int>> GetYearList();
+
 
     }
 }

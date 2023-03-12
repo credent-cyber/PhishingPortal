@@ -556,6 +556,14 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
+        [HttpGet]
+        [Route("GetYearsfromCampaignlog")]
+        public async Task<List<int>> GetYearListfromCampaignLog()
+        {
+            var result = await _tenantRepository.GetYearList();
+            return result.ToList();
+        }
+
 
     }
 }

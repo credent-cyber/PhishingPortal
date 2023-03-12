@@ -626,5 +626,23 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return result;
         }
+
+        public async Task<List<int>> GetCampaignLogYears()
+        {
+            List<int> years = new List<int>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetYearsfromCampaignlog");
+                res.EnsureSuccessStatusCode();
+                years = await res.Content.ReadFromJsonAsync<List<int>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return years;
+        }
     }
 }
