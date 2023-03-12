@@ -12,6 +12,15 @@ using Serilog;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
 using Microsoft.OpenApi.Models;
+using Microsoft.Owin;
+using Owin;
+using Microsoft.Owin.Security;
+using Microsoft.Owin.Security.Cookies;
+using Microsoft.Owin.Security.OpenIdConnect;
+using Microsoft.Owin.Security.Notifications;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Build.Framework;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +31,13 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnCh
 
 
 var config = (IConfiguration)builder.Configuration;
+
+var aadClientId = config.GetValue<string>("AzureAD:ClientId");
+var aadClientSecret = config.GetValue<string>("AzureAD:ClientSecret");
+var aadTenant = config.GetValue<string>("AzureAD:Tenant");
+var aadRedirectUri = config.GetValue<string>("AzureAD:RedirectUri");
+var authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, config.GetValue<string>("AzureAD:Authority"));
+
 
 builder.Services.AddLogging((builder) =>
 {
@@ -37,10 +53,10 @@ builder.Services.AddControllers()
     .AddODataControllers()
     .AddNewtonsoftJson();
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PhishsimsODataDemo", Version = "v1" });
-});
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "PhishsimsODataDemo", Version = "v1" });
+//});
 
 
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
@@ -99,26 +115,70 @@ else
     #endregion
 }
 
-builder.Services.AddIdentity<PhishingPortalUser, IdentityRole>()
+builder.Services.AddIdentityCore<PhishingPortalUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PhishingPortalDbContext2>()
-    .AddTokenProvider<DataProtectorTokenProvider<PhishingPortalUser>>(TokenOptions.DefaultProvider);
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.HttpOnly = false;
-    options.Events.OnRedirectToLogin = context =>
+//builder.Services.AddIdentity<PhishingPortalUser, IdentityRole>()
+//    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
+//    .AddTokenProvider<DataProtectorTokenProvider<PhishingPortalUser>>(TokenOptions.DefaultProvider);
+
+//builder.Services.ConfigureApplicationCookie(options =>
+//{
+//    options.Cookie.HttpOnly = false;
+//    options.Events.OnRedirectToLogin = context =>
+//    {
+//        context.Response.StatusCode = 401;
+//        return Task.CompletedTask;
+//    };
+//});
+
+
+builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
+    .AddMicrosoftAccount(options =>
     {
-        context.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-});
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.ClientId = aadClientId;
+        options.ClientSecret = aadClientSecret;
+        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
+        options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
+    })
+    .AddIdentityCookies();
+
+//.AddOpenIdConnect("oidc", options =>
+//{
+//    options.Authority = authority;
+//    options.ClientId = aadClientId;
+//    options.ClientSecret = aadClientSecret;
+//    options.ResponseType = "code";
+//    options.SaveTokens = true;
+//    options.GetClaimsFromUserInfoEndpoint = true;
+//    options.UseTokenLifetime = false;
+//    options.CallbackPath = new Microsoft.AspNetCore.Http.PathString("/signin-oidc");
+//    options.Scope.Add("openid");
+//    options.Scope.Add("profile");
+//    options.TokenValidationParameters = new TokenValidationParameters { NameClaimType = "name" };
+//    options.Events = new OpenIdConnectEvents
+//    {
+//        OnAccessDenied = context =>
+//        {
+//            context.HandleResponse();
+//            context.Response.Redirect("/");
+//            return Task.CompletedTask;
+//        },
+
+//        OnUserInformationReceived = userInfo =>
+//        {
+//            return Task.CompletedTask;
+//        }
+
+//    };
+//});
 
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
-
-builder.Services.AddAuthentication()
-    .AddCookie();
-
 
 builder.Services.AddScoped<ITenantAdmin, TenantAdmin>();
 builder.Services.AddSingleton<TenantAdminRepoConfig>();
@@ -155,22 +215,16 @@ else
     app.UseHsts();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v1"));
-
-
+//app.UseSwagger();
+//app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v1"));
 
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
 
-
-
 app.UseAuthentication();
-
 app.UseAuthorization();
-
 
 app.UseEndpoints(endpoints =>
 {

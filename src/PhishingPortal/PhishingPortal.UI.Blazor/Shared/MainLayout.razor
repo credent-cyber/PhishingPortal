@@ -5,40 +5,26 @@
 
 
 <div class="page">
-
-    <AuthorizeView Roles="superadmin">
-        <Admin_topnav />
-    </AuthorizeView>
-
-    <AuthorizeView Roles="tenantadmin">
-        <Topnav />
-    </AuthorizeView>
-
     <main>
+        <AuthorizeView Roles="superadmin">
+            <Admin_topnav />
+        </AuthorizeView>
+
+        <AuthorizeView Roles="tenantadmin">
+            <Topnav />
+        </AuthorizeView>
+
+        <AuthorizeView Roles="tenantuser">
+            <UserPage IsTrainingLanding="true"></UserPage>
+        </AuthorizeView>
 
         <AuthorizeView>
             <NotAuthorized>
-                @*<nav class="navbar navbar-expand-lg navbar-dark" style=" background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">
-                    <div class="m-header">
-                        <a href="#!" class="b-brand" style="margin-left:-40px">
-                            <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-responsive"
-                            width="210" height="40">
-                        </a>
-                    </div>
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <div style="float:right;">
-                                <LoginDisplay />
-                            </div>
-                        </li>
-                    </ul>
-                </nav>*@
                 <LoginDisplay />
-                <SlideShow/>
+                <SlideShow />
             </NotAuthorized>
         </AuthorizeView>
 
-        
         <article class="content px-4">
             <CascadingValue TValue="AlertModel" Value="alerts">
                 <div style="margin-top:0px">
@@ -46,6 +32,7 @@
                 </div>
             </CascadingValue>
         </article>
+
     </main>
 </div>
 
