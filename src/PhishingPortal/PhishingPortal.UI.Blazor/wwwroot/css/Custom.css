@@ -413,6 +413,12 @@ imgs {
 }
 
 /*Havit multiSelect css*/
+.dropdown-menu[b-kjzuko47a2] {
+    width: 100%;
+    overflow: auto;
+    max-height: var(--hx-multi-select-dropdown-menu-height);
+}
+
 .dropdown-menu.show {
     max-width: 100%;
     max-height: 100px !important;
