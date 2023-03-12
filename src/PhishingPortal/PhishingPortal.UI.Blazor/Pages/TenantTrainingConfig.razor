@@ -56,13 +56,13 @@ else
                                             <div class="card-body">
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Name Of Training</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Campaigns</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaigns</label>
                                                     <div class="col-md-8">
                                                         <HxMultiSelect TItem="Campaign"
                                                                    AutoSort="false"
@@ -78,7 +78,7 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Is Active</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -105,7 +105,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Training Category<span style="color:red">*</span></label>
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
 
@@ -118,7 +118,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Schedule</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
                                                     <div class="col-md-5">
                                                         @if (isScheduled == false)
                                                         {
@@ -171,7 +171,7 @@ else
 
 
                                                 <div class="form-group row" id="UploadTrainingUsers">
-                                                    <label for="" class="col-form-label col-md-4">Import Training Recipients</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
                                                     <div class="col-md-8">
                                                         <div class="input-group">
                                                             <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -182,7 +182,7 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4">Training State</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
                                                     <div class="col-md-8">
                                                         @if (model.Id > 0 && model.State == TrainingState.Completed)
                                                         {
