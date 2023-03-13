@@ -153,3 +153,10 @@ section.samples {
         margin-left: 20px;
         min-width: 80px;
     }
+
+.report-link:hover {
+    color :yellow;
+}
+.report-link{
+    color: white;
+}
