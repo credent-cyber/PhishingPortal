@@ -421,5 +421,5 @@ imgs {
 
 .dropdown-menu.show {
     max-width: 100%;
-    max-height: 100px !important;
+    max-height: 180px !important;
 }
