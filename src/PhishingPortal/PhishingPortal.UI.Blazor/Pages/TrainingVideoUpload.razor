@@ -5,10 +5,12 @@
 @using System.ComponentModel.DataAnnotations;
 @using System.Linq
 @using System.Net.Http.Headers
+@using System.Text.Json;
+@using System.Text;
 @inject HttpClient Http
 @inject TenantClient client;
 @inject ILogger<Index> Logger
-
+@attribute [Authorize]
 
 <div class="row">
 
@@ -50,8 +52,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (trainingVideos != null)
-                            {
+@*                          @if (trainingVideos != null)
+                            {*@
                                 @foreach (var video in trainingVideos)
                                 {
                                     <tr role="row" class="odd">
@@ -60,7 +62,7 @@
                                         <td>@video.FilePath</td>
                                     </tr>
                                 }
-                            }
+                            @*}*@
                         </tbody>
                     </table>
                 </div>
@@ -78,11 +80,22 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
     public bool isDisabled = true;
+    private Timer _timer;
+    private int _delay = 1500;
     TrainingVideo model = new TrainingVideo();
-    IEnumerable<TrainingVideo> trainingVideos;
+    List<TrainingVideo> trainingVideos = new List<TrainingVideo>();
+
+    public void Init()
+    {
+        model = new TrainingVideo();
+    }
     protected override async Task OnInitializedAsync()
     {
-        trainingVideos = await client.GetTrainigVideo();
+        alert?.Clear();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        var video = await client.GetTrainigVideo();
+        trainingVideos = video.ToList();
+
     }
 
     private List<File> files = new();
@@ -92,22 +105,15 @@
     bool upload = false;
 
     protected override bool ShouldRender() => shouldRender;
-    MultipartFormDataContent Contents = new MultipartFormDataContent();
+    private InputFileChangeEventArgs inputFileEventArgs;
 
     private async Task Add()
     {
-
-    }
-
-
-    private async Task OnInputFileChange(InputFileChangeEventArgs e)
-    {
+        alert?.Clear();
         shouldRender = false;
-        long maxFileSize = 1024 * 150000;
-
+        long maxFileSize = 1024 * 150000; //150mb
         using var content = new MultipartFormDataContent();
-
-        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        foreach (var file in inputFileEventArgs.GetMultipleFiles(maxAllowedFiles))
         {
             if (uploadResults.SingleOrDefault(f => f.FileName == file.Name) is null)
             {
@@ -115,11 +121,9 @@
                 {
                     files.Add(new() { Name = file.Name });
 
-                    var fileContent =
-                    new StreamContent(file.OpenReadStream(maxFileSize));
+                    var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
 
-                    fileContent.Headers.ContentType =
-                    new MediaTypeHeaderValue(file.ContentType);
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
 
                     content.Add(
                     content: fileContent,
@@ -141,25 +145,37 @@
                             ErrorCode = 6,
                             Uploaded = false
                         });
+                    alert?.SetError("Error while saving");
                 }
             }
         }
-        Contents = content;
         if (upload)
         {
             var response = await Http.PostAsync("api/filesave", content);
 
-            var newUploadResults = await response.Content
-            .ReadFromJsonAsync<IList<UploadResult>>();
-
+            var newUploadResults = await response.Content.ReadFromJsonAsync<IList<UploadResult>>();
             if (newUploadResults is not null)
             {
                 uploadResults = uploadResults.Concat(newUploadResults).ToList();
             }
         }
-
+        var filePath = uploadResults[0].FileLocation;
+        model.FilePath = filePath;
+        var result = await client.UpsertTrainingVideo(model);
         shouldRender = true;
         upload = false;
+        alert?.SetSuccess("Successfully Saved!");
+        Init();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+
+    }
+
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        shouldRender = false;
+        long maxFileSize = 1024 * 150000;
+        inputFileEventArgs = e;
     }
 
     private static bool FileUpload(IList<UploadResult> uploadResults,
@@ -180,5 +196,11 @@
     {
         public string? Name { get; set; }
     }
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
 
+    }
 }

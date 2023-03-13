@@ -2,6 +2,7 @@
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using PhishingPortal.UI.Blazor.Pages;
 using System;
 using System.Net.Http.Json;
 
@@ -723,6 +724,24 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return trainigVideo;
+        }
+        public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
+        {
+            TrainingVideo result;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/upsert-trainingVideo", trainingVideo);
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<TrainingVideo>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
         }
     }
 }

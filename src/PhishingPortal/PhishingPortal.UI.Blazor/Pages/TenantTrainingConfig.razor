@@ -53,14 +53,14 @@ else
                                             <div class="card-body">
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
                                                         <ValidationMessage For="() => model.TrainingName" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaigns</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Campaigns</label>
                                                     <div class="col-md-8">
                                                         <HxMultiSelect TItem="Campaign"
                                                                    AutoSort="false"
@@ -75,7 +75,19 @@ else
                                                     @*<p class="mt-3">Selected initials: @String.Join(' ', SelectedCampaigns)</p>*@
                                                     <ValidationMessage For="() => SelectedCampaigns" />
                                                 </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Training Video</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.TrainingVideo" class="form-control" id="TrainingVideo">
 
+                                                            <option>-Select-</option>
+                                                            @foreach (var v in trainingVideos)
+                                                            {
+                                                                <option value="@v.FilePath">@v.VideoTitle</option>                                                               
+                                                            }
+                                                        </InputSelect>
+                                                    </div>
+                                                </div>
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
@@ -211,7 +223,7 @@ else
 
 
                                             <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
                                                 <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
 
                                                 @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
@@ -224,12 +236,12 @@ else
                                                 }
                                                 @if (model.State == TrainingState.Draft && model.Id > 0)
                                                 {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
                                                 }
 
                                                 @if (model.State == TrainingState.Published)
                                                 {
-                                                    <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
                                                 }
 
                                             </div>
@@ -317,7 +329,7 @@ else
             return model?.Id > 0 ? "Modify Training" : "Create New Training";
         }
     }
-  string Message = string.Empty;
+    string Message = string.Empty;
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
@@ -338,10 +350,26 @@ else
     private List<int> SelectedCampaigns { get; set; } = new();
     private List<Campaign> campaigns;
     Training model;
+    IEnumerable<TrainingVideo> trainingVideos;
+
+    public void Init()
+    {
+        Message = string.Empty;
+        model = new Training()
+            {
+                TrainingSchedule = new TrainingSchedule
+                {
+                    ScheduleType = ScheduleTypeEnum.NoSchedule,
+                    WillRepeat = false
+                }
+            };
+        TrainingScheduleOff.Date = DateTime.Now.Date;
+    }
 
     protected override async Task OnInitializedAsync()
     {
         campaigns = await client.GetCampaignsNames();
+        trainingVideos = await client.GetTrainigVideo();
         if (Id != 0)
         {
             Message = string.Empty;
@@ -361,16 +389,7 @@ else
         }
         else
         {
-            Message = string.Empty;
-            model = new Training()
-            {
-                    TrainingSchedule = new TrainingSchedule
-                    {
-                        ScheduleType = ScheduleTypeEnum.NoSchedule,
-                        WillRepeat = false
-                    }
-            };
-            TrainingScheduleOff.Date = DateTime.Now.Date;
+            Init();
         }
 
     }
@@ -754,9 +773,8 @@ else
         show = false;
         if (Message.Contains("Successfully Added"))
         {
-            //model = new Training();
-            //contents = string.Empty;
-            //model.Content = null;
+            Init();
+            SelectedCampaigns.Clear();
         }
     }
     private void CloseDailogBox()

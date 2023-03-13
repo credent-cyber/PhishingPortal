@@ -12,5 +12,6 @@ namespace PhishingPortal.Dto
         public string? FileName { get; set; }
         public string? StoredFileName { get; set; }
         public int ErrorCode { get; set; }
+        public string FileLocation { get; set; }
     }
 }

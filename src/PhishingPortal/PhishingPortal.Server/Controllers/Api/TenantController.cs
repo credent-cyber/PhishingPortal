@@ -621,6 +621,13 @@ namespace PhishingPortal.Server.Controllers.Api
                 throw;
             }
         }
+        [HttpPost]
+        [Route("upsert-trainingVideo")]
+        public async Task<TrainingVideo> UpsertTrainingVideoDetail(TrainingVideo trainingVideo)
+        {
+
+            return await _tenantRepository.UpsertTrainingVideo(trainingVideo);
+        }
 
     }
 }

@@ -17,23 +17,23 @@ public class FilesaveController : ControllerBase
 {
     private readonly IWebHostEnvironment env;
     private readonly ILogger<FilesaveController> logger;
-    readonly TenantRepository _tenantRepository;
-    public TenantDbContext TenantDbCtx { get; private set; }
+    private readonly IConfiguration configuration;
 
-    public FilesaveController(IWebHostEnvironment env, ILogger<FilesaveController> logger)
+    public FilesaveController(IWebHostEnvironment env, ILogger<FilesaveController> logger, IConfiguration configuration)
     {
         this.env = env;
         this.logger = logger;
-        _tenantRepository = new TenantRepository(logger, TenantDbCtx);
+        this.configuration = configuration;
     }
 
     [HttpPost]
-    public async Task<ActionResult<IList<UploadResult>>> PostFile([FromForm] IEnumerable<IFormFile> files, TrainingVideo video)
+    public async Task<ActionResult<IList<UploadResult>>> PostFile([FromForm] IEnumerable<IFormFile> files)
     {
         var maxAllowedFiles = 3;
         long maxFileSize = 1024 * 150000;
         var filesProcessed = 0;
         var resourcePath = new Uri($"{Request.Scheme}://{Request.Host}/");
+        var TrainingVideoLocation = configuration.GetValue<string>("TrainingVideoPath");
         List<UploadResult> uploadResults = new();
 
         foreach (var file in files)
@@ -42,8 +42,7 @@ public class FilesaveController : ControllerBase
             string trustedFileNameForFileStorage;
             var untrustedFileName = file.FileName;
             uploadResult.FileName = untrustedFileName;
-            var trustedFileNameForDisplay =
-                WebUtility.HtmlEncode(untrustedFileName);
+            var trustedFileNameForDisplay = WebUtility.HtmlEncode(untrustedFileName);
 
             if (filesProcessed < maxAllowedFiles)
             {
@@ -64,11 +63,11 @@ public class FilesaveController : ControllerBase
                 {
                     try
                     {
-                        //random name generator
-                        trustedFileNameForFileStorage = Path.GetRandomFileName(); //env.EnvironmentName(Development Path)
-                        var path = Path.Combine(env.ContentRootPath,
-                            env.EnvironmentName, "unsafe_uploads",
-                            trustedFileNameForFileStorage);
+                        trustedFileNameForFileStorage = Path.GetRandomFileName();
+                        //var path = Path.Combine(env.ContentRootPath,
+                        //    env.EnvironmentName, "unsafe_uploads",
+                        //    trustedFileNameForFileStorage);
+                        var path = Path.Combine(env.ContentRootPath, TrainingVideoLocation, untrustedFileName);
 
                         await using FileStream fs = new(path, FileMode.Create);
                         await file.CopyToAsync(fs);
@@ -77,6 +76,7 @@ public class FilesaveController : ControllerBase
                             trustedFileNameForDisplay, path);
                         uploadResult.Uploaded = true;
                         uploadResult.StoredFileName = trustedFileNameForFileStorage;
+                        uploadResult.FileLocation = path;
 
                         // var result = await _tenantRepository.UpsertTrainingVideo(trainingVideo);
                     }
@@ -99,6 +99,7 @@ public class FilesaveController : ControllerBase
             }
 
             uploadResults.Add(uploadResult);
+
         }
 
         return new CreatedResult(resourcePath, uploadResults);

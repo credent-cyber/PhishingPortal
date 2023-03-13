@@ -66,6 +66,7 @@
 
 	<ItemGroup>
 	  <Folder Include="logs\" />
+	  <Folder Include="TrainingVideo\" />
 	</ItemGroup>
 
 
