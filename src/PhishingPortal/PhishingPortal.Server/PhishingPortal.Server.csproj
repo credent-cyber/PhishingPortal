@@ -19,6 +19,7 @@
 		<PackageReference Include="Azure.Identity" Version="1.6.1" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
 		<PackageReference Include="Microsoft.AspNet.OData" Version="7.5.17" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.13" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(AspNetCoreVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="$(AspNetCoreVersion)" />
@@ -33,6 +34,9 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
+		<PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
+		<PackageReference Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.10" />
 		<PackageReference Include="Microsoft.Graph" Version="4.36.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.4.0" />
