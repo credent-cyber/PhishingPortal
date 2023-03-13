@@ -119,43 +119,43 @@ namespace PhishingPortal.OutlookAddin.Pages
 
         public async void Forward()
         {
-            //// var input = "https://phishsims.com/cmpgn/PhishSim-T-20220908134615/7794bb787c99639457ff50136e40f9b7";
-            //var input = "https://localhost:7018/cmpgn/T-20220619003439/78d49cb73871d59b32119b8b9db47e3d";
+            var BaseUrl2 = Configuration.GetValue<string>("ApiBaseUrl");
 
-            ////  string parts = input.Split("https://phishsims.com/cmpgn/")[1];
-            //string parts = input.Split("https://localhost:7018/cmpgn/")[1];
-            //string TenantId = parts.Split('/')[0];
-            //string Key = parts.Split('/')[1];
-            ////////////
-            //var BaseUrl = "https://phishsims.com/";
-            //var BaseUrl1 = "https://localhost:7018/";
-            ////var BaseUrl = Configuration.GetValue<string>("ApiBaseUrl");
-            //var client = new HttpClient();
-            //client.BaseAddress = new Uri(BaseUrl1);
-            //client.DefaultRequestHeaders.Accept.Clear();
-            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            //var input = "https://localhost:7018/T-20220619003439/9b2d0d09d79a8c53ab51a9b0fe423de0";
+            var input = WebLink;
+            //  string parts = input.Split("https://phishsims.com/cmpgn/")[1];
+            string parts = input.Split("https://localhost:7018/")[1];
+            string TenantId = parts.Split('/')[0];
+            string Key = parts.Split('/')[1];
+            //////////
+            var BaseUrl = "https://phishsims.com/";
+            var BaseUrl1 = "https://localhost:7018/";
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(BaseUrl1);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            //var request = new GenericApiRequest<string> { Param = Key };
-            //var json = JsonSerializer.Serialize(request);
-            //var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var request = new GenericApiRequest<string> { Param = Key };
+            var json = JsonSerializer.Serialize(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            //var response = await client.PostAsync($"api/tenant/campaign-spam-report?t={TenantId}", content);
-            //var responseJson = await response.Content.ReadAsStringAsync();
-            //var result = JsonSerializer.Deserialize<ApiResponse<string>>(responseJson);
+            var response = await client.PostAsync($"api/tenant/campaign-spam-report?t={TenantId}", content);
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<ApiResponse<string>>(responseJson);
 
-            //if (result.IsSuccess)
-            //{
-            //    Responce = true;
-            //}
-            //else
-            //{
-            //    Responce = true;
-            //}
+            if (result.IsSuccess)
+            {
+                Responce = true;
+            }
+            else
+            {
+                Responce = false;
+            }
 
             ///////////
 
-            var a = true;
-            Responce = a == true ? true : false;
+            //var a = true;
+            //Responce = a == true ? true : false;
 
             EmailForward = true;
             StateHasChanged();

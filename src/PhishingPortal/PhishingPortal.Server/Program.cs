@@ -43,6 +43,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
+
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
@@ -113,6 +114,17 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", builder =>
+    {
+        builder.WithOrigins("https://localhost:7002")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
+
 builder.Services.AddSingleton<IEmailClient, SmtpEmailClient>();
 builder.Services.AddTransient<IdentityUIServices.IEmailSender, EmailSender>();
 
@@ -159,7 +171,7 @@ app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ODataDemo v1"));
 
 
-
+app.UseCors("AllowSpecificOrigin");
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();

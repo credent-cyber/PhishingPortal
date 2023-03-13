@@ -15,7 +15,7 @@ builder.Services.AddSingleton(sp =>
     });
 
 
-//builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddJsonFile("appsettings.json");
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 
