@@ -13,6 +13,7 @@ using PhishingPortal.Server.Services;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Web.Http.Results;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
@@ -25,6 +26,7 @@ namespace PhishingPortal.Server.Controllers.Api
         readonly TenantRepository _tenantRepository;
         readonly string _templateImageRootPath;
         readonly IAzActDirClientService _adImportClient;
+        readonly ITrainingRepository TrainingRepository;
 
         public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
             IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
@@ -35,6 +37,7 @@ namespace PhishingPortal.Server.Controllers.Api
             _templateImageRootPath = appConfig.GetValue<string>("TemplateImgRootPath");
 
             _adImportClient = new AzActDirClientService(logger, _tenantRepository);
+            TrainingRepository = new TrainingRepository(logger, TenantDbCtx);
         }
 
         [HttpGet]
@@ -563,6 +566,58 @@ namespace PhishingPortal.Server.Controllers.Api
             var result = await _tenantRepository.GetYearList();
             return result.ToList();
         }
+
+        #region MyTraining
+
+        [HttpGet]
+        [Route("GetMyTrainings")]
+        public async Task<List<MyTraining>> GetMyTrainings()
+        {
+            var output = new List<MyTraining>();
+            
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                 Forbid("Unauthorized user");
+
+            var result = await TrainingRepository.GetMyTrainings(email);
+
+            foreach(var r in result)
+            {
+                output.Add(new MyTraining()
+                {
+                    Training = r.Training,
+                    TrainingLog = r.TrainingLog
+                });
+            }
+
+            return output;
+        }
+
+        [HttpGet]
+        [Route("GetTrainingByUniqueId")]
+        public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingByUniqueId(string uniqueID)
+        {
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                Forbid("Unauthorized user");
+
+            return await TrainingRepository.GetTrainingByUniqueID(new Guid(uniqueID), email);
+        }
+
+        [HttpPost]
+        [Route("UpdateTrainingProgress")]
+        public async Task<TrainingLog> UpdateTrainingProgress([FromBody] TrainingProgress progres)
+        {
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                throw new InvalidOperationException("User not authorized");
+
+            return await TrainingRepository.UpdateTrainingProgress(new Guid(progres.UniqueID), progres.Value, email);
+        }
+        #endregion
 
 
     }

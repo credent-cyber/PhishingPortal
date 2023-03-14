@@ -1,0 +1,34 @@
+﻿@page "/training/details/{Id}"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+
+@attribute [AllowAnonymous]
+
+@inject TenantClient client
+@inject HttpClient httpClient;
+@inject NavigationManager navigation
+
+<h4>Training Details</h4>
+<h5>Training Title</h5>
+<p>Training Description</p>
+<label>Status</label>
+<label>Percent Complete : 0%</label>
+<button @onclick="LaunchTraining">Launch</button>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.CompletedTask;
+    }
+    
+    private void LaunchTraining()
+    {
+        // launch training in a new window
+    }
+
+}

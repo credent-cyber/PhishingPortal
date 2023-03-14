@@ -45,4 +45,18 @@ namespace PhishingPortal.Dto.Dashboard
         //}
     }
 
+    public class MyTraining
+    {
+        public Training Training { get; set; }
+        public TrainingLog TrainingLog { get; set; }
+
+    }
+
+    public class TrainingProgress
+    {
+        public string  UniqueID { get; set; }
+        public decimal  Value { get; set; }
+        public string CheckPoint { get; set; }
+    }
+
 }

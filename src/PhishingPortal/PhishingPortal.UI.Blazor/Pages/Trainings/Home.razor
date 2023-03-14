@@ -1,0 +1,35 @@
+﻿@page "/training/my-trainings"
+@using PhishingPortal.UI.Blazor.Client
+
+
+@inject TenantClient tenantClient
+
+<h3>My Trainings</h3>
+
+<ul>
+    @foreach (var training in myTrainings)
+    {
+        <li>
+            @training.Training.TrainingName | @training.TrainingLog.PercentCompleted | @training.TrainingLog.Status 
+
+            @if(training.TrainingLog.Status != "COMPLETED"){
+                <a href="/training/details/@training.TrainingLog.UniqueID">Launch</a>
+            }
+
+        </li>
+
+
+    }
+
+</ul>
+
+@code {
+
+    private List<MyTraining> myTrainings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        myTrainings = await tenantClient.GetMyTrainings();
+    }
+
+}

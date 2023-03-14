@@ -644,5 +644,61 @@ namespace PhishingPortal.UI.Blazor.Client
             }
             return years;
         }
+
+        public async Task<List<MyTraining>> GetMyTrainings()
+        {
+            var myTrainings = new List<MyTraining>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetMyTrainings");
+                res.EnsureSuccessStatusCode();
+                myTrainings = await res.Content.ReadFromJsonAsync<List<MyTraining>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return myTrainings;
+        }
+
+        public async Task<List<(Training Training, TrainingLog TrainingLog)>> GetTrainingDetails(string uniqueID)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
+                res.EnsureSuccessStatusCode();
+                return await res.Content.ReadFromJsonAsync<List<(Training Training, TrainingLog TrainingLog)>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<TrainingProgress>($"api/tenant/UpdateTrainingProgress", new TrainingProgress
+                {
+                    UniqueID = uniqueID,
+                    CheckPoint = checkpoint,
+                    Value = percentage
+                });
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<TrainingLog>();
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }
