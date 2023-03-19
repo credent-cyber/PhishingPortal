@@ -743,5 +743,26 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return result;
         }
+
+        public async Task<List<Training>> GetAllTrainings()
+        {
+            List<Training> training;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetTrainings");
+
+                res.EnsureSuccessStatusCode();
+
+                training = await res.Content.ReadFromJsonAsync<List<Training>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return training;
+        }
     }
 }

@@ -629,5 +629,21 @@ namespace PhishingPortal.Server.Controllers.Api
             return await _tenantRepository.UpsertTrainingVideo(trainingVideo);
         }
 
+        [HttpGet]
+        [Route("GetTrainings")]
+        public async Task<List<Training>> GetAllTrainings()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetAllTraining();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
     }
 }

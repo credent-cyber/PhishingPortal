@@ -1285,6 +1285,16 @@ namespace PhishingPortal.Repositories
             }
             return await Task.FromResult(trainingVideo);
         }
+
+        public async Task<List<Training>> GetAllTraining()
+        {
+            int currentYear = DateTime.Now.Year;
+            int previousYear = currentYear - 1;
+            var result = Enumerable.Empty<Training>();
+            //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
+            result = TenantDbCtx.Training.OrderByDescending(o => o.Id).ToList();
+            return (List<Training>)result;
+        }
     }
 
 }

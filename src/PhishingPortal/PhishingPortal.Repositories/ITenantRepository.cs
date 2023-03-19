@@ -32,7 +32,7 @@ namespace PhishingPortal.Repositories
         Task<TrainingStatics> GetLastTrainingStatics();
         Task<Campaign> GetCampaignByName(string name);
         Task<List<int>> GetYearList();
-
+        Task<List<Training>> GetAllTraining();
 
     }
 }

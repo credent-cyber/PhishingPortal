@@ -33,6 +33,7 @@ namespace PhishingPortal.DataContext
         public DbSet<TrainingRecipients> TrainingRecipient { get; set; }
         public DbSet<TrainingCompaignMapping> TrainingCompaignMapping { get; set; }
         public DbSet<TrainingVideo> TrainingVideoPath { get; set; }
+        public DbSet<TrainingQuiz> TrainingQuiz { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
