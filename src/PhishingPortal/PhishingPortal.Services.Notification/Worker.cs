@@ -84,7 +84,7 @@ namespace PhishingPortal.Services.Notification
             _demoRequestHandler.Start();
             _campaignExecutor.Start();
             _smsExecutor.Start();
-            // _whatsappCampaignExecutor.Start();
+            _whatsappCampaignExecutor.Start();
             _trainingExecutor.Start();
 
             while (!stoppingToken.IsCancellationRequested)
@@ -124,9 +124,9 @@ namespace PhishingPortal.Services.Notification
                                      await _smsProvider.CheckAndPublish(stoppingToken);
 
                                      // whatsapp provider 
-                                     //var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
-                                     //_waProvider.Subscribe(_whatsappCampaignExecutor);
-                                     //await _waProvider.CheckAndPublish(stoppingToken);
+                                     var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
+                                     _waProvider.Subscribe(_whatsappCampaignExecutor);
+                                     await _waProvider.CheckAndPublish(stoppingToken);
 
                                      //training provider
                                      var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager);

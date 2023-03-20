@@ -13,10 +13,10 @@ namespace PhishingPortal.Dto
     {
         [Required]
         public string Name { get; set; }
-        [Required]
+        //[Required]
         public string Description { get; set; }
 
-        [Required]
+        //[Required]
         public string Subject { get; set; }
 
         [Required]
@@ -34,11 +34,11 @@ namespace PhishingPortal.Dto
 
         [ForeignKey("CampaignScheduleId")]
         public virtual CampaignSchedule Schedule { get; set; }
-        [Required]
+        //[Required]
         public string ReturnUrl { get; set; }
 
-        [Required]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+        //[Required]
+        //[EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         public string FromEmail { get; set; }
 
     }
