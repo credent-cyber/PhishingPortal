@@ -4,6 +4,7 @@ CREATE TABLE Training (
   Id int NOT NULL auto_increment UNIQUE,
   TrainingName varchar(45) NOT NULL,
   TrainingCategory varchar(45) NOT NULL,
+  TrainingVideo varchar(255) NOT NULL,
   Content LONGTEXT NOT NULL,
   IsActive bool,
   State int,
