@@ -16,6 +16,7 @@ namespace PhishingPortal.Dto
         public string Content { get; set; }
         [Required]
         public string TrainingCategory { get; set; }
+        public string TrainingVideo { get; set; }
         public TrainingState State { get; set; }
 
         public int TrainingScheduleId { get; set; }

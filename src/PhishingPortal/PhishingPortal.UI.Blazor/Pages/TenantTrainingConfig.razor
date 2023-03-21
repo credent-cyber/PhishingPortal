@@ -5,16 +5,16 @@
 @using PhishingPortal.UI.Blazor.Client
 @using System.Text.RegularExpressions
 @using PhishingPortal.UI.Blazor.Pages
-@inject NavigationManager NavigationManager
 @using PhishingPortal.UI.Blazor.Shared.TenantCampaingConfig
+@using PhishingPortal.Common
+@using BlazingComponents.Summernote
+@using System.ComponentModel.DataAnnotations;
 
+@inject NavigationManager NavigationManager
 @inject TenantClient client
 @inject ILogger<TenantTraining> logger
 @inject IJSRuntime JSRuntime
-@using BlazingComponents.Summernote
 @inject HttpClient Http
-@using PhishingPortal.Common
-@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 @if (model == null)
@@ -49,15 +49,43 @@ else
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnSave">
                                         <DataAnnotationsValidator />
-                                        @*<ValidationSummary />*@
                                         <div class="card">
                                             <div class="card-body">
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Training</label>
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Name Of Training</label>
                                                     <div class="col-md-8">
-                                                        <InputText id="TrainingName" @bind-Value="model.TrainingName" class="form-control" />
+                                                        <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
                                                         <ValidationMessage For="() => model.TrainingName" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Campaigns</label>
+                                                    <div class="col-md-8">
+                                                        <HxMultiSelect TItem="Campaign"
+                                                                   AutoSort="false"
+                                                                   TValue="int"
+                                                                   Data="@campaigns"
+                                                                   @bind-Value="@SelectedCampaigns"
+                                                                   TextSelector="@(p => p.Name)"
+                                                                   ValueSelector="@(p => p.Id)"
+                                                                   EmptyText="- select -"
+                                                                   NullDataText="Loading..." />
+                                                    </div>
+                                                    @*<p class="mt-3">Selected initials: @String.Join(' ', SelectedCampaigns)</p>*@
+                                                    <ValidationMessage For="() => SelectedCampaigns" />
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Training Video</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.TrainingVideo" class="form-control" id="TrainingVideo">
+
+                                                            <option>-Select-</option>
+                                                            @foreach (var v in trainingVideos)
+                                                            {
+                                                                <option value="@v.FilePath">@v.VideoTitle</option>                                                               
+                                                            }
+                                                        </InputSelect>
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
@@ -92,7 +120,7 @@ else
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
 
-                                                            <option>- Select -</option>
+                                                            <option>-Select-</option>
                                                             <option value="Category1">Category1</option>
                                                             <option value="Category2">Category2</option>
                                                             <option value="Category3">Category3</option>
@@ -229,7 +257,7 @@ else
                                                 <label for="Content" class="form-label">Contents</label>
                                                 <div class="overflow-auto">
                                                     <!-- Rich text editor -->
-                                                    <BlazingComponents.Summernote.Editor/>
+                                                    <BlazingComponents.Summernote.Editor />
                                                 </div>
                                             </div>
                                         </div>
@@ -247,7 +275,7 @@ else
         </div>
     </div>
     <div>
-        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
             @if (showRecipientss)
             {
                 <Recipients DataList="@recipients"></Recipients>
@@ -259,7 +287,7 @@ else
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
@@ -291,7 +319,7 @@ else
 
     [Parameter]
     public int Id { get; set; }
-    private string contents;
+    private string contents = "";
     private bool show = false;
 
     public string Title
@@ -317,22 +345,35 @@ else
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
 
-    List<Training> training;
+    Dictionary<int, List<int>> trainingCampIds = new Dictionary<int, List<int>>();
+    [Required]
+    private List<int> SelectedCampaigns { get; set; } = new();
+    private List<Campaign> campaigns;
     Training model;
+    IEnumerable<TrainingVideo> trainingVideos;
+
+    public void Init()
+    {
+        Message = string.Empty;
+        model = new Training()
+            {
+                TrainingSchedule = new TrainingSchedule
+                {
+                    ScheduleType = ScheduleTypeEnum.NoSchedule,
+                    WillRepeat = false
+                }
+            };
+        TrainingScheduleOff.Date = DateTime.Now.Date;
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        // training = await client.GetTemplatesByType(type);
+        campaigns = await client.GetCampaignsNames();
+        trainingVideos = await client.GetTrainigVideo();
         if (Id != 0)
         {
             Message = string.Empty;
             model = await client.GetTrainingById(Id);
-            await LoadRecipeints(model.Id);
-            //if (fileimport.Count() > 0)
-            //{
-            //    sources = RecipientSources.Imported;
-            //}
-
             contents = model.Content;
             if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
                 TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
@@ -343,19 +384,12 @@ else
             {
                 isScheduled = true;
             }
+            var trainingCampaignsIds = await client.GetTrainingCampaignIDs(model.Id);
+            SelectedCampaigns.AddRange(trainingCampaignsIds.Select(tc => tc.CampaignId));
         }
         else
         {
-            Message = string.Empty;
-            model = new Training()
-                {
-                    TrainingSchedule = new TrainingSchedule
-                    {
-                        ScheduleType = ScheduleTypeEnum.NoSchedule,
-                        WillRepeat = false
-                    }
-                };
-
+            Init();
         }
 
     }
@@ -386,17 +420,29 @@ else
         IsError = false;
         IsSuccess = false;
         message = string.Empty;
-        show = true;
         try
         {
 
             if (model.Id > 0)
             {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
+
                 Message = "Successfully Updated";
                 model.ModifiedOn = DateTime.Now;
             }
             else
             {
+                if (model.TrainingName is null)
+                {
+                    IsError = true;
+                    message = "Training Name, Training Type can't be null!";
+                    return;
+                }
                 Message = "Successfully Added";
                 model.CreatedOn = DateTime.Now;
             }
@@ -410,6 +456,20 @@ else
                 await OnImportRecipientClick();
             }
 
+            if (model.Id > 0)
+            {
+                //trainingCampIds.Add(model.Id, new List<int>());
+                if (trainingCampIds.ContainsKey(model.Id))
+                {
+                    trainingCampIds[model.Id] = SelectedCampaigns.Select(id => id).ToList();
+                }
+                else
+                {
+                    trainingCampIds.Add(model.Id, SelectedCampaigns.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertTRainingCampIDsMap(trainingCampIds);
+            }
             IsSuccess = true;
 
         }
@@ -419,8 +479,8 @@ else
             Message = ex.Message;
             logger.LogCritical(ex, ex.Message);
         }
-
         loading = false;
+        show = true;
 
     }
 
@@ -445,14 +505,8 @@ else
         return result;
     }
 
-    List<ImageFile> filesBase64 = new List<ImageFile>();
     string message = "";
     bool isDisabled = false;
-
-
-
-
-
     bool HasHeader = true;
     bool isloading = false;
     bool showRecipients = false;
@@ -614,8 +668,8 @@ else
         {
             var data = await client.ImportRecipientToTraining(model.Id, recipients);
             recipients = data;
-            //IsSuccess = true;
-            //message = "Successfully imported";
+            IsSuccess = true;
+            message = "Successfully imported";
         }
         catch (Exception ex)
         {
@@ -639,8 +693,7 @@ else
         {
             if (model.Id > 0)
             {
-                //await LoadRecipeints(model.Id);
-                recipients = fileimport;
+                await LoadRecipeints(model.Id);
             }
             else
             {
@@ -686,7 +739,7 @@ else
     {
         var data = await client.GetRecipientByTrainingId(id);
 
-        fileimport = recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
     }
 
     protected async Task OnPublishClick()
@@ -720,9 +773,8 @@ else
         show = false;
         if (Message.Contains("Successfully Added"))
         {
-            //model = new Training();
-            //contents = string.Empty;
-            //model.Content = null;
+            Init();
+            SelectedCampaigns.Clear();
         }
     }
     private void CloseDailogBox()
@@ -730,4 +782,6 @@ else
         showRecipients = false;
         showRecipientss = false;
     }
+
+
 }
