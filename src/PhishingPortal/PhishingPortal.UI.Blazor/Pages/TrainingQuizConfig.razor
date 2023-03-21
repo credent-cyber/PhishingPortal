@@ -63,12 +63,9 @@ else
                     <div class="table-responsive mt-3">
 
 
+
                         <table class="table table-striped table-bordered nowrap">
                             <tbody>
-                                @if (TrainingQuiz == null || TrainingQuiz.Count == 0)
-                                {
-                                    TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 } };
-                                }
                                 @foreach (var trainingQuiz in TrainingQuiz)
                                 {
                                     <tr>
@@ -169,6 +166,7 @@ else
     private bool show = false;
     private List<Training> training = new();
     TrainingQuiz model = new();
+
     public string Title
     {
         get
@@ -180,7 +178,6 @@ else
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
-    string message = "";
     bool isloading = false;
     private List<TrainingQuiz> TrainingQuiz { get; set; } = new List<TrainingQuiz>();
 
@@ -189,17 +186,44 @@ else
     {
         Message = string.Empty;
         model = new TrainingQuiz() { };
+        TrainingQuiz.Clear();
+        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 } };
     }
 
     protected override async Task OnInitializedAsync()
     {
+        if (Id > 0)
+        {
+            var Data = await client.GetTrainingQuizById(Id);
+            TrainingQuiz = Data.ToList();
+            model.Id = TrainingQuiz[0].Id;
+            model.OrderNumber = TrainingQuiz[0].OrderNumber;
+            model.TrainingId = TrainingQuiz[0].TrainingId;
+            model.IsActive = TrainingQuiz[0].IsActive;
+
+            //var Data = await client.GetTrainingQuizById(Id);
+            //if (Data == null)
+            //{
+            //    TrainingQuiz = Data.ToList();
+            //}
+
+            //var trainingQuiz = Data.FirstOrDefault();
+            //if (trainingQuiz != null)
+            //{
+            //    model.OrderNumber = trainingQuiz.OrderNumber;
+            //    model.TrainingId = trainingQuiz.TrainingId;
+            //    model.IsActive = trainingQuiz.IsActive;
+            //}
+        }
+        else
+        {
+            Init();
+        }
         training = await client.GetAllTrainings();
-        Init();
     }
     private void AddParent()
     {
         TrainingQuiz.Add(new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 });
-
     }
 
     private void RemoveParent(TrainingQuiz trainingQuiz)
@@ -221,17 +245,27 @@ else
         loading = true;
         IsError = false;
         IsSuccess = false;
-        message = string.Empty;
+        show = false;
+        Message = string.Empty;
+
+        if (TrainingQuiz.Any(quiz => quiz.Id == 0))
+        {
+            loading = false;
+            IsError = true;
+            show = true;
+            Message = "Empty input field!";
+            return;
+        }
 
         try
         {
-            if (model.Id > 0)
+            if (model.Id != 0)
             {
-                message = "Successfully Updated";
+                Message = "Successfully Updated";
             }
             else
             {
-                message = "Successfully Added";
+                Message = "Successfully Added";
             }
             foreach (var quiz in TrainingQuiz)
             {
@@ -239,8 +273,8 @@ else
                 quiz.TrainingId = model.TrainingId;
                 quiz.IsActive = model.IsActive;
             }
-            var Data = TrainingQuiz;
-           // Data = await client.UpsertTrainingQuizAsync(Data);
+            TrainingQuiz = await client.UpsertTrainingQuizAsync(TrainingQuiz);
+            IsSuccess = true;
         }
         catch (Exception ex)
         {
@@ -265,7 +299,6 @@ else
         if (Message.Contains("Successfully Added"))
         {
             Init();
-            //SelectedCampaigns.Clear();
         }
     }
     private void CloseDailogBox()

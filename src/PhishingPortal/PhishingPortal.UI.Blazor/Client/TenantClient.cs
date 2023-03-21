@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
@@ -763,6 +765,45 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return training;
+        }
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizAsync(List<TrainingQuiz> trainingQuiz)
+        {
+            List<TrainingQuiz> result = null;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertTrainingQuiz", trainingQuiz);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingQuiz>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return result;
+
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        {
+            IEnumerable<TrainingQuiz> result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/TrainingQuiz-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
         }
     }
 }

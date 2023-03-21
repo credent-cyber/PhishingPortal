@@ -14,6 +14,7 @@ namespace PhishingPortal.Dto
         public int TrainingId { get; set; }
         [Required]
         public string Question { get; set; }
+        [NotMapped]
         public int QuestionNumber { get; set; }
         public string AnswerType { get; set; }
         public int OrderNumber { get; set; }
