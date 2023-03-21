@@ -4,8 +4,6 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 {
     internal class DealWhatsAppGatewayClient : IWhatsappGatewayClient
     {
-
-        //https://dealsms.in/api/send.php?number=91xxxxxxxxxx&type=media&message=test%20message&media_url=https://drjsharanlab.com/report/1560260_9430152159.pdf&filename=rahul.pdf&instance_id=63E5F247D7D9D&access_token=783c698eef4306a2d370c9de3862744c
         private readonly HttpClient httpClient_;
         public DealWhatsAppGatewayClient(ILogger<DealWhatsAppGatewayClient> logger, DealWhatsAppGatewayClientConfig config)
         {
@@ -39,7 +37,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
             {
                 var uri = $"{Config.BaseUrl}/api/send.php?number={to}&type=media&message={message}";
 
-                if (!string.IsNullOrEmpty(mediaUrl))
+                if (!string.IsNullOrEmpty(mediaUrl) && !string.IsNullOrEmpty(file))
                 {
                     uri += $"&media_url={mediaUrl}&filename={file}";
                 }

@@ -3,8 +3,8 @@
     internal class DealWhatsAppGatewayClientConfig
     {
         public string BaseUrl { get; set; } = "https://dealsms.in";
-        public string InstanceId { get; set; } = "63E5F247D7D9D";
-        public string AccessToken { get; set; } = "783c698eef4306a2d370c9de3862744c";
+        public string InstanceId { get; set; } = "641864A8AA901";
+        public string AccessToken { get; set; } = "6511cc6939dc30cff0874eac82c8121b";
         public bool IsEnabled { get; set; } = true;
 
         public DealWhatsAppGatewayClientConfig(ILogger<DealWhatsAppGatewayClientConfig> logger, IConfiguration appsettings)
