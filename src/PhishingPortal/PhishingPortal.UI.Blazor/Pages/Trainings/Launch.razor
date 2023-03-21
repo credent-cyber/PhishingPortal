@@ -1,17 +1,170 @@
-﻿@page "/training/launch/{Id}"
+﻿@page "/training/launch/{UniqueID}"
 
-<h3>Launch</h3>
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Blazored.Video
+@using Blazored.Video.Support
+
+@attribute [Authorize]
+
+@inject TenantClient client
+@inject HttpClient httpClient;
+@inject NavigationManager navigation
+@inject ILogger<Detail> logger;
+
+<h4>Training Details</h4>
+
+@if (!string.IsNullOrEmpty(errorMessage_))
+{
+    <div class="alert alert-danger">@errorMessage_</div>
+}
+
+@if (training_ != null)
+{
+    <h5>Training Title</h5>
+    <p>Training Description</p>
+    <label>Status</label>
+
+    if (mode_ == Mode.Video)
+    {
+       <div class="card">
+            <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
+               EventFired="OnEvent"
+               VideoEventOptions="options"
+               class="w-100"
+               autoplay="autoplay"
+               style="max-width:800px;"
+               controls="controls" 
+               @ref="video">
+            <source src="videos/training.mp4" type="video/mp4" />
+        </BlazoredVideo>
+       </div>
+
+    }
+    else if (mode_ == Mode.Quiz)
+    {
+        // show quiz and replay menu
+        <div class="card">
+            This is quiz section
+
+            <ul>
+                <li>
+                    <div class="card">
+                        <h1>This is a sample question?</h1>
+                        <ul>
+                            <li>option1 </li>
+                            <li>option2 </li>
+                            <li>option3 </li>
+                        </ul>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <button @onclick="QuizComplete" type="button">Submit</button>
+    }
+    else
+    {
+
+        <h3>Training Completed!</h3>
+        <p>You have successfully completed the course, you may close this window.</p>
+        @*<p>Your Score: 67</p>*@
+
+    }
+
+    <label>Percent Complete : @progress_ </label>
+}
 
 
 @code {
 
-    [Parameter]
-    public string Id { get; set; }
 
-
-    protected override Task OnInitializedAsync()
+    private enum Mode
     {
-        return base.OnInitializedAsync();
+        Video,
+        Quiz,
+        Score
+    }
+
+    [Parameter]
+    public string UniqueID { get; set; } = string.Empty;
+
+    private Training training_ = new();
+    private TrainingLog trainingLog_ = new();
+    private double currentTime;
+    private string errorMessage_ = string.Empty;
+    private double progress_;
+    private Mode mode_;
+
+    Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
+    VideoState videoState = new();
+    Dictionary<VideoEvents, int> eventCounter = new Dictionary<VideoEvents, int>();
+    BlazoredVideo video = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //var result = await client.GetTrainingDetails(UniqueID);
+
+        //if (result != default((Training, TrainingLog)))
+        //{
+        //    training_ = result.Training;
+        //    trainingLog_ = result.TrainingLog;
+        //}
+        //else
+        //{
+        //    errorMessage_ = "Training not found";
+        //}
+
+        await Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        var allOptionsEnabled = new VideoStateOptions() { All = true };
+        foreach (var item in (VideoEvents[])(Enum.GetValues(typeof(VideoEvents))))
+        {
+            if (item != VideoEvents.NotSet)
+            {
+                options[item] = allOptionsEnabled;
+                eventCounter[item] = 0;
+            }
+        }
+    }
+    void OnEvent(VideoEventData videoData)
+    {
+        videoState = videoData.State;
+        if (videoData.EventName != VideoEvents.NotSet)
+        {
+            eventCounter[videoData.EventName]++;
+        }
+        StateHasChanged();
+    }
+
+    private void OnPlay(VideoState state)
+    {
+        logger.LogInformation("Playing now..");
+    }
+
+    private void OnEnd(VideoState state)
+    {
+        logger.LogInformation("Video completed!");
+    }
+
+    private void OnProgress(VideoState state)
+    {
+
+        progress_ = (state.CurrentTime / state.Duration) * 100;
+
+        if (progress_ >= 99.9)
+        {
+            mode_ = Mode.Quiz;
+        }
+        logger.LogInformation(state.CurrentTime.ToString());
+    }
+
+    private void QuizComplete(){
+        mode_ = Mode.Score;
     }
 
 }

@@ -663,13 +663,13 @@ namespace PhishingPortal.UI.Blazor.Client
             return myTrainings;
         }
 
-        public async Task<List<(Training Training, TrainingLog TrainingLog)>> GetTrainingDetails(string uniqueID)
+        public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingDetails(string uniqueID)
         {
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
                 res.EnsureSuccessStatusCode();
-                return await res.Content.ReadFromJsonAsync<List<(Training Training, TrainingLog TrainingLog)>>();
+                return await res.Content.ReadFromJsonAsync<(Training Training, TrainingLog TrainingLog)>();
 
             }
             catch (Exception ex)

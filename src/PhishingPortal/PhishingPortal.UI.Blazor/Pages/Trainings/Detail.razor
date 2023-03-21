@@ -1,34 +1,48 @@
-﻿@page "/training/details/{Id}"
+﻿@page "/training/details/{UniqueID}"
 
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
+@using Blazored.Video
+@using Blazored.Video.Support
 
-@attribute [AllowAnonymous]
+@attribute [Authorize]
 
 @inject TenantClient client
 @inject HttpClient httpClient;
 @inject NavigationManager navigation
+@inject ILogger<Detail> logger;
 
 <h4>Training Details</h4>
+
+@if(!string.IsNullOrEmpty(errorMessage_)){
+    <div class="alert alert-danger">@errorMessage_</div>
+}
+
 <h5>Training Title</h5>
 <p>Training Description</p>
 <label>Status</label>
-<label>Percent Complete : 0%</label>
-<button @onclick="LaunchTraining">Launch</button>
+<label>Percent Complete : @progress_ </label>
+
+<a href="/training/launch/1" class="btn btn-primary" target="_blank">Start Training</a>
 
 @code {
 
     [Parameter]
-    public string Id { get; set; } = string.Empty;
+    public string UniqueID { get; set; } = string.Empty;
+
+    private Training training_ = new ();
+    private TrainingLog trainingLog_ = new();
+    private double currentTime;
+    private string errorMessage_ = string.Empty;
+    private double progress_;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.CompletedTask;
     }
-    
+
     private void LaunchTraining()
     {
-        // launch training in a new window
+        navigation.NavigateTo($"/training/launch/{trainingLog_.UniqueID}");
     }
-
 }
