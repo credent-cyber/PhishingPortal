@@ -28,14 +28,5 @@ namespace PhishingPortal.Server.Controllers.Api.OData
             return data;
         }
 
-        //public IQueryable<CampaignLog> Get(int page = 1, int pageSize = 1000)
-        //{
-        //    return DbContext.CampaignLogs
-        //        .Skip((page - 1) * pageSize)
-        //        .Take(pageSize)
-        //        .AsQueryable();
-        //}
-
-
     }
 }

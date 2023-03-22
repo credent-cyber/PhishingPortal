@@ -1,5 +1,7 @@
-﻿@page "/gridsamplee"
+﻿@page "/gridsample"
+@using GridShared.Columns;
 @using GridShared.Events
+@using GridShared.Filtering;
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.Dto
 @using System.Drawing
@@ -11,6 +13,7 @@
 @using PhishingPortal.UI.Blazor.Helpers
 @using PhishingPortal.UI.Blazor.Models
 @using PhishingPortal.UI.Blazor.Shared.Components.Reports
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 
 @inject TenantClient client
 @inject ILogger<TenantDashboard> logger
@@ -18,6 +21,16 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject AuthState authState;
+
+@if (isFetching)
+{
+    <div class="spinner-wrapper">
+        <div class="spinner-border text-light" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+
 
 <div class="form-group row">
     <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
@@ -41,8 +54,9 @@
 
     </div>
 </div>
+
 <div class="pcoded-content">
-    <div class="row">   
+    <div class="row">
         <div class="col-sm-12 col-md-12 col-xl-12">
             <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent">
             </DrillDown_Summary>
@@ -54,6 +68,9 @@
     <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
 </div>
 
+
+
+
 @code {
 
     [Parameter]
@@ -63,6 +80,8 @@
     private int hits;
     private int reported;
     private decimal pronePercent;
+
+    private bool isFetching = false;
 
     private GridComponent<CampaignLog> _gridComponent;
     private CGrid<CampaignLog> _grid;
@@ -91,7 +110,7 @@
     }
 
     private async Task AfterRefreshGrid()
-    {  
+    {
 
         var grid = _gridComponent.Grid as CGrid<CampaignLog>;
 
@@ -108,8 +127,19 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        isFetching = true;
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
+
+        var year = Int32.Parse(Year.ToString());
+        var yearStartDate = new DateTime(year, 1, 1);
+        var start = yearStartDate.Year + "-" + yearStartDate.Month + "-" + yearStartDate.Day;
+        var yearEndDate = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+        var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+        var values = new string[] { $"CreatedOn__7__{start}", "CampaignId__9__2", $"CreatedOn__6__{end}" };
+        query.Add("grid-filter", new StringValues(values));
+
+
         try
         {
             var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
@@ -117,7 +147,7 @@
             .Filterable()
             .ClearFiltersButton(true)
             .SetStriped(true)
-            .WithMultipleFilters()
+            //.WithMultipleFilters()
             .WithGridItemsCount()
             .Searchable(true, false, false);
 
@@ -135,6 +165,7 @@
             await Task.CompletedTask;
         });
         Years = await client.GetCampaignLogYears();
+        isFetching = false;
     }
 
     private void Calculate(CGrid<CampaignLog> grid)
@@ -150,13 +181,31 @@
         }
     }
 
-    void ChangeYear(ChangeEventArgs e)
-    {
-        Year = Convert.ToInt32(e.Value);
-        //_gridComponent.AddFilter(Column, filters);
-        //_gridComponent.RemoveFilter(Column);
-        //_ref = 1;
 
+    async void ChangeYear(ChangeEventArgs e)
+    {
+        isFetching = true;
+        Year = Convert.ToInt32(e.Value);
+        var yearStartDate = new DateTime(Year, 1, 1);
+        var start = yearStartDate.Year + "-" + yearStartDate.Month.ToString("00") + "-" + yearStartDate.Day.ToString("00");
+        var yearEndDate = new DateTime(Year, 12, 31).AddHours(24).AddSeconds(-1);
+        var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+
+
+        var filter = new FilterCollection();
+        filter.Add("GreaterThanOrEquals", start);
+        filter.Add("LessThan", end);
+        IGridColumn column = _gridComponent.Grid.Columns.FirstOrDefault(c => c.FieldName == "CreatedOn");
+
+
+        _grid.RemoveAllFilters();
+        _gridComponent.RemoveAllFilters();
+        await _gridComponent.AddFilter(column, filter);
+        isFetching = false;
+        StateHasChanged();
     }
+
+
+
 }
 

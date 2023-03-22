@@ -1,4 +1,4 @@
-﻿@page "/gridsample"
+﻿@page "/gridsamplee"
 @using GridShared.Events
 @using Newtonsoft.Json.Linq
 @using PhishingPortal.Dto
@@ -68,8 +68,8 @@
         if (grid != null)
         {
             //Calculate(grid);
-            var c = GetTotalIsHits();
 
+            var c = GetTotalIsHits();
             StateHasChanged();
         }
 
@@ -102,26 +102,10 @@
 
         await _task.ContinueWith(async (st) =>
         {
-            // Calculate(_grid);
             await Task.CompletedTask;
         });
         Years = await client.GetCampaignLogYears();
     }
-
-
-    //private void Calculate(CGrid<CampaignLog> grid)
-    //{
-    //    CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
-    //    total = CampaignLogs.Count();
-    //    hits = CampaignLogs.Count(o => o.IsHit);
-    //    reported = CampaignLogs.Count(o => o.IsReported);
-
-    //    if (total > 0)
-    //    {
-    //        pronePercent = Math.Round((decimal)hits / total * 100, 2);
-    //    }
-    //}
-
 
     private async Task<int> GetTotalIsHits()
     {
