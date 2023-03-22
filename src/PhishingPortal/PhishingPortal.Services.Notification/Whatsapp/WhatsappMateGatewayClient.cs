@@ -1,9 +1,10 @@
 ﻿using System.Net;
-
+using System.Threading;
 
 namespace PhishingPortal.Services.Notification.Whatsapp
 {
     using System.Net.Http.Json;
+
     internal class WhatsappMateGatewayClient : IWhatsappGatewayClient
     {
         public ILogger<WhatsappMateGatewayClient> Logger { get; }
@@ -69,6 +70,11 @@ namespace PhishingPortal.Services.Notification.Whatsapp
             }
 
             return success;
+        }
+
+        public Task<bool> Send(string to, string from, string message, string mediaUrl, string file)
+        {
+            return Send(to, from, message);
         }
     }
 }
