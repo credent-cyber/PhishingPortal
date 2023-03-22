@@ -14,6 +14,15 @@
 		<EntityFrameworkVersion>6.0.1</EntityFrameworkVersion>
 	</PropertyGroup>
 
+
+
+	<ItemGroup>
+	  <Compile Remove="TrainingVideo\**" />
+	  <Content Remove="TrainingVideo\**" />
+	  <EmbeddedResource Remove="TrainingVideo\**" />
+	  <None Remove="TrainingVideo\**" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="BlazingComponents.Summernote" Version="0.0.6" />
 		<PackageReference Include="Azure.Identity" Version="1.6.1" />
@@ -70,6 +79,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Extensions\" />
+	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="logs\" />
 	</ItemGroup>
 

@@ -1,0 +1,309 @@
+﻿@page "/training-quiz"
+@page "/training-quiz/{Id:int}"
+@using System.Collections.Generic
+@using System.IO
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using System.ComponentModel.DataAnnotations;
+@inject ILogger<TrainingQuizConfig> logger
+@inject NavigationManager NavigationManager
+@inject TenantClient client
+@inject IJSRuntime JSRuntime
+@attribute [Authorize]
+
+@if (training == null)
+{
+
+    <div class="col-sm-12" style="margin-top:45vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="pcoded-content" style="padding:10px 10px">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="padding:15px !important;">
+                        <h5 class="text-white">@Title</h5>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3" style="padding:0 10px">
+                        <div class="row">
+
+                            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Order Number</label>
+                            <div class="col-md-2">
+                                <input type="number" @bind="model.OrderNumber" class="form-control" />
+                            </div>
+
+                            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Training ID</label>
+                            <div class="col-md-4">
+                                <select @bind="model.TrainingId" class="form-control" id="TrainingId">
+                                    <option selected>-Select-</option>
+                                    @foreach (var t in training)
+                                    {
+                                        <option value="@t.Id">@t.TrainingName</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <label class="col-form-label col-md-1 col-sm-6 col-xs-6 bold-font" style="padding-right: 0;">Is Active</label>
+                            <div class="col-md-1 col-sm-6 col-xs-6">
+                                <input type="checkbox" @bind="model.IsActive" class="form-check-input" style="margin-top:10px; margin-left:0" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mt-3">
+
+
+
+                        <table class="table table-striped table-bordered nowrap">
+                            <tbody>
+                                @foreach (var trainingQuiz in TrainingQuiz)
+                                {
+                                    <tr>
+                                        <td style="width: 60%">
+                                            <div style="display: flex; align-items: center;">
+                                                <label for="Question" style="margin-right:10px; margin-bottom:0" class="bold-font">Question - @trainingQuiz.QuestionNumber</label>
+                                                <input type="text" class="form-control" @bind="@trainingQuiz.Question" />
+                                            </div>
+                                        </td>
+                                        <td style="width: 20%">
+                                            <div style="display: flex; align-items: center;">
+                                                <label for="AnswerType" style="margin-right:10px; margin-bottom:0" class="bold-font">Answer Type</label>
+                                                <select @bind="@trainingQuiz.AnswerType" class="form-control" id="TrainingId">
+                                                    <option>-Select-</option>
+                                                    <option value="Multiple-Choice">Multiple Choice</option>
+                                                    <option value="Single-Choice">Single Choice</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td style="width: 15%">
+                                            <div style="display: flex; align-items: center;">
+                                                <label for="Weightage" style="margin-right:10px; margin-bottom:0" class="bold-font">Weightage</label>
+                                                <input type="number" class="form-control" @bind="@trainingQuiz.Weightage" min="0" max="100" />
+
+                                            </div>
+                                        </td>
+                                        <td style="width: 5%; text-align:center">
+                                            <a title="Remove Question" style="cursor:pointer; color:red" @onclick="() => RemoveParent(trainingQuiz)"><i class="fa fa-times-circle fa-2x" aria-hidden="true"></i></a>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td colspan="4" style="padding: 5px 0 !important;">
+                                            <table class="table">
+                                                <thead style="text-align:center">
+                                                    <tr>
+                                                        <th style="width: 5%">Order Number</th>
+                                                        <th style="width: 85%">Answer</th>
+                                                        <th style="width: 5%">IsCorrect</th>
+                                                        <th style="width: 5%"><a title="Add Row" style="cursor:pointer; color:darkblue" @onclick="() => AddChild(trainingQuiz)"><i class="fa fa-plus-circle fa-2x" aria-hidden="true"></i></a></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var trainingQuizAnswer in trainingQuiz.TrainingQuizAnswer)
+                                                    {
+                                                        <tr>
+                                                            <td><input type="number" class="form-control" @bind="@trainingQuizAnswer.OrderNumber" /></td>
+                                                            <td><input type="text" class="form-control" @bind="@trainingQuizAnswer.AnswerText" /></td>
+                                                            <td>
+                                                                @if (trainingQuiz.AnswerType == "Multiple-Choice")
+                                                                {
+                                                                    <input type="checkbox" style="margin-top:-6px; margin-left:30px;" class="form-check-input" @bind="@trainingQuizAnswer.IsCorrect" />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="radio" style="margin-top:-6px; margin-left:30px;" class="form-check-input" name="@($"correct_{trainingQuiz.QuestionNumber}")" @bind="@trainingQuizAnswer.IsCorrect" />
+                                                                }
+                                                            </td>
+                                                            <td style="text-align:center"><a title="Remove Row" style="cursor:pointer; color:red" @onclick="() => RemoveChild(trainingQuiz, trainingQuizAnswer)"><i class="fa fa-trash fa-2x" aria-hidden="true"></i></a></td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <button type="button" style="margin-top:-15px" class="btn btn-primary col-md-12 mb-2" @onclick="AddParent">Add Question</button>
+                        <div style="text-align:center;">
+                            <button type="submit" class="btn btn-success col-md-3" @onclick="OnSave">Submit</button>
+                            <button type="button" class="btn btn-danger col-md-3" @onclick="onClose">Close</button>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        <div style="text-align:center;">
+            Thank you!
+        </div>
+    }
+</Dailog>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    private bool show = false;
+    private List<Training> training = new();
+    TrainingQuiz model = new();
+
+    public string Title
+    {
+        get
+        {
+            return model?.Id > 0 ? "Modify Training Quiz" : "Create New Training Quiz";
+        }
+    }
+    string Message = string.Empty;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool loading = false;
+    bool isloading = false;
+    private List<TrainingQuiz> TrainingQuiz { get; set; } = new List<TrainingQuiz>();
+
+
+    public void Init()
+    {
+        Message = string.Empty;
+        model = new TrainingQuiz() { };
+        TrainingQuiz.Clear();
+        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 } };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            var Data = await client.GetTrainingQuizById(Id);
+            TrainingQuiz = Data.ToList();
+            model.Id = TrainingQuiz[0].Id;
+            model.OrderNumber = TrainingQuiz[0].OrderNumber;
+            model.TrainingId = TrainingQuiz[0].TrainingId;
+            model.IsActive = TrainingQuiz[0].IsActive;
+
+            //var Data = await client.GetTrainingQuizById(Id);
+            //if (Data == null)
+            //{
+            //    TrainingQuiz = Data.ToList();
+            //}
+
+            //var trainingQuiz = Data.FirstOrDefault();
+            //if (trainingQuiz != null)
+            //{
+            //    model.OrderNumber = trainingQuiz.OrderNumber;
+            //    model.TrainingId = trainingQuiz.TrainingId;
+            //    model.IsActive = trainingQuiz.IsActive;
+            //}
+        }
+        else
+        {
+            Init();
+        }
+        training = await client.GetAllTrainings();
+    }
+    private void AddParent()
+    {
+        TrainingQuiz.Add(new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 });
+    }
+
+    private void RemoveParent(TrainingQuiz trainingQuiz)
+    {
+        TrainingQuiz.Remove(trainingQuiz);
+    }
+
+    private void AddChild(TrainingQuiz trainingQuiz)
+    {
+        trainingQuiz.TrainingQuizAnswer.Add(new TrainingQuizAnswer());
+    }
+
+    private void RemoveChild(TrainingQuiz trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
+    {
+        trainingQuiz.TrainingQuizAnswer.Remove(trainingQuizAnswer);
+    }
+    protected async Task OnSave()
+    {
+        loading = true;
+        IsError = false;
+        IsSuccess = false;
+        show = false;
+        Message = string.Empty;
+
+        if (TrainingQuiz.Any(quiz => quiz.Id == 0))
+        {
+            loading = false;
+            IsError = true;
+            show = true;
+            Message = "Empty input field!";
+            return;
+        }
+
+        try
+        {
+            if (model.Id != 0)
+            {
+                Message = "Successfully Updated";
+            }
+            else
+            {
+                Message = "Successfully Added";
+            }
+            foreach (var quiz in TrainingQuiz)
+            {
+                quiz.OrderNumber = model.OrderNumber;
+                quiz.TrainingId = model.TrainingId;
+                quiz.IsActive = model.IsActive;
+            }
+            TrainingQuiz = await client.UpsertTrainingQuizAsync(TrainingQuiz);
+            IsSuccess = true;
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            Message = ex.Message;
+            logger.LogCritical(ex, ex.Message);
+        }
+        loading = false;
+        show = true;
+
+    }
+    protected void onClose()
+    {
+        NavigationManager.NavigateTo("training-Quizzes");
+    }
+    protected void OnActive() { model.IsActive = true; }
+    protected void OnNoActive() { model.IsActive = false; }
+
+    private void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Added"))
+        {
+            Init();
+        }
+    }
+    private void CloseDailogBox()
+    {
+
+    }
+}
+

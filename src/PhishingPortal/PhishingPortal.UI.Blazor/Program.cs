@@ -8,6 +8,7 @@ using PhishingPortal.UI.Blazor.Client;
 using PhishingPortal.UI.Blazor.Services;
 using PhishingPortal.UI.Blazor.Pages;
 using Serilog;
+using Havit.Blazor.Components.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -40,5 +41,6 @@ builder.Services.AddHttpClient<TenantAdminClient>(client => client.BaseAddress =
 builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddHttpClient<RequestClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddHxServices();
 
 await builder.Build().RunAsync();

@@ -619,6 +619,100 @@ namespace PhishingPortal.Server.Controllers.Api
         }
         #endregion
 
+        [HttpGet]
+        [Route("GetCampaignsNames")]
+        public async Task<List<Campaign>> GetCompaignNames()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetCampaignsName();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+        [HttpPost]
+        [Route("TrainingCampIdMap")]
+        public async Task<ApiResponse<string>> TrainingCampIdMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.UpsertTrainingCampaignMap(dict);
+                result.Message = "Successful";
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
 
+            return result;
+        }
+
+        [HttpGet]
+        [Route("getTrainingCampaignIds/{trainingId}")]
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int trainingId)
+        {
+            var result = await _tenantRepository.GetTrainingCampaignsId(trainingId);
+            return await Task.FromResult(result);
+        }
+
+
+        [HttpGet]
+        [Route("GetTrainingVideo")]
+        public async Task<IEnumerable<TrainingVideo>> GetTrainingVideo()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetTrainingVideos();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+        [HttpPost]
+        [Route("upsert-trainingVideo")]
+        public async Task<TrainingVideo> UpsertTrainingVideoDetail(TrainingVideo trainingVideo)
+        {
+
+            return await _tenantRepository.UpsertTrainingVideo(trainingVideo);
+        }
+
+        [HttpGet]
+        [Route("GetTrainings")]
+        public async Task<List<Training>> GetAllTrainings()
+        {
+            try
+            {
+                var result = await _tenantRepository.GetAllTraining();
+                return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [Route("UpsertTrainingQuiz")]
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> trainingQuiz)
+        {
+
+            return await _tenantRepository.UpsertTrainingQuiz(trainingQuiz);
+        }
+
+        [HttpGet]
+        [Route("TrainingQuiz-by-id/{id}")]
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        {
+            return await _tenantRepository.GetTrainingQuizById(id);
+        }
     }
 }
