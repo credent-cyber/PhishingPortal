@@ -18,12 +18,19 @@
     <div class="alert alert-danger">@errorMessage_</div>
 }
 
-<h5>Training Title</h5>
-<p>Training Description</p>
-<label>Status</label>
-<label>Percent Complete : @progress_ </label>
+@if(training_ != null){
+   <div class="card">
+        <h5 class="card-title">@training_.TrainingName</h5>
+        <div class="content">
+            <p>@((MarkupString)training_.Content)</p>
 
-<a href="/training/launch/1" class="btn btn-primary" target="_blank">Start Training</a>
+            <label>Status: @training_.State</label>
+            <label>Percent Complete : @progress_ </label>
+        </div>
+        
+        <a href="/training/launch/@trainingLog_.UniqueID" class="btn btn-primary" target="_blank">Start Training</a>
+   </div>
+}
 
 @code {
 
@@ -38,6 +45,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var result = await client.GetTrainingDetails(UniqueID);
+
+        if (result != default((Training, TrainingLog)))
+        {
+            training_ = result.Training;
+            trainingLog_ = result.TrainingLog;
+        }
+        else
+        {
+            errorMessage_ = "Training not found";
+        }
+
         await Task.CompletedTask;
     }
 

@@ -830,7 +830,10 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
                 res.EnsureSuccessStatusCode();
-                return await res.Content.ReadFromJsonAsync<(Training Training, TrainingLog TrainingLog)>();
+                var str = await res.Content.ReadAsStringAsync();
+
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<(Training, TrainingLog)>(str);
+                return (result.Item1, result.Item2);
 
             }
             catch (Exception ex)

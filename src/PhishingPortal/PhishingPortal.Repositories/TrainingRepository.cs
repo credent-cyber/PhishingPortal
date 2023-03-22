@@ -35,7 +35,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingByUniqueID(Guid uniqueID, string email)
         {
-            var trainingLog = DbContext.TrainingLog.FirstOrDefault(o => o.UniqueID == uniqueID);
+            var trainingLog = DbContext.TrainingLog.FirstOrDefault(o => o.UniqueID == uniqueID.ToString());
 
             try
             {
@@ -64,7 +64,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<TrainingLog> UpdateTrainingProgress(Guid uniqueID, decimal percentage, string email)
         {
-            var trainingLog = await DbContext.TrainingLog.FirstOrDefaultAsync(o => o.UniqueID == uniqueID);
+            var trainingLog = await DbContext.TrainingLog.FirstOrDefaultAsync(o => o.UniqueID == uniqueID.ToString());
 
             if (trainingLog == null)
                 throw new InvalidOperationException("Training not found");

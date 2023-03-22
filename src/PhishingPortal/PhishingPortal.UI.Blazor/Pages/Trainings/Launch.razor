@@ -21,23 +21,23 @@
 
 @if (training_ != null)
 {
-    <h5>Training Title</h5>
-    <p>Training Description</p>
-    <label>Status</label>
-
     if (mode_ == Mode.Video)
     {
-       <div class="card">
-            <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
-               EventFired="OnEvent"
-               VideoEventOptions="options"
-               class="w-100"
-               autoplay="autoplay"
-               style="max-width:800px;"
-               controls="controls" 
-               @ref="video">
-            <source src="videos/training.mp4" type="video/mp4" />
-        </BlazoredVideo>
+       <div class="card m-1 p-2">
+            
+            <h5>@training_.TrainingName</h5>
+
+            <div class="content p-2">
+                <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
+                       EventFired="OnEvent"
+                       VideoEventOptions="options"
+                       class="w-100"
+                       style="max-width:800px;"
+                       controls="controls"
+                       @ref="video">
+                    <source src="videos/@training_.TrainingVideo" type="video/mp4" />
+                </BlazoredVideo>
+            </div>
        </div>
 
     }
@@ -72,8 +72,6 @@
         @*<p>Your Score: 67</p>*@
 
     }
-
-    <label>Percent Complete : @progress_ </label>
 }
 
 
@@ -90,7 +88,7 @@
     [Parameter]
     public string UniqueID { get; set; } = string.Empty;
 
-    private Training training_ = new();
+    private Training training_;
     private TrainingLog trainingLog_ = new();
     private double currentTime;
     private string errorMessage_ = string.Empty;
@@ -104,17 +102,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //var result = await client.GetTrainingDetails(UniqueID);
+        var result = await client.GetTrainingDetails(UniqueID);
 
-        //if (result != default((Training, TrainingLog)))
-        //{
-        //    training_ = result.Training;
-        //    trainingLog_ = result.TrainingLog;
-        //}
-        //else
-        //{
-        //    errorMessage_ = "Training not found";
-        //}
+        if (result != default((Training, TrainingLog)))
+        {
+            training_ = result.Training;
+            trainingLog_ = result.TrainingLog;
+        }
+        else
+        {
+            errorMessage_ = "Training not found";
+        }
 
         await Task.CompletedTask;
     }
