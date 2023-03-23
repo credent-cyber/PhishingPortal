@@ -37,10 +37,10 @@ else
                     <div class="form-group mt-3" style="padding:0 10px">
                         <div class="row">
 
-                            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Order Number</label>
-                            <div class="col-md-2">
-                                <input type="number" @bind="model.OrderNumber" class="form-control" />
-                            </div>
+                            @*<label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Order Number</label>
+                        <div class="col-md-2">
+                        <input type="number" @bind="model.OrderNumber" class="form-control" />
+                        </div>*@
 
                             <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Training ID</label>
                             <div class="col-md-4">
@@ -71,7 +71,7 @@ else
                                     <tr>
                                         <td style="width: 60%">
                                             <div style="display: flex; align-items: center;">
-                                                <label for="Question" style="margin-right:10px; margin-bottom:0" class="bold-font">Question - @trainingQuiz.QuestionNumber</label>
+                                                <label for="Question" style="margin-right:10px; margin-bottom:0" class="bold-font">Question - @trainingQuiz.OrderNumber</label>
                                                 <input type="text" class="form-control" @bind="@trainingQuiz.Question" />
                                             </div>
                                         </td>
@@ -122,7 +122,7 @@ else
                                                                 }
                                                                 else
                                                                 {
-                                                                    <input type="radio" style="margin-top:-6px; margin-left:30px;" class="form-check-input" name="@($"correct_{trainingQuiz.QuestionNumber}")" @bind="@trainingQuizAnswer.IsCorrect" />
+                                                                    <input type="radio" style="margin-top:-6px; margin-left:30px;" class="form-check-input" name="@($"correct_{trainingQuiz.OrderNumber}")" @bind="@trainingQuizAnswer.IsCorrect" />
                                                                 }
                                                             </td>
                                                             <td style="text-align:center"><a title="Remove Row" style="cursor:pointer; color:red" @onclick="() => RemoveChild(trainingQuiz, trainingQuizAnswer)"><i class="fa fa-trash fa-2x" aria-hidden="true"></i></a></td>
@@ -187,7 +187,7 @@ else
         Message = string.Empty;
         model = new TrainingQuiz() { };
         TrainingQuiz.Clear();
-        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 } };
+        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 } };
     }
 
     protected override async Task OnInitializedAsync()
@@ -197,23 +197,8 @@ else
             var Data = await client.GetTrainingQuizById(Id);
             TrainingQuiz = Data.ToList();
             model.Id = TrainingQuiz[0].Id;
-            model.OrderNumber = TrainingQuiz[0].OrderNumber;
             model.TrainingId = TrainingQuiz[0].TrainingId;
             model.IsActive = TrainingQuiz[0].IsActive;
-
-            //var Data = await client.GetTrainingQuizById(Id);
-            //if (Data == null)
-            //{
-            //    TrainingQuiz = Data.ToList();
-            //}
-
-            //var trainingQuiz = Data.FirstOrDefault();
-            //if (trainingQuiz != null)
-            //{
-            //    model.OrderNumber = trainingQuiz.OrderNumber;
-            //    model.TrainingId = trainingQuiz.TrainingId;
-            //    model.IsActive = trainingQuiz.IsActive;
-            //}
         }
         else
         {
@@ -223,7 +208,7 @@ else
     }
     private void AddParent()
     {
-        TrainingQuiz.Add(new TrainingQuiz() { QuestionNumber = TrainingQuiz.Count + 1 });
+        TrainingQuiz.Add(new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 });
     }
 
     private void RemoveParent(TrainingQuiz trainingQuiz)
@@ -233,12 +218,18 @@ else
 
     private void AddChild(TrainingQuiz trainingQuiz)
     {
-        trainingQuiz.TrainingQuizAnswer.Add(new TrainingQuizAnswer());
+        var newTrainingQuizAnswer = new TrainingQuizAnswer
+            {
+                OrderNumber = trainingQuiz.TrainingQuizAnswer.Count + 1
+            };
+        trainingQuiz.TrainingQuizAnswer.Add(newTrainingQuizAnswer);
+        UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
     }
 
     private void RemoveChild(TrainingQuiz trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
     {
         trainingQuiz.TrainingQuizAnswer.Remove(trainingQuizAnswer);
+        UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
     }
     protected async Task OnSave()
     {
@@ -248,31 +239,24 @@ else
         show = false;
         Message = string.Empty;
 
-        if (TrainingQuiz.Any(quiz => quiz.Id == 0))
-        {
-            loading = false;
-            IsError = true;
-            show = true;
-            Message = "Empty input field!";
-            return;
-        }
-
         try
         {
-            if (model.Id != 0)
-            {
-                Message = "Successfully Updated";
-            }
-            else
-            {
-                Message = "Successfully Added";
-            }
+
             foreach (var quiz in TrainingQuiz)
             {
-                quiz.OrderNumber = model.OrderNumber;
                 quiz.TrainingId = model.TrainingId;
                 quiz.IsActive = model.IsActive;
             }
+            if (TrainingQuiz.Any(quiz => quiz.Question == null))
+            {
+                loading = false;
+                IsError = true;
+                show = true;
+                Message = "Empty input field!";
+                return;
+            }
+            Message = (model.Id != 0) ? "Successfully Updated" : "Successfully Added";
+
             TrainingQuiz = await client.UpsertTrainingQuizAsync(TrainingQuiz);
             IsSuccess = true;
         }
@@ -282,6 +266,7 @@ else
             Message = ex.Message;
             logger.LogCritical(ex, ex.Message);
         }
+
         loading = false;
         show = true;
 
@@ -304,6 +289,14 @@ else
     private void CloseDailogBox()
     {
 
+    }
+    private void UpdateOrderNumbers(IEnumerable<TrainingQuizAnswer> trainingQuizAnswers)
+    {
+        int orderNumber = 1;
+        foreach (var trainingQuizAnswer in trainingQuizAnswers)
+        {
+            trainingQuizAnswer.OrderNumber = orderNumber++;
+        }
     }
 }
 
