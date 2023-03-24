@@ -806,6 +806,24 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizByTrainingId(int trainingId)
+        {
+            IEnumerable<TrainingQuiz> result;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/training-quiz-by-training-id/{trainingId}");
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
         public async Task<List<MyTraining>> GetMyTrainings()
         {
             var myTrainings = new List<MyTraining>();

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace PhishingPortal.Repositories
 {
@@ -1384,6 +1385,11 @@ namespace PhishingPortal.Repositories
 
             return result;
         }
-    }
 
+        public async Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId)
+        {
+            return TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == trainingId && o.IsActive)
+                .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+        }
+    }
 }

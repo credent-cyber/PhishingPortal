@@ -608,14 +608,14 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpPost]
         [Route("UpdateTrainingProgress")]
-        public async Task<TrainingLog> UpdateTrainingProgress([FromBody] TrainingProgress progres)
+        public async Task<TrainingLog> UpdateTrainingProgress([FromBody] TrainingProgress progress)
         {
             var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
 
             if (string.IsNullOrEmpty(email))
                 throw new InvalidOperationException("User not authorized");
 
-            return await TrainingRepository.UpdateTrainingProgress(new Guid(progres.UniqueID), progres.Value, email);
+            return await TrainingRepository.UpdateTrainingProgress(new Guid(progress.UniqueID), progress.Value, email, progress.CheckPoint);
         }
         #endregion
 
@@ -713,6 +713,13 @@ namespace PhishingPortal.Server.Controllers.Api
         public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
         {
             return await _tenantRepository.GetTrainingQuizById(id);
+        }
+
+        [HttpGet]
+        [Route("training-quiz-by-training-id/{trainingId}")]
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizByTrainingId(int trainingId)
+        {
+            return await _tenantRepository.GetQuizByTrainingId(trainingId);
         }
     }
 }

@@ -2,6 +2,7 @@
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using Microsoft.EntityFrameworkCore;
+using PhishingPortal.Dto.Quiz;
 
 namespace PhishingPortal.Repositories
 {
@@ -62,7 +63,7 @@ namespace PhishingPortal.Repositories
             }
         }
 
-        public async Task<TrainingLog> UpdateTrainingProgress(Guid uniqueID, decimal percentage, string email)
+        public async Task<TrainingLog> UpdateTrainingProgress(Guid uniqueID, decimal percentage, string email, string checkpoint)
         {
             var trainingLog = await DbContext.TrainingLog.FirstOrDefaultAsync(o => o.UniqueID == uniqueID.ToString());
 
@@ -74,10 +75,20 @@ namespace PhishingPortal.Repositories
             if (recipient == null)
                 throw new ArgumentException("The training is not assigned to the currently logged in user");
 
+            var status = Dto.Quiz.TrainingStatus.Pending.ToString();
+
+            if (checkpoint == Dto.Quiz.TrainingStatus.Completed.ToString())
+            {
+                percentage = 100;
+                status = Dto.Quiz.TrainingStatus.Completed.ToString();
+            }
 
             if (percentage > trainingLog.PercentCompleted)
             {
                 trainingLog.PercentCompleted = percentage;
+                trainingLog.Status = status;
+                trainingLog.ModifiedBy = email;
+                trainingLog.ModifiedOn = DateTime.Now;
                 DbContext.SaveChanges();
             }
 

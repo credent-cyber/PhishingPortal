@@ -35,6 +35,6 @@ namespace PhishingPortal.Repositories
         Task<List<Training>> GetAllTraining();
         Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos);
         Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id);
-
+        Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId);
     }
 }

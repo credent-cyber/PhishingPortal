@@ -33,23 +33,6 @@ namespace PhishingPortal.Dto.Dashboard
         public int TrainingNotAttampt { get; set; }
         public decimal TrainingCompromised { get; set; }
 
-        //public decimal TrainingCompromised
-        //{
-        //    get
-        //    {
-        //        if (TotalTrainingAssign == 0)
-        //            return 0;
-        //        var compromise = Math.Round(((decimal)TrainingCompleted / PhisedAfterTraining) * 100, 2);
-        //        return compromise;
-        //    }
-        //}
-    }
-
-    public class MyTraining
-    {
-        public Training Training { get; set; }
-        public TrainingLog TrainingLog { get; set; }
-
     }
 
     public class TrainingProgress

@@ -1,6 +1,7 @@
 ﻿@page "/training/launch/{UniqueID}"
 
 @using PhishingPortal.Dto
+@using PhishingPortal.Dto.Quiz
 @using PhishingPortal.UI.Blazor.Client
 @using Blazored.Video
 @using Blazored.Video.Support
@@ -12,8 +13,6 @@
 @inject NavigationManager navigation
 @inject ILogger<Detail> logger;
 
-<h4>Training Details</h4>
-
 @if (!string.IsNullOrEmpty(errorMessage_))
 {
     <div class="alert alert-danger">@errorMessage_</div>
@@ -21,69 +20,138 @@
 
 @if (training_ != null)
 {
+    if (mode_ == Mode.Start)
+    {
+        <Card>
+            <Header>
+                <h4>Training Instructions</h4>
+            </Header>
+            <Content>
+                <p>
+                    To complete the trainig you need to -
+                </p>
+                <ul class="list-unstyled">
+                    <li>Watch the training video</li>
+                    <li>Attempt quiz question and score 100% in it</li>
+                </ul>
+            </Content>
+            <Footer>
+                <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
+            </Footer>
+        </Card>
+    }
+
     if (mode_ == Mode.Video)
     {
-       <div class="card m-1 p-2">
-            
-            <h5>@training_.TrainingName</h5>
-
-            <div class="content p-2">
-                <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
-                       EventFired="OnEvent"
-                       VideoEventOptions="options"
-                       class="w-100"
-                       style="max-width:800px;"
-                       controls="controls"
-                       @ref="video">
-                    <source src="videos/@training_.TrainingVideo" type="video/mp4" />
-                </BlazoredVideo>
-            </div>
-       </div>
-
-    }
-    else if (mode_ == Mode.Quiz)
-    {
-        // show quiz and replay menu
-        <div class="card">
-            This is quiz section
-
-            <ul>
-                <li>
-                    <div class="card">
-                        <h1>This is a sample question?</h1>
-                        <ul>
-                            <li>option1 </li>
-                            <li>option2 </li>
-                            <li>option3 </li>
-                        </ul>
+        <Card>
+            <Header>
+                <h4>@training_.TrainingName</h4>
+            </Header>
+            <Content>
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
+                               EventFired="OnEvent"
+                               VideoEventOptions="options"
+                               class="w-100"
+                               autoplay="autoplay"
+                               controls="controls"
+                               @ref="video">
+                            <source src="videos/@training_.TrainingVideo" type="video/mp4" />
+                        </BlazoredVideo>
                     </div>
-                </li>
-
-            </ul>
-        </div>
-
-        <button @onclick="QuizComplete" type="button">Submit</button>
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <h4 class="mb-2 bold-font">Transcripts</h4>
+                        <p class="mt-1 p-1">
+                            @((MarkupString)training_.Content);
+                        </p>
+                    </div>
+                </div>
+            </Content>
+        </Card>
     }
-    else
+
+    if (mode_ == Mode.QuizInstruction)
     {
 
-        <h3>Training Completed!</h3>
-        <p>You have successfully completed the course, you may close this window.</p>
-        @*<p>Your Score: 67</p>*@
+        <Card>
+            <Header>
+                <h4>Training Quiz</h4>
+            </Header>
+            <Content>
+                <p>
+                    To complete the trainig you need to answer the question in quiz-
+                </p>
+            </Content>
+            <Footer>
+                <div class="col">
+                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz</button>
+                    <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Video">Watch Again</button>
+                </div>
+            </Footer>
+        </Card>
+    }
+
+    if (mode_ == Mode.Quiz)
+    {
+
+        <PhishingPortal.UI.Blazor.Shared.Components.Training.Quiz Training="training_" TrainingLog="trainingLog_" OnSubmit="OnQuizSubmit">
+
+        </PhishingPortal.UI.Blazor.Shared.Components.Training.Quiz>
+
+    }
+
+    if (mode_ == Mode.End)
+    {
+
+        <Card>
+            <Header>
+                <h3>Quiz Over!</h3>
+            </Header>
+            <Content>
+                @if (pass_)
+                {
+                    <h4>Your Score: @score_%</h4>
+                    <p>Well done! You successfully completed the training.</p>
+
+                }
+                else
+                {
+                    <h4>You score is @score_% and minimum pass percentage is 70% </h4>
+                    <p style="color:indianred;">Unfortunately, you didn't complete the training, please try again.</p>
+                }
+
+            </Content>
+            <Footer>
+                <div class="col">
+                    @if (pass_)
+                    {
+                        <button class="btn btn-primary" @onclick="@(() => navigation.NavigateTo("/training/my-trainings"))">Back To My Trainings</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz Again</button>
+                        <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Start">Start Over</button>
+                    }
+                </div>
+            </Footer>
+        </Card>
 
     }
 }
 
-
 @code {
-
 
     private enum Mode
     {
+        Start,
+        Continued,
         Video,
+        QuizInstruction,
         Quiz,
-        Score
+        End
     }
+
 
     [Parameter]
     public string UniqueID { get; set; } = string.Empty;
@@ -94,6 +162,8 @@
     private string errorMessage_ = string.Empty;
     private double progress_;
     private Mode mode_;
+    private decimal score_;
+    private bool pass_;
 
     Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
     VideoState videoState = new();
@@ -149,20 +219,38 @@
         logger.LogInformation("Video completed!");
     }
 
-    private void OnProgress(VideoState state)
+    private async void OnProgress(VideoState state)
     {
-
         progress_ = (state.CurrentTime / state.Duration) * 100;
 
+        // record checkpoint
         if (progress_ >= 99.9)
         {
-            mode_ = Mode.Quiz;
+            mode_ = Mode.QuizInstruction;
+            await client.UpdateTrainingProgress(trainingLog_.UniqueID, 50, Dto.Quiz.TrainingStatus.Watched.ToString());
         }
+
         logger.LogInformation(state.CurrentTime.ToString());
     }
 
-    private void QuizComplete(){
-        mode_ = Mode.Score;
+    private async void QuizComplete()
+    {
+        if (pass_)
+        {
+            await client.UpdateTrainingProgress(trainingLog_.UniqueID, 100, Dto.Quiz.TrainingStatus.Completed.ToString());
+        }
+        else
+        {
+            await client.UpdateTrainingProgress(trainingLog_.UniqueID, 60, Dto.Quiz.TrainingStatus.Watched.ToString());
+        }
+        mode_ = Mode.End;
+    }
+
+    private void OnQuizSubmit(Scores result)
+    {
+        pass_ = result.Pass;
+        score_ = result.Score;
+        QuizComplete();
     }
 
 }
