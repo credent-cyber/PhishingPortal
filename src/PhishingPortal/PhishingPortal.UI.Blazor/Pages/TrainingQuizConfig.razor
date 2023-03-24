@@ -239,7 +239,7 @@ else
         IsSuccess = false;
         show = false;
         Message = string.Empty;
-        
+
         try
         {  
             if (TrainingQuiz.Count == 0)
@@ -264,7 +264,17 @@ else
                 quiz.IsActive = model.IsActive;
             }
             Message = (model.Id != 0) ? "Successfully Updated" : "Successfully Added";
-
+            if (model.Id > 0)
+            {
+                //foreach (var Quiz in TrainingQuiz)
+                //{
+                //    foreach(var opt in Quiz.TrainingQuizAnswer)
+                //    {
+                //        opt.Id = Quiz.TrainingId;
+                //        opt.TrainingQuizId = Quiz.Id;
+                //    }
+                //}
+            }
             TrainingQuiz = await client.UpsertTrainingQuizAsync(TrainingQuiz);
             IsSuccess = true;
         }

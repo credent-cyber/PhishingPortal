@@ -38,7 +38,7 @@ else
         c.Add(o => o.TrainingId).Css("table-bordered").SetWidth("50px");
         c.Add(o => o.OrderNumber).Css("table-bordered").Titled("QuestionNumber").SetWidth("50px");
         c.Add(o => o.Question).Css("table-bordered");
-        c.Add(o => o.AnswerType).Titled("CreatedBy").SetWidth("50px").Css("table-bordered");
+        c.Add(o => o.AnswerType).SetWidth("50px").Css("table-bordered");
         c.Add(o => o.IsActive).Css("table-bordered").SetWidth("50px");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TrainingQuizzesEdit>().SetWidth("50px");
     };
@@ -66,6 +66,5 @@ else
         _task = client.UpdateGrid();
         await _task;
     }
-
 
 }
