@@ -113,6 +113,8 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
 
 .table thead th {
     background: #bec7ea;
+    text-transform: initial;
+    font-size: 15px !important;
 }
 
 .table-bordered td, .table-bordered th {
@@ -123,9 +125,7 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
     font-weight: 500 !important;
     font-size: 16px !important;
 }
-/*.dropdown-menu {
-            left:270px;
-        }*/
+
 .dropdown-menu[data-bs-popper] {
     top: 145% !important;
 }
@@ -423,3 +423,6 @@ imgs {
     max-width: 100%;
     max-height: 180px !important;
 }
+/*Havit multiSelect css*/
+
+
