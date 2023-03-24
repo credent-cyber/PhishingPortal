@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
+using Humanizer;
 using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace PhishingPortal.Repositories
@@ -1303,8 +1304,17 @@ namespace PhishingPortal.Repositories
             {
                 throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
             }
-
             var results = dtos;
+
+            var existingQuestions = TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+              .Where(tq => tq.TrainingId == dtos.First().TrainingId).ToList();
+            foreach (var existingQuestion in existingQuestions)
+            {
+                if (!dtos.Any(dto => dto.Id == existingQuestion.Id))
+                {
+                    TenantDbCtx.TrainingQuiz.Remove(existingQuestion);
+                }
+            }
             foreach (var dto in dtos)
             {
                 if (dto.Id > 0)
@@ -1317,11 +1327,18 @@ namespace PhishingPortal.Repositories
                     }
 
                     existingQuiz.TrainingId = dto.TrainingId;
-                    existingQuiz.Question = dto.Question;
                     existingQuiz.AnswerType = dto.AnswerType;
                     existingQuiz.OrderNumber = dto.OrderNumber;
                     existingQuiz.Weightage = dto.Weightage;
                     existingQuiz.IsActive = dto.IsActive;
+
+                    foreach (var answer in existingQuiz.TrainingQuizAnswer.ToList())
+                    {
+                        if (!dto.TrainingQuizAnswer.Any(a => a.Id == answer.Id))
+                        {
+                            TenantDbCtx.TrainingQuizAnswer.Remove(answer);
+                        }
+                    }
 
                     foreach (var answerDto in dto.TrainingQuizAnswer)
                     {
@@ -1329,11 +1346,21 @@ namespace PhishingPortal.Repositories
                                                 .FirstOrDefault(a => a.Id == answerDto.Id);
                         if (existingAnswer == null)
                         {
-                            throw new ArgumentException($"No TrainingQuizAnswer found with ID {answerDto.Id}", nameof(dtos));
+                            var newAnswer = new TrainingQuizAnswer
+                            {
+                                TrainingQuizId = existingQuiz.Id,
+                                AnswerText = answerDto.AnswerText,
+                                OrderNumber = answerDto.OrderNumber,
+                                IsCorrect = answerDto.IsCorrect
+                            };
+                            TenantDbCtx.TrainingQuizAnswer.Add(newAnswer);
                         }
-                        existingAnswer.AnswerText = answerDto.AnswerText;
-                        existingAnswer.OrderNumber = answerDto.OrderNumber;
-                        existingAnswer.IsCorrect = answerDto.IsCorrect;
+                        else
+                        {
+                            existingAnswer.AnswerText = answerDto.AnswerText;
+                            existingAnswer.OrderNumber = answerDto.OrderNumber;
+                            existingAnswer.IsCorrect = answerDto.IsCorrect;
+                        }
                     }
                 }
                 else
@@ -1366,7 +1393,7 @@ namespace PhishingPortal.Repositories
                 {
                     await TenantDbCtx.SaveChangesAsync();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }
@@ -1375,12 +1402,13 @@ namespace PhishingPortal.Repositories
             return results;
         }
 
+
         public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
         {
             IEnumerable<TrainingQuiz> result = null;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.TrainingQuiz.Where(o => o.Id == id).Include(o => o.TrainingQuizAnswer);
+            result = TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return result;
