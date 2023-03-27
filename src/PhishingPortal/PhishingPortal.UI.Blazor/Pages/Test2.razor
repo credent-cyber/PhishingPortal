@@ -38,6 +38,13 @@
     private CGrid<CampaignLog> _grid;
     private Task _task;
     private GridODataClient<CampaignLog> _client;
+
+    private Task<ODataDTO<CampaignLog>> _task1;
+    private static IEnumerable<SelectItem> _campaignType;
+    private static IEnumerable<SelectItem> _categoty;
+    private static IEnumerable<SelectItem> _department;
+
+
     private bool _eventHooked = false;
     private List<int> Years;
     public int Year { get; set; } = DateTime.Now.Year;
@@ -47,8 +54,10 @@
         c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.Camp.Id).Titled("CampID").SetWidth("30px").Css("table-bordered");
         c.Add(o => o.Camp.Name).Css("table-bordered").Titled("Campaign Name"); ;
-        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px");
-        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category");
+        c.Add(o => o.CampignType).Css("table-bordered").SetWidth("60px").SetListFilter(_campaignType);
+        c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").SetListFilter(_categoty);
+        c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email");
+        c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department");
         c.Add(o => o.IsHit).Css("table-bordered");
         c.Add(o => o.IsReported).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered");
@@ -79,6 +88,36 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        _campaignType = new List<SelectItem>
+        {
+        new SelectItem("Email", "Email"),
+        new SelectItem("Sms", "Sms"),
+        new SelectItem("Whatsapp", "Whatsapp"),
+        };
+        _categoty = new List<SelectItem>
+        {
+        new SelectItem("Clicks", "Clicks"),
+        new SelectItem("Offers", "Offers"),
+        new SelectItem("Banking", "Banking"),
+        new SelectItem("ITServices", "ITServices"),
+        new SelectItem("Finance", "Finance"),
+        new SelectItem("Verification", "Verification"),
+        };
+
+        //** Init SetListFilter on the top of this funtion **//       
+        // var urls = NavigationManager.BaseUri + $"Odata/Campaignlog?t={authState.TenantIdentifier}&$apply=groupby((CampignType))";
+        //_task1 = HttpClient.GetFromJsonAsync<ODataDTO<CampaignLog>>(urls);
+        //var campaign = await _task1;
+        //if (campaign == null || campaign.Value == null)
+        //{
+        //    _campaignType = new List<SelectItem>();
+        //}
+        //else
+        //{
+        //     _campaignType = campaign.Value.Select(r => new SelectItem(r.CampignType, r.CampignType)).ToList();
+        //}
+
+
         string url = $"Odata/Campaignlog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
         try
@@ -105,6 +144,7 @@
             await Task.CompletedTask;
         });
         Years = await client.GetCampaignLogYears();
+
     }
 
     private async Task<int> GetTotalIsHits()
