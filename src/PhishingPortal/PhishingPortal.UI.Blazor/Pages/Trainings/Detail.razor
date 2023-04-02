@@ -1,0 +1,86 @@
+﻿@page "/training/details/{UniqueID}"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using Blazored.Video
+@using Blazored.Video.Support
+
+@attribute [Authorize]
+
+@inject TenantClient client
+@inject HttpClient httpClient
+@inject NavigationManager navigation
+@inject ILogger<Detail> logger
+@inject AuthenticationStateProvider authState
+
+<h4>Training Details</h4>
+
+@if (!string.IsNullOrEmpty(errorMessage_))
+{
+    <div class="alert alert-danger">@errorMessage_</div>
+}
+
+@if (training_ != null)
+{
+    <div class="card">
+        <div class="card-header bg-info p-2">
+            <h3 class="text-white">@training_.TrainingName</h3>
+
+        </div>
+
+        <div class="card-body-small p-2">
+            <p>@((MarkupString)training_.Content)</p>
+        </div>
+
+        <div class="card-footer row">
+            <div class="col-4">
+                <label class="bold-font">Status: </label>
+                <label>@trainingLog_.Status</label>
+            </div>
+            <div class="col-4">
+                <label class="bold-font">% Completed: </label>
+                <label>@trainingLog_.PercentCompleted</label>
+            </div>
+            <div class="col-4 float-right">
+                @if (trainingLog_.PercentCompleted < 100)
+                {
+                    <a href="/training/launch/@trainingLog_.UniqueID" class="btn btn-primary" target="_blank">Start Training</a>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string UniqueID { get; set; } = string.Empty;
+
+    private Training training_;
+    private TrainingLog trainingLog_ = new();
+    private double currentTime;
+    private string errorMessage_ = string.Empty;
+    private double progress_;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await client.GetTrainingDetails(UniqueID);
+
+        if (result != default((Training, TrainingLog)))
+        {
+            training_ = result.Training;
+            trainingLog_ = result.TrainingLog;
+        }
+        else
+        {
+            errorMessage_ = "Training not found";
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private void LaunchTraining()
+    {
+        navigation.NavigateTo($"/training/launch/{trainingLog_.UniqueID}");
+    }
+}

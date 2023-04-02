@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PhishingPortal.Server;
 using PhishingPortal.Repositories;
 using PhishingPortal.Core;
 using PhishingPortal.Server.Services;
@@ -11,16 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
-using Microsoft.OpenApi.Models;
-using Microsoft.Owin;
-using Owin;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OpenIdConnect;
-using Microsoft.Owin.Security.Notifications;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Build.Framework;
 
 var builder = WebApplication.CreateBuilder(args);
 

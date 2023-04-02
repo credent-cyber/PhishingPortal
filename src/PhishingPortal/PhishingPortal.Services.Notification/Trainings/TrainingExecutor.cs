@@ -67,25 +67,25 @@ namespace PhishingPortal.Services.Notification.Trainings
                     while (!_stopped)
                     {
                         Logger.LogInformation($"Training executor - total pending Training {Queue.Count()}");
-                        if (Queue.TryDequeue(out TraininigInfo ecinfo))
+                        if (Queue.TryDequeue(out TraininigInfo trainingInfo))
                         {
-                            if (ecinfo != null)
+                            if (trainingInfo != null)
                             {
-                                Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.TrainingSubject}");
+                                Logger.LogInformation($"Sending email for tenantIdentifier:{trainingInfo.Tenantdentifier}, EmailSubject: {trainingInfo.TrainingSubject}");
 
-                                var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
+                                var db = TenantDbConnMgr.GetContext(trainingInfo.Tenantdentifier);
 
                                 if (_mailTrackerConfig.EnableEmbedTracker)
-                                    ecinfo.TrainingContent += EmbedTracker(ecinfo);
+                                    trainingInfo.TrainingContent += EmbedTracker(trainingInfo);
 
-                                await EmailSender.SendEmailAsync(ecinfo.TrainingRecipients, ecinfo.TrainingSubject, ecinfo.TrainingContent, true, ecinfo.TrainingLogEntry.SecurityStamp, ecinfo.TrainingFrom);
+                                await EmailSender.SendEmailAsync(trainingInfo.TrainingRecipients, trainingInfo.TrainingSubject, trainingInfo.TrainingContent, true, trainingInfo.TrainingLogEntry.SecurityStamp, trainingInfo.TrainingFrom);
 
                                 Logger.LogInformation($"Training sent");
 
-                                ecinfo.TrainingLogEntry.SentOn = DateTime.Now;
-                                db.Add(ecinfo.TrainingLogEntry);
+                                trainingInfo.TrainingLogEntry.SentOn = DateTime.Now;
+                                db.Add(trainingInfo.TrainingLogEntry);
                                 db.SaveChanges();
-                                Logger.LogInformation($"Traininglog with id: [{ecinfo.TrainingLogEntry.Id}] updated");
+                                Logger.LogInformation($"Traininglog with id: [{trainingInfo.TrainingLogEntry.Id}] updated");
                             }
 
                         }
