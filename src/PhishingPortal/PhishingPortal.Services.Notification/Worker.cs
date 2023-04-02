@@ -12,16 +12,8 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.Trainings;
     using PhishingPortal.Services.Notification.EmailTemplate;
 
-    public class Worker : BackgroundService
+    public partial class Worker : BackgroundService
     {
-        class WorkerSettings
-        {
-            public int WaitIntervalInMinutes { get; set; }
-            public WorkerSettings(IConfiguration config)
-            {
-                config.GetSection("WorkerSettings").Bind(this);
-            }
-        }
 
         public Worker(ILogger<Worker> logger,
             ILogger<EmailCampaignProvider> agentLogger,
@@ -37,7 +29,8 @@ namespace PhishingPortal.Services.Notification
             IDemoRequestHandler demoRequestHandler,
             IWhatsappGatewayClient waClient,
             ITrainingExecutor trainingExecutor,
-            IEmailTemplateProvider emailTemplateProvider
+            IEmailTemplateProvider emailTemplateProvider,
+            ApplicationSettings applicationSettings
             )
 
 
@@ -47,8 +40,7 @@ namespace PhishingPortal.Services.Notification
             this.providerLogger = agentLogger;
             this.TrainingProviderLogger = trainingLogger;
             _configuration = configuration;
-            _settings = new WorkerSettings(configuration);
-
+            _settings = applicationSettings;
             this._emailClient = emailClient;
             _configuration = configuration;
             _centralDbContext = centralDbContext;
@@ -61,12 +53,13 @@ namespace PhishingPortal.Services.Notification
             this._demoRequestHandler = demoRequestHandler;
             this._trainingExecutor = trainingExecutor;
             this._emailTemplateProvider = emailTemplateProvider;
+            this.applicationSettings = applicationSettings;
         }
 
         readonly ILogger<Worker> _logger;
         private readonly ILogger<EmailCampaignProvider> providerLogger;
         private readonly ILogger<TrainingProvider> TrainingProviderLogger;
-        readonly WorkerSettings _settings;
+        readonly ApplicationSettings _settings;
         readonly IEmailClient _emailClient;
         readonly IConfiguration _configuration;
         readonly CentralDbContext _centralDbContext;
@@ -77,6 +70,7 @@ namespace PhishingPortal.Services.Notification
         private readonly IDemoRequestHandler _demoRequestHandler;
         private readonly ITrainingExecutor _trainingExecutor;
         private readonly IEmailTemplateProvider _emailTemplateProvider;
+        private readonly ApplicationSettings applicationSettings;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
         public ISmsGatewayClient SmsClient { get; }
@@ -85,11 +79,20 @@ namespace PhishingPortal.Services.Notification
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _demoRequestHandler.Start();
-            _campaignExecutor.Start();
-            _smsExecutor.Start();
-            // _whatsappCampaignExecutor.Start();
-            _trainingExecutor.Start();
+            if (_settings.EnableDemoRequestHandler)
+                _demoRequestHandler.Start();
+
+            if (_settings.EnableEmailCampaign)
+                _campaignExecutor.Start();
+
+            if (_settings.EnableSmsCampaign)
+                _smsExecutor.Start();
+
+            if (_settings.EnableWhatsappCampaign)
+                _whatsappCampaignExecutor.Start();
+
+            if (_settings.EnableTrainingProvider)
+                _trainingExecutor.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -118,28 +121,44 @@ namespace PhishingPortal.Services.Notification
                                  try
                                  {
                                      // run email campaing for each tenant
-                                     var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
-                                     provider.Subscribe(_campaignExecutor);
-                                     await provider.CheckAndPublish(stoppingToken);
+                                     if (_settings.EnableEmailCampaign)
+                                     {
+                                         var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                         provider.Subscribe(_campaignExecutor);
+                                         await provider.CheckAndPublish(stoppingToken);
+
+                                     }
 
                                      //// sms campaign executor
-                                     var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
-                                     _smsProvider.Subscribe(_smsExecutor);
-                                     await _smsProvider.CheckAndPublish(stoppingToken);
+                                     if (_settings.EnableSmsCampaign)
+                                     {
+                                         var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                         _smsProvider.Subscribe(_smsExecutor);
+                                         await _smsProvider.CheckAndPublish(stoppingToken); 
+                                     }
 
                                      // whatsapp provider 
-                                     //var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
-                                     //_waProvider.Subscribe(_whatsappCampaignExecutor);
-                                     //await _waProvider.CheckAndPublish(stoppingToken);
+                                     if (_settings.EnableWhatsappCampaign)
+                                     {
+                                         var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
+                                         _waProvider.Subscribe(_whatsappCampaignExecutor);
+                                         await _waProvider.CheckAndPublish(stoppingToken); 
+                                     }
 
                                      //training provider
-                                     var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
-                                     trainingProvider.Subscribe(_trainingExecutor);
-                                     await trainingProvider.CheckAndPublish(stoppingToken);
+                                     if (_settings.EnableTrainingProvider)
+                                     {
+                                         var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
+                                         trainingProvider.Subscribe(_trainingExecutor);
+                                         await trainingProvider.CheckAndPublish(stoppingToken); 
+                                     }
 
                                      //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
-                                     var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
-                                     await _reportMonitor.ProcessAsync();
+                                     if (_settings.EnableReportingMonitor)
+                                     {
+                                         var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
+                                         await _reportMonitor.ProcessAsync(); 
+                                     }
 
                                  }
                                  catch (Exception ex)

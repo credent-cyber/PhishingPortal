@@ -75,7 +75,7 @@ IHost host = Host.CreateDefaultBuilder(args)
 
             services.AddSingleton<CentralDbContext>(new CentralDbContext(ctxBuilder.Options));
         }
-
+        services.AddSingleton<ApplicationSettings>();
         services.AddSingleton<IEmailClient, SmtpEmailClient>();
         services.AddSingleton<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
