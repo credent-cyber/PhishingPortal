@@ -59,6 +59,7 @@
                 <button class="btn btn-primary col-3 ml-2" @onclick="Submit">Submit</button>
             }
 
+            <button class="btn btn-warning col-3 ml-2" @onclick="Quit">Quit</button>
         </div>
     </Footer>
 </Card>
@@ -133,7 +134,7 @@
         }
     }
 
-    private async void Submit()
+    private async Task Submit()
     {
         var incorrectMultichoice = questions_.Where(o => o.TrainingQuiz.AnswerType == "Multiple-Choice" &&
                 o.Options.Any(i => i.Option.IsCorrect != i.Selected));
@@ -155,6 +156,15 @@
             {
                 Score = percentage,
                 Pass = percentage > 70
+            });
+    }
+
+    private async Task Quit()
+    {
+        await OnSubmit.InvokeAsync(new Scores
+            {
+                Score = 0,
+                Pass = false
             });
     }
 

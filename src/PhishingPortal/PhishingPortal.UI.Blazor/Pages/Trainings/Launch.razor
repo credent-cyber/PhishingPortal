@@ -5,6 +5,7 @@
 @using PhishingPortal.UI.Blazor.Client
 @using Blazored.Video
 @using Blazored.Video.Support
+@using PhishingPortal.UI.Blazor.Shared.Components.Training
 
 @attribute [Authorize]
 
@@ -30,13 +31,23 @@
                 <p>
                     To complete the trainig you need to -
                 </p>
-                <ul class="list-unstyled">
+                <ul>
                     <li>Watch the training video</li>
                     <li>Attempt quiz question and score 100% in it</li>
                 </ul>
             </Content>
             <Footer>
-                <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
+                @if (trainingLog_.Status == "Completed" || trainingLog_.PercentCompleted >= 100)
+                {
+                    <p class="alert-info mb-2">You have already completed this training.</p>
+                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Retake</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
+                }
+               
+
             </Footer>
         </Card>
     }
@@ -53,9 +64,9 @@
                         <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
                                EventFired="OnEvent"
                                VideoEventOptions="options"
-                               class="w-100"
-                               autoplay="autoplay"
-                               controls="controls"
+                                       class="w-100"
+                                       autoplay="autoplay"
+                                       controls="controls"
                                @ref="video">
                             <source src="videos/@training_.TrainingVideo" type="video/mp4" />
                         </BlazoredVideo>
@@ -95,9 +106,9 @@
     if (mode_ == Mode.Quiz)
     {
 
-        <PhishingPortal.UI.Blazor.Shared.Components.Training.Quiz Training="training_" TrainingLog="trainingLog_" OnSubmit="OnQuizSubmit">
+        <Quiz Training="training_" TrainingLog="trainingLog_" OnSubmit="OnQuizSubmit">
 
-        </PhishingPortal.UI.Blazor.Shared.Components.Training.Quiz>
+        </Quiz>
 
     }
 

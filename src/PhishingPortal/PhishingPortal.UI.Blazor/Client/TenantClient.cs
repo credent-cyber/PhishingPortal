@@ -857,8 +857,10 @@ namespace PhishingPortal.UI.Blazor.Client
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
-                throw;
+               
             }
+
+            return default((Training, TrainingLog));
         }
 
         public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
