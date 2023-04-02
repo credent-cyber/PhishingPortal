@@ -10,6 +10,7 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.Whatsapp;
     using PhishingPortal.Services.Notification.RequestMonitor;
     using PhishingPortal.Services.Notification.Trainings;
+    using PhishingPortal.Services.Notification.EmailTemplate;
 
     public class Worker : BackgroundService
     {
@@ -35,7 +36,8 @@ namespace PhishingPortal.Services.Notification
             ISmsGatewayClient smsClient,
             IDemoRequestHandler demoRequestHandler,
             IWhatsappGatewayClient waClient,
-            ITrainingExecutor trainingExecutor
+            ITrainingExecutor trainingExecutor,
+            IEmailTemplateProvider emailTemplateProvider
             )
 
 
@@ -58,6 +60,7 @@ namespace PhishingPortal.Services.Notification
             WaClient = waClient;
             this._demoRequestHandler = demoRequestHandler;
             this._trainingExecutor = trainingExecutor;
+            this._emailTemplateProvider = emailTemplateProvider;
         }
 
         readonly ILogger<Worker> _logger;
@@ -73,6 +76,7 @@ namespace PhishingPortal.Services.Notification
         bool _isprocessing = false;
         private readonly IDemoRequestHandler _demoRequestHandler;
         private readonly ITrainingExecutor _trainingExecutor;
+        private readonly IEmailTemplateProvider _emailTemplateProvider;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
         public ISmsGatewayClient SmsClient { get; }
@@ -129,7 +133,7 @@ namespace PhishingPortal.Services.Notification
                                      //await _waProvider.CheckAndPublish(stoppingToken);
 
                                      //training provider
-                                     var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                     var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
                                      trainingProvider.Subscribe(_trainingExecutor);
                                      await trainingProvider.CheckAndPublish(stoppingToken);
 
