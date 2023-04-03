@@ -11,6 +11,7 @@ using PhishingPortal.Common;
 using PhishingPortal.Services.Notification.Monitoring;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Dto.Extensions;
+using Humanizer;
 
 namespace PhishingPortal.Services.Notification.Email
 {
@@ -45,20 +46,42 @@ namespace PhishingPortal.Services.Notification.Email
 
                 try
                 {
-
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
-                                                && o.Detail.Type == CampaignType.Email).ToList();
+                                  .Where(o => o.IsActive && o.Detail.Type == CampaignType.Email).ToList();
 
-                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
 
-                    foreach (var campaign in campaigns)
+
+                    var CampaignsToBeCompleted = campaigns.Where(o => o.State == CampaignStateEnum.InProgress)
+                                                          .OrderBy(o => o.Id).FirstOrDefault();
+                    if (CampaignsToBeCompleted != null)
+                    {
+                        //var total = dbContext.CampaignLogs.Where(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        //int totalSent = total.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
+                        //decimal percentageSent = totalSent == 0 ? 0 : decimal.Divide(totalSent, total.Count()) * 100;
+
+                        int total = dbContext.CampaignRecipients.Count(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        int totalSent = dbContext.CampaignLogs.Count(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        decimal percentageSent = totalSent == 0 ? 0 : decimal.Divide(totalSent, total) * 100;
+
+                        if (percentageSent > 98 && CampaignsToBeCompleted.State != CampaignStateEnum.Completed)
+                        {
+                            CampaignsToBeCompleted.State = CampaignStateEnum.Completed;
+                            dbContext.Update(CampaignsToBeCompleted);
+                            dbContext.SaveChanges();
+                        }
+                    }
+
+
+
+                    var campaign = campaigns.Where(o => o.State == CampaignStateEnum.Published && o.Schedule.IsScheduledNow())
+                                            .OrderBy(o => o.Id).FirstOrDefault();   
+                    if (campaign != null)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await Send(campaign, dbContext, Tenant.UniqueId);
@@ -89,8 +112,8 @@ namespace PhishingPortal.Services.Notification.Email
                 if (template == null)
                     throw new Exception("Template not found");
 
-              
-                  
+
+
 
                 var recipients = dbContext.CampaignRecipients.Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
 
@@ -137,10 +160,10 @@ namespace PhishingPortal.Services.Notification.Email
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {

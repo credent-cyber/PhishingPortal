@@ -44,15 +44,35 @@ namespace PhishingPortal.Services.Notification.Sms
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
-                                                && o.Detail.Type == CampaignType.Sms).ToList();
+                                 .Where(o => o.IsActive && o.Detail.Type == CampaignType.Sms).ToList();
 
-                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
 
-                    foreach (var campaign in campaigns)
+                    var CampaignsToBeCompleted = campaigns.Where(o => o.State == CampaignStateEnum.InProgress)
+                                                          .OrderBy(o => o.Id).FirstOrDefault();
+                    if (CampaignsToBeCompleted != null)
+                    {
+                        //var total = dbContext.CampaignLogs.Where(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        //int totalSent = total.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
+                        //decimal percentageSent = totalSent == 0 ? 0 : decimal.Divide(totalSent, total.Count()) * 100;
+
+                        int total = dbContext.CampaignRecipients.Count(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        int totalSent = dbContext.CampaignLogs.Count(o => o.CampaignId == CampaignsToBeCompleted.Id);
+                        decimal percentageSent = totalSent == 0 ? 0 : decimal.Divide(totalSent, total) * 100;
+
+                        if (percentageSent > 98 && CampaignsToBeCompleted.State != CampaignStateEnum.Completed)
+                        {
+                            CampaignsToBeCompleted.State = CampaignStateEnum.Completed;
+                            dbContext.Update(CampaignsToBeCompleted);
+                            dbContext.SaveChanges();
+                        }
+                    }
+
+
+                    var campaign = campaigns.Where(o => o.State == CampaignStateEnum.Published && o.Schedule.IsScheduledNow()).OrderBy(o => o.Id).FirstOrDefault();
+                    if (campaign != null)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
-                        
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await QueueSms(campaign, dbContext, Tenant.UniqueId);

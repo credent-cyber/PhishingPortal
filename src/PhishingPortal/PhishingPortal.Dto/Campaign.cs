@@ -38,7 +38,7 @@ namespace PhishingPortal.Dto
         public string ReturnUrl { get; set; }
 
         [Required]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+       //[EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         public string FromEmail { get; set; }
 
     }

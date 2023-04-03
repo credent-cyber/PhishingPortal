@@ -134,8 +134,8 @@ namespace PhishingPortal.Services.Notification
                                      await trainingProvider.CheckAndPublish(stoppingToken);
 
                                      //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
-                                     var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
-                                     await _reportMonitor.ProcessAsync();
+                                     //var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
+                                     //await _reportMonitor.ProcessAsync();
 
                                  }
                                  catch (Exception ex)

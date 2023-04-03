@@ -1,4 +1,5 @@
 ﻿using PhishingPortal.Common;
+using PhishingPortal.Dto;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Services.Notification.Monitoring;
 using System.Collections.Concurrent;
