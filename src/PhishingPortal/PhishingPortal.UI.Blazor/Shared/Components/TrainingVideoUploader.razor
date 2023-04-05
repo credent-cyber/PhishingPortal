@@ -1,0 +1,170 @@
+﻿@using Microsoft.Extensions.Logging;
+@using PhishingPortal.Dto;
+@using PhishingPortal.UI.Blazor.Client;
+@using PhishingPortal.UI.Blazor.Models;
+@using System.ComponentModel.DataAnnotations;
+@using System.Linq
+@using System.Net.Http.Headers
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient Http
+@inject TenantClient client;
+@inject ILogger<Index> Logger
+@attribute [Authorize]
+
+@if (model == null)
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+}
+else
+{
+    <UiAlerts Model="alert"></UiAlerts>
+    <EditForm Model="@model" OnValidSubmit="@Add">
+        <DataAnnotationsValidator />
+        <div class="form-row">
+            <label class="col-form-label bold-font required-field">Video Name</label>
+            <div class="form-group col-md-3">
+                <InputText id="Name" @bind-Value="model.VideoTitle" class="form-control" />
+                <ValidationMessage For="() => model.VideoTitle" />
+            </div>
+            <label class="col-form-label bold-font required-field">Select Video</label>
+            <div class="form-group col-md-4">
+                <InputFile OnChange="@OnInputFileChange" class="form-control" accept="video/mp4,video/x-m4v,video/*" />
+            </div>
+            <div class="form-group col-md-2" style="margin-top:0px">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-cloud-upload" aria-hidden="true"></i> Upload</button>
+            </div>
+
+        </div>
+    </EditForm>
+
+}
+
+@code {
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    public bool isDisabled = true;
+    private Timer _timer;
+    private int _delay = 1500;
+    TrainingVideo model = new TrainingVideo();
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = new TrainingVideo();
+    }
+
+    private List<File> files = new();
+    private List<UploadResult> uploadResults = new();
+    private int maxAllowedFiles = 1;
+    private bool shouldRender;
+    bool upload = false;
+
+    protected override bool ShouldRender() => shouldRender;
+    private InputFileChangeEventArgs inputFileEventArgs;
+
+    private async Task Add()
+    {
+        alert?.Clear();
+        if (inputFileEventArgs == null)
+        {
+            alert?.SetError("Please Select file!");
+            return;
+        }
+
+        shouldRender = false;
+        long maxFileSize = 1024 * 150000; //150mb
+        using var content = new MultipartFormDataContent();
+        foreach (var file in inputFileEventArgs.GetMultipleFiles(maxAllowedFiles))
+        {
+            if (uploadResults.SingleOrDefault(f => f.FileName == file.Name) is null)
+            {
+                try
+                {
+                    files.Add(new() { Name = file.Name });
+
+                    var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
+
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+                    content.Add(
+                    content: fileContent,
+                    name: "\"files\"",
+                    fileName: file.Name);
+
+                    upload = true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogInformation(
+                    "{FileName} not uploaded (Err: 6): {Message}",
+                    file.Name, ex.Message);
+
+                    uploadResults.Add(
+                    new()
+                        {
+                            FileName = file.Name,
+                            ErrorCode = 6,
+                            Uploaded = false
+                        });
+                    alert?.SetError("Error while saving");
+                }
+            }
+        }
+        if (upload)
+        {
+            var response = await Http.PostAsync("api/filesave", content);
+
+            var newUploadResults = await response.Content.ReadFromJsonAsync<IList<UploadResult>>();
+            if (newUploadResults is not null)
+            {
+                uploadResults = uploadResults.Concat(newUploadResults).ToList();
+            }
+        }
+        var filePath = uploadResults[0].FileLocation;
+        model.FilePath = filePath;
+        var result = await client.UpsertTrainingVideo(model);
+        shouldRender = true;
+        upload = false;
+        alert?.SetSuccess("Successfully Saved!");
+        model = new TrainingVideo();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+
+    }
+
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        shouldRender = false;
+        long maxFileSize = 1024 * 150000;
+        inputFileEventArgs = e;
+    }
+
+    private static bool FileUpload(IList<UploadResult> uploadResults,
+        string? fileName, ILogger<Index> logger, out UploadResult result)
+    {
+        result = uploadResults.SingleOrDefault(f => f.FileName == fileName) ?? new();
+
+        if (!result.Uploaded)
+        {
+            logger.LogInformation("{FileName} not uploaded (Err: 5)", fileName);
+            result.ErrorCode = 5;
+        }
+
+        return result.Uploaded;
+    }
+
+    private class File
+    {
+        public string? Name { get; set; }
+    }
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+}
