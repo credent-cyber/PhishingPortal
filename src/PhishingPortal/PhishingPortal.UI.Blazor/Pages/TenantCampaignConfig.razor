@@ -45,7 +45,9 @@ else
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
                                         <DataAnnotationsValidator />
-                                        @*<ValidationSummary />*@
+                                        @if(model.Id>0){
+                                            <ValidationSummary />         
+                                        }
                                         <div class="card">
 
                                             <div class="card-body">
@@ -87,53 +89,48 @@ else
                                                         </InputSelect>
                                                     </div>
                                                 </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
+                                                    <div class="col-md-8">
+                                                        <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        <ValidationMessage For="@(() => model.FromEmail)" />
+                                                    </div>
+                                                </div>
+
+
+
                                                 @if (model.Detail.Type == CampaignType.Email)
                                                 {
                                                     <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender(Phishing) Email</label>
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
                                                         <div class="col-md-8">
-                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                            <ValidationMessage For="() => model.FromEmail" />
+                                                            <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                                <option>- Select -</option>
+                                                                @foreach (var val in _returnUrlList.OrderBy(o => o))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                            <ValidationMessage For="() => model.ReturnUrl" />
                                                         </div>
                                                     </div>
-                                                }
-                                                else
-                                                {
                                                     <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
                                                         <div class="col-md-8">
-                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                            <ValidationMessage For="() => model.FromEmail" />
+                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.Subject" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
+                                                        <div class="col-md-8">
+                                                            <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.Description" />
                                                         </div>
                                                     </div>
                                                 }
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
-                                                    <div class="col-md-8">
-                                                        <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
-                                                            <option>- Select -</option>
-                                                            @foreach (var val in _returnUrlList.OrderBy(o => o))
-                                                            {
-                                                                <option value="@val">@val</option>
-                                                            }
-                                                        </InputSelect>
-                                                        <ValidationMessage For="() => model.ReturnUrl" />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
-                                                    <div class="col-md-8">
-                                                        <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
-                                                        <ValidationMessage For="() => model.Subject" />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
-                                                    <div class="col-md-8">
-                                                        <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-                                                        <ValidationMessage For="() => model.Description" />
-                                                    </div>
-                                                </div>
+
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Category</label>
                                                     <div class="col-md-8">
@@ -312,7 +309,7 @@ else
                                                 <div style="text-align:center;">
                                                     <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
                                                     <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                    @if ((model.Id == 0 && fileimport is null) ||(model.Id>0 && recipients.Count()==0))
+                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
                                                     {
                                                         <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
@@ -380,7 +377,7 @@ else
                 <Recipients DataList="recipients"></Recipients>
 
                 <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false; this.sources = RecipientSources.None; recipients = new List<RecipientImport>(); }"
-                class="btn btn-secondary" type="button">
+                        class="btn btn-secondary" type="button">
                     Close
                 </button>
 
@@ -392,7 +389,7 @@ else
                 <div style="padding-top: -50%">
                     <Recipients DataList="recipients"></Recipients>
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
-                    class="btn btn-secondary" type="button">
+                            class="btn btn-secondary" type="button">
                         Close
                     </button>
                 </div>

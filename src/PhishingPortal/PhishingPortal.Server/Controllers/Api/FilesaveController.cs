@@ -29,7 +29,7 @@ public class FilesaveController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<IList<UploadResult>>> PostFile([FromForm] IEnumerable<IFormFile> files)
     {
-        var maxAllowedFiles = 3;
+        var maxAllowedFiles = 1;
         long maxFileSize = 1024 * 150000;
         var filesProcessed = 0;
         var resourcePath = new Uri($"{Request.Scheme}://{Request.Host}/");
@@ -77,8 +77,6 @@ public class FilesaveController : ControllerBase
                         uploadResult.Uploaded = true;
                         uploadResult.StoredFileName = trustedFileNameForFileStorage;
                         uploadResult.FileLocation = path;
-
-                        // var result = await _tenantRepository.UpsertTrainingVideo(trainingVideo);
                     }
                     catch (IOException ex)
                     {
