@@ -7,9 +7,11 @@
 @using System.Net.Http.Headers
 @using System.Text.Json;
 @using System.Text;
-@inject HttpClient Http
+@inject HttpClient _httpClient
+@using System.IO
 @inject TenantClient client;
 @inject ILogger<Index> Logger
+@inject NavigationManager NavigationManager
 @attribute [Authorize]
 
 @if (model == null)
@@ -22,7 +24,6 @@
 }
 else
 {
-    <UiAlerts Model="alert"></UiAlerts>
     <EditForm Model="@model" OnValidSubmit="@Add">
         <DataAnnotationsValidator />
         <div class="form-row">
@@ -33,7 +34,11 @@ else
             </div>
             <label class="col-form-label bold-font required-field">Select Video</label>
             <div class="form-group col-md-4">
-                <InputFile OnChange="@OnInputFileChange" class="form-control" accept="video/mp4,video/x-m4v,video/*" />
+                <InputFile OnChange="@OnInputFileChange" disabled="@_uploading" class="form-control" accept="video/mp4,video/x-m4v,video/*" />
+                @if (file == null && IsError)
+                {
+                    <span style="color:red">Please select video file!</span>
+                }
             </div>
             <div class="form-group col-md-2" style="margin-top:0px">
                 <button type="submit" class="btn btn-primary"><i class="fa fa-cloud-upload" aria-hidden="true"></i> Upload</button>
@@ -42,129 +47,121 @@ else
         </div>
     </EditForm>
 
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <progress id="progressBar" value="@percent" max="100" style="width:100%;"></progress>
+            <div>@echo</div><br/>
+            <div style="font-size:8px">@uploadedBytesInfo</div>
+        }
+    </Dailog>
 }
+
 
 @code {
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
+    [Parameter]
+    public EventCallback<bool> OnUploadCompletion { get; set; }
     public bool isDisabled = true;
+    public bool IsError = false;
+    string message = string.Empty;
+    private bool show = false;
+    IBrowserFile file;
+
     private Timer _timer;
     private int _delay = 1500;
     TrainingVideo model = new TrainingVideo();
-
-    protected override async Task OnInitializedAsync()
-    {
-        model = new TrainingVideo();
-    }
-
-    private List<File> files = new();
-    private List<UploadResult> uploadResults = new();
-    private int maxAllowedFiles = 1;
-    private bool shouldRender;
-    bool upload = false;
-
-    protected override bool ShouldRender() => shouldRender;
-    private InputFileChangeEventArgs inputFileEventArgs;
-
-    private async Task Add()
-    {
-        alert?.Clear();
-        if (inputFileEventArgs == null)
-        {
-            alert?.SetError("Please Select file!");
-            return;
-        }
-
-        shouldRender = false;
-        long maxFileSize = 1024 * 150000; //150mb
-        using var content = new MultipartFormDataContent();
-        foreach (var file in inputFileEventArgs.GetMultipleFiles(maxAllowedFiles))
-        {
-            if (uploadResults.SingleOrDefault(f => f.FileName == file.Name) is null)
-            {
-                try
-                {
-                    files.Add(new() { Name = file.Name });
-
-                    var fileContent = new StreamContent(file.OpenReadStream(maxFileSize));
-
-                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-
-                    content.Add(
-                    content: fileContent,
-                    name: "\"files\"",
-                    fileName: file.Name);
-
-                    upload = true;
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogInformation(
-                    "{FileName} not uploaded (Err: 6): {Message}",
-                    file.Name, ex.Message);
-
-                    uploadResults.Add(
-                    new()
-                        {
-                            FileName = file.Name,
-                            ErrorCode = 6,
-                            Uploaded = false
-                        });
-                    alert?.SetError("Error while saving");
-                }
-            }
-        }
-        if (upload)
-        {
-            var response = await Http.PostAsync("api/filesave", content);
-
-            var newUploadResults = await response.Content.ReadFromJsonAsync<IList<UploadResult>>();
-            if (newUploadResults is not null)
-            {
-                uploadResults = uploadResults.Concat(newUploadResults).ToList();
-            }
-        }
-        var filePath = uploadResults[0].FileLocation;
-        model.FilePath = filePath;
-        var result = await client.UpsertTrainingVideo(model);
-        shouldRender = true;
-        upload = false;
-        alert?.SetSuccess("Successfully Saved!");
-        model = new TrainingVideo();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
-
-    }
-
+    bool _uploading;
+    string echo = string.Empty;
+    string uploadedBytesInfo = string.Empty;
+    long percent = 0;
 
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        shouldRender = false;
-        long maxFileSize = 1024 * 150000;
-        inputFileEventArgs = e;
+        var a = file;
+        file = e.File;
     }
 
-    private static bool FileUpload(IList<UploadResult> uploadResults,
-        string? fileName, ILogger<Index> logger, out UploadResult result)
+    private async Task Add()
     {
-        result = uploadResults.SingleOrDefault(f => f.FileName == fileName) ?? new();
-
-        if (!result.Uploaded)
+        IsError = false;
+        if (file == null)
         {
-            logger.LogInformation("{FileName} not uploaded (Err: 5)", fileName);
-            result.ErrorCode = 5;
+            IsError = true;
+            return;
         }
+        show = true;
+        message = "Uploading...";
 
-        return result.Uploaded;
+        const long CHUNKSIZE = 1024 * 400; // subjective
+        long uploadedBytes = 0;
+        long totalBytes = file.Size;
+        percent = 0;
+        int fragment = 0;
+        long chunkSize;
+
+        using (var inStream = file.OpenReadStream(long.MaxValue))
+        {
+            _uploading = true;
+            while (_uploading)
+            {
+                chunkSize = CHUNKSIZE;
+                if (uploadedBytes + CHUNKSIZE > totalBytes)
+                {// remainder
+                    chunkSize = totalBytes - uploadedBytes;
+                }
+                var chunk = new byte[chunkSize];
+                await inStream.ReadAsync(chunk, 0, chunk.Length);
+                // upload this fragment
+                using var formFile = new MultipartFormDataContent();
+                var fileContent = new StreamContent(new MemoryStream(chunk));
+                formFile.Add(fileContent, "file", file.Name);
+                var response = await _httpClient.PostAsync($"api/FileUpload/AppendFile/{fragment++}", formFile);
+
+                // check if the response is successful
+                if (!response.IsSuccessStatusCode)
+                {
+                    message = "Failed to upload file.";
+                    return;
+                }
+
+                // extract the filename from the response
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var result = JsonSerializer.Deserialize<UploadResult>(responseBody, jsonOptions);
+
+                // Update our progress data and UI
+                uploadedBytes += chunkSize;
+                percent = uploadedBytes * 100 / totalBytes;
+                echo = $"{percent}% | Fragment: {fragment}";
+                uploadedBytesInfo = $"Uploaded {uploadedBytes} of {totalBytes}";
+                if (percent >= 100)
+                {
+                    _uploading = false;
+                    message = "";
+                    message = "Successfully Uploaded!";
+                    // store the filelocation in the model
+                    model.FilePath = result.FileLocation;
+                    var upsertResult = await client.UpsertTrainingVideo(model);
+                    model = new TrainingVideo();
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+        }
     }
 
-    private class File
+
+    private void ResetForm()
     {
-        public string? Name { get; set; }
+        show = false;
+        if (message.Contains("Successfully Uploaded"))
+        {
+            model = new TrainingVideo();
+        }
+        RefreshTrainingVideos.InvokeAsync();
     }
-    private void TimerCallback(Object o)
-    {
-        alert?.Clear();
-        _timer.Dispose();
-        StateHasChanged();
-    }
+
+    [Parameter]
+    public EventCallback RefreshTrainingVideos { get; set; }
 }

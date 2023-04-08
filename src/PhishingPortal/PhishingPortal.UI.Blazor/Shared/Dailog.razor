@@ -3,11 +3,11 @@
 
     @*string cssClass = Title.Contains("Success") ? "btn-success" : "btn-danger";*@
      string cssClass;
-    if (Title.Contains("Added") || Title.Contains("Submitted"))
+    if (Title.Contains("Added") || Title.Contains("Submitted") || Title.Contains("Uploaded"))
     {
         cssClass = "btn-success";
     }
-    else if (Title.Contains("Updated"))
+    else if (Title.Contains("Updated") || Title.Contains("Uploading"))
     {
         cssClass = "btn-warning";
     }

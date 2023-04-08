@@ -28,7 +28,7 @@
             <div class="dropdown-divider"></div>
  
             <div class="card-body">
-                <TrainingVideoUploader />
+                <TrainingVideoUploader RefreshTrainingVideos="@RefreshTrainingVideos" />
 
                 <div class="table-responsive">
                     @if (_isLoading)
@@ -81,4 +81,13 @@
         trainingVideos = await client.GetTrainigVideo();
         _isLoading = false;
     }
+
+    public async void RefreshTrainingVideos()
+    {
+        _isLoading = true;
+        trainingVideos = await client.GetTrainigVideo();
+        _isLoading = false;
+        StateHasChanged();
+    }
+    private TrainingVideoUploader uploaderRef;
 }
