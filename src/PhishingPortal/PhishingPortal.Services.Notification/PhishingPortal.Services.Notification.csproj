@@ -62,5 +62,11 @@
 		<ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="EmailTemplate\Training.htm">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 
 </Project>

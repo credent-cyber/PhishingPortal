@@ -11,6 +11,7 @@ using PhishingPortal.Services.Notification.RequestMonitor;
 using PhishingPortal.Services.Notification.Trainings;
 using PhishingPortal.Services.Notification.Whatsapp.Deal;
 using PhishingPortal.Services.Notification.Sms.Deal;
+using PhishingPortal.Services.Notification.EmailTemplate;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -74,8 +75,9 @@ IHost host = Host.CreateDefaultBuilder(args)
 
             services.AddSingleton<CentralDbContext>(new CentralDbContext(ctxBuilder.Options));
         }
-
+        services.AddSingleton<ApplicationSettings>();
         services.AddSingleton<IEmailClient, SmtpEmailClient>();
+        services.AddSingleton<IEmailTemplateProvider, EmailTemplateProvider>();
         services.AddSingleton<IEmailCampaignExecutor, EmailCampaignExecutor>();
         services.AddSingleton<ITrainingExecutor, TrainingExecutor>();
         services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();

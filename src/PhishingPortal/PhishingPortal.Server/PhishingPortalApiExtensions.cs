@@ -1,4 +1,5 @@
-﻿using PhishingPortal.Server;
+﻿using Duende.IdentityServer.Extensions;
+using PhishingPortal.Server;
 using System.Security.Claims;
 
 namespace PhishingPortal.Server
@@ -18,6 +19,14 @@ namespace PhishingPortal.Server
 
             return name.Value;
         }
+        public  static string GetUserEmail(this HttpContext context)
+        {
+            if (context.User.IsAuthenticated())
+            {
+                return context?.User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
+            }
 
+            throw new InvalidOperationException("The use is not authentication");
+        }
     }
 }
