@@ -54,6 +54,12 @@ else
             <div>@echo</div>
             <div style="font-size:8px">@uploadedBytesInfo</div>
         }
+       @* @if (show)
+        {         
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>       
+        }*@
     </Dailog>
 }
 
@@ -66,7 +72,7 @@ else
     public bool isDisabled = true;
     public bool IsError = false;
     string message = string.Empty;
-    private bool show = false;
+    private bool show = true;
     IBrowserFile file;
 
     private Timer _timer;
