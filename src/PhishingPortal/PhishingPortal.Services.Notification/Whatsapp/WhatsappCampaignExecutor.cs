@@ -90,7 +90,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                         {
                             if (msgInfo != null)
                             {
-                                Logger.LogInformation($"Sending email for tenantIdentifier:{msgInfo.Tenantdentifier},To:{msgInfo.SmsRecipient},SecurityId:{msgInfo.LogEntry.SecurityStamp}");
+                                Logger.LogInformation($"Sending whatsapp for tenantIdentifier:{msgInfo.Tenantdentifier},To:{msgInfo.SmsRecipient},SecurityId:{msgInfo.LogEntry.SecurityStamp}");
 
                                 var db = TenantDbConnMgr.GetContext(msgInfo.Tenantdentifier);
 
