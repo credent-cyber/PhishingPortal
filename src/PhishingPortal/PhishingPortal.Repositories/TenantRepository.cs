@@ -1070,7 +1070,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<Tuple<bool, string>> Training(string key)
         {
-            var status = TrainingStatus.Sent.ToString();
+            var status = TrainingLogStatus.Sent.ToString();
             var trainingLog = await TenantDbCtx.TrainingLog.FirstOrDefaultAsync(o => o.SecurityStamp == key && o.Status == status);
 
             if (trainingLog == null)
@@ -1134,8 +1134,8 @@ namespace PhishingPortal.Repositories
                 {
                     Month = (Months)key,
                     TotalTraining = entries.Count(),
-                    Completed = entries.Count(i => i.Status == (TrainingStatus.Completed).ToString()),
-                    Inprogress = entries.Count(i => i.Status == (TrainingStatus.InProgress).ToString()),
+                    Completed = entries.Count(i => i.Status == (TrainingLogStatus.Completed).ToString()),
+                    Inprogress = entries.Count(i => i.Status == (TrainingLogStatus.InProgress).ToString()),
 
                 });
 
@@ -1188,12 +1188,12 @@ namespace PhishingPortal.Repositories
             if (lastTraining != null)
             {
                 var logs = TenantDbCtx.TrainingLog.Where(o => o.TrainingID == lastTraining.Id
-                             && (o.Status == TrainingStatus.Sent.ToString() || o.Status == TrainingStatus.Completed.ToString()));
+                             && (o.Status == TrainingLogStatus.Sent.ToString() || o.Status == TrainingLogStatus.Completed.ToString()));
 
                 outcome.TotalTrainingAssign = logs.Count();
-                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingStatus.Completed.ToString());
-                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingStatus.InProgress.ToString());
-                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingStatus.Sent.ToString());
+                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingLogStatus.Completed.ToString());
+                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingLogStatus.InProgress.ToString());
+                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingLogStatus.Sent.ToString());
 
                 if (outcome.TotalTrainingAssign > 0)
                 {

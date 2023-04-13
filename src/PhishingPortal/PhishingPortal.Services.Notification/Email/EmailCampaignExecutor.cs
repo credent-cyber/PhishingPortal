@@ -82,8 +82,10 @@ namespace PhishingPortal.Services.Notification.Email
                                 await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
 
                                 Logger.LogInformation($"Email sent");
-
+                                
+                                ecinfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
                                 ecinfo.LogEntry.SentOn = DateTime.Now;
+
                                 db.Add(ecinfo.LogEntry);
                                 db.SaveChanges();
                                 Logger.LogInformation($"CampaignLog with id: [{ecinfo.LogEntry.Id}] updated");

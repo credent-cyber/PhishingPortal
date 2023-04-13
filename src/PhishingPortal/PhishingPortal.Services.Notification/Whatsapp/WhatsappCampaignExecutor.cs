@@ -1,4 +1,5 @@
-﻿using PhishingPortal.Services.Notification.Helper;
+﻿using PhishingPortal.Dto;
+using PhishingPortal.Services.Notification.Helper;
 using System.Collections.Concurrent;
 
 namespace PhishingPortal.Services.Notification.Whatsapp
@@ -101,6 +102,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                                     Logger.LogInformation($"Whatsapp sent");
 
                                     msgInfo.LogEntry.SentOn = DateTime.Now;
+                                    msgInfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
 
                                     db.Add(msgInfo.LogEntry);
                                     db.SaveChanges();

@@ -1,4 +1,5 @@
-﻿using PhishingPortal.Services.Notification.Helper;
+﻿using PhishingPortal.Dto;
+using PhishingPortal.Services.Notification.Helper;
 using System.Collections.Concurrent;
 
 namespace PhishingPortal.Services.Notification.Sms
@@ -100,7 +101,7 @@ namespace PhishingPortal.Services.Notification.Sms
                                     Logger.LogInformation($"Sms sent");
 
                                     smsInfo.LogEntry.SentOn = DateTime.Now;
-
+                                    smsInfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
                                     db.Add(smsInfo.LogEntry);
                                     db.SaveChanges();
 

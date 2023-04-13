@@ -1,4 +1,5 @@
 ﻿using PhishingPortal.Common;
+using PhishingPortal.Dto;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Services.Notification.Monitoring;
 using System.Collections.Concurrent;
@@ -83,8 +84,11 @@ namespace PhishingPortal.Services.Notification.Trainings
                                 Logger.LogInformation($"Training sent");
 
                                 trainingInfo.TrainingLogEntry.SentOn = DateTime.Now;
+                                trainingInfo.TrainingLogEntry.Status = TrainingLogStatus.Sent.ToString();
+
                                 db.Add(trainingInfo.TrainingLogEntry);
                                 db.SaveChanges();
+
                                 Logger.LogInformation($"Traininglog with id: [{trainingInfo.TrainingLogEntry.Id}] updated");
                             }
 

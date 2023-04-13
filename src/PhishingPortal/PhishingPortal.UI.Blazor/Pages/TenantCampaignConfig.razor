@@ -870,12 +870,6 @@ else
             message = "Recipients can't be null";
             return;
         }
-        if (model.Subject is null || model.FromEmail is null)
-        {
-            IsError = true;
-            message = "Subject, Sender Email can't be null";
-
-        }
         else
         {
             model.State = CampaignStateEnum.Published;
