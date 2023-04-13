@@ -82,11 +82,14 @@
         {
             alert?.Clear();
             var settings = await TenantApi.GetSettings();
-            var json = settings[Constants.Keys.RETURN_URL_COLLECTION];
-            var jsonSettings = JsonConvert.DeserializeObject<Settings>(json) ?? null;
+            if (settings.ContainsKey("return_urls"))
+            {               
+                var json = settings[Constants.Keys.RETURN_URL_COLLECTION];
+                var jsonSettings = JsonConvert.DeserializeObject<Settings>(json) ?? null;
 
-            if (jsonSettings != null)
-                urls = jsonSettings.ReturnUrls.ToList();
+                if (jsonSettings != null)
+                    urls = jsonSettings.ReturnUrls.ToList();
+            }
         }
         catch (Exception ex)
         {

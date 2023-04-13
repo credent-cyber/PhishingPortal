@@ -32,7 +32,7 @@ namespace PhishingPortal.Server.Services
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
             };
-            if(ClientID != "")
+            if(ClientID != null)
             {
                 var clientSecretCredential = new ClientSecretCredential(TenantID, ClientID, ClientSecret, options);
 

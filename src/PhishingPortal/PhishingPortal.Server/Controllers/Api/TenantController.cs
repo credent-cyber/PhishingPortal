@@ -96,7 +96,7 @@ namespace PhishingPortal.Server.Controllers.Api
             else
             {
                 campaign.CreatedOn = DateTime.Now;
-                campaign.State = CampaignStateEnum.Draft;
+               // campaign.State = CampaignStateEnum.Draft;
             }
 
             return await _tenantRepository.UpsertCampaign(campaign);

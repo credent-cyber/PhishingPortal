@@ -45,8 +45,9 @@ else
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
                                         <DataAnnotationsValidator />
-                                        @if(model.Id>0){
-                                            <ValidationSummary />         
+                                        @if (model.Id > 0)
+                                        {
+                                            <ValidationSummary />
                                         }
                                         <div class="card">
 
@@ -61,7 +62,7 @@ else
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-md-4 bold-font required-field">Template Category</label>
                                                     <div class="col-md-8">
-                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType">
+                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" disabled="@(model.Id > 0)">
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -234,15 +235,14 @@ else
                                                     <label for="txtImportUsers" class="col-form-label col-md-4 bold-font">Import Users</label>
                                                     <div class="col-md-8">
                                                         <div class="input-group">
-                                                            <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">
+
+                                                            <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource" disabled="@(model.State == CampaignStateEnum.Published)">
                                                                 @foreach (var val in Enum.GetValues<RecipientSources>())
                                                                 {
-                                                                    @*if (val != RecipientSources.Imported)*@
-                                                                    {
-                                                                        <option value="@val">@val</option>
-                                                                    }
+                                                                    <option value="@val">@val</option>
                                                                 }
                                                             </InputSelect>
+
                                                             @if (sources == RecipientSources.Csv)
                                                             {
                                                                 <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
@@ -307,26 +307,28 @@ else
                                                 </div>
 
                                                 <div style="text-align:center;">
-                                                    <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
-                                                    <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
+                                                    <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
+                                                    <button type="button" class="btn btn-danger col-md-2 m-1" @onclick="onClose">Close</button>
+                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && fileimport.Count() == 0))
                                                     {
-                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
                                                     else
                                                     {
-                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk">Recipients</button>
                                                     }
                                                     @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                     {
-                                                        <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
+                                                        <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 m-1" type="button">Publish </button>
                                                     }
 
                                                     @if (model.State == CampaignStateEnum.Published)
                                                     {
-                                                        <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
+                                                        <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 m-1" type="button">UnPublish </button>
                                                     }
                                                 </div>
+
+
                                                 <br />
                                             </div>
                                         </div>
@@ -397,20 +399,27 @@ else
         </DialogTemplate>
 
         <AzAdRecipientImporter ShowDialog="showAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></AzAdRecipientImporter>
-
     </div>
 
     <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
         @if (show)
         {
-            <div style="text-align:center;">
-                Thank you!
-            </div>
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    Thank you!
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
         }
+
     </Dailog>
 }
-
-
 @code {
 
     [Parameter]
@@ -425,6 +434,7 @@ else
     bool IsError = false;
     bool IsSuccess = false;
     bool HasHeader = true;
+    bool TaskCompleted = false;
     Campaign model = null;
 
     bool showImportDialog = false;
@@ -478,7 +488,7 @@ else
                 State = CampaignStateEnum.Draft,
                 Detail = new CampaignDetail
                 {
-                    CampaignTemplateId = Templates.FirstOrDefault().Id,
+                    CampaignTemplateId = Templates.Count() != 0 ? Templates.FirstOrDefault().Id : 0,
                     Type = CampaignType.Email,
                 },
                 Schedule = new CampaignSchedule
@@ -490,6 +500,10 @@ else
             };
         scheduleOnceOff.Date = DateTime.Now.Date;
         //scheduleOnceOff.Time = DateTime.Now;
+        recipients.Clear();
+        fileimport = null;
+
+
     }
     protected override async Task OnInitializedAsync()
     {
@@ -538,36 +552,40 @@ else
         IsError = false;
         IsSuccess = false;
         show = true;
+        TaskCompleted = false;
+        if (model.Detail.CampaignTemplateId == 0)
+        {
+            IsError = true;
+            message = "No template selected!";
+            TaskCompleted = true;
+            return;
+        }
         UpdateModelScheduleInfo();
 
         try
         {
-            if (model.Id > 0)
-            {
-                message = "Successfully Updated";
-                model.ModifiedOn = DateTime.Now;
-            }
-            else
-            {
-                message = "Successfully Added";
-                model.CreatedOn = DateTime.Now;
-            }
+            message = "Please wait";
+            int Id = model.Id;
             model = await client.UpsertCampaignAsync(model);
+
+            if (fileimport.Count() > 0)
+            {
+                await OnImportRecipientClick();
+            }    
+            
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            isloading = false;
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
             IsError = true;
             message = "Error while updating";
-        }
-        @if (recipients.Count() > 0)
-        {
-            await OnImportRecipientClick();
-        }
-        isloading = false;
+            TaskCompleted = true;
+        }  
     }
 
-    //protected void OnScheduleTypeChange(ChangeEventArgs e)
     protected void OnScheduleTypeChange()
     {
         isScheduled = true;
@@ -752,6 +770,7 @@ else
     protected void OnCancelImportClick()
     {
         recipients.Clear();
+        fileimport.Clear();
         isloading = false;
         this.showImportDialog = false;
         this.showRecipients = false;
@@ -764,7 +783,7 @@ else
         isloading = true;
         try
         {
-            var data = await client.ImportRecipientToCampaign(model.Id, recipients);
+            var data = await client.ImportRecipientToCampaign(model.Id, fileimport);
             recipients = data;
             //IsSuccess = true;
             //message = "Successfully imported";
@@ -799,7 +818,6 @@ else
         {
             if (model.Id > 0)
             {
-                //await LoadRecipeints(model.Id);
                 recipients = fileimport;
             }
             else
@@ -951,8 +969,17 @@ else
             }
             else if (a == "Email")
             {
-                model.Detail.Type = CampaignType.Email;
-                model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
+                var count = Templates.Where(o => o.Type == CampaignType.Email).Count();
+                if (count.Equals(0))
+                {
+                    model.Detail.CampaignTemplateId = 0;
+                    model.Detail.Type = CampaignType.Email;
+                }
+                else
+                {
+                    model.Detail.Type = CampaignType.Email;
+                    model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
+                }
             }
             else if (a == "Whatsapp")
             {

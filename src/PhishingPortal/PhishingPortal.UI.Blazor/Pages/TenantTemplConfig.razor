@@ -55,19 +55,19 @@ else
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.Name" class="form-control" />
                                                         <ValidationMessage For="() => model.Name" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field">Template Type</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
 
-                                                            <option >- Select -</option>
-                                         >
+                                                            <option>- Select -</option>
+
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -77,7 +77,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                    <label class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -106,7 +106,7 @@ else
                                                 @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
                                                 {
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Is Html</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Is Html</label>
                                                         <div class="col-md-5">
                                                             @if (model.IsHtml is false || model.Id == 0)
                                                             {
@@ -138,7 +138,7 @@ else
                                                 {
 
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Import Template</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Import Template</label>
                                                         <div class="col-md-5">
                                                             <div class="radio radio-info radio-fill d-inline">
                                                                 <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
@@ -155,7 +155,7 @@ else
                                                 @if (model.Id == 0 && import is true)
                                                 {
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Template</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Template</label>
                                                         <div class="col-md-8">
                                                             <div class="input-group">
                                                                 @if (model.Type == CampaignType.Sms)
@@ -187,14 +187,11 @@ else
                                                     <h>@message</h>
                                                 }
 
-                                            </div>
 
-
-
-                                            <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary col-md-3 m-1">Save</button>
+                                                    <button type="button" class="btn btn-danger col-md-3 m-1" @onclick="onClose">Close</button>
+                                                </div>
                                             </div>
                                             <br />
                                         </div>
@@ -382,7 +379,7 @@ else
             }
             if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { model.Content = text; }
 
-             model = await client.UpsertCampaignTemplate(model);
+            model = await client.UpsertCampaignTemplate(model);
 
             IsSuccess = true;
 
@@ -397,7 +394,7 @@ else
         }
 
         loading = false;
-        
+
     }
 
     int pageSize = 5;

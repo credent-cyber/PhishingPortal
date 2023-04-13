@@ -83,7 +83,7 @@ else
                                                             <option>-Select-</option>
                                                             @foreach (var v in trainingVideos)
                                                             {
-                                                                <option value="@v.FilePath">@v.VideoTitle</option>                                                               
+                                                                <option value="@v.FilePath">@v.VideoTitle</option>
                                                             }
                                                         </InputSelect>
                                                     </div>
@@ -217,33 +217,29 @@ else
                                                     </div>
                                                 </div>
 
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
+                                                    <button type="button" @onclick="onClose" class="btn btn-danger col-md-2 m-1">Close</button>
 
-                                            </div>
+                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
+                                                    {
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                    }
+                                                    @if (model.State == TrainingState.Draft && model.Id > 0)
+                                                    {
+                                                        <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 m-1" type="button">Publish </button>
+                                                    }
 
+                                                    @if (model.State == TrainingState.Published)
+                                                    {
+                                                        <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 m-1" type="button">UnPublish </button>
+                                                    }
 
-
-                                            <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
-                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-
-                                                @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
-                                                {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
-                                                }
-                                                else
-                                                {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
-                                                }
-                                                @if (model.State == TrainingState.Draft && model.Id > 0)
-                                                {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
-                                                }
-
-                                                @if (model.State == TrainingState.Published)
-                                                {
-                                                    <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
-                                                }
-
+                                                </div>
                                             </div>
                                             <br />
                                         </div>
@@ -281,7 +277,7 @@ else
                 <Recipients DataList="@recipients"></Recipients>
                 <br />
                 <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false;  recipients = new List<RecipientImport>(); }"
-                class="btn btn-secondary" type="button">
+                        class="btn btn-secondary" type="button">
                     Close
                 </button>
 
@@ -294,7 +290,7 @@ else
                     <Recipients DataList="@recipients"></Recipients>
                     <br />
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
-                    class="btn btn-secondary" type="button">
+                            class="btn btn-secondary" type="button">
                         Close
                     </button>
                 </div>
