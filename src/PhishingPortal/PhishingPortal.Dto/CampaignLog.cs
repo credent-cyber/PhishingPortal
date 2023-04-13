@@ -10,6 +10,7 @@ namespace PhishingPortal.Dto
     public enum CampaignLogStatus
     {
         Unknown,
+        Queued,
         Sent,
         Error,
         Expired,

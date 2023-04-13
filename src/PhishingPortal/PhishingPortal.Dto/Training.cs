@@ -31,6 +31,7 @@ namespace PhishingPortal.Dto
         Published,
         InProgress,
         Completed,
-        Aborted
+        Aborted,
+        Faulted
     }
 }

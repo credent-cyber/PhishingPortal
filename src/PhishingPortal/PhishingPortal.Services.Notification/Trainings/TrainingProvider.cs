@@ -41,11 +41,6 @@ namespace PhishingPortal.Services.Notification.Trainings
             observers = new();
         }
 
-
-
-
-
-
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
             await Task.Run(async () =>
@@ -59,9 +54,11 @@ namespace PhishingPortal.Services.Notification.Trainings
 
 
                     var training = dbContext.Training.Include(o => o.TrainingSchedule)
-                                            .Where(o => o.State == TrainingState.Published && o.IsActive).ToList();
+                                            .Where(o => (o.State == TrainingState.Published || o.State == TrainingState.InProgress) && o.IsActive).ToList();
 
-                    training = training.Where(o => o.TrainingSchedule.IsScheduledNow()).ToList();
+                    MarkExpiredOrCompleted(dbContext, training);
+
+                    training = training.Where(o => o.TrainingSchedule.IsScheduledNow() && o.State == TrainingState.Published).ToList();
 
                     foreach (var t in training)
                     {
@@ -121,7 +118,7 @@ namespace PhishingPortal.Services.Notification.Trainings
                                 ReicipientID = r.AllTrainingRecipient.Id,
                                 TrainingType = training.TrainingCategory,
                                 SentOn = timestamp,
-                                Status = TrainingStatus.Sent.ToString(),
+                                Status = TrainingLogStatus.Sent.ToString(),
                                 Url = returnUrl,
                                 UniqueID = uniqueID,
                             }
@@ -171,5 +168,44 @@ namespace PhishingPortal.Services.Notification.Trainings
         {
             throw new NotImplementedException();
         }
+
+        private static void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Training> allActiveCampaigns)
+        {
+            var allTrainingExpired = allActiveCampaigns.Where(o => o.State == TrainingState.InProgress
+                    && !o.TrainingSchedule.IsScheduledNow()
+                    && o.TrainingSchedule.ScheduleType != ScheduleTypeEnum.NoSchedule);
+
+            foreach (var t in allTrainingExpired)
+            {
+                var allCount = dbContext.TrainingRecipient.Count(o =>o.TrainingId == t.Id);
+                var allLogs = dbContext.TrainingLog.Where(c => c.TrainingID == c.Id);
+                var allSent = allLogs.Count(o => o.Status == TrainingLogStatus.Sent.ToString());
+
+                if (allCount > 0)
+                {
+                    var percentSent = (allSent / allCount) * 100;
+
+                    if (percentSent >= 98)
+                    {
+                        t.State = TrainingState.Completed;
+                    }
+                    else
+                    {
+                        t.State = TrainingState.Faulted;
+                    }
+
+                    dbContext.Update(t);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    t.State = TrainingState.Completed;
+                    dbContext.Update(t);
+                    dbContext.SaveChanges();
+                }
+
+            }
+        }
+
     }
 }

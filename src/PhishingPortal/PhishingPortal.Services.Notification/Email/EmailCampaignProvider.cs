@@ -47,16 +47,19 @@ namespace PhishingPortal.Services.Notification.Email
                 {
 
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
-                    dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-
-                    var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
+                    var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
+                                            .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
                                                 && o.Detail.Type == CampaignType.Email).ToList();
 
-                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
+                    MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
 
-                    foreach (var campaign in campaigns)
+
+                    allActiveCampaigns = allActiveCampaigns.Where(o =>
+                                o.Schedule.IsScheduledNow() &&
+                                o.State != CampaignStateEnum.Published).ToList();
+
+                    foreach (var campaign in allActiveCampaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
                         dbContext.SaveChanges();
@@ -88,9 +91,6 @@ namespace PhishingPortal.Services.Notification.Email
 
                 if (template == null)
                     throw new Exception("Template not found");
-
-              
-                  
 
                 var recipients = dbContext.CampaignRecipients.Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
 
@@ -129,7 +129,7 @@ namespace PhishingPortal.Services.Notification.Email
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,
-                                Status = CampaignLogStatus.Sent.ToString()
+                                Status = CampaignLogStatus.Queued.ToString()
                             }
                         };
 
@@ -163,6 +163,45 @@ namespace PhishingPortal.Services.Notification.Email
             }
             return new Unsubscriber<EmailCampaignInfo>(observers, observer);
         }
+
+
+        private static void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Campaign> allActiveCampaigns)
+        {
+            var allCampaignScheduleExpired = allActiveCampaigns.Where(o => (!o.Schedule.IsScheduledNow() || o.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                && o.State == CampaignStateEnum.InProgress);
+
+            foreach (var c in allCampaignScheduleExpired)
+            {
+                var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
+                var allLogs = dbContext.CampaignLogs.Where(c => c.CampaignId == c.Id);
+                var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
+               
+                if (allCount > 0)
+                {
+                    var percentSent = (allSent / allCount) * 100;
+
+                    if (percentSent >= 98)
+                    {
+                        c.State = CampaignStateEnum.Completed;
+                    }
+                    else
+                    {
+                        c.State = CampaignStateEnum.Unknown;
+                    }
+
+                    dbContext.Update(c);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    c.State = CampaignStateEnum.Completed;
+                    dbContext.Update(c);
+                    dbContext.SaveChanges();
+                }
+
+            }
+        }
+
 
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
         public ILogger<EmailCampaignProvider> Logger { get; }
