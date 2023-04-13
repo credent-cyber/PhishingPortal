@@ -57,7 +57,7 @@ namespace PhishingPortal.Services.Notification.Email
 
                     allActiveCampaigns = allActiveCampaigns.Where(o =>
                                 o.Schedule.IsScheduledNow() &&
-                                o.State != CampaignStateEnum.Published).ToList();
+                                o.State == CampaignStateEnum.Published).ToList();
 
                     foreach (var campaign in allActiveCampaigns)
                     {
