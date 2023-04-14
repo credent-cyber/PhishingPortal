@@ -271,7 +271,7 @@ else
         </div>
     </div>
     <div>
-        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="@recipients"></Recipients>
@@ -283,7 +283,7 @@ else
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">

@@ -41,8 +41,8 @@ else
         c.Add(o => o.Type).Css("table-bordered").Titled("Template Type");
         c.Add(o => o.Version).SetWidth("50px").Css("table-bordered").Filterable(true);
         //c.Add().RenderComponentAs(typeof(TenantTemplates)).Titled("View").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempView>();
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>();
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempView>().SetWidth("50px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>().SetWidth("50px");
     };
 
     protected override async Task OnParametersSetAsync()
@@ -62,7 +62,7 @@ else
             .WithGridItemsCount()
             .SetExcelExport(true, "SmsTemplateList.xlsx")
             .ChangePageSize(true)
-            .EmptyText("-")
+            .EmptyText("No Data Available!!")
             .SetKeyboard(true)
             .Searchable(true, false, false);
         //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
