@@ -419,6 +419,11 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-training")]
         public async Task<Training> UpsertTraining(Training training)
         {
+            if (training.Id > 0)
+                training.ModifiedOn = DateTime.Now;
+            else
+                training.CreatedOn = DateTime.Now;
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(training.Content);
