@@ -4,22 +4,22 @@
 @using Microsoft.Extensions.Primitives
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.Dto
-@implements ICustomGridComponent<CampaignTemplate>
+@implements ICustomGridComponent<Campaign>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler"><i class="fa fa-pencil-square-o"></i></button>
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
 
 @code {
     [Parameter]
-    public CampaignTemplate Item { get; set; }
+    public Campaign Item { get; set; }
 
     [Parameter]
-    public CGrid<CampaignTemplate> Grid { get; set; }
+    public CGrid<Campaign> Grid { get; set; }
 
     private void MyClickHandler(MouseEventArgs e)
     {
         //string gridState = Grid.GetState();
         //string returnUrl = (string)Object;
-        NavigationManager.NavigateTo($"/tenant-templates-config/{Item.Id}");
+        NavigationManager.NavigateTo($"/tenant-campaign-config/{Item.Id}");
     }
 }

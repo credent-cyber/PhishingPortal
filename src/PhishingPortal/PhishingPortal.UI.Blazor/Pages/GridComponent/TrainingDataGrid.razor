@@ -43,7 +43,7 @@ else
         c.Add(o => o.CreatedBy).Css("table-bordered");
         c.Add(o => o.CreatedOn).Css("table-bordered").Titled("CreatedOn");
         c.Add(o => o.ModifiedOn).Css("table-bordered").Titled("ModifiedOn");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TrainingEdit>().SetWidth("50px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TrainingEditButton>().SetWidth("50px");
     };
 
     protected override async Task OnParametersSetAsync()
