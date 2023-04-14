@@ -32,11 +32,11 @@ namespace PhishingPortal.Server.Services
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
             };
-            if(ClientID != null)
+            if (ClientID != null)
             {
                 var clientSecretCredential = new ClientSecretCredential(TenantID, ClientID, ClientSecret, options);
 
-                _graphClient = new GraphServiceClient(clientSecretCredential, Scopes); 
+                _graphClient = new GraphServiceClient(clientSecretCredential, Scopes);
             }
 
             #endregion
@@ -44,7 +44,7 @@ namespace PhishingPortal.Server.Services
 
         public async Task<Dictionary<string, string>?> GetAllUserGroups()
         {
-            var defaultValue = new Dictionary<string, string>(); 
+            var defaultValue = new Dictionary<string, string>();
             try
             {
                 if (_graphClient is not null)
@@ -79,7 +79,7 @@ namespace PhishingPortal.Server.Services
             if (result == null)
                 return Enumerable.Empty<User>().ToList();
 
-            return result.CurrentPage.Where(o => !string.IsNullOrEmpty(o.EmployeeId) 
+            return result.CurrentPage.Where(o => !string.IsNullOrEmpty(o.EmployeeId)
                             && !string.IsNullOrEmpty(o.Mail)).ToList();
 
         }
@@ -91,18 +91,18 @@ namespace PhishingPortal.Server.Services
             if (result == null)
                 return Enumerable.Empty<User>().ToList();
 
-            var values  = new List<User>();
+            var values = new List<User>();
 
-            foreach(var member in result.CurrentPage)
+            foreach (var member in result.CurrentPage)
             {
                 var usr = member as Microsoft.Graph.User;
 
-                if(usr != null)
+                if (usr != null)
                     values.Add(usr);
             }
 
             return values.ToList();
-            
+
         }
 
     }

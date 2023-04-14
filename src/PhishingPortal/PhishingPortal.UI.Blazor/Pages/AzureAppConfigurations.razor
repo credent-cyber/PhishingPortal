@@ -61,7 +61,7 @@
     {
         var settings = await client.GetSettings();
         alert?.Clear();
-        if (settings.ContainsKey("ClientID"))
+        if (settings.ContainsKey("az_client_id"))
             model = new AzureRegistrationSettings(settings);
 
 
