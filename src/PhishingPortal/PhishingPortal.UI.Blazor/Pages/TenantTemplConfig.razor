@@ -299,8 +299,8 @@ else
         {
             Message = string.Empty;
             model = await client.GetTemplateById(Id);
-            if (model.Type == CampaignType.Email) { contents = model.Content; }
-            if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { text = model.Content; }
+            if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp) { contents = model.Content; }
+            if (model.Type == CampaignType.Sms) { text = model.Content; }
 
         }
         else
@@ -358,11 +358,11 @@ else
         message = string.Empty;
         TaskCompleted = false;
 
-        if (model.Type == CampaignType.Email)
+        if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
         {
             model.Content = contents = await GetSummerNoteContent();
         }
-        if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { model.Content = text; }
+        if (model.Type == CampaignType.Sms) { model.Content = text; }
 
         if (model.Content == string.Empty)
         {

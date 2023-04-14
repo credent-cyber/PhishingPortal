@@ -46,7 +46,7 @@
     protected override async Task OnInitializedAsync()
     {
         template = await client.GetTemplateById(Id);
-        if (template.Type == CampaignType.Email)
+        if (template.Type == CampaignType.Email || template.Type == CampaignType.Whatsapp)
         {
 
             sms = false;
