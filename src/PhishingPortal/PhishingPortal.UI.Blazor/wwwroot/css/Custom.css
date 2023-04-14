@@ -148,6 +148,11 @@ table.striped > tbody > tr.grid-row:nth-of-type(odd) {
     color: red;
 }
 
+.dialog {
+    background-color: transparent;
+    box-shadow: none;
+}
+
 .dialog-container {
     position: fixed;
     top: 0;
@@ -445,7 +450,7 @@ imgs {
 
         .lds-ellipsis div:nth-child(1) {
             left: 8px;
-            top : 8px;
+            top: 8px;
             animation: lds-ellipsis1 0.6s infinite;
         }
 

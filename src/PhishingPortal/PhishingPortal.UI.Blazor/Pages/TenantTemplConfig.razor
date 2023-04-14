@@ -236,13 +236,23 @@ else
     </div>
 }
 
-<Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+<Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-        <div style="text-align:center;">
-            Thank you!
-        </div>
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                Thank you!
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
     }
+
 </Dailog>
 
 
@@ -252,6 +262,7 @@ else
     [Parameter]
     public int Id { get; set; }
     private string contents;
+    bool TaskCompleted = false;
 
     public string Title
     {
@@ -345,74 +356,47 @@ else
         IsError = false;
         IsSuccess = false;
         message = string.Empty;
-        show = true;
+        TaskCompleted = false;
+
+        if (model.Type == CampaignType.Email)
+        {
+            model.Content = contents = await GetSummerNoteContent();
+        }
+        if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { model.Content = text; }
+
+        if (model.Content == string.Empty)
+        {
+            IsError = true;
+            message = "Template Content can't be null.";
+            show = true;
+            TaskCompleted = true;
+            return;
+        }
+
         try
         {
-
-            if (model.Id > 0)
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Updated";
-                model.ModifiedOn = DateTime.Now;
-            }
-            else
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Added";
-                model.CreatedOn = DateTime.Now;
-            }
-
-            if (model.Type == CampaignType.Email)
-            {
-                contents = await GetSummerNoteContent();
-                model.Content = contents;
-            }
-            if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { model.Content = text; }
-
+            show = true;
+            message = "Please wait";
+            int Id = model.Id;            
             model = await client.UpsertCampaignTemplate(model);
-
             IsSuccess = true;
 
             if (!Templates.Any(o => o.Id == model.Id))
                 Templates.Add(model);
+
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            loading = false;
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
             Message = ex.Message;
+            TaskCompleted = true;
             logger.LogCritical(ex, ex.Message);
         }
-
-        loading = false;
-
     }
 
-    int pageSize = 5;
-    int pageIndex = 0;
-    int pageIndext = 0;
-    public void Prevv()
-    {
-
-        if (pageIndex > 0) { pageIndex--; }
-        pageIndext = pageIndex;
-        // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
-    }
-    public void Nextt()
-    {
-        pageIndex++;
-        pageIndext = pageIndex;
-
-    }
     protected void onClose()
     {
         NavigationManager.NavigateTo("tenant-templates");

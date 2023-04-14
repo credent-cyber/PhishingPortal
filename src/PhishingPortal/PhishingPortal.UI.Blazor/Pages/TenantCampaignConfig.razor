@@ -572,7 +572,7 @@ else
             {
                 await OnImportRecipientClick();
             }    
-            
+
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
             isloading = false;
             TaskCompleted = true;
@@ -862,12 +862,14 @@ else
 
     protected async Task OnPublishClick()
     {
+        await OnValidSubmit();
         await LoadRecipeints(model.Id);
         show = true;
         if (recipients.Count == 0)
         {
             IsError = true;
             message = "Recipients can't be null";
+            TaskCompleted = true;
             return;
         }
         else
