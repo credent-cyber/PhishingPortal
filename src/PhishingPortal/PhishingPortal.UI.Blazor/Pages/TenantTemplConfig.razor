@@ -242,7 +242,7 @@ else
         @if (TaskCompleted)
         {
             <div style="text-align:center;">
-                Thank you!
+                @MessageBody
             </div>
         }
         else
@@ -263,6 +263,7 @@ else
     public int Id { get; set; }
     private string contents;
     bool TaskCompleted = false;
+    string MessageBody = "Thank you!";
 
     public string Title
     {
@@ -271,7 +272,7 @@ else
             return model?.Id > 0 ? "Modify Template" : "Create New Template";
         }
     }
-    string Message = string.Empty;
+
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
@@ -297,7 +298,7 @@ else
         Templates = await client.GetTemplatesByType(type);
         if (Id != 0)
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = await client.GetTemplateById(Id);
             if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp) { contents = model.Content; }
             if (model.Type == CampaignType.Sms) { text = model.Content; }
@@ -305,7 +306,7 @@ else
         }
         else
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = new CampaignTemplate();
             model.Version = "1";
 
@@ -335,7 +336,7 @@ else
 
     public void OnNewClick()
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = new CampaignTemplate();
         model.Version = "1";
         showNewDialog = true;
@@ -343,7 +344,7 @@ else
 
     public void OnEditClick(CampaignTemplate template)
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = template;
         showNewDialog = true;
     }
@@ -352,10 +353,10 @@ else
 
     protected async Task OnSave()
     {
-        loading = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
         IsError = false;
         IsSuccess = false;
-        message = string.Empty;
         TaskCompleted = false;
 
         if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
@@ -385,13 +386,13 @@ else
                 Templates.Add(model);
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
-            loading = false;
             TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            message = "Error!";
+            MessageBody = ex.Message;
             TaskCompleted = true;
             logger.LogCritical(ex, ex.Message);
         }
@@ -497,7 +498,7 @@ else
     private void ResetForm()
     {
         show = false;
-        if (Message.Contains("Successfully Added"))
+        if (message.Contains("Successfully Added"))
         {
             model = new CampaignTemplate();
             contents = string.Empty;

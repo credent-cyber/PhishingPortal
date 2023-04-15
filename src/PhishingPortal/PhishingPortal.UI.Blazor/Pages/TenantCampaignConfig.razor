@@ -407,7 +407,7 @@ else
             @if (TaskCompleted)
             {
                 <div style="text-align:center;">
-                    Thank you!
+                    @MessageBody
                 </div>
             }
             else
@@ -425,6 +425,7 @@ else
     [Parameter]
     public int Id { get; set; }
     private bool show = false;
+    string MessageBody = "Thank you!";
 
     List<RecipientImport> fileimport;
     Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
@@ -548,7 +549,7 @@ else
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
-        isloading = true;
+        MessageBody = "Thank you!";
         IsError = false;
         IsSuccess = false;
         show = true;
@@ -574,14 +575,14 @@ else
             }    
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
-            isloading = false;
             TaskCompleted = true;
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
             IsError = true;
-            message = "Error while updating";
+            message = "Error!";
+            MessageBody = ex.Message;
             TaskCompleted = true;
         }  
     }

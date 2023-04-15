@@ -304,7 +304,7 @@ else
             @if (TaskCompleted)
             {
                 <div style="text-align:center;">
-                    Thank you!
+                    @MessageBody
                 </div>
             }
             else
@@ -326,6 +326,7 @@ else
     public int Id { get; set; }
     private string contents = "";
     private bool show = false;
+    string MessageBody = "Thank you!";
 
     public string Title
     {
@@ -433,6 +434,7 @@ else
     protected async Task OnSave()
     {
         message = string.Empty;
+        MessageBody = "Thank you!";
         isloading = true;
         IsError = false;
         IsSuccess = false;
@@ -475,7 +477,8 @@ else
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            Message = "Error!";
+            MessageBody = ex.Message;
             logger.LogCritical(ex, ex.Message);
             TaskCompleted = true;
         }
