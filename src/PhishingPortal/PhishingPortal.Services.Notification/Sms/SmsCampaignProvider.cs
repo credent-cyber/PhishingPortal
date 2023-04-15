@@ -55,7 +55,7 @@ namespace PhishingPortal.Services.Notification.Sms
                     foreach (var campaign in allActiveCampaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
-                        
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await QueueSms(campaign, dbContext, Tenant.UniqueId);

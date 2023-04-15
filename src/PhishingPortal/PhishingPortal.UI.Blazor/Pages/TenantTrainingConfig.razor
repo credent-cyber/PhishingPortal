@@ -83,7 +83,7 @@ else
                                                             <option>-Select-</option>
                                                             @foreach (var v in trainingVideos)
                                                             {
-                                                                <option value="@v.FilePath">@v.VideoTitle</option>                                                               
+                                                                <option value="@v.FilePath">@v.VideoTitle</option>
                                                             }
                                                         </InputSelect>
                                                     </div>
@@ -217,33 +217,29 @@ else
                                                     </div>
                                                 </div>
 
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
+                                                    <button type="button" @onclick="onClose" class="btn btn-danger col-md-2 m-1">Close</button>
 
-                                            </div>
+                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && fileimport.Count() == 0))
+                                                    {
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                    }
+                                                    @if (model.State == TrainingState.Draft && model.Id > 0)
+                                                    {
+                                                        <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 m-1" type="button">Publish </button>
+                                                    }
 
+                                                    @if (model.State == TrainingState.Published)
+                                                    {
+                                                        <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 m-1" type="button">UnPublish </button>
+                                                    }
 
-
-                                            <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
-                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-
-                                                @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && recipients.Count() == 0))
-                                                {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
-                                                }
-                                                else
-                                                {
-                                                    <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
-                                                }
-                                                @if (model.State == TrainingState.Draft && model.Id > 0)
-                                                {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning" style="margin:3px" type="button">Publish </button>
-                                                }
-
-                                                @if (model.State == TrainingState.Published)
-                                                {
-                                                    <button @onclick="OnUnpublish" class="btn btn-warning" style="margin:3px" type="button">UnPublish </button>
-                                                }
-
+                                                </div>
                                             </div>
                                             <br />
                                         </div>
@@ -275,26 +271,26 @@ else
         </div>
     </div>
     <div>
-        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Imported Training Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="@recipients"></Recipients>
                 <br />
                 <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false;  recipients = new List<RecipientImport>(); }"
-                class="btn btn-secondary" type="button">
+                        class="btn btn-secondary" type="button">
                     Close
                 </button>
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
                     <Recipients DataList="@recipients"></Recipients>
                     <br />
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
-                    class="btn btn-secondary" type="button">
+                            class="btn btn-secondary" type="button">
                         Close
                     </button>
                 </div>
@@ -302,12 +298,21 @@ else
         </DialogTemplate>
     </div>
 
-    <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
         @if (show)
         {
-            <div style="text-align:center;">
-                Thank you!
-            </div>
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
         }
     </Dailog>
 
@@ -321,6 +326,7 @@ else
     public int Id { get; set; }
     private string contents = "";
     private bool show = false;
+    string MessageBody = "Thank you!";
 
     public string Title
     {
@@ -343,6 +349,8 @@ else
     bool isScheduled = false;
     bool showNewDialog = false;
     string content = string.Empty;
+    bool TaskCompleted = false;
+
     MarkupString previewContent => (MarkupString)content;
 
     Dictionary<int, List<int>> trainingCampIds = new Dictionary<int, List<int>>();
@@ -351,6 +359,8 @@ else
     private List<Campaign> campaigns;
     Training model;
     IEnumerable<TrainingVideo> trainingVideos;
+    RecipientSources sources;
+  
 
     public void Init()
     {
@@ -364,6 +374,8 @@ else
                 }
             };
         TrainingScheduleOff.Date = DateTime.Now.Date;
+        recipients.Clear();
+        fileimport = null;
     }
 
     protected override async Task OnInitializedAsync()
@@ -374,6 +386,11 @@ else
         {
             Message = string.Empty;
             model = await client.GetTrainingById(Id);
+            await LoadRecipeints(model.Id);
+            if (fileimport.Count() > 0)
+            {
+                sources = RecipientSources.Imported;
+            }
             contents = model.Content;
             if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once)
                 TrainingScheduleOff = new OnceOffSchedule(model.TrainingSchedule.ScheduleInfo);
@@ -416,42 +433,24 @@ else
 
     protected async Task OnSave()
     {
-        loading = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        isloading = true;
         IsError = false;
         IsSuccess = false;
-        message = string.Empty;
+        show = true;
+        TaskCompleted = false;
+
         try
         {
-
-            if (model.Id > 0)
-            {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
-
-                Message = "Successfully Updated";
-                model.ModifiedOn = DateTime.Now;
-            }
-            else
-            {
-                if (model.TrainingName is null)
-                {
-                    IsError = true;
-                    message = "Training Name, Training Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Added";
-                model.CreatedOn = DateTime.Now;
-            }
+            message = "Please wait";
+            int Id = model.Id;
             contents = await GetSummerNoteContent();
             model.Content = contents;
             UpdateModelScheduleInfo();
             model = await client.UpsertTraining(model);
 
-            @if (recipients.Count() > 0)
+            if (recipients.Count() > 0)
             {
                 await OnImportRecipientClick();
             }
@@ -471,16 +470,18 @@ else
                 var result = await client.UpsertTRainingCampIDsMap(trainingCampIds);
             }
             IsSuccess = true;
-
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            isloading = false;
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            Message = "Error!";
+            MessageBody = ex.Message;
             logger.LogCritical(ex, ex.Message);
+            TaskCompleted = true;
         }
-        loading = false;
-        show = true;
 
     }
 
@@ -693,7 +694,8 @@ else
         {
             if (model.Id > 0)
             {
-                await LoadRecipeints(model.Id);
+                //await LoadRecipeints(model.Id);
+                 recipients = fileimport;
             }
             else
             {
@@ -739,11 +741,12 @@ else
     {
         var data = await client.GetRecipientByTrainingId(id);
 
-        recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
+        fileimport = recipients = data.Select(o => new RecipientImport(o.AllTrainingRecipient)).ToList();
     }
 
     protected async Task OnPublishClick()
     {
+        await OnSave();
         await LoadRecipeints(model.Id);
 
         if (recipients.Count == 0)

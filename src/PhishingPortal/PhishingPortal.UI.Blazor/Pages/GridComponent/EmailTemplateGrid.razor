@@ -27,6 +27,7 @@ else
     </div>
 }
 
+
 @code
 {
     private CGrid<CampaignTemplate> _grid;
@@ -38,18 +39,18 @@ else
         c.Add(o => o.Name).Css("table-bordered").Titled("Template Name").Filterable(true);
         c.Add(o => o.IsActive).SetWidth("50px").Css("table-bordered").Filterable(true);
         c.Add(o => o.IsHtml).SetWidth("50px").Css("table-bordered").Filterable(true);
-        c.Add(o => o.Type).SetWidth("50px").Css("table-bordered").Titled("Template Type");
+        c.Add(o => o.Type).Css("table-bordered").Titled("Template Type");
         c.Add(o => o.Version).SetWidth("50px").Css("table-bordered").Filterable(true);
         //c.Add().RenderComponentAs(typeof(TenantTemplates)).Titled("View").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempView>();
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TempEdit>();
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TemplateViewButton>().SetWidth("50px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TemplateEditButton>().SetWidth("50px");
     };
 
     protected override async Task OnParametersSetAsync()
     {
         string url = $"odata/template?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        query.Add("grid-filter", "Type__1__Whatsapp");
+        query.Add("grid-filter", "Type__1__1");
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
@@ -60,7 +61,7 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "WhatsappTemplateList.xlsx")
+            .SetExcelExport(true, "EmailTemplateList.xlsx")
             .ChangePageSize(true)
             .EmptyText("-")
             .SetKeyboard(true)
@@ -73,6 +74,5 @@ else
         _task = client.UpdateGrid();
         await _task;
     }
-
 
 }

@@ -61,7 +61,9 @@
     {
         var settings = await client.GetSettings();
         alert?.Clear();
-        model = new AzureRegistrationSettings(settings);
+        if (settings.ContainsKey("az_client_id"))
+            model = new AzureRegistrationSettings(settings);
+
 
         secret = model.ClientSecret;
         model.ClientSecret = SecretMask;

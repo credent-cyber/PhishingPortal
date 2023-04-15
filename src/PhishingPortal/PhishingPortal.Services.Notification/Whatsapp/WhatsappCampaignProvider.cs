@@ -58,7 +58,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                     foreach (var campaign in campaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
-
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await QueueSms(campaign, dbContext, Tenant.UniqueId);

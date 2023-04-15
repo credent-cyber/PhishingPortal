@@ -11,6 +11,7 @@ using PhishingPortal.Common;
 using PhishingPortal.Services.Notification.Monitoring;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Dto.Extensions;
+using Humanizer;
 
 namespace PhishingPortal.Services.Notification.Email
 {
@@ -45,7 +46,6 @@ namespace PhishingPortal.Services.Notification.Email
 
                 try
                 {
-
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
 
                     var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
@@ -62,6 +62,7 @@ namespace PhishingPortal.Services.Notification.Email
                     foreach (var campaign in allActiveCampaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await Send(campaign, dbContext, Tenant.UniqueId);
@@ -137,10 +138,10 @@ namespace PhishingPortal.Services.Notification.Email
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {

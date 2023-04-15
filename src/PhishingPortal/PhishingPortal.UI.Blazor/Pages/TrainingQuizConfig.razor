@@ -145,10 +145,20 @@ else
 <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-        <div style="text-align:center;">
-            Thank you!
-        </div>
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
     }
+
 </Dailog>
 
 
@@ -174,10 +184,12 @@ else
         }
     }
     string Message = string.Empty;
+    string MessageBody = "Thank you!";
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
     bool isloading = false;
+    bool TaskCompleted = false;
     private List<TrainingQuiz> TrainingQuiz { get; set; } = new List<TrainingQuiz>();
 
 
@@ -234,11 +246,13 @@ else
     }
     protected async Task OnSave()
     {
+        Message = string.Empty;
+        MessageBody = "Thank you!";
         loading = true;
         IsError = false;
         IsSuccess = false;
         show = false;
-        Message = string.Empty;
+        TaskCompleted = false;
 
         try
         {  
@@ -277,12 +291,15 @@ else
             }
             TrainingQuiz = await client.UpsertTrainingQuizAsync(TrainingQuiz);
             IsSuccess = true;
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            Message = "Error!";
             logger.LogCritical(ex, ex.Message);
+            MessageBody = ex.Message;
+            TaskCompleted = true;
         }
 
         loading = false;

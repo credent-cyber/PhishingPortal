@@ -95,7 +95,6 @@ namespace PhishingPortal.Repositories
             }
 
             TenantDbCtx.SaveChanges();
-
             return campaign;
         }
 
@@ -173,6 +172,7 @@ namespace PhishingPortal.Repositories
 
             if (hasChanges)
                 TenantDbCtx.SaveChanges();
+               
             else
             {
                 throw new InvalidOperationException("No changes");

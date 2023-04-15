@@ -96,7 +96,7 @@ namespace PhishingPortal.Server.Controllers.Api
             else
             {
                 campaign.CreatedOn = DateTime.Now;
-                campaign.State = CampaignStateEnum.Draft;
+                // campaign.State = CampaignStateEnum.Draft;
             }
 
             return await _tenantRepository.UpsertCampaign(campaign);
@@ -148,6 +148,11 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-template")]
         public async Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template)
         {
+            if (template.Id > 0)
+                template.ModifiedOn = DateTime.Now;
+            else
+                template.CreatedOn = DateTime.Now;
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(template.Content);
@@ -414,6 +419,11 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-training")]
         public async Task<Training> UpsertTraining(Training training)
         {
+            if (training.Id > 0)
+                training.ModifiedOn = DateTime.Now;
+            else
+                training.CreatedOn = DateTime.Now;
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(training.Content);
@@ -574,15 +584,15 @@ namespace PhishingPortal.Server.Controllers.Api
         public async Task<List<MyTraining>> GetMyTrainings()
         {
             var output = new List<MyTraining>();
-            
+
             var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
 
             if (string.IsNullOrEmpty(email))
-                 Forbid("Unauthorized user");
+                Forbid("Unauthorized user");
 
             var result = await TrainingRepository.GetMyTrainings(email);
 
-            foreach(var r in result)
+            foreach (var r in result)
             {
                 output.Add(new MyTraining()
                 {

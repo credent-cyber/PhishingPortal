@@ -78,6 +78,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="Extensions\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="logs\" />

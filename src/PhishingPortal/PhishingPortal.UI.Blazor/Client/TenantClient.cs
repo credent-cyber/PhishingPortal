@@ -219,7 +219,7 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
-
+        
         public async Task<CampaignTemplate> UpsertCampaignTemplate(CampaignTemplate template)
         {
             CampaignTemplate result;

@@ -43,7 +43,7 @@ else
         c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info").Filterable(true); ;
         c.Add(o => o.State).Css("table-bordered").Titled("Status").Filterable(true);
         //c.Add(o => o.IsActive, true).SetWidth("50px").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampEdit>();
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampaignEditButton>().SetWidth("50px").Titled("Edit");
     };
 
     protected override async Task OnParametersSetAsync()
@@ -61,9 +61,9 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, "SmsCampaign.xlsx")
             .ChangePageSize(true)
-            .EmptyText("-")
+            .EmptyText("No Data Available!!")
             .SetKeyboard(true)
             .Searchable(true, false, false);
         //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");

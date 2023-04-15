@@ -55,19 +55,19 @@ else
                                         <div class="card">
                                             <div class="card-body">
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
                                                     <div class="col-md-8">
                                                         <InputText id="Name" @bind-Value="model.Name" class="form-control" />
                                                         <ValidationMessage For="() => model.Name" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font required-field">Template Type</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
                                                     <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
 
-                                                            <option >- Select -</option>
-                                         >
+                                                            <option>- Select -</option>
+
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -77,7 +77,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label  class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                    <label class="col-form-label col-md-4 bold-font">Is Active</label>
                                                     <div class="col-md-5">
                                                         @if (model.IsActive is false || model.Id == 0)
                                                         {
@@ -106,7 +106,7 @@ else
                                                 @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
                                                 {
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Is Html</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Is Html</label>
                                                         <div class="col-md-5">
                                                             @if (model.IsHtml is false || model.Id == 0)
                                                             {
@@ -138,7 +138,7 @@ else
                                                 {
 
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Import Template</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Import Template</label>
                                                         <div class="col-md-5">
                                                             <div class="radio radio-info radio-fill d-inline">
                                                                 <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
@@ -155,7 +155,7 @@ else
                                                 @if (model.Id == 0 && import is true)
                                                 {
                                                     <div class="form-group row">
-                                                        <label  class="col-form-label col-md-4 bold-font">Template</label>
+                                                        <label class="col-form-label col-md-4 bold-font">Template</label>
                                                         <div class="col-md-8">
                                                             <div class="input-group">
                                                                 @if (model.Type == CampaignType.Sms)
@@ -187,14 +187,11 @@ else
                                                     <h>@message</h>
                                                 }
 
-                                            </div>
 
-
-
-                                            <div style="text-align:center;">
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                                <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary col-md-3 m-1">Save</button>
+                                                    <button type="button" class="btn btn-danger col-md-3 m-1" @onclick="onClose">Close</button>
+                                                </div>
                                             </div>
                                             <br />
                                         </div>
@@ -239,13 +236,23 @@ else
     </div>
 }
 
-<Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+<Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-        <div style="text-align:center;">
-            Thank you!
-        </div>
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
     }
+
 </Dailog>
 
 
@@ -255,6 +262,8 @@ else
     [Parameter]
     public int Id { get; set; }
     private string contents;
+    bool TaskCompleted = false;
+    string MessageBody = "Thank you!";
 
     public string Title
     {
@@ -263,7 +272,7 @@ else
             return model?.Id > 0 ? "Modify Template" : "Create New Template";
         }
     }
-    string Message = string.Empty;
+
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
@@ -289,15 +298,15 @@ else
         Templates = await client.GetTemplatesByType(type);
         if (Id != 0)
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = await client.GetTemplateById(Id);
-            if (model.Type == CampaignType.Email) { contents = model.Content; }
-            if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { text = model.Content; }
+            if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp) { contents = model.Content; }
+            if (model.Type == CampaignType.Sms) { text = model.Content; }
 
         }
         else
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = new CampaignTemplate();
             model.Version = "1";
 
@@ -327,7 +336,7 @@ else
 
     public void OnNewClick()
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = new CampaignTemplate();
         model.Version = "1";
         showNewDialog = true;
@@ -335,7 +344,7 @@ else
 
     public void OnEditClick(CampaignTemplate template)
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = template;
         showNewDialog = true;
     }
@@ -344,78 +353,51 @@ else
 
     protected async Task OnSave()
     {
-        loading = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
         IsError = false;
         IsSuccess = false;
-        message = string.Empty;
-        show = true;
+        TaskCompleted = false;
+
+        if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+        {
+            model.Content = contents = await GetSummerNoteContent();
+        }
+        if (model.Type == CampaignType.Sms) { model.Content = text; }
+
+        if (model.Content == string.Empty)
+        {
+            IsError = true;
+            message = "Template Content can't be null.";
+            show = true;
+            TaskCompleted = true;
+            return;
+        }
+
         try
         {
-
-            if (model.Id > 0)
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Updated";
-                model.ModifiedOn = DateTime.Now;
-            }
-            else
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Added";
-                model.CreatedOn = DateTime.Now;
-            }
-
-            if (model.Type == CampaignType.Email)
-            {
-                contents = await GetSummerNoteContent();
-                model.Content = contents;
-            }
-            if (model.Type == CampaignType.Sms || model.Type == CampaignType.Whatsapp) { model.Content = text; }
-
-             model = await client.UpsertCampaignTemplate(model);
-
+            show = true;
+            message = "Please wait";
+            int Id = model.Id;            
+            model = await client.UpsertCampaignTemplate(model);
             IsSuccess = true;
 
             if (!Templates.Any(o => o.Id == model.Id))
                 Templates.Add(model);
+
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
             logger.LogCritical(ex, ex.Message);
         }
-
-        loading = false;
-        
     }
 
-    int pageSize = 5;
-    int pageIndex = 0;
-    int pageIndext = 0;
-    public void Prevv()
-    {
-
-        if (pageIndex > 0) { pageIndex--; }
-        pageIndext = pageIndex;
-        // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
-    }
-    public void Nextt()
-    {
-        pageIndex++;
-        pageIndext = pageIndex;
-
-    }
     protected void onClose()
     {
         NavigationManager.NavigateTo("tenant-templates");
@@ -516,7 +498,7 @@ else
     private void ResetForm()
     {
         show = false;
-        if (Message.Contains("Successfully Added"))
+        if (message.Contains("Successfully Added"))
         {
             model = new CampaignTemplate();
             contents = string.Empty;
