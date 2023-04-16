@@ -262,6 +262,7 @@ else
                 IsError = true;
                 show = true;
                 Message = "Question is Required!";
+                TaskCompleted = true;
                 return;
             }
             if (TrainingQuiz.Any(quiz => quiz.Question == null))
@@ -270,6 +271,7 @@ else
                 IsError = true;
                 show = true;
                 Message = "Empty Question field!";
+                TaskCompleted = true;
                 return;
             }
             foreach (var quiz in TrainingQuiz)
