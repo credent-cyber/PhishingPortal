@@ -276,6 +276,7 @@
             await client.UpdateTrainingProgress(trainingLog_.UniqueID, 60, Dto.Quiz.TrainingStatus.Watched.ToString());
         }
         mode_ = Mode.End;
+        StateHasChanged();
     }
 
     private void OnQuizSubmit(Scores result)

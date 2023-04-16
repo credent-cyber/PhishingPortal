@@ -148,7 +148,7 @@
                                            .Except(correctMultipleChoice)
                                            .Except(incoorectSingleChoice);
 
-        var totalWeigtage = questions_.Sum(o => o.TrainingQuiz.Weightage < 0 ? 1 : o.TrainingQuiz.Weightage);
+        var totalWeigtage = questions_.Sum(o => o.TrainingQuiz.Weightage < 1 ? 1 : o.TrainingQuiz.Weightage);
         var totalCorrectScores = correctMultipleChoice.Sum(o => o.TrainingQuiz.Weightage) + correctSingleChoie.Sum(o => o.TrainingQuiz.Weightage);
         var percentage = Math.Round((totalCorrectScores / totalWeigtage) * 100, 2) ;
 
