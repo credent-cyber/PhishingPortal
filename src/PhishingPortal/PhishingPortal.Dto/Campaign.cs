@@ -20,7 +20,7 @@ namespace PhishingPortal.Dto
         public string Description { get; set; }
 
         [RequiredIfString("Detail.Type", new[] { CampaignType.Email }, "The Subject field is required.")]
-        public string Subject { get; set; }
+        public string Subject { get; set; } = string.Empty;
 
 
         [Required]

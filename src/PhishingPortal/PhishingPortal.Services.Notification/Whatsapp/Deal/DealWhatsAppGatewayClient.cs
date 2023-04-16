@@ -35,7 +35,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 
             try
             {
-                var uri = $"{Config.BaseUrl}/api/send.php?number={to}&type=media&message={message}";
+                var uri = $"{Config.BaseUrl}/api/send.php?number={to}&type=text&message={message}";
 
                 if (!string.IsNullOrEmpty(mediaUrl) && !string.IsNullOrEmpty(file))
                 {
@@ -52,7 +52,11 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 
                 if (response.IsSuccessStatusCode)
                     Logger.LogInformation($"Whatsapp message sent");
-
+               
+                var content = await response.Content.ReadAsStringAsync();
+                
+                Logger.LogInformation($"WhatsApi Response Message: {content}");
+                
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
