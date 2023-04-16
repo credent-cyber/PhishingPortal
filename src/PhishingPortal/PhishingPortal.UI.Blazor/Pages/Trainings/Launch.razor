@@ -46,7 +46,7 @@
                 {
                     <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
                 }
-               
+
 
             </Footer>
         </Card>
@@ -117,7 +117,14 @@
 
         <Card>
             <Header>
-                <h3>Quiz Over!</h3>
+                @if (hasQuiz_)
+                {
+                    <h3>Quiz Over!</h3>
+                }
+                else
+                {
+                    <h3>Training Completed!</h3>
+                }
             </Header>
             <Content>
                 @if (pass_)
@@ -175,6 +182,7 @@
     private Mode mode_;
     private decimal score_;
     private bool pass_;
+    private bool hasQuiz_ = true;
 
     Dictionary<VideoEvents, VideoStateOptions> options = new Dictionary<VideoEvents, VideoStateOptions>();
     VideoState videoState = new();
@@ -194,6 +202,10 @@
         {
             errorMessage_ = "Training not found";
         }
+
+        var quizCollection = await client.GetTrainingQuizByTrainingId(training_.Id);
+        if (quizCollection == null || quizCollection.Count() == 0)
+            hasQuiz_ = false;
 
         await Task.CompletedTask;
     }
@@ -237,8 +249,17 @@
         // record checkpoint
         if (progress_ >= 99.9)
         {
-            mode_ = Mode.QuizInstruction;
-            await client.UpdateTrainingProgress(trainingLog_.UniqueID, 50, Dto.Quiz.TrainingStatus.Watched.ToString());
+            if (hasQuiz_)
+            {
+                mode_ = Mode.QuizInstruction;
+                await client.UpdateTrainingProgress(trainingLog_.UniqueID, 50, Dto.Quiz.TrainingStatus.Watched.ToString());
+            }
+            else
+            {
+                pass_ = true;
+                score_ = 100;
+                QuizComplete();
+            }
         }
 
         logger.LogInformation(state.CurrentTime.ToString());

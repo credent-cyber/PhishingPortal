@@ -93,11 +93,11 @@ namespace PhishingPortal.Services.Notification.Trainings
 
                         var timestamp = DateTime.Now;
                         var key = $"{training.Id}-{r.AllTrainingRecipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
-                        var returnUrl = $"{TrainingBaseUrl}/oidc/challenge?returnUrl=/training/detail/{uniqueID}&provider=Microsoft";
+                        var trainingUrl = $"{TrainingBaseUrl}{uniqueID}";
 
                         // TODO: use training template
                         var parameter = new Dictionary<string, string>();
-                        parameter.Add("###LINK###", returnUrl);
+                        parameter.Add("###LINK###", trainingUrl);
                         parameter.Add("###NAME###", r.AllTrainingRecipient.Name);
 
                         var content = EmailTemplateProvider.GetEmailBody(Constants.EmailTemplate.TRAINING_CAMPAIGN, parameter);
@@ -119,7 +119,7 @@ namespace PhishingPortal.Services.Notification.Trainings
                                 TrainingType = training.TrainingCategory,
                                 SentOn = timestamp,
                                 Status = TrainingLogStatus.Sent.ToString(),
-                                Url = returnUrl,
+                                Url = trainingUrl,
                                 UniqueID = uniqueID,
                             }
                         };
