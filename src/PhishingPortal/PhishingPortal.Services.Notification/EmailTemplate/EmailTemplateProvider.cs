@@ -1,10 +1,12 @@
-﻿namespace PhishingPortal.Services.Notification.EmailTemplate
+﻿using AutoMapper.Configuration;
+
+namespace PhishingPortal.Services.Notification.EmailTemplate
 {
     public class EmailTemplateProvider : IEmailTemplateProvider
     {
         private string templatePath_ = "./EmailTemplates";
 
-        public EmailTemplateProvider(ILogger<EmailTemplateProvider> logger, IConfiguration appsettings)
+        public EmailTemplateProvider(ILogger<EmailTemplateProvider> logger, Microsoft.Extensions.Configuration.IConfiguration appsettings)
         {
             templatePath_ = appsettings.GetValue<string>("EmailTemplatePath") ?? "./EmailTemplates";
             Logger = logger;
@@ -17,10 +19,11 @@
 
             try
             {
-                if (Directory.Exists(templatePath_))
+                var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, templatePath_);
+                if (!Directory.Exists(path))
                     throw new Exception("Template Path Does not exists");
 
-                var templateFilePath = Path.Combine(templatePath_, $"{templateName}.htm");
+                var templateFilePath = Path.Combine(path, $"{templateName}.htm");
 
                 if (!File.Exists(templateFilePath))
                     throw new Exception("Template File doesn't exist");

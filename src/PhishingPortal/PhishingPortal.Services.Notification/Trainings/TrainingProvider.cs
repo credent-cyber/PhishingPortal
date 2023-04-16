@@ -97,8 +97,8 @@ namespace PhishingPortal.Services.Notification.Trainings
 
                         // TODO: use training template
                         var parameter = new Dictionary<string, string>();
-                        parameter.Add("###LINK####", returnUrl);
-                        parameter.Add("###NAME####", r.AllTrainingRecipient.Name);
+                        parameter.Add("###LINK###", returnUrl);
+                        parameter.Add("###NAME###", r.AllTrainingRecipient.Name);
 
                         var content = EmailTemplateProvider.GetEmailBody(Constants.EmailTemplate.TRAINING_CAMPAIGN, parameter);
 
