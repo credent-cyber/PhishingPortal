@@ -68,13 +68,13 @@
                                        autoplay="autoplay"
                                        controls="controls"
                                @ref="video">
-                            <source src="videos/@training_.TrainingVideo" type="video/mp4" />
+                            <source src="trainingvideo/@training_.TrainingVideo" type="video/mp4" />
                         </BlazoredVideo>
                     </div>
                     <div class="col-lg-6 col-md-12 col-sm-12">
                         <h4 class="mb-2 bold-font">Transcripts</h4>
                         <p class="mt-1 p-1">
-                            @((MarkupString)training_.Content);
+                            @((MarkupString)training_.Content)
                         </p>
                     </div>
                 </div>

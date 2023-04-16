@@ -147,8 +147,7 @@ else
                     _uploading = false;
                     message = "";
                     message = "Successfully Uploaded!";
-                    // store the filelocation in the model
-                    model.FilePath = result.FileLocation;
+                    model.FilePath = result?.FileLocation;
                     var upsertResult = await client.UpsertTrainingVideo(model);
                     model = new TrainingVideo();
                 }

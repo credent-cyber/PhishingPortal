@@ -29,14 +29,9 @@ namespace PhishingPortal.Server.Controllers.Api
 
             try
             {
-                // ** let the hosted path 
+                var trainingVideoPath = configuration.GetValue<string>("TrainingVideoPath");
 
-                var TrainingVideoLocation = configuration.GetValue<string>("TrainingVideoPath");
-
-                var path = Path.Combine(env.ContentRootPath, TrainingVideoLocation);
-
-
-                var fileLocation = path + "\\" + file.FileName;
+                var fileLocation = Path.Combine(env.ContentRootPath, trainingVideoPath, file.FileName);
 
                 if (fragment == 0 && IO.File.Exists(fileLocation))
                 {
@@ -47,7 +42,9 @@ namespace PhishingPortal.Server.Controllers.Api
                 {
                     await file.CopyToAsync(fileStream);
                 }
-                return new UploadResult { IsUploaded = true, FileLocation = fileLocation };
+
+                var fileName = Path.GetFileName(fileLocation);
+                return new UploadResult { IsUploaded = true, FileLocation = fileName };
             }
             catch (Exception exception)
             {

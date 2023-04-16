@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -210,6 +211,15 @@ else
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), @"App_Data", "trainingvideo")),
+
+    RequestPath = new PathString("/trainingvideo")
+});
+
 app.UseRouting();
 
 app.UseAuthentication();

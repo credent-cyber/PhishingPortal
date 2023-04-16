@@ -26,7 +26,6 @@
 
     Action<IGridColumnCollection<MyTraining>> columns = c =>
     {
-        c.Add(o => o.Training.Id).Titled("Id").SetWidth("50px").Css("table-bordered");
         c.Add(o => o.Training.TrainingName).Titled("Title").SetWidth("200px").Css("table-bordered");
         c.Add(o => o.TrainingLog.SentOn).Titled("Assigned On").SetWidth("50px").Css("table-bordered");
         c.Add(o => o.TrainingLog.PercentCompleted).Titled("% Completed").SetWidth("50px").Css("table-bordered");
