@@ -45,10 +45,10 @@ else
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
                                         <DataAnnotationsValidator />
-                                        @if (model.Id > 0)
-                                        {
-                                            <ValidationSummary />
-                                        }
+                                        @* @if (model.Id > 0)
+                                    {
+                                    <ValidationSummary />
+                                    }*@
                                         <div class="card">
 
                                             <div class="card-body">
@@ -309,7 +309,7 @@ else
                                                 <div style="text-align:center;">
                                                     <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
                                                     <button type="button" class="btn btn-danger col-md-2 m-1" @onclick="onClose">Close</button>
-                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && fileimport.Count() == 0))
+                                                    @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
                                                     {
                                                         <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
@@ -377,13 +377,12 @@ else
             @if (showRecipientss)
             {
                 <Recipients DataList="recipients"></Recipients>
-
-                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false; this.sources = RecipientSources.None; recipients = new List<RecipientImport>(); }"
+                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false; this.sources = RecipientSources.Imported; recipients = new List<RecipientImport>(); }"
                         class="btn btn-secondary" type="button">
                     Close
                 </button>
-
             }
+
         </DialogTemplate>
         <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
@@ -395,6 +394,19 @@ else
                         Close
                     </button>
                 </div>
+            }
+            else
+            {
+                @if (string.IsNullOrEmpty(message))
+                {
+                    <div>No data found</div>
+                }
+                else
+                {
+                    @message
+                }
+                <br />
+                <button @onclick="CloseDailogBox" class="btn btn-secondary" type="button"> Close </button>
             }
         </DialogTemplate>
 
@@ -420,6 +432,7 @@ else
 
     </Dailog>
 }
+
 @code {
 
     [Parameter]
@@ -427,7 +440,7 @@ else
     private bool show = false;
     string MessageBody = "Thank you!";
 
-    List<RecipientImport> fileimport;
+    List<RecipientImport> fileimport = new List<RecipientImport>();
     Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
     string seletedAdGroup;
 
@@ -502,7 +515,7 @@ else
         scheduleOnceOff.Date = DateTime.Now.Date;
         //scheduleOnceOff.Time = DateTime.Now;
         recipients.Clear();
-        fileimport = null;
+        fileimport.Clear();
 
 
     }
@@ -572,7 +585,7 @@ else
             if (fileimport.Count() > 0)
             {
                 await OnImportRecipientClick();
-            }    
+            }
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
             TaskCompleted = true;
@@ -584,7 +597,7 @@ else
             message = "Error!";
             MessageBody = ex.Message;
             TaskCompleted = true;
-        }  
+        }
     }
 
     protected void OnScheduleTypeChange()
@@ -694,7 +707,7 @@ else
                     index++;
                     continue;
                 }
-                if (item.Equals(string.Empty)) { continue; }
+                if (item.Equals(string.Empty) || item.Equals(",,,,,,,\r")) { continue; }
 
                 try
                 {
@@ -720,6 +733,7 @@ else
                             {
                                 IsError = true;
                                 message = r.ValidationErrMsg;
+                                showRecipients = true;
                                 isloading = false;
                                 return;
                             }
@@ -737,7 +751,6 @@ else
                 {
                     IsError = true;
                     message = ex.Message;
-
                 }
                 isloading = false;
 
@@ -826,7 +839,6 @@ else
                 recipients = fileimport;
             }
             isloading = false;
-
         }
         catch (Exception ex)
         {

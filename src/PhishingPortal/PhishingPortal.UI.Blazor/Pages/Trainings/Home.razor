@@ -32,7 +32,7 @@
         c.Add(o => o.TrainingLog.Status).Titled("Status").Css("table-bordered");
         c.Add().Encoded(false)
             .Sanitized(false)
-            .RenderComponentAs<LaunchTrainingButton>();
+            .RenderComponentAs<LaunchTrainingButton>().SetWidth("50px");
     };
 
     protected override async Task OnParametersSetAsync()
