@@ -2,6 +2,15 @@
 {
     public class Constants
     {
+        public class EmailTemplate
+        {
+            public const string TRAINING_CAMPAIGN = "Training";
+        }
+
+        public class Literals
+        {
+            public const string CREATED_BY = "system";
+        }
 
         public class LocalStorage
         {

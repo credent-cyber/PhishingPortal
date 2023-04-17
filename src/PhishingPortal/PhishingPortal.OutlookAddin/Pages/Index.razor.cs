@@ -29,6 +29,8 @@ namespace PhishingPortal.OutlookAddin.Pages
         public bool EmailForward = false;
 
         public bool Responce = false;
+
+        public bool NoSpam = false;
         public string TrademarkMessage1 { get; set; } = "Copyright © " + @DateTime.Now.Year + " PhishSims.";
         public string TrademarkMessage2 { get; set; } = "All rights reserved.";
 
@@ -119,17 +121,24 @@ namespace PhishingPortal.OutlookAddin.Pages
 
         public async void Forward()
         {
-            var BaseUrl2 = Configuration.GetValue<string>("ApiBaseUrl");
+            NoSpam = false;
+            Responce = false;
 
-            //var input = "https://localhost:7018/T-20220619003439/9b2d0d09d79a8c53ab51a9b0fe423de0";
+            var BaseUrl1 = Configuration.GetValue<string>("ApiBaseUrl1");
+
             var input = WebLink;
-            //  string parts = input.Split("https://phishsims.com/cmpgn/")[1];
-            string parts = input.Split("https://localhost:7018/")[1];
+            if (input == null)
+            {
+                EmailForward = true;
+                NoSpam = true;
+                StateHasChanged();
+                return;
+            }
+            string parts = input.Split($"https://phishsims.com/cmpgn/")[1];
+           //string parts = input.Split($"{BaseUrl}/cmpgn/")[1];
             string TenantId = parts.Split('/')[0];
             string Key = parts.Split('/')[1];
-            //////////
-            var BaseUrl = "https://phishsims.com/";
-            var BaseUrl1 = "https://localhost:7018/";
+
             var client = new HttpClient();
             client.BaseAddress = new Uri(BaseUrl1);
             client.DefaultRequestHeaders.Accept.Clear();
@@ -151,11 +160,6 @@ namespace PhishingPortal.OutlookAddin.Pages
             {
                 Responce = false;
             }
-
-            ///////////
-
-            //var a = true;
-            //Responce = a == true ? true : false;
 
             EmailForward = true;
             StateHasChanged();

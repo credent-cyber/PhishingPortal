@@ -17,9 +17,9 @@ namespace PhishingPortal.Dto
         public string SecurityStamp { get; set; }
         public string Url { get; set; }
         public DateTime SentOn { get; set; }
-
+        public string UniqueID { get; set; }
     }
-    public enum TrainingStatus
+    public enum TrainingLogStatus
     {
         Assigned,
         InProgress,

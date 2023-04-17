@@ -1,0 +1,20 @@
+﻿@using GridShared.Columns
+@using PhishingPortal.Dto
+
+@implements ICustomGridComponent<MyTraining>
+@inject NavigationManager NavigationManager
+
+@if (Item.TrainingLog.Status != "Completed"){
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Launch Training"><i class="fa fa-eye"></i></button>
+}
+
+@code {
+
+    [Parameter]
+    public MyTraining Item { get; set; }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo($"training/details/{Item.TrainingLog.UniqueID}");
+    }
+}

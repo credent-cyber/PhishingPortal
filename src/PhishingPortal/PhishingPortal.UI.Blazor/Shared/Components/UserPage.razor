@@ -1,0 +1,16 @@
+﻿<LoginDisplay />
+            
+@if (IsTrainingLanding)
+{
+    <div class="container">
+        <h3>Cyber Security Trainings</h3>
+        <p>You can do some trainings</p>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public bool IsTrainingLanding { get; set; }
+
+}

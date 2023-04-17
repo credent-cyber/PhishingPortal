@@ -12,7 +12,7 @@
                  
                    <div class="card-header bg-info" style="padding:15px !important;">
                      <h5 class="text-white">@Title</h5>
-                        @if(Title=="Template Preview" || Title=="Import Campaign Recipients")
+                    @if (Title == "Template Preview" || Title == "Import Campaign Recipients" || Title == "Imported Training Recipients")
                         {
                             <div style="float:right">
                                    <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
@@ -21,7 +21,7 @@
                    </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col">
+                            <div class="mt-2">
                                 @ChildContent
                             </div>
                         </div>
@@ -38,12 +38,14 @@
     [Parameter] public RenderFragment ChildContent { get; set; }
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
+    [Parameter] public EventCallback<bool> OnCloseDialog { get; set; }
+
     TenantCampaignConfig campaignConfig=new TenantCampaignConfig();
 
-    public void onClose()
+    private async Task onClose()
     {
-        Show = false;
-        if (Title == "Template Preview") { NavigationManager.NavigateTo($"/tenant-templates"); }
-    }
+        await OnCloseDialog.InvokeAsync(false);
 
+        //if (Title == "Template Preview") { NavigationManager.NavigateTo($"/tenant-templates"); }
+    }
 }

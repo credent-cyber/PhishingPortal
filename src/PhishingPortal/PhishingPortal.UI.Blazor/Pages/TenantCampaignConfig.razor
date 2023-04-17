@@ -16,15 +16,13 @@
 @using NPOI.XSSF.UserModel
 @attribute [Authorize]
 
-@if (model == null || isloading)
+@if (model == null)
 {
 
-    <div class="col-sm-12" style="margin-top:45vh">
-
+    <div class="col-sm-12" style="margin-top:45vh; background-color: transparent;">
         <div class="card-header">
             <div class="loading-bar"></div>
         </div>
-
     </div>
 }
 else
@@ -42,117 +40,121 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
-                            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@message></Alerts>
-
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
+                                        <DataAnnotationsValidator />
+                                        @* @if (model.Id > 0)
+                                    {
+                                    <ValidationSummary />
+                                    }*@
                                         <div class="card">
 
                                             <div class="card-body">
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Campaign Name<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaign Name</label>
+                                                    <div class="col-md-8">
                                                         <InputText @bind-Value="@model.Name" id="Name" class="form-control"></InputText>
+                                                        <ValidationMessage For="() => model.Name" />
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Template Category</label>
-                                                    <div class="col-md-9">
-                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" >
-                                                                @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                                                {
+                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Category</label>
+                                                    <div class="col-md-8">
+                                                        <select @bind="CheckSelected" class="form-control" id="CampaignType" disabled="@(model.Id > 0)">
+                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                                            {
                                                                 <option value="@val">@val</option>
-                                                                }
+                                                            }
                                                         </select>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">Select Template </label>
-                                                    <div class="col-md-9">
+                                                    <label class="col-form-label col-md-4 bold-font">Select Template </label>
+                                                    <div class="col-md-8">
                                                         <InputSelect @bind-Value="model.Detail.CampaignTemplateId" class="form-control" id="CampaignTemplateId">
-                                                            @foreach (var val in Templates.OrderBy(o=>o.Name).Where(o=>o.Type==model.Detail.Type))
-                                                            {   
-                                                                if(val.Id.Equals(0))
+                                                            @foreach (var val in Templates.OrderBy(o => o.Name).Where(o => o.Type == model.Detail.Type))
+                                                            {
+                                                                if (val.Id.Equals(0))
                                                                 {
-                                                                    <option>- Not Available -</option>                                                                 
+                                                                    <option>- Not Available -</option>
                                                                 }
                                                                 else
                                                                 {
                                                                     <option value="@val.Id">@val.Name</option>
                                                                 }
-                                                                    
+
                                                             }
                                                         </InputSelect>
                                                     </div>
                                                 </div>
-                                                @if (model.Detail.Type == CampaignType.Email)
-                                                {                                                  
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender(Phishing) Email<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                     <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Sender<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                }
+
                                                 <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Return Page<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                             <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
-                                                        @foreach (var val in _returnUrlList.OrderBy(o => o))
-                                                            {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                    </InputSelect>
-                                                        </div>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
+                                                    <div class="col-md-8">
+                                                        <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        <ValidationMessage For="@(() => model.FromEmail)" />
                                                     </div>
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Subject<span style="color:red">*</span></label>
-                                                        <div class="col-md-9">
-                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Description</label>
-                                                        <div class="col-md-9">
-                                                             <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
-                                                        </div>
-                                                    </div>
-                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Category<span style="color:red">*</span></label>
-                                                    <div class="col-md-9">
-                                                      @* <InputText @bind-Value="@model.Category" id="Category" class="form-control"></InputText>
-                                                       <div id="contentHelp" class="form-text">Eg. Clicks, Offers, IT Services, Banking & Finance, etc.</div>*@
-                                                       <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
-
-                                                                <option>-Select-</option>
-                                                                <option value="Clicks">Clicks</option>
-                                                                <option value="Offers">Offers</option>
-                                                                <option value="ITServices">IT Services</option>
-                                                                <option value="Banking">Banking</option>
-                                                                <option value="Finance">Finance</option>
-                                                                <option value="Finance">Verification</option>
-
-                                                    </InputSelect>
                                                 </div>
-                                            </div>
 
 
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-3">Schedule</label>
-                                                <div class="col-md-5">
-                                                    @if (isScheduled == false)
+
+                                                @if (model.Detail.Type == CampaignType.Email)
+                                                {
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
+                                                        <div class="col-md-8">
+                                                            <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                                <option>- Select -</option>
+                                                                @foreach (var val in _returnUrlList.OrderBy(o => o))
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+                                                            <ValidationMessage For="() => model.ReturnUrl" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
+                                                        <div class="col-md-8">
+                                                            <InputText @bind-Value="@model.Subject" id="Subject" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.Subject" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Description</label>
+                                                        <div class="col-md-8">
+                                                            <InputText @bind-Value="@model.Description" id="Description" class="form-control"></InputText>
+                                                            <ValidationMessage For="() => model.Description" />
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Category</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.Category" class="form-control" id="Category">
+
+                                                            <option>- Select -</option>
+                                                            <option value="Clicks">Clicks</option>
+                                                            <option value="Offers">Offers</option>
+                                                            <option value="ITServices">IT Services</option>
+                                                            <option value="Banking">Banking</option>
+                                                            <option value="Finance">Finance</option>
+                                                            <option value="Finance">Verification</option>
+
+                                                        </InputSelect>
+                                                        <ValidationMessage For="() => model.Category" />
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                    <div class="col-md-5">
+                                                        @if (isScheduled == false)
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
                                                                 <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
@@ -177,7 +179,7 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row" id="divSchedule">
-                                                    <div class="col-md-9 offset-md-3 row" style="padding: 0;">
+                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
 
                                                         <div class="col-12">
                                                             @if (model.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
@@ -186,10 +188,10 @@ else
                                                             }
                                                             @if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
                                                             {
-                                                                <label class="form-label">Scheduled Once</label>
+                                                                @*<label class="form-label">Scheduled Once</label>*@
                                                                 <div class="input-group">
                                                                     <div class="input-group-prepend">
-                                                                        <span class="input-group-text" id="">Date & Time</span>
+                                                                        <span class="input-group-text" id="">Date</span>
                                                                     </div>
                                                                     <InputDate @bind-Value="scheduleOnceOff.Date" id="OnceOffScheduleDate" class="form-control"></InputDate>
                                                                     <input type="time" @bind="scheduleOnceOff.Time" id="OnceOffScheduleTime" class="form-control"></input>
@@ -230,26 +232,28 @@ else
                                                 </div>
 
                                                 <div class="form-group row">
-                                                    <label for="txtImportUsers" class="col-form-label col-md-3">Import Users</label>
-                                                    <div class="col-md-9">
+                                                    <label for="txtImportUsers" class="col-form-label col-md-4 bold-font">Import Users</label>
+                                                    <div class="col-md-8">
                                                         <div class="input-group">
-                                                        <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource">                                                         
-                                                            @foreach (var val in Enum.GetValues<RecipientSources>())
+
+                                                            <InputSelect id="RecipientSources" @bind-Value="sources" class="form-control" @oninput="OnChangeRecipientSource" disabled="@(model.State == CampaignStateEnum.Published)">
+                                                                @foreach (var val in Enum.GetValues<RecipientSources>())
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
+                                                            </InputSelect>
+
+                                                            @if (sources == RecipientSources.Csv)
                                                             {
-                                                            <option value="@val">@val</option>
-                                                            }
-                                                        </InputSelect>   
-                                                            @if(sources == RecipientSources.Csv)
-                                                            {                                                                
                                                                 <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
                                                             }
                                                         </div>
-                                                        <br/>
+                                                        <br />
                                                         @if (sources == RecipientSources.Csv)
                                                         {
                                                             <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Has Header Row</label>
-                                                                <div class="col-md-5">
+                                                                <label class="col-form-label col-md-4"> Has Header</label>
+                                                                <div class="col-md-8">
                                                                     <div class="radio radio-info radio-fill d-inline">
                                                                         <input type="radio" name="radio-i-in-3" id="chkHasHeader" @onclick="Header" checked>
                                                                         <label for="chkHasHeader" class="cr">Yes</label>
@@ -262,7 +266,7 @@ else
                                                             </div>
 
                                                             <div class="form-group row" id="divUploadUsers">
-                                                                <label for="" class="col-form-label col-md-3">Select File</label>
+                                                                <label class="col-form-label col-md-3">File</label>
                                                                 <div class="col-md-9">
                                                                     <div class="input-group">
                                                                         <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
@@ -279,55 +283,57 @@ else
 
 
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-3">State</label>
-                                                    <div class="col-md-9">
-                                                    @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
-                                                    {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                    <label class="col-form-label col-md-4 bold-font">State</label>
+                                                    <div class="col-md-8">
+                                                        @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
                                                                 @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                                 {
-                                                                <option value="@val">@val</option>
+                                                                    <option value="@val">@val</option>
                                                                 }
-                                                        </InputSelect>
-                                                    }
-                                                    else
-                                                    {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                            </InputSelect>
+                                                        }
+                                                        else
+                                                        {
+                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
                                                                 @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                                 {
-                                                                <option value="@val">@val</option>
+                                                                    <option value="@val">@val</option>
                                                                 }
-                                                        </InputSelect>
-                                                    }
+                                                            </InputSelect>
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            
+
                                                 <div style="text-align:center;">
-                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                    <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                    @if (model.Id == 0 && fileimport is null)
+                                                    <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
+                                                    <button type="button" class="btn btn-danger col-md-2 m-1" @onclick="onClose">Close</button>
+                                                    @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
                                                     {
-                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk" disabled>Recipients</button>
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
                                                     else
                                                     {
-                                                        <button type="button" style="margin:3px" class="btn btn-dark" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk">Recipients</button>
                                                     }
                                                     @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                     {
-                                                        <button @onclick="OnPublishClick" class="btn btn-warning  me-2" type="button">Publish </button>
+                                                        <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 m-1" type="button">Publish </button>
                                                     }
 
                                                     @if (model.State == CampaignStateEnum.Published)
                                                     {
-                                                        <button @onclick="OnUnpublish" class="btn btn-warning  me-2" type="button">UnPublish </button>
+                                                        <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 m-1" type="button">UnPublish </button>
                                                     }
                                                 </div>
-                                                <br/>
+
+
+                                                <br />
                                             </div>
                                         </div>
                                     </EditForm>
-                                   
+
                                 </div>
 
                                 <div class="col-md-6">
@@ -339,17 +345,17 @@ else
                                             }
                                             else
                                             {
-                                                if(model.Detail.Type == CampaignType.Sms)
+                                                if (model.Detail.Type == CampaignType.Sms)
                                                 {
                                                     OnShowPreview(model.Detail.CampaignTemplateId);
-                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text"  disabled />
+                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" disabled />
                                                 }
                                                 else
                                                 {
-                                                    OnShowPreview(model.Detail.CampaignTemplateId);                                                                                                      
-                                                    @previewContent 
+                                                    OnShowPreview(model.Detail.CampaignTemplateId);
+                                                    @previewContent
                                                 }
-                                                
+
                                             }
                                         </div>
                                     </div>
@@ -367,43 +373,74 @@ else
 
     </div>
     <div>
-        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipientss">
+        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipientss" OnCloseDialog="CloseDailogBox">
             @if (showRecipientss)
             {
                 <Recipients DataList="recipients"></Recipients>
-
-                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false; this.sources = RecipientSources.None; recipients = new List<RecipientImport>(); }"
-                class="btn btn-secondary" type="button">
+                <button @onclick="() => { this.showImportDialog = false; this.showRecipientss = false; this.sources = RecipientSources.Imported; recipients = new List<RecipientImport>(); }"
+                        class="btn btn-secondary" type="button">
                     Close
                 </button>
-
             }
+
         </DialogTemplate>
-        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients">
+        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
                     <Recipients DataList="recipients"></Recipients>
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
-                    class="btn btn-secondary" type="button">
+                            class="btn btn-secondary" type="button">
                         Close
                     </button>
                 </div>
             }
+            else
+            {
+                @if (string.IsNullOrEmpty(message))
+                {
+                    <div>No data found</div>
+                }
+                else
+                {
+                    @message
+                }
+                <br />
+                <button @onclick="CloseDailogBox" class="btn btn-secondary" type="button"> Close </button>
+            }
         </DialogTemplate>
 
         <AzAdRecipientImporter ShowDialog="showAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></AzAdRecipientImporter>
-
     </div>
-}
 
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+
+    </Dailog>
+}
 
 @code {
 
     [Parameter]
     public int Id { get; set; }
+    private bool show = false;
+    string MessageBody = "Thank you!";
 
-    List<RecipientImport> fileimport;
+    List<RecipientImport> fileimport = new List<RecipientImport>();
     Dictionary<string, string> LstAzAdGroups = new Dictionary<string, string>();
     string seletedAdGroup;
 
@@ -411,6 +448,7 @@ else
     bool IsError = false;
     bool IsSuccess = false;
     bool HasHeader = true;
+    bool TaskCompleted = false;
     Campaign model = null;
 
     bool showImportDialog = false;
@@ -426,7 +464,7 @@ else
 
     public bool sms = false;
     string text = "";
-   
+
 
     public string Title
     {
@@ -445,7 +483,6 @@ else
 
     }
 
-    //IEnumerable<CampaignTemplate> Templates = new List<CampaignTemplate>();
     List<CampaignTemplate> Templates;
     CampaignType? type = null;
 
@@ -458,11 +495,32 @@ else
 
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
+    public void Init()
+    {
+        model = new Campaign()
+            {
+                State = CampaignStateEnum.Draft,
+                Detail = new CampaignDetail
+                {
+                    CampaignTemplateId = Templates.Count() != 0 ? Templates.FirstOrDefault().Id : 0,
+                    Type = CampaignType.Email,
+                },
+                Schedule = new CampaignSchedule
+                {
+                    ScheduleType = ScheduleTypeEnum.NoSchedule,
+                    WillRepeat = false
+                },
+
+            };
+        scheduleOnceOff.Date = DateTime.Now.Date;
+        //scheduleOnceOff.Time = DateTime.Now;
+        recipients.Clear();
+        fileimport.Clear();
 
 
+    }
     protected override async Task OnInitializedAsync()
     {
-        //Templates = await client.GetCampaignTemplates();
         Templates = await client.GetTemplatesByType(type);
 
         #region Bind Return urls
@@ -472,8 +530,11 @@ else
         if (Id != 0)
         {
             model = await client.GetCampaingById(Id);
-            
-
+            await LoadRecipeints(model.Id);
+            if (fileimport.Count() > 0)
+            {
+                sources = RecipientSources.Imported;
+            }
             _selectReturnUrl = model.ReturnUrl;
 
             if (model.Schedule.ScheduleType == ScheduleTypeEnum.Once)
@@ -494,67 +555,51 @@ else
         }
         else
         {
-            model = new Campaign()
-                {
-                    State = CampaignStateEnum.Draft,
-                    Detail = new CampaignDetail
-                    {
-                        CampaignTemplateId = Templates.FirstOrDefault().Id,
-                        Type = CampaignType.Email,
-                    },
-                    Schedule = new CampaignSchedule
-                    {
-                        ScheduleType = ScheduleTypeEnum.NoSchedule,
-                        WillRepeat = false
-                    }
-                };
+            Init();
         }
     }
 
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
-
-        if (@model.Name is null || @model.Subject is null || @model.FromEmail is null || @model.Category is null || @model.ReturnUrl is null)
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        if (model.Detail.CampaignTemplateId == 0)
         {
             IsError = true;
-            message = "Please fill all the required field";
+            message = "No template selected!";
+            TaskCompleted = true;
             return;
         }
-    @if (@model.FromEmail is not null && model.Detail.Type == CampaignType.Email)
-        {
-            var formate = Regex.IsMatch(@model.FromEmail, @".+@.+\..+");
-            if (!formate)
-            {
-                IsError = true;
-                message = "Invalid Phishing Email!";
-                return;
-            }
-        }
-
-        isloading = true;
         UpdateModelScheduleInfo();
 
         try
         {
+            message = "Please wait";
+            int Id = model.Id;
             model = await client.UpsertCampaignAsync(model);
+
+            if (fileimport.Count() > 0)
+            {
+                await OnImportRecipientClick();
+            }
+
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
             IsError = true;
-            message = "Error while updating";
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
         }
-        @if (recipients.Count() > 0)
-        {
-            await OnImportRecipientClick();
-        }
-        isloading = false;
-        IsSuccess = true;
-        message = "Updated successfully";
     }
 
-    //protected void OnScheduleTypeChange(ChangeEventArgs e)
     protected void OnScheduleTypeChange()
     {
         isScheduled = true;
@@ -662,7 +707,7 @@ else
                     index++;
                     continue;
                 }
-                if (item.Equals(string.Empty)) { continue; }
+                if (item.Equals(string.Empty) || item.Equals(",,,,,,,\r")) { continue; }
 
                 try
                 {
@@ -682,16 +727,17 @@ else
                                     Department = arr[5],
                                     Branch = arr[6],
                                     Address = arr[7]
-                            };
+                                };
                             r.Validate();
-                            if(r.ValidationErrMsg is not null)
+                            if (r.ValidationErrMsg is not null)
                             {
                                 IsError = true;
                                 message = r.ValidationErrMsg;
+                                showRecipients = true;
                                 isloading = false;
                                 return;
                             }
-                            if(!recipients.Any(i => i.Email == r.Email))
+                            if (!recipients.Any(i => i.Email == r.Email))
                                 recipients.Add(r);
                         }
 
@@ -705,7 +751,6 @@ else
                 {
                     IsError = true;
                     message = ex.Message;
-
                 }
                 isloading = false;
 
@@ -739,6 +784,7 @@ else
     protected void OnCancelImportClick()
     {
         recipients.Clear();
+        fileimport.Clear();
         isloading = false;
         this.showImportDialog = false;
         this.showRecipients = false;
@@ -751,10 +797,10 @@ else
         isloading = true;
         try
         {
-            var data = await client.ImportRecipientToCampaign(model.Id, recipients);
+            var data = await client.ImportRecipientToCampaign(model.Id, fileimport);
             recipients = data;
-            IsSuccess = true;
-            message = "Successfully imported";
+            //IsSuccess = true;
+            //message = "Successfully imported";
         }
         catch (Exception ex)
         {
@@ -772,7 +818,7 @@ else
     {
         var data = await client.GetRecipientByCampaignId(id);
 
-        recipients = data.Select(o => new RecipientImport(o.Recipient)).ToList();
+        fileimport = recipients = data.Select(o => new RecipientImport(o.Recipient)).ToList();
     }
 
     protected async Task OnShowRecipientClickk()
@@ -786,14 +832,13 @@ else
         {
             if (model.Id > 0)
             {
-                await LoadRecipeints(model.Id);
+                recipients = fileimport;
             }
             else
             {
                 recipients = fileimport;
             }
             isloading = false;
-
         }
         catch (Exception ex)
         {
@@ -830,19 +875,15 @@ else
 
     protected async Task OnPublishClick()
     {
+        await OnValidSubmit();
         await LoadRecipeints(model.Id);
-
+        show = true;
         if (recipients.Count == 0)
         {
             IsError = true;
             message = "Recipients can't be null";
+            TaskCompleted = true;
             return;
-        }
-        if (model.Subject is null || model.FromEmail is null)
-        {
-            IsError = true;
-            message = "Subject, Sender Email can't be null";
-
         }
         else
         {
@@ -865,15 +906,15 @@ else
         var template = Templates.FirstOrDefault(o => o.Id == id);
         showPreview = true;
         //content = template.Content;
-        if(template.Type==CampaignType.Email ||template.Type==CampaignType.Whatsapp)
+        if (template.Type == CampaignType.Email || template.Type == CampaignType.Whatsapp)
         {
             sms = false;
-            content = template.Content;           
+            content = template.Content;
         }
-        if(template.Type==CampaignType.Sms)
+        if (template.Type == CampaignType.Sms)
         {
             sms = true;
-            text = template.Content;           
+            text = template.Content;
         }
     }
     protected void onClose()
@@ -916,13 +957,13 @@ else
             updt(selectedEventArgs);
         }
     }
-    public void updt(ChangeEventArgs e) 
+    public void updt(ChangeEventArgs e)
     {
         if (e.Value.ToString() != string.Empty)
         {
             var a = e.Value.ToString();
-            if(a=="Sms")
-            { 
+            if (a == "Sms")
+            {
                 var count = Templates.Where(o => o.Type == CampaignType.Sms).Count();
                 if (count.Equals(0))
                 {
@@ -935,23 +976,32 @@ else
                     OnShowPreview(model.Detail.CampaignTemplateId);
                 }
             }
-            else if(a=="Email")
+            else if (a == "Email")
             {
-                model.Detail.Type = CampaignType.Email;            
-                model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
+                var count = Templates.Where(o => o.Type == CampaignType.Email).Count();
+                if (count.Equals(0))
+                {
+                    model.Detail.CampaignTemplateId = 0;
+                    model.Detail.Type = CampaignType.Email;
+                }
+                else
+                {
+                    model.Detail.Type = CampaignType.Email;
+                    model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Email).FirstOrDefault().Id;
+                }
             }
-            else if(a=="Whatsapp")
+            else if (a == "Whatsapp")
             {
 
                 var count = Templates.Where(o => o.Type == CampaignType.Whatsapp).Count();
-                if (count.Equals(0)) 
+                if (count.Equals(0))
                 {
                     model.Detail.CampaignTemplateId = 0;
                     model.Detail.Type = CampaignType.Whatsapp;
                 }
                 else
                 {
-                    model.Detail.Type = CampaignType.Whatsapp; 
+                    model.Detail.Type = CampaignType.Whatsapp;
                     model.Detail.CampaignTemplateId = Templates.Where(o => o.Type == CampaignType.Whatsapp).FirstOrDefault().Id;
                 }
             }
@@ -959,4 +1009,19 @@ else
         }
 
     }
+
+    private void ResetForm()
+    {
+        show = false;
+        if (message.Contains("Successfully Added"))
+        {
+            Init();
+        }
+    }
+    private void CloseDailogBox()
+    {
+        showRecipients = false;
+        showRecipientss = false;
+    }
+
 }

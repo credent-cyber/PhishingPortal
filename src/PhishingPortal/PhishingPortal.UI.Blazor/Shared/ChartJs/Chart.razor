@@ -30,7 +30,7 @@
 
     [Parameter]
     public bool Responsive { get; set; } = true;
-    
+
     [Parameter]
     public bool AspectRatio { get; set; } = true;
 
@@ -40,7 +40,7 @@
     [Parameter]
     public List<ChartJsDataset> Datasets { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public EventCallback<int> OnChartClick { get; set; }
 
     [Parameter]
@@ -68,10 +68,10 @@
 
                         YAxes = new[]
                         {
-                                new 
-                                { 
-                                    Ticks = new {  BeginAtZero = true}, 
-                                    Stacked = true 
+                                new
+                                {
+                                    Ticks = new {  BeginAtZero = true},
+                                    Stacked = true
                                 }
     }
                     },
@@ -110,16 +110,16 @@
     }
 
     [JSInvokable]
-    public async Task ChartClick(int CampId, string ChartId)
+    public async Task ChartClick(int CampId, string label, string ChartId)
     {
         if (!IsClickable)
             return;
-        NavManager.NavigateTo($"/report/{CampId}");
+        NavManager.NavigateTo($"/report/{CampId}/{label}");
     }
     [JSInvokable]
     public static async Task ChartHover()
     {
-       //Console.WriteLine("MouseHovered"); 
+        //Console.WriteLine("MouseHovered");
     }
 
 }

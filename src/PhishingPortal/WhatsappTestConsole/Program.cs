@@ -1,48 +1,24 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.Net.Http;
-using System.Net.Http.Json;
+﻿Console.WriteLine("DealSms Testing");
 
-Console.WriteLine("Whatsapp Test Console");
+//var httpClient = new HttpClient();
+//httpClient.BaseAddress = new Uri("http://bhashsms.com/");
 
+//var response = await httpClient.GetAsync($"/api/sendmsg.php?user=success&pass=sms@2023&sender=BHAINF&phone=8826171494&text=api  test2 BHASHSMS&priority=ndnd&stype=normal");
+//response.EnsureSuccessStatusCode();
 
-var client = new HttpClient();
-client.BaseAddress = new Uri("http://142.132.202.49/");
+//var content = await response.Content.ReadAsStringAsync();
 
-var key = "68bf86afef99416898e5fbe7ecf5364d";
-var mobile = "8826171494";
-var msg = "Hi";
-
-var options = Environment.GetCommandLineArgs();
-
-if(options.Length >= 2)
-{
-    key = options[1];
-}
-
-if (options.Length >= 3)
-{
-    mobile = options[2];
-}
-
-if(options.Length >= 4)
-{
-    msg = options[3];
-}
-
-var uri = $"/wapp/api/send?apikey={key}&mobile={mobile}&msg={msg}";
-
-Console.WriteLine(uri);
-
-var response  = await client.PostAsJsonAsync<object>(uri, new { });
-
+//Console.WriteLine("Sms Response");
+//Console.WriteLine($"StatusCode : {response.StatusCode}");
+//Console.WriteLine(content);
+// WHATSAPP
+var httpClient = new HttpClient();
+httpClient.BaseAddress = new Uri("https://dealsms.in");
+var uri = $"/api/send.php?number=917987163540&type=text&message=%3Cp%3ETest%20Message%3C%2Fp%3E%3Ca%20href%3D%22https%3A%2F%2Fgoogle.com%22%3EClick%20Here%3C%2Fa%3E&instance_id=641864A8AA901&access_token=6511cc6939dc30cff0874eac82c8121b";
+var response = await httpClient.GetAsync(uri);
 response.EnsureSuccessStatusCode();
+var content = await response.Content.ReadAsStringAsync();
 
-if (response.IsSuccessStatusCode)
-    Console.WriteLine("Success :)");
-else
-{
-    Console.WriteLine("Failed :(");
-}
-
-
-
+Console.WriteLine("Whatsapp Response");
+Console.WriteLine($"StatusCode : {response.StatusCode}");
+Console.WriteLine(content);

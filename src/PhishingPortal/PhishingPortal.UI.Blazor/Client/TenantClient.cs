@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using PhishingPortal.UI.Blazor.Pages;
 using System;
 using System.Net.Http.Json;
 
@@ -216,7 +219,7 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
-
+        
         public async Task<CampaignTemplate> UpsertCampaignTemplate(CampaignTemplate template)
         {
             CampaignTemplate result;
@@ -625,6 +628,261 @@ namespace PhishingPortal.UI.Blazor.Client
             }
 
             return result;
+        }
+
+        public async Task<List<int>> GetCampaignLogYears()
+        {
+            List<int> years = new List<int>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetYearsfromCampaignlog");
+                res.EnsureSuccessStatusCode();
+                years = await res.Content.ReadFromJsonAsync<List<int>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return years;
+        }
+
+        public async Task<List<Campaign>> GetCampaignsNames()
+        {
+            List<Campaign> campaigns;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetCampaignsNames");
+
+                res.EnsureSuccessStatusCode();
+
+                campaigns = await res.Content.ReadFromJsonAsync<List<Campaign>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return campaigns;
+        }
+
+        public async Task<bool> UpsertTRainingCampIDsMap(Dictionary<int, List<int>> dict)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/TrainingCampIdMap", dict);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return false;
+        }
+
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignIDs(int id)
+        {
+            List<TrainingCompaignMapping> Trainingcampaign = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/getTrainingCampaignIds/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCompaignMapping>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return Trainingcampaign;
+        }
+
+        public async Task<IEnumerable<TrainingVideo>> GetTrainigVideo()
+        {
+            IEnumerable<TrainingVideo> trainigVideo;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetTrainingVideo");
+
+                res.EnsureSuccessStatusCode();
+
+                trainigVideo = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingVideo>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return trainigVideo;
+        }
+        public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
+        {
+            TrainingVideo result;
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/upsert-trainingVideo", trainingVideo);
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<TrainingVideo>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<List<Training>> GetAllTrainings()
+        {
+            List<Training> training;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/Tenant/GetTrainings");
+
+                res.EnsureSuccessStatusCode();
+
+                training = await res.Content.ReadFromJsonAsync<List<Training>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return training;
+        }
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizAsync(List<TrainingQuiz> trainingQuiz)
+        {
+            List<TrainingQuiz> result = null;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertTrainingQuiz", trainingQuiz);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingQuiz>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return result;
+
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        {
+            IEnumerable<TrainingQuiz> result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/TrainingQuiz-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizByTrainingId(int trainingId)
+        {
+            IEnumerable<TrainingQuiz> result;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/training-quiz-by-training-id/{trainingId}");
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<List<MyTraining>> GetMyTrainings()
+        {
+            var myTrainings = new List<MyTraining>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetMyTrainings");
+                res.EnsureSuccessStatusCode();
+                myTrainings = await res.Content.ReadFromJsonAsync<List<MyTraining>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return myTrainings;
+        }
+
+        public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingDetails(string uniqueID)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
+                res.EnsureSuccessStatusCode();
+                var str = await res.Content.ReadAsStringAsync();
+
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<(Training, TrainingLog)>(str);
+                return (result.Item1, result.Item2);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+               
+            }
+
+            return default((Training, TrainingLog));
+        }
+
+        public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<TrainingProgress>($"api/tenant/UpdateTrainingProgress", new TrainingProgress
+                {
+                    UniqueID = uniqueID,
+                    CheckPoint = checkpoint,
+                    Value = percentage
+                });
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<TrainingLog>();
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

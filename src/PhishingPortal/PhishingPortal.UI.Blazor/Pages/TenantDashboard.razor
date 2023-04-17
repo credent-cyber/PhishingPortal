@@ -1,5 +1,4 @@
-﻿
-@using PhishingPortal.Dto.Dashboard
+﻿@using PhishingPortal.Dto.Dashboard
 @using PhishingPortal.UI.Blazor.Helpers
 @using PhishingPortal.UI.Blazor.Pages.GridComponent
 @using PhishingPortal.UI.Blazor.Shared.ChartJs;
@@ -49,7 +48,7 @@
                 <div class="card-body">
                     <div class="row align-items-center m-b-30">
                         <div class="col-auto">
-                            <i class="fas fa-bug text-c-red f-30"></i>
+                            <i class="fas fa-hand-o-up text-c-red f-30"></i>
                         </div>
                         <div class="col p-l-0">
                             <h6 class="m-b-0 text-c-red"><span style="font-size:16px">Total Clicked</span></h6>
@@ -488,7 +487,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
-                
+
                                             <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
                                                    Labels="@TrainingBarChartLabels" IsStacked="false">
                                             </Chart>
@@ -506,7 +505,7 @@
                                     <div class="card-body">
                                         <div style="width: 100%;">
                                             @*<DummyTable />*@
-                                            <Traininglogs Desc="true" />
+                                            <TraininglogsGrid Desc="true" />
                                         </div>
                                     </div>
                                 </div>
@@ -856,7 +855,7 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, TrainingData.MonthwiseTrainingEntry.Count()), //Trend of Training Completion Percentege
                     });
 
-                    #endregion
+                #endregion
             }
         }
         catch (Exception ex)

@@ -23,5 +23,19 @@ namespace PhishingPortal.Repositories
         Task<Campaign> UpsertCampaign(Campaign campaign);
         Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template);
 
+        Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query);
+        Task<Training> UpsertTraining(Training training);
+        Task<Training> GetTrainingById(int id);
+        Task<List<RecipientImport>> ImportTrainingRecipient(int trainingId, List<RecipientImport> data);
+        Task<List<TrainingRecipients>> GetRecipientByTrainingId(int trainingId);
+        Task<Tuple<bool, string>> Training(string key);
+        Task<MonthlyTrainingBarChart> GetTrainingReportData(int year);
+        Task<TrainingStatics> GetLastTrainingStatics();
+        Task<Campaign> GetCampaignByName(string name);
+        Task<List<int>> GetYearList();
+        Task<List<Training>> GetAllTraining();
+        Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos);
+        Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id);
+        Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId);
     }
 }

@@ -45,6 +45,8 @@
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 1500;
 
     private AzureRegistrationSettings model = new AzureRegistrationSettings();
 
@@ -59,7 +61,9 @@
     {
         var settings = await client.GetSettings();
         alert?.Clear();
-        model = new AzureRegistrationSettings(settings);
+        if (settings.ContainsKey("az_client_id"))
+            model = new AzureRegistrationSettings(settings);
+
 
         secret = model.ClientSecret;
         model.ClientSecret = SecretMask;
@@ -92,6 +96,16 @@
                 alert?.SetError("Error while saving!");
                 logger.LogError(ex, ex.Message);
             }
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         }
     }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+
 }

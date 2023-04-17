@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
+using Humanizer;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace PhishingPortal.Repositories
 {
@@ -61,12 +63,7 @@ namespace PhishingPortal.Repositories
 
             return result;
         }
-        //public async Task<CampaignLog> GetCamplogByCampId(int id)
-        //{
-        //    CampaignLog result = null;
-        //    result = TenantDbCtx.CampaignLogs.Include();
-        //    return result;
-        //}
+
         public async Task<Campaign> UpsertCampaign(Campaign campaign)
         {
             Campaign result = null;
@@ -98,7 +95,6 @@ namespace PhishingPortal.Repositories
             }
 
             TenantDbCtx.SaveChanges();
-
             return campaign;
         }
 
@@ -176,6 +172,7 @@ namespace PhishingPortal.Repositories
 
             if (hasChanges)
                 TenantDbCtx.SaveChanges();
+               
             else
             {
                 throw new InvalidOperationException("No changes");
@@ -1097,7 +1094,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<Tuple<bool, string>> Training(string key)
         {
-            var status = TrainingStatus.Sent.ToString();
+            var status = TrainingLogStatus.Sent.ToString();
             var trainingLog = await TenantDbCtx.TrainingLog.FirstOrDefaultAsync(o => o.SecurityStamp == key && o.Status == status);
 
             if (trainingLog == null)
@@ -1161,8 +1158,8 @@ namespace PhishingPortal.Repositories
                 {
                     Month = (Months)key,
                     TotalTraining = entries.Count(),
-                    Completed = entries.Count(i => i.Status == (TrainingStatus.Completed).ToString()),
-                    Inprogress = entries.Count(i => i.Status == (TrainingStatus.InProgress).ToString()),
+                    Completed = entries.Count(i => i.Status == (TrainingLogStatus.Completed).ToString()),
+                    Inprogress = entries.Count(i => i.Status == (TrainingLogStatus.InProgress).ToString()),
 
                 });
 
@@ -1215,12 +1212,12 @@ namespace PhishingPortal.Repositories
             if (lastTraining != null)
             {
                 var logs = TenantDbCtx.TrainingLog.Where(o => o.TrainingID == lastTraining.Id
-                             && (o.Status == TrainingStatus.Sent.ToString() || o.Status == TrainingStatus.Completed.ToString()));
+                             && (o.Status == TrainingLogStatus.Sent.ToString() || o.Status == TrainingLogStatus.Completed.ToString()));
 
                 outcome.TotalTrainingAssign = logs.Count();
-                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingStatus.Completed.ToString());
-                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingStatus.InProgress.ToString());
-                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingStatus.Sent.ToString());
+                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingLogStatus.Completed.ToString());
+                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingLogStatus.InProgress.ToString());
+                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingLogStatus.Sent.ToString());
 
                 if (outcome.TotalTrainingAssign > 0)
                 {
@@ -1232,9 +1229,219 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(outcome);
         }
 
+        public async Task<List<int>> GetYearList()
+        {
+            var years = TenantDbCtx.CampaignLogs.Select(c => c.CreatedOn.Year).Distinct().ToList();
+            return await Task.FromResult(years);
+        }
+
+        public async Task<List<Campaign>> GetCampaignsName()
+        {
+            int currentYear = DateTime.Now.Year;
+            int previousYear = currentYear - 1;
+            var result = Enumerable.Empty<Campaign>();
+            //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
+            result = TenantDbCtx.Campaigns.OrderByDescending(o => o.Id).ToList();
+            return (List<Campaign>)result;
+        }
+
+        public async Task<bool> UpsertTrainingCampaignMap(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var trainingId = kvp.Key;
+                var campaignIds = kvp.Value;
+
+                var existingCampaignIds = await TenantDbCtx.TrainingCampaignMapping
+                    .Where(tcm => tcm.TrainingId == trainingId)
+                    .Select(tcm => tcm.CampaignId)
+                    .ToListAsync();
+
+                var campaignIdsToAdd = campaignIds.Except(existingCampaignIds);
+                var campaignIdsToRemove = existingCampaignIds.Except(campaignIds);
+                var campaignIdsToKeep = campaignIds.Intersect(existingCampaignIds);
+
+                if (campaignIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await TenantDbCtx.TrainingCampaignMapping
+                        .Where(tcm => tcm.TrainingId == trainingId && campaignIdsToRemove.Contains(tcm.CampaignId))
+                        .ToListAsync();
+                    TenantDbCtx.RemoveRange(mappingsToRemove);
+                }
+
+                if (campaignIdsToAdd.Any())
+                {
+                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCompaignMapping
+                    {
+                        TrainingId = trainingId,
+                        CampaignId = c
+                    });
+                    TenantDbCtx.AddRange(mappingsToAdd);
+                }
+
+                await TenantDbCtx.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int id)
+        {
+            var compaignIds = TenantDbCtx.TrainingCampaignMapping.Where(o => o.TrainingId == id);
+            return compaignIds.ToList();
+        }
+
+        public Task<IEnumerable<TrainingVideo>> GetTrainingVideos()
+        {
+            var result = Enumerable.Empty<TrainingVideo>();
+            result = TenantDbCtx.TrainingVideoPath.OrderByDescending(o => o.Id);
+            return Task.FromResult(result);
+        }
+        public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
+        {
+            try
+            {
+                TenantDbCtx.Add(trainingVideo);
+                TenantDbCtx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            return await Task.FromResult(trainingVideo);
+        }
+
+        public async Task<List<Training>> GetAllTraining()
+        {
+            int currentYear = DateTime.Now.Year;
+            int previousYear = currentYear - 1;
+            var result = Enumerable.Empty<Training>();
+            //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
+            result = TenantDbCtx.Training.OrderByDescending(o => o.Id).ToList();
+            return (List<Training>)result;
+        }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos)
+        {
+            if (dtos == null || !dtos.Any())
+            {
+                throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
+            }
+            var results = dtos;
+
+            var existingQuestions = TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+              .Where(tq => tq.TrainingId == dtos.First().TrainingId).ToList();
+            foreach (var existingQuestion in existingQuestions)
+            {
+                if (!dtos.Any(dto => dto.Id == existingQuestion.Id))
+                {
+                    TenantDbCtx.TrainingQuiz.Remove(existingQuestion);
+                }
+            }
+            foreach (var dto in dtos)
+            {
+                if (dto.Id > 0)
+                {
+                    var existingQuiz = await TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+                                            .FirstOrDefaultAsync(tq => tq.Id == dto.Id);
+                    if (existingQuiz == null)
+                    {
+                        throw new ArgumentException($"No TrainingQuiz found with ID {dto.Id}", nameof(dtos));
+                    }
+
+                    existingQuiz.TrainingId = dto.TrainingId;
+                    existingQuiz.AnswerType = dto.AnswerType;
+                    existingQuiz.OrderNumber = dto.OrderNumber;
+                    existingQuiz.Weightage = dto.Weightage;
+                    existingQuiz.IsActive = dto.IsActive;
+
+                    foreach (var answer in existingQuiz.TrainingQuizAnswer.ToList())
+                    {
+                        if (!dto.TrainingQuizAnswer.Any(a => a.Id == answer.Id))
+                        {
+                            TenantDbCtx.TrainingQuizAnswer.Remove(answer);
+                        }
+                    }
+
+                    foreach (var answerDto in dto.TrainingQuizAnswer)
+                    {
+                        var existingAnswer = existingQuiz.TrainingQuizAnswer
+                                                .FirstOrDefault(a => a.Id == answerDto.Id);
+                        if (existingAnswer == null)
+                        {
+                            var newAnswer = new TrainingQuizAnswer
+                            {
+                                TrainingQuizId = existingQuiz.Id,
+                                AnswerText = answerDto.AnswerText,
+                                OrderNumber = answerDto.OrderNumber,
+                                IsCorrect = answerDto.IsCorrect
+                            };
+                            TenantDbCtx.TrainingQuizAnswer.Add(newAnswer);
+                        }
+                        else
+                        {
+                            existingAnswer.AnswerText = answerDto.AnswerText;
+                            existingAnswer.OrderNumber = answerDto.OrderNumber;
+                            existingAnswer.IsCorrect = answerDto.IsCorrect;
+                        }
+                    }
+                }
+                else
+                {
+                    var newQuiz = new TrainingQuiz
+                    {
+                        TrainingId = dto.TrainingId,
+                        Question = dto.Question,
+                        AnswerType = dto.AnswerType,
+                        OrderNumber = dto.OrderNumber,
+                        Weightage = dto.Weightage,
+                        IsActive = dto.IsActive
+                    };
+                    TenantDbCtx.TrainingQuiz.Add(newQuiz);
+                    await TenantDbCtx.SaveChangesAsync();
+
+                    foreach (var answerDto in dto.TrainingQuizAnswer)
+                    {
+                        var newAnswer = new TrainingQuizAnswer
+                        {
+                            TrainingQuizId = newQuiz.Id,
+                            AnswerText = answerDto.AnswerText,
+                            OrderNumber = answerDto.OrderNumber,
+                            IsCorrect = answerDto.IsCorrect
+                        };
+                        TenantDbCtx.TrainingQuizAnswer.Add(newAnswer);
+                    }
+                }
+                try
+                {
+                    await TenantDbCtx.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return results;
+        }
 
 
+        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        {
+            IEnumerable<TrainingQuiz> result = null;
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+            result = TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
+            return result;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId)
+        {
+            return TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == trainingId && o.IsActive)
+                .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+        }
     }
 }

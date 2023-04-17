@@ -24,211 +24,236 @@
 
     <div class="col-sm-12" style="margin-top:45vh">
 
-            <div class="card-header">
-              <div class="loading-bar"></div>
-            </div>
-     
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
     </div>
 }
-        else
-        {
-              <div class="pcoded-content" style="padding:10px 10px">
+else
+{
+    <div class="pcoded-content" style="padding:10px 10px">
 
-                    <div class="row">
+        <div class="row">
 
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header bg-info" style="padding:15px !important;">
-                                    <h5 class="text-white">@Title</h5>
-                                    <div style="float:right">
-                                        <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
-                                    </div>
-                                </div>
-                                   <div class="card-body" style="padding-top: 20px;">
-                                     <div class="row">
-                                         <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message=@Message></Alerts>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info" style="padding:15px !important;">
+                        <h5 class="text-white">@Title</h5>
+                        <div style="float:right">
+                            <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top: 20px;">
+                        <div class="row">
 
-                   
-                                         <div class="row">
-                                             <div class="col-md-5">
-                                                <EditForm Model="@model" OnValidSubmit="@OnSave">
-                                                    <div class="card" >
-                                                        <div class="card-body">
-                                                            <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3" style="padding-right: 0;">Name Of Template</label>
-                                                                <div class="col-md-9">
-                                                                      <InputText id="Name" @bind-Value="model.Name" class="form-control" />                                                 
-                                                                </div>
-                                                            </div>
-                                                             <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Template Type</label>
-                                                                <div class="col-md-9">
-                                                                   <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
-                                                                     
-                                                                        @foreach (var val in Enum.GetValues<CampaignType>())
-                                                                        {
-                                                                            <option value="@val">@val</option>
-                                                                        }
-                                                                   </InputSelect>
-                                                                </div>
-                                                            </div>
-                                                            <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Is Active</label>
-                                                                <div class="col-md-5">
-                                                                    @if(model.IsActive is false || model.Id == 0)
-                                                                    {                                                           
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" >
-                                                                            <label for="radio-1" class="cr">Yes</label>
-                                                                        </div>
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
-                                                                            <label for="radio-2" class="cr">No</label>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                         <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
-                                                                            <label for="radio-1" class="cr">Yes</label>
-                                                                        </div>
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" >
-                                                                            <label for="radio-2" class="cr">No</label>
-                                                                        </div>
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                            @if(model.Type==CampaignType.Email || model.Type==CampaignType.Whatsapp)
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                        <DataAnnotationsValidator />
+                                        @*<ValidationSummary />*@
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
+                                                    <div class="col-md-8">
+                                                        <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                                                        <ValidationMessage For="() => model.Name" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
+                                                    <div class="col-md-8">
+                                                        <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+
+                                                            <option>- Select -</option>
+
+                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                             {
-                                                             <div class="form-group row">
-                                                                <label for="" class="col-form-label col-md-3">Is Html</label>
-                                                                <div class="col-md-5">
-                                                                    @if (model.IsHtml is false || model.Id == 0)
-                                                                    {
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" >
-                                                                            <label for="radio-i-infill-1" class="cr">Yes</label>
-                                                                        </div>
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
-                                                                            <label for="radio-i-infill-2" class="cr">No</label>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
-                                                                            <label for="radio-i-infill-1" class="cr">Yes</label>
-                                                                        </div>
-                                                                        <div class="radio radio-info radio-fill d-inline">
-                                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" >
-                                                                            <label for="radio-i-infill-2" class="cr">No</label>
-                                                                        </div>
-                                                                    }
-                                                    </div>
-                                                            </div>
+                                                                <option value="@val">@val</option>
                                                             }
-                                                           
-                                                                    @if(model.Id==0)
-                                                                    {
-                                                    
-                                                                        <div class="form-group row">
-                                                                            <label for="" class="col-form-label col-md-3">Import Template</label>
-                                                                            <div class="col-md-5">
-                                                                               <div class="radio radio-info radio-fill d-inline">
-                                                                                    <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp" >
-                                                                                    <label for="radio-i-temp1" class="cr">Yes</label>
-                                                                                </div>
-                                                                                <div class="radio radio-info radio-fill d-inline">
-                                                                                    <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
-                                                                                    <label for="radio-i-temp2" class="cr">No</label>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    }
-                                                             
-                                                                    @if(model.Id==0 &&  import is true)
-                                                                    {    
-                                                                        <div class="form-group row" >
-                                                                            <label for="" class="col-form-label col-md-3">Template</label>
-                                                                            <div class="col-md-9">
-                                                                                <div class="input-group">
-                                                                                    @if(model.Type==CampaignType.Sms){ <InputFile OnChange="@LoadFiles" class="form-control" accept=".txt"/>  }
-                                                                                     else{ <InputFile OnChange="@LoadFiles" class="form-control" accept=".html"/>  }                                                                                                                                                                                                                                          
-                                                                                </div>
-                                                                                <p style="color:red; font-size:8px; padding-top:3px;">Choose Html file for Email, Whatsapp Template Type
-                                                                                    <br />Choose Text file for Sms Template Type </p>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="input-group">
-
-	                                                                       @* <div class="custom-file">
-		                                                                        <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
-		                                                                        <label class="custom-file-label" for="inputFile">Upload Images </label>
-	                                                                        </div>
-	                                                                        <div class="input-group-append">
-		                                                                        <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
-	                                                                        </div>*@
-                                                                        </div>
-                                                                        <h>@message</h>
-                                                                    }
-
-                                                        </div>
-
-
-
-                                                        <div style="text-align:center;">    
-                                                            <button type="submit" class="btn btn-primary">Save</button>
-                                                            <button type="button" @onclick="onClose" class="btn btn-secondary">Close</button>
-                                                          
-                                                        </div>
-                                                        <br/>
+                                                        </InputSelect>
+                                                        <ValidationMessage For="() => model.Type" />
                                                     </div>
-                                                  
-                                                </EditForm>
-                                             </div>
-                                             <div class="col-md-7">
-                                                    <div class="card" style="margin-bottom: 0;">
-                                                        <div class="card-body ">
-                                                            <div class="mb-3">
-                                                                <label for="Content" class="form-label">Template Content</label>
-                                                               
-                                                                
-                                                                @if(model.Type==CampaignType.Sms)
-                                                                {
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                    <div class="col-md-5">
+                                                        @if (model.IsActive is false || model.Id == 0)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                                <label for="radio-1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                                <label for="radio-2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+                                                {
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font">Is Html</label>
+                                                        <div class="col-md-5">
+                                                            @if (model.IsHtml is false || model.Id == 0)
+                                                            {
+                                                                <div class="radio radio-info radio-fill d-inline">
+                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml">
+                                                                    <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                                </div>
+                                                                <div class="radio radio-info radio-fill d-inline">
+                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
+                                                                    <label for="radio-i-infill-2" class="cr">No</label>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="radio radio-info radio-fill d-inline">
+                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
+                                                                    <label for="radio-i-infill-1" class="cr">Yes</label>
+                                                                </div>
+                                                                <div class="radio radio-info radio-fill d-inline">
+                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml">
+                                                                    <label for="radio-i-infill-2" class="cr">No</label>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
 
-                                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />                                                                         
-                                                                    <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
+                                                @if (model.Id == 0)
+                                                {
+
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font">Import Template</label>
+                                                        <div class="col-md-5">
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
+                                                                <label for="radio-i-temp1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
+                                                                <label for="radio-i-temp2" class="cr">No</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                @if (model.Id == 0 && import is true)
+                                                {
+                                                    <div class="form-group row">
+                                                        <label class="col-form-label col-md-4 bold-font">Template</label>
+                                                        <div class="col-md-8">
+                                                            <div class="input-group">
+                                                                @if (model.Type == CampaignType.Sms)
+                                                                {
+                                                                    <InputFile OnChange="@LoadFiles" class="form-control" accept=".txt" />
                                                                 }
                                                                 else
                                                                 {
-                                                                    <div class="overflow-auto">
-                                                                    <!-- Rich text editor -->
-                                                                    <BlazingComponents.Summernote.Editor />
-                                                                     </div>
+                                                                    <InputFile OnChange="@LoadFiles" class="form-control" accept=".html" />
                                                                 }
-
                                                             </div>
+                                                            <p style="color:red; font-size:8px; padding-top:3px;">
+                                                                Choose Html file for Email, Whatsapp Template Type
+                                                                <br />Choose Text file for Sms Template Type
+                                                            </p>
                                                         </div>
                                                     </div>
-                                             </div>            
-                                         </div>
-                    
 
+                                                    <div class="input-group">
+
+                                                        @* <div class="custom-file">
+                                                <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+                                                <label class="custom-file-label" for="inputFile">Upload Images </label>
+                                                </div>
+                                                <div class="input-group-append">
+                                                <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+                                                </div>*@
+                                                    </div>
+                                                    <h>@message</h>
+                                                }
+
+
+                                                <div style="text-align:center;">
+                                                    <button type="submit" class="btn btn-primary col-md-3 m-1">Save</button>
+                                                    <button type="button" class="btn btn-danger col-md-3 m-1" @onclick="onClose">Close</button>
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </div>
+
+                                    </EditForm>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="margin-bottom: 0;">
+                                        <div class="card-body ">
+                                            <div class="mb-3">
+                                                <label for="Content" class="form-label">Template Content</label>
+
+
+                                                @if (model.Type == CampaignType.Sms)
+                                                {
+
+                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
+                                                    <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
+                                                }
+                                                else
+                                                {
+                                                    <div class="overflow-auto">
+                                                        <!-- Rich text editor -->
+                                                        <BlazingComponents.Summernote.Editor />
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                 
+
+
                         </div>
-
                     </div>
-              </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+<Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
         }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
 
-
-
+</Dailog>
 
 
 @code {
@@ -237,6 +262,8 @@
     [Parameter]
     public int Id { get; set; }
     private string contents;
+    bool TaskCompleted = false;
+    string MessageBody = "Thank you!";
 
     public string Title
     {
@@ -245,7 +272,7 @@
             return model?.Id > 0 ? "Modify Template" : "Create New Template";
         }
     }
-    string Message = string.Empty;
+
     bool IsError = false;
     bool IsSuccess = false;
     bool loading = false;
@@ -264,21 +291,22 @@
     List<CampaignTemplate> Templates;
     CampaignType? type = null;
     CampaignTemplate model;
+    private bool show = false;
 
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
         if (Id != 0)
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = await client.GetTemplateById(Id);
-            if(model.Type==CampaignType.Email){  contents = model.Content;}
-            if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp){ text = model.Content;}
+            if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp) { contents = model.Content; }
+            if (model.Type == CampaignType.Sms) { text = model.Content; }
 
         }
         else
         {
-            Message = string.Empty;
+            message = string.Empty;
             model = new CampaignTemplate();
             model.Version = "1";
 
@@ -288,7 +316,7 @@
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if(model != null)
+        if (model != null)
             UpdateSummerNoteContent(contents);
 
         return base.OnAfterRenderAsync(firstRender);
@@ -308,7 +336,7 @@
 
     public void OnNewClick()
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = new CampaignTemplate();
         model.Version = "1";
         showNewDialog = true;
@@ -316,7 +344,7 @@
 
     public void OnEditClick(CampaignTemplate template)
     {
-        Message = string.Empty;
+        message = string.Empty;
         model = template;
         showNewDialog = true;
     }
@@ -325,88 +353,63 @@
 
     protected async Task OnSave()
     {
-        loading = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
         IsError = false;
         IsSuccess = false;
-        message = string.Empty;
+        TaskCompleted = false;
+
+        if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+        {
+            model.Content = contents = await GetSummerNoteContent();
+        }
+        if (model.Type == CampaignType.Sms) { model.Content = text; }
+
+        if (model.Content == string.Empty)
+        {
+            IsError = true;
+            message = "Template Content can't be null.";
+            show = true;
+            TaskCompleted = true;
+            return;
+        }
+
         try
         {
-            
-            if (model.Id > 0)
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Updated";
-                model.ModifiedOn = DateTime.Now;
-            }
-            else
-            {
-                if (model.Name is null || model.Type == 0)
-                {
-                    IsError = true;
-                    message = "Template Name, Template Type can't be null!";
-                    return;
-                }
-                Message = "Successfully Added";
-                model.CreatedOn = DateTime.Now;
-            }
-
-            if(model.Type==CampaignType.Email){ 
-                contents = await GetSummerNoteContent();
-                model.Content = contents;
-            }
-            if(model.Type==CampaignType.Sms || model.Type==CampaignType.Whatsapp){ model.Content = text;}
-
+            show = true;
+            message = "Please wait";
+            int Id = model.Id;            
             model = await client.UpsertCampaignTemplate(model);
-
             IsSuccess = true;
 
             if (!Templates.Any(o => o.Id == model.Id))
                 Templates.Add(model);
+
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             IsError = true;
-            Message = ex.Message;
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
             logger.LogCritical(ex, ex.Message);
         }
-
-        loading = false;
-
     }
 
-    int pageSize = 5;
-    int pageIndex = 0;
-    int pageIndext = 0;
-    public void Prevv()
-    {
-
-        if(pageIndex>0){ pageIndex--;} 
-        pageIndext = pageIndex;
-        // Templates =  client.GetCampaignTemplates(pageIndex, pageSize);
-    }
-    public void Nextt()
-    {
-        pageIndex++; 
-        pageIndext = pageIndex;
-
-    }
     protected void onClose()
     {
-        NavigationManager.NavigateTo("tenant-templates"); 
+        NavigationManager.NavigateTo("tenant-templates");
     }
-    protected void OnActive(){model.IsActive = true;}
-    protected void OnNoActive(){model.IsActive = false;}
+    protected void OnActive() { model.IsActive = true; }
+    protected void OnNoActive() { model.IsActive = false; }
 
-    protected void Ishtml(){ model.IsHtml = true; }
-    protected void Nohtml(){ model.IsHtml = false; }
+    protected void Ishtml() { model.IsHtml = true; }
+    protected void Nohtml() { model.IsHtml = false; }
 
-    protected void Ytemp(){ import = true; }
-    protected void Ntemp(){ import = false; }
+    protected void Ytemp() { import = true; }
+    protected void Ntemp() { import = false; }
 
     string result = "";
     public async Task LoadFiles(InputFileChangeEventArgs e)
@@ -417,8 +420,8 @@
         await fileStream.CopyToAsync(ms);
         fileStream.Close();
         result = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-        // const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";   
-        //const string section= @"<img src\s*=\s*""(?<pick>(\.{0,2}\/.+))(/.+\.jpg)";   
+        // const string section= @"<img src\s*=\s*""(?<pick>(.+))(/.+\.jpg)";
+        //const string section= @"<img src\s*=\s*""(?<pick>(\.{0,2}\/.+))(/.+\.jpg)";
         //var matches = Regex.Matches(result, section ,RegexOptions.IgnoreCase|RegexOptions.Multiline);
         //foreach(Match match in matches)
         //{
@@ -456,41 +459,54 @@
         var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
         return result;
     }
-    
-    //Image Upload    
+
+    //Image Upload
     List<ImageFile> filesBase64 = new List<ImageFile>();
-	string message = "";
-	bool isDisabled = false;
+    string message = "";
+    bool isDisabled = false;
 
-	async Task OnChange(InputFileChangeEventArgs e)
-	{
-		var files = e.GetMultipleFiles(); // get the files selected by the users
-		foreach(var file in files)
-		{
-			var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // resize the image file
-			var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
-			using (var stream = resizedFile.OpenReadStream())
-			{
-				await stream.ReadAsync(buf); // copy the stream to the buffer
-			}
-			filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name }); // convert to a base64 string!!
-		}
-		message = "Click UPLOAD to continue";
-	}
+    async Task OnChange(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(); // get the files selected by the users
+        foreach (var file in files)
+        {
+            var resizedFile = await file.RequestImageFileAsync(file.ContentType, 640, 480); // resize the image file
+            var buf = new byte[resizedFile.Size]; // allocate a buffer to fill with the file's data
+            using (var stream = resizedFile.OpenReadStream())
+            {
+                await stream.ReadAsync(buf); // copy the stream to the buffer
+            }
+            filesBase64.Add(new ImageFile { base64data = Convert.ToBase64String(buf), contentType = file.ContentType, fileName = file.Name }); // convert to a base64 string!!
+        }
+        message = "Click UPLOAD to continue";
+    }
 
-	async Task Upload()
-	{
-		isDisabled = true;
-		using (var msg = await Http.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64, System.Threading.CancellationToken.None))
-		{
-			isDisabled = false;
-			if (msg.IsSuccessStatusCode)
-			{
-				message = $"{filesBase64.Count} files uploaded";
-				filesBase64.Clear();
-			}
-		}
-	}
+    async Task Upload()
+    {
+        isDisabled = true;
+        using (var msg = await Http.PostAsJsonAsync<List<ImageFile>>("/api/upload", filesBase64, System.Threading.CancellationToken.None))
+        {
+            isDisabled = false;
+            if (msg.IsSuccessStatusCode)
+            {
+                message = $"{filesBase64.Count} files uploaded";
+                filesBase64.Clear();
+            }
+        }
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+        if (message.Contains("Successfully Added"))
+        {
+            model = new CampaignTemplate();
+            contents = string.Empty;
+            model.Content = null;
+        }
+    }
+
+
 
 }
 

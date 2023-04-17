@@ -1,0 +1,93 @@
+﻿@page "/training-video-upload"
+@using Microsoft.Extensions.Logging;
+@using PhishingPortal.Dto;
+@using PhishingPortal.UI.Blazor.Client;
+@using PhishingPortal.UI.Blazor.Models;
+@using System.ComponentModel.DataAnnotations;
+@using System.Linq
+@using System.Net.Http.Headers
+@using System.Text.Json;
+@using System.Text;
+@inject HttpClient Http
+@inject TenantClient client;
+@inject ILogger<Index> Logger
+@attribute [Authorize]
+
+<div class="row">
+    <div class="card-body" style="padding: 1px 25px;">
+        <div class="card">
+            <div class="card-header pb-0">
+                <h5>Add New Training Video</h5>
+                <div style="float:right">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                        <li class="breadcrumb-item active">Training Video</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="dropdown-divider"></div>
+ 
+            <div class="card-body">
+                <TrainingVideoUploader RefreshTrainingVideos="@RefreshTrainingVideos" />
+
+                <div class="table-responsive">
+                    @if (_isLoading)
+                    {
+                        <div class="col-sm-12" style="margin-top:40vh">
+                            <div class="card-header">
+                                <div class="loading-bar"></div>
+                            </div>
+                        </div>
+                    }
+
+                    else
+                    {
+                        <table id="redirect-urls" class="table table-striped table-bordered">
+                            <thead>
+                                <tr role="row">
+                                    <th>Id</th>
+                                    <th>Video Title</th>
+                                    <th>Path</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var video in trainingVideos)
+                                {
+                                    <tr role="row" class="odd">
+                                        <td>@video.Id</td>
+                                        <td>@video.VideoTitle</td>
+                                        <td>@video.FilePath</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    bool _isLoading = false;
+    IEnumerable<TrainingVideo> trainingVideos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+        trainingVideos = await client.GetTrainigVideo();
+        _isLoading = false;
+    }
+
+    public async void RefreshTrainingVideos()
+    {
+        _isLoading = true;
+        trainingVideos = await client.GetTrainigVideo();
+        _isLoading = false;
+        StateHasChanged();
+    }
+    private TrainingVideoUploader uploaderRef;
+}

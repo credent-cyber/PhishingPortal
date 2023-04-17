@@ -8,6 +8,7 @@ using NPOI.SS.Formula.Functions;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto.Auth;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
@@ -54,13 +55,20 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("currentUserInfo")]
         public CurrentUser CurrentUserInfo()
         {
-            return new CurrentUser
+            var user = new CurrentUser
             {
                 IsAuthenticated = User?.Identity?.IsAuthenticated ?? false,
                 UserName = User?.Identity?.Name ?? "guest",
                 Claims = User?.Claims?
                               .ToDictionary(c => c.Type, c => c.Value)
             };
+
+            if (!User.Claims.Any(o => o.Type == "role"))
+            {
+                user.Claims.Add(ClaimTypes.Role, "tenantuser");
+            }
+
+            return user;
         }
 
         [Route("forgetpassword")]

@@ -1,9 +1,14 @@
 ﻿@page "/login"
+
 @using PhishingPortal.Dto.Auth
 @using PhishingPortal.UI.Blazor.Models
+@using Microsoft.AspNetCore.WebUtilities
+
 @layout AuthLayout
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
+@inject AuthenticationStateProvider authState
+
 
 <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="loginRequest">
     <div class="card-body">
@@ -20,41 +25,66 @@
                 <InputText id="inputUsername" class="form-control" @bind-Value="loginRequest.UserName" autofocus placeholder="Email address" autocomplete="username" />
                 <ValidationMessage For="@(() => loginRequest.UserName)" />
             </div>
-            <div class="input-group mb-4">
+            <div class="input-group has-validation">
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="feather icon-lock"></i></span>
                 </div>
                 <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="loginRequest.Password" autocomplete="current-password" />
-                <ValidationMessage For="@(() => loginRequest.Password)" />
             </div>
-            <div class="form-group text-left">
+            <ValidationMessage style="text-align: left" For="@(() => loginRequest.Password)" />
+
+            <div class="form-group text-left mt-3">
                 <div class="checkbox checkbox-primary d-inline">
                     <InputCheckbox id="checkbox-fill-a1" @bind-Value="@loginRequest.RememberMe" />
                     <label for="checkbox-fill-a1" class="cr"> Save credentials</label>
                 </div>
             </div>
-            <button class="btn  btn-primary mb-4" type="submit">Signin</button>
+            <button class="btn  btn-primary mb-2 col" type="submit">Signin</button>
+            <a class="btn  btn-primary mb-4 col" href="/oidc/challenge?returnUrl=@(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl)&provider=Microsoft">Office 365 User</a>
             <p class="mb-2 text-muted">
                 Forgot password?
                 <span @onclick="ResetPasswordClick" class="f-w-400 font-weight-bold" style="cursor: pointer">Reset</span>
             </p>
 
-           
+
         </div>
     </div>
 
 </EditForm>
 
 @code {
+    [Parameter]
+    public string Oidc { get; set; } = string.Empty;
+
+    public string ReturnUrl { get; protected set; } = string.Empty;
+
     [CascadingParameter]
     public AlertModel Alerts { get; set; } = new();
 
     LoginRequest loginRequest { get; set; } = new LoginRequest();
 
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Alerts.Clear();
+
+        var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
+        var queryStrings = QueryHelpers.ParseQuery(uri.Query);
+        if (queryStrings.TryGetValue("ReturnUrl", out var url))
+        {
+            ReturnUrl = url;
+        }
+
+        try
+        {
+            var state = await authState.GetAuthenticationStateAsync();
+
+            if (state?.User?.Identity?.IsAuthenticated ?? false)
+            {
+                navigationManager.NavigateTo("/");
+            }
+        }
+        catch { }
+
     }
 
     private void ResetPasswordClick()
@@ -70,7 +100,10 @@
 
             await authStateProvider.Login(loginRequest);
 
-            navigationManager.NavigateTo("/", true);
+            if (string.IsNullOrEmpty(ReturnUrl))
+                navigationManager.NavigateTo("/", true);
+            else
+                navigationManager.NavigateTo(ReturnUrl);
         }
         catch (Exception)
         {
