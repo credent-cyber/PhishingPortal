@@ -196,7 +196,7 @@ else
                                                 <div class="col-md-8">
                                                     @if (model.Id > 0 && model.State == TrainingState.Completed)
                                                     {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                        <InputSelect @bind-Value="model.State" class="form-control" id="State" disabled>
                                                             @foreach (var val in Enum.GetValues(typeof(TrainingState)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -205,7 +205,7 @@ else
                                                     }
                                                     else
                                                     {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" >
+                                                        <InputSelect @bind-Value="model.State" class="form-control" id="State" disabled>
                                                             @foreach (var val in Enum.GetValues(typeof(TrainingState)))
                                                             {
                                                                 <option value="@val">@val</option>

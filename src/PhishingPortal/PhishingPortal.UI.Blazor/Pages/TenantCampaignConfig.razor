@@ -285,7 +285,7 @@ else
                                                 <div class="col-md-8">
                                                     @if (model.Id > 0 && model.State == CampaignStateEnum.Completed)
                                                     {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                        <InputSelect @bind-Value="model.State" class="form-control" id="State" disabled>
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -294,7 +294,7 @@ else
                                                     }
                                                     else
                                                     {
-                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                        <InputSelect @bind-Value="model.State" class="form-control" id="State" disabled>
                                                             @foreach (var val in Enum.GetValues(typeof(CampaignStateEnum)))
                                                             {
                                                                 <option value="@val">@val</option>
@@ -306,18 +306,18 @@ else
 
                                             <div style="text-align:center;">
                                                 <button type="submit" class="btn btn-primary col-md-2 mb-1" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
-                                                <button type="button" class="btn btn-danger col-md-2 mb-1" @onclick="onClose">Close</button>
+                                                <button type="button" class="btn btn-danger col-md-2 mb-1 mr-1" @onclick="onClose">Close</button>
                                                 @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
                                                 {
-                                                    <button type="button" class="btn btn-dark col-md-3 mb-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                    <button type="button" class="btn btn-dark col-md-3 mb-1 mr-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                 }
                                                 else
                                                 {
-                                                    <button type="button" class="btn btn-dark col-md-3 mb-1" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                    <button type="button" class="btn btn-dark col-md-3 mb-1 mr-1" @onclick="OnShowRecipientClickk">Recipients</button>
                                                 }
                                                 @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                                 {
-                                                    <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 mb-1" type="button">Publish </button>
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 mb-1 mr-1" type="button">Publish </button>
                                                 }
 
                                                 @if (model.State == CampaignStateEnum.Published)
