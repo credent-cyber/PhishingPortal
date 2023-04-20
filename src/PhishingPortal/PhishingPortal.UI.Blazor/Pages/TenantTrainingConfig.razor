@@ -17,6 +17,7 @@
 @inject HttpClient Http
 @attribute [Authorize]
 
+
 @if (model == null)
 {
 
@@ -60,21 +61,56 @@ else
                                                     </div>
                                                 </div>
                                                 <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Campaigns</label>
-                                                    <div class="col-md-8">
-                                                        <HxMultiSelect TItem="Campaign"
-                                                                   AutoSort="false"
-                                                                   TValue="int"
-                                                                   Data="@campaigns"
-                                                                   @bind-Value="@SelectedCampaigns"
-                                                                   TextSelector="@(p => p.Name)"
-                                                                   ValueSelector="@(p => p.Id)"
-                                                                   EmptyText="- select -"
-                                                                   NullDataText="Loading..." />
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Training Trigger</label>
+                                                    <div class="col-md-5">
+                                                        @if (model.TrainingTrigger is false || model.Id == 0)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger">
+                                                                <label for="radio-t1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger" checked>
+                                                                <label for="radio-t2" class="cr">No</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger" checked>
+                                                                <label for="radio-t1" class="cr">Yes</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger">
+                                                                <label for="radio-t2" class="cr">No</label>
+                                                            </div>
+                                                        }
                                                     </div>
-                                                    @*<p class="mt-3">Selected initials: @String.Join(' ', SelectedCampaigns)</p>*@
-                                                    <ValidationMessage For="() => SelectedCampaigns" />
                                                 </div>
+                                               
+                                                @if (model.TrainingTrigger)
+                                                {                                                   
+                                                    <div class="form-group row">
+                                                        <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaigns</label>
+                                                        <div class="col-md-8">
+                                                            <HxMultiSelect TItem="Campaign"
+                                                                       AutoSort="false"
+                                                                       TValue="int"
+                                                                       Data="@campaigns"
+                                                                       @bind-Value="@SelectedCampaigns"
+                                                                       TextSelector="@(p => p.Name)"
+                                                                       ValueSelector="@(p => p.Id)"
+                                                                       EmptyText="- select -"
+                                                                       NullDataText="Loading..." />
+
+                                                                        @if (SelectedCampaigns.Count() == 0 && IsError)
+                                                                        {
+                                                                            <span style="color:red">Please select at least one campaign</span>
+                                                                        }
+                                                        </div>
+
+                                                    </div>
+                                                }
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Training Video</label>
                                                     <div class="col-md-8">
@@ -181,18 +217,19 @@ else
                                                     </div>
                                                 </div>
 
-
-                                                <div class="form-group row" id="UploadTrainingUsers">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
-                                                    <div class="col-md-8">
-                                                        <div class="input-group">
-                                                            <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
+                                                @if (!model.TrainingTrigger)
+                                                {
+                                                    <div class="form-group row" id="UploadTrainingUsers">
+                                                        <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
+                                                        <div class="col-md-8">
+                                                            <div class="input-group">
+                                                                <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
+                                                            </div>
+                                                            <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
+                                                            <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
                                                         </div>
-                                                        <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
-                                                        <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
                                                     </div>
-                                                </div>
-
+                                                }
                                                 <div class="form-group row">
                                                     <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
                                                     <div class="col-md-8">
@@ -221,7 +258,7 @@ else
                                                     <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
                                                     <button type="button" @onclick="onClose" class="btn btn-danger col-md-2 m-1">Close</button>
 
-                                                    @if ((model.Id == 0 && fileimport is null) || (model.Id > 0 && fileimport.Count() == 0))
+                                                    @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
                                                     {
                                                         <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
                                                     }
@@ -354,13 +391,15 @@ else
     MarkupString previewContent => (MarkupString)content;
 
     Dictionary<int, List<int>> trainingCampIds = new Dictionary<int, List<int>>();
+
     [Required]
     private List<int> SelectedCampaigns { get; set; } = new();
+
     private List<Campaign> campaigns;
     Training model;
     IEnumerable<TrainingVideo> trainingVideos;
     RecipientSources sources;
-  
+
 
     public void Init()
     {
@@ -371,11 +410,12 @@ else
                 {
                     ScheduleType = ScheduleTypeEnum.NoSchedule,
                     WillRepeat = false
-                }
+                },
+                TrainingTrigger = false
             };
         TrainingScheduleOff.Date = DateTime.Now.Date;
         recipients.Clear();
-        fileimport = null;
+        fileimport.Clear();
     }
 
     protected override async Task OnInitializedAsync()
@@ -401,6 +441,7 @@ else
             {
                 isScheduled = true;
             }
+
             var trainingCampaignsIds = await client.GetTrainingCampaignIDs(model.Id);
             SelectedCampaigns.AddRange(trainingCampaignsIds.Select(tc => tc.CampaignId));
         }
@@ -438,6 +479,12 @@ else
         isloading = true;
         IsError = false;
         IsSuccess = false;
+        if(SelectedCampaigns.Count() == 0 && model.TrainingTrigger)
+        {
+            IsError = true;
+            return;
+        }
+
         show = true;
         TaskCompleted = false;
 
@@ -492,6 +539,9 @@ else
     protected void OnActive() { model.IsActive = true; }
     protected void OnNoActive() { model.IsActive = false; }
 
+    protected void OnTrigger() { model.TrainingTrigger = true; }
+    protected void OffTrigger() { model.TrainingTrigger = false; SelectedCampaigns.Clear(); }
+
 
     protected void UpdateSummerNoteContent(string content)
     {
@@ -512,7 +562,7 @@ else
     bool isloading = false;
     bool showRecipients = false;
     List<RecipientImport> recipients = new List<RecipientImport>();
-    List<RecipientImport> fileimport;
+    List<RecipientImport> fileimport = new List<RecipientImport>();
 
     public async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
@@ -749,7 +799,7 @@ else
         await OnSave();
         await LoadRecipeints(model.Id);
 
-        if (recipients.Count == 0)
+        if (recipients.Count == 0 && !model.TrainingTrigger)
         {
             IsError = true;
             message = "Recipients can't be null";
@@ -785,6 +835,5 @@ else
         showRecipients = false;
         showRecipientss = false;
     }
-
 
 }
