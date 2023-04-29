@@ -13,6 +13,7 @@ namespace PhishingPortal.Dto
         [Required]
         public string TrainingName { get; set; }
         public bool IsActive { get; set; }
+        public bool TrainingTrigger { get; set; }
         public string Content { get; set; }
         [Required]
         public string TrainingCategory { get; set; }
