@@ -30,5 +30,11 @@ namespace PhishingPortal.Dto
         {
             return this.DailyScheduleTime.ToString("HH:mm:ss");
         }
+
+        public override double GetElapsedTimeInMinutes()
+        {
+            _ = DateTime.TryParse($"{DateTime.Now:dd/MM/yyyy} {ToString()}", out var dt);
+            return (DateTime.Now - dt).TotalMinutes;
+        }
     }
 }

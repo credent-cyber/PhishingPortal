@@ -41,5 +41,32 @@
 
             return result;
         }
+
+        public static BaseSchedule ToActualScheduleType(this CampaignSchedule schedule)
+        {
+            if (schedule == null)
+                return null;
+
+            var scheduleInfo = schedule.ScheduleInfo;
+            var scheduleType = schedule.ScheduleType;
+
+            switch (scheduleType)
+            {
+                case ScheduleTypeEnum.Once:
+                    return new OnceOffSchedule(scheduleInfo);
+
+                case ScheduleTypeEnum.Daily:
+                    return new DailySchedule(scheduleInfo);
+
+                case ScheduleTypeEnum.Weekly:
+                    return new WeeklySchedule(scheduleInfo);
+
+                case ScheduleTypeEnum.NoSchedule:
+                    return null;
+
+                default: return null;
+
+            }
+        }
     }
 }

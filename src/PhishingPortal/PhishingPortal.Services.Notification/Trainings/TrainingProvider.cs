@@ -61,7 +61,7 @@ namespace PhishingPortal.Services.Notification.Trainings
 
 
                     var training = dbContext.Training.Include(o => o.TrainingSchedule)
-                                            .Where(o => (o.State == TrainingState.Published || o.State == TrainingState.InProgress) && o.IsActive).ToList();
+                                            .Where(o => (o.State == TrainingState.Published || o.State == TrainingState.InProgress) && o.IsActive && !o.TrainingTrigger).ToList();
 
                     MarkExpiredOrCompleted(dbContext, training);
 

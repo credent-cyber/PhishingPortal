@@ -34,6 +34,15 @@ namespace PhishingPortal.Dto
             return DateTime.Now.Date == Date && (DateTime.Now - Time).TotalMinutes < 10;
         }
 
+        public override double GetElapsedTimeInMinutes()
+        {
+            var dtString = ToString();
+            
+            DateTime.TryParse(dtString, out var dt);
+
+            return (DateTime.Now - dt).TotalMinutes;
+        }
+
         public override string ToString()
         {
             return $"{this.Date.ToString("dd/MM/yyyy")} {this.Time.ToString("HH:mm:ss")}";

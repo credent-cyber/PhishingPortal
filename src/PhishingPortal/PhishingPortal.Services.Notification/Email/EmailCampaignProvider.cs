@@ -12,6 +12,7 @@ using PhishingPortal.Services.Notification.Monitoring;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Dto.Extensions;
 using Humanizer;
+using Serilog.Core;
 
 namespace PhishingPortal.Services.Notification.Email
 {
@@ -52,7 +53,7 @@ namespace PhishingPortal.Services.Notification.Email
                                             .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
                                                 && o.Detail.Type == CampaignType.Email).ToList();
 
-                    MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
+                    MarkExpiredOrCompleted(ConnManager.GetContext(Tenant.UniqueId), allActiveCampaigns);
 
 
                     allActiveCampaigns = allActiveCampaigns.Where(o =>
@@ -166,40 +167,61 @@ namespace PhishingPortal.Services.Notification.Email
         }
 
 
-        private static void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Campaign> allActiveCampaigns)
+        private void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Campaign> allActiveCampaigns)
         {
-            var allCampaignScheduleExpired = allActiveCampaigns.Where(o => (!o.Schedule.IsScheduledNow() || o.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
-                && o.State == CampaignStateEnum.InProgress);
-
-            foreach (var c in allCampaignScheduleExpired)
+            try
             {
-                var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
-                var allLogs = dbContext.CampaignLogs.Where(c => c.CampaignId == c.Id);
-                var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString());
-               
-                if (allCount > 0)
-                {
-                    var percentSent = (allSent / allCount) * 100;
+                var allCampaignScheduleExpired = allActiveCampaigns.Where(o => (!o.Schedule.IsScheduledNow() || o.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                       && o.State == CampaignStateEnum.InProgress);
 
-                    if (percentSent >= 98)
+                foreach (var c in allCampaignScheduleExpired)
+                {
+                    var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
+                    var allLogs = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id);
+                    var allSentOrCompleted = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString());
+
+                    if (allCount > 0)
                     {
-                        c.State = CampaignStateEnum.Completed;
+                        var percentSent = (allSentOrCompleted / allCount) * 100;
+
+                        if (percentSent >= 95)
+                        {
+                            c.State = CampaignStateEnum.Completed;
+                        }
+
+                        if (c.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule &&
+                            c.State == CampaignStateEnum.InProgress)
+                        {
+                            var lastLogTime = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id)?.OrderByDescending(o => o.SentOn)
+                                .Select(o => o.SentOn).FirstOrDefault();
+
+                            if (lastLogTime.HasValue && (DateTime.Now - lastLogTime.Value).TotalMinutes > 15)
+                            {
+                                c.State = CampaignStateEnum.InComplete;
+                            }
+
+                        }
+                        else if (c.Schedule.ScheduleType != ScheduleTypeEnum.NoSchedule && c.State == CampaignStateEnum.InProgress
+                            && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
+                        {
+                            c.State = CampaignStateEnum.InComplete;
+                        }
+
+                        dbContext.Update(c);
+                        dbContext.SaveChanges();
                     }
                     else
                     {
-                        c.State = CampaignStateEnum.Unknown;
+                        c.State = CampaignStateEnum.Completed;
+                        dbContext.Update(c);
+                        dbContext.SaveChanges();
                     }
 
-                    dbContext.Update(c);
-                    dbContext.SaveChanges();
                 }
-                else
-                {
-                    c.State = CampaignStateEnum.Completed;
-                    dbContext.Update(c);
-                    dbContext.SaveChanges();
-                }
-
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, $"Error while marking campaigns completed");
             }
         }
 

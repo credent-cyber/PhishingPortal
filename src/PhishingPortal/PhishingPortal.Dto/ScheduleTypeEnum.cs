@@ -6,6 +6,9 @@
         Daily,
         Weekly,
         //Monthly,
+        /// <summary>
+        /// To be executed as soon as possible
+        /// </summary>
         NoSchedule
     }
 }
