@@ -175,7 +175,7 @@ namespace PhishingPortal.Services.Notification.Email
             {
                 var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
                 var allLogs = dbContext.CampaignLogs.Where(c => c.CampaignId == c.Id);
-                var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
+                var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString());
                
                 if (allCount > 0)
                 {
