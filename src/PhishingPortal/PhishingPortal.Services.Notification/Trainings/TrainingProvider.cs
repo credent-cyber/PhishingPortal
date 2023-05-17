@@ -158,9 +158,11 @@ namespace PhishingPortal.Services.Notification.Trainings
             try
             {
                 var recipients = DataContext.TrainingRecipient.Include(o => o.AllTrainingRecipient).Where(o => o.TrainingId == training.Id);
-                var uniqueID = Guid.NewGuid().ToString();
+              
                 foreach (var r in recipients)
                 {
+                    var uniqueID = Guid.NewGuid().ToString();
+
                     if (string.IsNullOrEmpty(r.AllTrainingRecipient.Email))
                         continue;
 
