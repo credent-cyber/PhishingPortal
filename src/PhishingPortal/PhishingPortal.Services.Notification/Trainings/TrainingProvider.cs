@@ -103,10 +103,12 @@ namespace PhishingPortal.Services.Notification.Trainings
                                 cl.Recipient
                             };
 
-            var uniqueID = Guid.NewGuid().ToString();
+            
 
             foreach (var t in failedCampaignTrainings)
             {
+                var uniqueID = Guid.NewGuid().ToString();
+
                 if (string.IsNullOrEmpty(t.Recipient.Recipient.Email))
                     continue;
 
