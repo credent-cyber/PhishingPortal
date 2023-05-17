@@ -664,7 +664,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpGet]
         [Route("getTrainingCampaignIds/{trainingId}")]
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int trainingId)
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int trainingId)
         {
             var result = await _tenantRepository.GetTrainingCampaignsId(trainingId);
             return await Task.FromResult(result);

@@ -1247,7 +1247,7 @@ namespace PhishingPortal.Repositories
 
                 if (campaignIdsToAdd.Any())
                 {
-                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCompaignMapping
+                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCampaignMapping
                     {
                         TrainingId = trainingId,
                         CampaignId = c
@@ -1261,7 +1261,7 @@ namespace PhishingPortal.Repositories
             return true;
         }
 
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int id)
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int id)
         {
             var compaignIds = TenantDbCtx.TrainingCampaignMapping.Where(o => o.TrainingId == id);
             return compaignIds.ToList();

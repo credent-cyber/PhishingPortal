@@ -687,16 +687,16 @@ namespace PhishingPortal.UI.Blazor.Client
             return false;
         }
 
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignIDs(int id)
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
         {
-            List<TrainingCompaignMapping> Trainingcampaign = null;
+            List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/getTrainingCampaignIds/{id}");
 
                 res.EnsureSuccessStatusCode();
 
-                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCompaignMapping>>();
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCampaignMapping>>();
 
             }
             catch (Exception ex)

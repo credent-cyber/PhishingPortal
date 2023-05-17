@@ -18,13 +18,6 @@ namespace PhishingPortal.Dto
         public string Url { get; set; }
         public DateTime SentOn { get; set; }
         public string UniqueID { get; set; }
-    }
-    public enum TrainingLogStatus
-    {
-        Assigned,
-        InProgress,
-        Sent,
-        Completed,
-
+        public int? CampaignLogID { get; set; }
     }
 }
