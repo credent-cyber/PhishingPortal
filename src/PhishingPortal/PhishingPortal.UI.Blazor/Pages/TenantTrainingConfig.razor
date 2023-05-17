@@ -31,7 +31,7 @@
 }
 else
 {
-    <div class="pcoded-content" style="padding:10px 10px">
+    <div class="pcoded-content" style="padding:0px 0px">
 
         <div class="row">
 
@@ -45,260 +45,256 @@ else
                     </div>
                     <div class="card-body" style="padding-top: 20px;">
                         <div class="row">
+                            <div class="col-md-6">
+                                <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                    <DataAnnotationsValidator />
+                                    <div class="card">
+                                        <div class="card-body">
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <EditForm Model="@model" OnValidSubmit="@OnSave">
-                                        <DataAnnotationsValidator />
-                                        <div class="card">
-                                            <div class="card-body">
-
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Name Of Training</label>
-                                                    <div class="col-md-8">
-                                                        <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
-                                                        <ValidationMessage For="() => model.TrainingName" />
-                                                    </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Name Of Training</label>
+                                                <div class="col-md-8">
+                                                    <InputText id="Name" @bind-Value="model.TrainingName" class="form-control" />
+                                                    <ValidationMessage For="() => model.TrainingName" />
                                                 </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Training Trigger</label>
-                                                    <div class="col-md-5">
-                                                        @if (model.TrainingTrigger is false || model.Id == 0)
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger">
-                                                                <label for="radio-t1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger" checked>
-                                                                <label for="radio-t2" class="cr">No</label>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger" checked>
-                                                                <label for="radio-t1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger">
-                                                                <label for="radio-t2" class="cr">No</label>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                               
-                                                @if (model.TrainingTrigger)
-                                                {                                                   
-                                                    <div class="form-group row">
-                                                        <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaigns</label>
-                                                        <div class="col-md-8">
-                                                            <HxMultiSelect TItem="Campaign"
-                                                                       AutoSort="false"
-                                                                       TValue="int"
-                                                                       Data="@campaigns"
-                                                                       @bind-Value="@SelectedCampaigns"
-                                                                       TextSelector="@(p => p.Name)"
-                                                                       ValueSelector="@(p => p.Id)"
-                                                                       EmptyText="- select -"
-                                                                       NullDataText="Loading..." />
-
-                                                                        @if (SelectedCampaigns.Count() == 0 && IsError)
-                                                                        {
-                                                                            <span style="color:red">Please select at least one campaign</span>
-                                                                        }
-                                                        </div>
-
-                                                    </div>
-                                                }
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Training Video</label>
-                                                    <div class="col-md-8">
-                                                        <InputSelect @bind-Value="model.TrainingVideo" class="form-control" id="TrainingVideo">
-
-                                                            <option>-Select-</option>
-                                                            @foreach (var v in trainingVideos)
-                                                            {
-                                                                <option value="@v.FilePath">@v.VideoTitle</option>
-                                                            }
-                                                        </InputSelect>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
-                                                    <div class="col-md-5">
-                                                        @if (model.IsActive is false || model.Id == 0)
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
-                                                                <label for="radio-1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
-                                                                <label for="radio-2" class="cr">No</label>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
-                                                                <label for="radio-1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
-                                                                <label for="radio-2" class="cr">No</label>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Training Category</label>
-                                                    <div class="col-md-8">
-                                                        <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
-
-                                                            <option>-Select-</option>
-                                                            <option value="Category1">Category1</option>
-                                                            <option value="Category2">Category2</option>
-                                                            <option value="Category3">Category3</option>
-
-                                                        </InputSelect>
-                                                        <ValidationMessage For="() => model.TrainingCategory" />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
-                                                    <div class="col-md-5">
-                                                        @if (isScheduled == false)
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                                <label for="radio-i-infill-1" class="cr">Later</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                                <label for="radio-i-infill-2" class="cr">Now</label>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
-                                                                <label for="radio-i-infill-1" class="cr">Later</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
-                                                                <label for="radio-i-infill-2" class="cr">Now</label>
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                                <div class="form-group row" id="divTrainingSchedule">
-                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
-                                                        <div class="col-12">
-                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
-                                                            {
-
-                                                            }
-                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
-                                                            {
-                                                                <label class="form-label">Scheduled Once</label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span class="input-group-text" id="">Date & Time</span>
-                                                                    </div>
-                                                                    <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
-                                                                    <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
-                                                                </div>
-
-                                                            }
-
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-
-                                                @if (!model.TrainingTrigger)
-                                                {
-                                                    <div class="form-group row" id="UploadTrainingUsers">
-                                                        <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
-                                                        <div class="col-md-8">
-                                                            <div class="input-group">
-                                                                <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
-                                                            </div>
-                                                            <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
-                                                            <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
-                                                        </div>
-                                                    </div>
-                                                }
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
-                                                    <div class="col-md-8">
-                                                        @if (model.Id > 0 && model.State == TrainingState.Completed)
-                                                        {
-                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
-                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
-                                                                {
-                                                                    <option value="@val">@val</option>
-                                                                }
-                                                            </InputSelect>
-                                                        }
-                                                        else
-                                                        {
-                                                            <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
-                                                                @foreach (var val in Enum.GetValues(typeof(TrainingState)))
-                                                                {
-                                                                    <option value="@val">@val</option>
-                                                                }
-                                                            </InputSelect>
-                                                        }
-                                                    </div>
-                                                </div>
-
-                                                <div style="text-align:center;">
-                                                    <button type="submit" class="btn btn-primary col-md-2 m-1" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
-                                                    <button type="button" @onclick="onClose" class="btn btn-danger col-md-2 m-1">Close</button>
-
-                                                    @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font">Training Trigger</label>
+                                                <div class="col-md-5">
+                                                    @if (model.TrainingTrigger is false || model.Id == 0)
                                                     {
-                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger">
+                                                            <label for="radio-t1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger" checked>
+                                                            <label for="radio-t2" class="cr">No</label>
+                                                        </div>
                                                     }
                                                     else
                                                     {
-                                                        <button type="button" class="btn btn-dark col-md-3 m-1" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger" checked>
+                                                            <label for="radio-t1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger">
+                                                            <label for="radio-t2" class="cr">No</label>
+                                                        </div>
                                                     }
-                                                    @if (model.State == TrainingState.Draft && model.Id > 0)
-                                                    {
-                                                        <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 m-1" type="button">Publish </button>
-                                                    }
+                                                </div>
+                                            </div>
 
-                                                    @if (model.State == TrainingState.Published)
+                                            @if (model.TrainingTrigger)
+                                            {
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Campaigns</label>
+                                                    <div class="col-md-8">
+                                                        <HxMultiSelect TItem="Campaign"
+                                                               AutoSort="false"
+                                                               TValue="int"
+                                                               Data="@campaigns"
+                                                               @bind-Value="@SelectedCampaigns"
+                                                               TextSelector="@(p => p.Name)"
+                                                               ValueSelector="@(p => p.Id)"
+                                                               EmptyText="- select -"
+                                                               NullDataText="Loading..." />
+
+                                                        @if (SelectedCampaigns.Count() == 0 && IsError)
+                                                        {
+                                                            <span style="color:red">Please select at least one campaign</span>
+                                                        }
+                                                    </div>
+
+                                                </div>
+                                            }
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Training Video</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="model.TrainingVideo" class="form-control" id="TrainingVideo">
+
+                                                        <option>-Select-</option>
+                                                        @foreach (var v in trainingVideos)
+                                                        {
+                                                            <option value="@v.FilePath">@v.VideoTitle</option>
+                                                        }
+                                                    </InputSelect>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                <div class="col-md-5">
+                                                    @if (model.IsActive is false || model.Id == 0)
                                                     {
-                                                        <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 m-1" type="button">UnPublish </button>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                            <label for="radio-1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                            <label for="radio-2" class="cr">No</label>
+                                                        </div>
                                                     }
+                                                    else
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                            <label for="radio-1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                            <label for="radio-2" class="cr">No</label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Training Category</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="model.TrainingCategory" class="form-control" id="TrainingCategory">
+
+                                                        <option>-Select-</option>
+                                                        <option value="Category1">Category1</option>
+                                                        <option value="Category2">Category2</option>
+                                                        <option value="Category3">Category3</option>
+
+                                                    </InputSelect>
+                                                    <ValidationMessage For="() => model.TrainingCategory" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                <div class="col-md-5">
+                                                    @if (isScheduled == false)
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                            <label for="radio-i-infill-1" class="cr">Later</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                            <label for="radio-i-infill-2" class="cr">Now</label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                            <label for="radio-i-infill-1" class="cr">Later</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
+                                                            <label for="radio-i-infill-2" class="cr">Now</label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" id="divTrainingSchedule">
+                                                <div class="col-md-8 offset-md-4 row" style="padding: 0;">
+                                                    <div class="col-12">
+                                                        @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                                                        {
+
+                                                        }
+                                                        @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
+                                                        {
+                                                            <label class="form-label">Scheduled Once</label>
+                                                            <div class="input-group">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="">Date & Time</span>
+                                                                </div>
+                                                                <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
+                                                                <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
+                                                            </div>
+
+                                                        }
+
+                                                    </div>
 
                                                 </div>
                                             </div>
-                                            <br />
-                                        </div>
 
-                                    </EditForm>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card" style="margin-bottom: 0;">
-                                        <div class="card-body ">
-                                            <div class="mb-3">
-                                                <label for="Content" class="form-label">Contents</label>
-                                                <div class="overflow-auto">
-                                                    <!-- Rich text editor -->
-                                                    <BlazingComponents.Summernote.Editor />
+                                            @if (!model.TrainingTrigger)
+                                            {
+                                                <div class="form-group row" id="UploadTrainingUsers">
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
+                                                    <div class="col-md-8">
+                                                        <div class="input-group">
+                                                            <InputFile OnChange="@OnInputFileChange" class="form-control" accept=".csv" />
+                                                        </div>
+                                                        <p style="color:red; font-size:10px; margin:0"> Select csv file </p>
+                                                        <a style="font-size: 10px;" href="sample-data/Recipient_Sample.csv" target="_top"> Download Template <i class="fas fa-download"></i></a>
+                                                    </div>
                                                 </div>
+                                            }
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font">Training State</label>
+                                                <div class="col-md-8">
+                                                    @if (model.Id > 0 && model.State == TrainingState.Completed)
+                                                    {
+                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State" disabled>
+                                                            @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                            {
+                                                                <option value="@val">@val</option>
+                                                            }
+                                                        </InputSelect>
+                                                    }
+                                                    else
+                                                    {
+                                                        <InputSelect readonly @bind-Value="model.State" class="form-control" id="State">
+                                                            @foreach (var val in Enum.GetValues(typeof(TrainingState)))
+                                                            {
+                                                                <option value="@val">@val</option>
+                                                            }
+                                                        </InputSelect>
+                                                    }
+                                                </div>
+                                            </div>
+
+                                            <div style="text-align:center;">
+                                                <button type="submit" class="btn btn-primary col-md-2 mb-1" disabled="@((model.Id > 0 && model.State == TrainingState.Completed) ? true : false)">Save</button>
+                                                <button type="button" @onclick="onClose" class="btn btn-danger col-md-2 mb-1 mr-1">Close</button>
+
+
+                                                @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
+                                                {
+                                                    <button type="button" class="btn btn-dark col-md-3 mb-1 mr-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-dark col-md-3 mb-1 mr-1" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                }
+                                                @if (model.State == TrainingState.Draft && model.Id > 0)
+                                                {
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 mb-1" type="button">Publish </button>
+                                                }
+
+                                                @if (model.State == TrainingState.Published)
+                                                {
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning col-md-3 mb-1" type="button">UnPublish </button>
+                                                }
+
+                                            </div>
+                                        </div>
+                                        <br />
+                                    </div>
+
+                                </EditForm>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card" style="margin-bottom: 0;">
+                                    <div class="card-body ">
+                                        <div class="mb-3">
+                                            <label for="Content" class="form-label">Contents</label>
+                                            <div class="overflow-auto">
+                                                <!-- Rich text editor -->
+                                                <BlazingComponents.Summernote.Editor />
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -320,17 +316,29 @@ else
 
             }
         </DialogTemplate>
-        <DialogTemplate Title="Import Training Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
+        <DialogTemplate Title="Import Campaign Recipients" Show="showRecipients" OnCloseDialog="CloseDailogBox">
             @if (recipients?.Count() > 0)
             {
                 <div style="padding-top: -50%">
-                    <Recipients DataList="@recipients"></Recipients>
-                    <br />
+                    <Recipients DataList="recipients"></Recipients>
                     <button @onclick="() => { this.showImportDialog = false; this.showRecipients = false;}"
                             class="btn btn-secondary" type="button">
                         Close
                     </button>
                 </div>
+            }
+            else
+            {
+                @if (string.IsNullOrEmpty(message))
+                {
+                    <div>No data found</div>
+                }
+                else
+                {
+                    @message
+                }
+                <br />
+                <button @onclick="CloseDailogBox" class="btn btn-secondary" type="button"> Close </button>
             }
         </DialogTemplate>
     </div>
@@ -354,7 +362,6 @@ else
     </Dailog>
 
 }
-
 
 @code {
 
@@ -479,7 +486,7 @@ else
         isloading = true;
         IsError = false;
         IsSuccess = false;
-        if(SelectedCampaigns.Count() == 0 && model.TrainingTrigger)
+        if (SelectedCampaigns.Count() == 0 && model.TrainingTrigger)
         {
             IsError = true;
             return;
@@ -497,7 +504,7 @@ else
             UpdateModelScheduleInfo();
             model = await client.UpsertTraining(model);
 
-            if (recipients.Count() > 0)
+            if (fileimport.Count() > 0)
             {
                 await OnImportRecipientClick();
             }
@@ -568,6 +575,7 @@ else
     {
         var singleFile = e.File;
         IsError = false;
+        showRecipients = false;
         message = string.Empty;
         isloading = true;
         Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
@@ -618,6 +626,7 @@ else
                             {
                                 IsError = true;
                                 message = r.ValidationErrMsg;
+                                showRecipients = true;
                                 isloading = false;
                                 return;
                             }
@@ -635,6 +644,8 @@ else
                 {
                     IsError = true;
                     message = ex.Message;
+                    showRecipients = true;
+                    isloading = false;
 
                 }
                 isloading = false;
@@ -717,7 +728,7 @@ else
         isloading = true;
         try
         {
-            var data = await client.ImportRecipientToTraining(model.Id, recipients);
+            var data = await client.ImportRecipientToTraining(model.Id, fileimport);
             recipients = data;
             IsSuccess = true;
             message = "Successfully imported";
@@ -745,7 +756,7 @@ else
             if (model.Id > 0)
             {
                 //await LoadRecipeints(model.Id);
-                 recipients = fileimport;
+                recipients = fileimport;
             }
             else
             {
@@ -826,7 +837,7 @@ else
         show = false;
         if (Message.Contains("Successfully Added"))
         {
-            Init();
+            //Init();
             SelectedCampaigns.Clear();
         }
     }
