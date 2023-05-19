@@ -9,10 +9,8 @@
 @inject TenantClient tenantClient
 @inject HttpClient HttpClient
 
-<h3>My Trainings</h3>
-
-<div class="row">
-    <div class="col-sm-12">
+<div>
+    <div class="">
         <GridComponent T="MyTraining" Grid="@_grid"></GridComponent>
     </div>
 </div>
@@ -26,13 +24,13 @@
 
     Action<IGridColumnCollection<MyTraining>> columns = c =>
     {
-        c.Add(o => o.Training.TrainingName).Titled("Title").SetWidth("200px").Css("table-bordered");
+        c.Add(o => o.Training.TrainingName).Titled("TrainingName").Css("table-bordered");
         c.Add(o => o.TrainingLog.SentOn).Titled("Assigned On").SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.TrainingLog.PercentCompleted).Titled("% Completed").SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.TrainingLog.Status).Titled("Status").Css("table-bordered");
+        c.Add(o => o.TrainingLog.PercentCompleted).Titled("% Completed").SetWidth("50px").Css("table-bordered").Format("{0:0.0}");
+        c.Add(o => o.TrainingLog.Status).Titled("Status").Css("table-bordered").SetWidth("50px");
         c.Add().Encoded(false)
             .Sanitized(false)
-            .RenderComponentAs<LaunchTrainingButton>().SetWidth("50px");
+            .RenderComponentAs<LaunchTrainingButton>().SetWidth("50px").Titled("Lauch");
     };
 
     protected override async Task OnParametersSetAsync()
