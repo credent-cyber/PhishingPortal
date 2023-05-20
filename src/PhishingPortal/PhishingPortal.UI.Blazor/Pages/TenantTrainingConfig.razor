@@ -123,6 +123,20 @@ else
                                                 </div>
                                             </div>
                                             <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Quiz</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="model.TrainingQuizId" class="form-control" id="TrainingQuizId">
+
+                                                        <option>-Select-</option>
+                                                        @foreach (var tq in TrainingQuiz)
+                                                        {
+                                                            <option value="@tq.Id">@tq.Name</option>
+                                                        }
+                                                    </InputSelect>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
                                                 <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                 <div class="col-md-5">
                                                     @if (model.IsActive is false || model.Id == 0)
@@ -163,6 +177,8 @@ else
                                                     <ValidationMessage For="() => model.TrainingCategory" />
                                                 </div>
                                             </div>
+                                            @if (!model.TrainingTrigger)
+                                            {
                                             <div class="form-group row">
                                                 <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
                                                 <div class="col-md-5">
@@ -215,8 +231,7 @@ else
                                                 </div>
                                             </div>
 
-                                            @if (!model.TrainingTrigger)
-                                            {
+                                           
                                                 <div class="form-group row" id="UploadTrainingUsers">
                                                     <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
                                                     <div class="col-md-8">
@@ -405,6 +420,7 @@ else
     private List<Campaign> campaigns;
     Training model;
     IEnumerable<TrainingVideo> trainingVideos;
+    IEnumerable<TrainingQuiz> TrainingQuiz;
     RecipientSources sources;
 
 
@@ -429,6 +445,7 @@ else
     {
         campaigns = await client.GetCampaignsNames();
         trainingVideos = await client.GetTrainigVideo();
+        TrainingQuiz = await client.GetAllTrainingQuizTitles();
         if (Id != 0)
         {
             Message = string.Empty;

@@ -731,5 +731,19 @@ namespace PhishingPortal.Server.Controllers.Api
         {
             return await _tenantRepository.GetQuizByTrainingId(trainingId);
         }
+
+        [HttpPost]
+        [Route("UpsertTrainingQuizTitle")]
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> Quiz)
+        {
+            return await _tenantRepository.UpsertTrainingQuizTitle(Quiz);
+        }
+
+        [HttpGet]
+        [Route("AllTrainingQuiz")]
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
+        {
+            return await _tenantRepository.GetAllTrainingQuiz();
+        }
     }
 }
