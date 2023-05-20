@@ -75,7 +75,7 @@
     [Parameter]
     public EventCallback<Scores> OnSubmit { get; set; }
 
-    private IEnumerable<TrainingQuiz> quizCollection_ = new List<TrainingQuiz>();
+    private IEnumerable<TrainingQuizQuestion> quizCollection_ = new List<TrainingQuizQuestion>();
     private List<Question> questions_ = new();
     private Question model_;
     private int index_ = 1;

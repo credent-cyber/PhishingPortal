@@ -21,10 +21,10 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
-        public IQueryable<TrainingQuiz> Get()
+        public IQueryable<TrainingQuizQuestion> Get()
         {
            // return DbContext.TrainingQuiz.Include(o=>o.TrainingQuizAnswer).GroupBy(x => x.TrainingId).Select(x => x.First()).ToList().AsQueryable();
-            return DbContext.TrainingQuiz.Include(o=>o.TrainingQuizAnswer).AsQueryable();
+            return DbContext.TrainingQuizQuestion.Include(o=>o.TrainingQuizAnswer).AsQueryable();
         }
 
     }

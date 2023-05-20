@@ -38,7 +38,7 @@ else
                         <div class="row">
                             <label class="col-form-label col-md-1 bold-font" style="padding-right: 0;">Training ID</label>
                             <div class="col-md-4">
-                                <select @bind="model.TrainingId" class="form-control" id="TrainingId">
+                                <select @bind="model.TrainingQuizId" class="form-control" id="TrainingId">
                                     <option selected>-Select-</option>
                                     @foreach (var t in training)
                                     {
@@ -174,7 +174,7 @@ else
     public int Id { get; set; }
     private bool show = false;
     private List<Training> training = new();
-    TrainingQuiz model = new();
+    TrainingQuizQuestion model = new();
 
     public string Title
     {
@@ -190,15 +190,15 @@ else
     bool loading = false;
     bool isloading = false;
     bool TaskCompleted = false;
-    private List<TrainingQuiz> TrainingQuiz { get; set; } = new List<TrainingQuiz>();
+    private List<TrainingQuizQuestion> TrainingQuiz { get; set; } = new List<TrainingQuizQuestion>();
 
 
     public void Init()
     {
         Message = string.Empty;
-        model = new TrainingQuiz() { };
+        model = new TrainingQuizQuestion() { };
         TrainingQuiz.Clear();
-        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 } };
+        TrainingQuiz = new List<TrainingQuizQuestion>() { new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 } };
     }
 
     protected override async Task OnInitializedAsync()
@@ -208,7 +208,7 @@ else
             var Data = await client.GetTrainingQuizById(Id);
             TrainingQuiz = Data.ToList();
             model.Id = TrainingQuiz[0].Id;
-            model.TrainingId = TrainingQuiz[0].TrainingId;
+            model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
             model.IsActive = TrainingQuiz[0].IsActive;
         }
         else
@@ -219,17 +219,17 @@ else
     }
     private void AddParent()
     {
-        TrainingQuiz.Add(new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 });
+        TrainingQuiz.Add(new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 });
     }
 
-    private void RemoveParent(TrainingQuiz trainingQuiz)
+    private void RemoveParent(TrainingQuizQuestion trainingQuiz)
     {
         TrainingQuiz.Remove(trainingQuiz);
         UpdateQuestionNumbers(TrainingQuiz);
 
     }
 
-    private void AddChild(TrainingQuiz trainingQuiz)
+    private void AddChild(TrainingQuizQuestion trainingQuiz)
     {
         var newTrainingQuizAnswer = new TrainingQuizAnswer
             {
@@ -239,7 +239,7 @@ else
         UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
     }
 
-    private void RemoveChild(TrainingQuiz trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
+    private void RemoveChild(TrainingQuizQuestion trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
     {
         trainingQuiz.TrainingQuizAnswer.Remove(trainingQuizAnswer);
         UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
@@ -276,7 +276,7 @@ else
             }
             foreach (var quiz in TrainingQuiz)
             {
-                quiz.TrainingId = model.TrainingId;
+                quiz.TrainingQuizId = model.TrainingQuizId;
                 quiz.IsActive = model.IsActive;
             }
             Message = (model.Id != 0) ? "Successfully Updated" : "Successfully Added";
@@ -335,7 +335,7 @@ else
             trainingQuizAnswer.OrderNumber = orderNumber++;
         }
     }
-    private void UpdateQuestionNumbers(IEnumerable<TrainingQuiz> trainingQuiz)
+    private void UpdateQuestionNumbers(IEnumerable<TrainingQuizQuestion> trainingQuiz)
     {
         int orderNumber = 1;
         foreach (var Quiz in trainingQuiz)

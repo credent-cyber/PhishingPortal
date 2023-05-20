@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace PhishingPortal.Dto
 {
-    public class TrainingQuiz : BaseEntity
+    public class TrainingQuizQuestion : BaseEntity
     {
         [Required]
-        public int TrainingId { get; set; }
+        public int TrainingQuizId { get; set; }
         [Required]
         public string Question { get; set; }
         [NotMapped]
@@ -23,9 +23,14 @@ namespace PhishingPortal.Dto
         public bool IsActive { get; set; }
         public virtual List<TrainingQuizAnswer> TrainingQuizAnswer { get; set; }
 
-        public TrainingQuiz()
+        public TrainingQuizQuestion()
         {
             TrainingQuizAnswer = new List<TrainingQuizAnswer>();
         }
+    }
+
+    public class TrainingQuiz : BaseEntity
+    {
+        public string Name { get; set; }
     }
 }

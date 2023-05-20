@@ -1298,7 +1298,7 @@ namespace PhishingPortal.Repositories
             return (List<Training>)result;
         }
 
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> dtos)
         {
             if (dtos == null || !dtos.Any())
             {
@@ -1306,27 +1306,27 @@ namespace PhishingPortal.Repositories
             }
             var results = dtos;
 
-            var existingQuestions = TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
-              .Where(tq => tq.TrainingId == dtos.First().TrainingId).ToList();
+            var existingQuestions = TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
+              .Where(tq => tq.TrainingQuizId == dtos.First().TrainingQuizId).ToList();
             foreach (var existingQuestion in existingQuestions)
             {
                 if (!dtos.Any(dto => dto.Id == existingQuestion.Id))
                 {
-                    TenantDbCtx.TrainingQuiz.Remove(existingQuestion);
+                    TenantDbCtx.TrainingQuizQuestion.Remove(existingQuestion);
                 }
             }
             foreach (var dto in dtos)
             {
                 if (dto.Id > 0)
                 {
-                    var existingQuiz = await TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+                    var existingQuiz = await TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
                                             .FirstOrDefaultAsync(tq => tq.Id == dto.Id);
                     if (existingQuiz == null)
                     {
                         throw new ArgumentException($"No TrainingQuiz found with ID {dto.Id}", nameof(dtos));
                     }
 
-                    existingQuiz.TrainingId = dto.TrainingId;
+                    existingQuiz.TrainingQuizId = dto.TrainingQuizId;
                     existingQuiz.AnswerType = dto.AnswerType;
                     existingQuiz.OrderNumber = dto.OrderNumber;
                     existingQuiz.Weightage = dto.Weightage;
@@ -1365,16 +1365,16 @@ namespace PhishingPortal.Repositories
                 }
                 else
                 {
-                    var newQuiz = new TrainingQuiz
+                    var newQuiz = new TrainingQuizQuestion
                     {
-                        TrainingId = dto.TrainingId,
+                        TrainingQuizId = dto.TrainingQuizId,
                         Question = dto.Question,
                         AnswerType = dto.AnswerType,
                         OrderNumber = dto.OrderNumber,
                         Weightage = dto.Weightage,
                         IsActive = dto.IsActive
                     };
-                    TenantDbCtx.TrainingQuiz.Add(newQuiz);
+                    TenantDbCtx.TrainingQuizQuestion.Add(newQuiz);
                     await TenantDbCtx.SaveChangesAsync();
 
                     foreach (var answerDto in dto.TrainingQuizAnswer)
@@ -1403,20 +1403,20 @@ namespace PhishingPortal.Repositories
         }
 
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuiz> result = null;
+            IEnumerable<TrainingQuizQuestion> result = null;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+            result = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return result;
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetQuizByTrainingId(int trainingId)
         {
-            return TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == trainingId && o.IsActive)
+            return TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == trainingId && o.IsActive)
                 .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
         }
     }

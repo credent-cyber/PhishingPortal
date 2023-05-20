@@ -33,8 +33,8 @@ namespace PhishingPortal.Repositories
         Task<Campaign> GetCampaignByName(string name);
         Task<List<int>> GetYearList();
         Task<List<Training>> GetAllTraining();
-        Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos);
-        Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id);
-        Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId);
+        Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> dtos);
+        Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id);
+        Task<IEnumerable<TrainingQuizQuestion>> GetQuizByTrainingId(int trainingId);
     }
 }

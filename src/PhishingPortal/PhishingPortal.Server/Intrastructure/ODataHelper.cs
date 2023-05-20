@@ -33,7 +33,7 @@
             builder.EntitySet<Campaign>("Campaign");
             builder.EntitySet<Training>("Training");
             builder.EntitySet<TrainingLog>("Traininglog");
-            builder.EntitySet<TrainingQuiz>("TrainingQuiz");
+            builder.EntitySet<TrainingQuizQuestion>("TrainingQuiz");
             builder.EntitySet<MyTraining>("MyTraining");
             return builder.GetEdmModel();
         }

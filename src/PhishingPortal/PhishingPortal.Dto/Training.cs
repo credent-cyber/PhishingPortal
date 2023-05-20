@@ -22,6 +22,8 @@ namespace PhishingPortal.Dto
 
         public int TrainingScheduleId { get; set; }
 
+        public int? TrainingQuizId { get; set; }
+
         [ForeignKey("TrainingScheduleId")]
         public virtual TrainingSchedule TrainingSchedule { get; set; }
     }

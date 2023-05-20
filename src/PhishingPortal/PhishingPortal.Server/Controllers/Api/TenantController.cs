@@ -712,7 +712,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpPost]
         [Route("UpsertTrainingQuiz")]
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> trainingQuiz)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> trainingQuiz)
         {
 
             return await _tenantRepository.UpsertTrainingQuiz(trainingQuiz);
@@ -720,14 +720,14 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpGet]
         [Route("TrainingQuiz-by-id/{id}")]
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
         {
             return await _tenantRepository.GetTrainingQuizById(id);
         }
 
         [HttpGet]
         [Route("training-quiz-by-training-id/{trainingId}")]
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizByTrainingId(int trainingId)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizByTrainingId(int trainingId)
         {
             return await _tenantRepository.GetQuizByTrainingId(trainingId);
         }

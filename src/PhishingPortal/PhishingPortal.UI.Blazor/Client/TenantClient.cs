@@ -766,16 +766,16 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return training;
         }
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuizAsync(List<TrainingQuiz> trainingQuiz)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuizAsync(List<TrainingQuizQuestion> trainingQuiz)
         {
-            List<TrainingQuiz> result = null;
+            List<TrainingQuizQuestion> result = null;
             try
             {
                 var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertTrainingQuiz", trainingQuiz);
 
                 res.EnsureSuccessStatusCode();
 
-                result = await res.Content.ReadFromJsonAsync<List<TrainingQuiz>>();
+                result = await res.Content.ReadFromJsonAsync<List<TrainingQuizQuestion>>();
 
             }
             catch (Exception ex)
@@ -787,15 +787,15 @@ namespace PhishingPortal.UI.Blazor.Client
 
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuiz> result;
+            IEnumerable<TrainingQuizQuestion> result;
 
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/TrainingQuiz-by-id/{id}");
                 res.EnsureSuccessStatusCode();
-                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuizQuestion>>();
             }
             catch (Exception ex)
             {
@@ -806,14 +806,14 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizByTrainingId(int trainingId)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizByTrainingId(int trainingId)
         {
-            IEnumerable<TrainingQuiz> result;
+            IEnumerable<TrainingQuizQuestion> result;
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/training-quiz-by-training-id/{trainingId}");
                 res.EnsureSuccessStatusCode();
-                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuizQuestion>>();
             }
             catch (Exception ex)
             {
