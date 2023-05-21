@@ -203,9 +203,7 @@
             errorMessage_ = "Training not found";
         }
 
-        var quizCollection = await client.GetTrainingQuizByTrainingId(training_.Id);
-        if (quizCollection == null || quizCollection.Count() == 0)
-            hasQuiz_ = false;
+        hasQuiz_ = training_.TrainingQuizId.HasValue;
 
         await Task.CompletedTask;
     }

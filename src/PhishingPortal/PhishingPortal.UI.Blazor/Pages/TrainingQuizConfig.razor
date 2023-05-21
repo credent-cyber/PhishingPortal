@@ -206,7 +206,7 @@ else
         if (Id > 0)
         {
             var Data = await client.GetTrainingQuizById(Id);
-            TrainingQuiz = Data.ToList();
+            TrainingQuiz = Data.Questions.ToList();
             model.Id = TrainingQuiz[0].Id;
             model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
             model.IsActive = TrainingQuiz[0].IsActive;

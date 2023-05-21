@@ -33,4 +33,10 @@ namespace PhishingPortal.Dto
     {
         public string Name { get; set; }
     }
+
+    public class TrainingQuizResult
+    {
+        public TrainingQuiz Quiz { get; set; }
+        public IEnumerable<TrainingQuizQuestion> Questions { get; set; }
+    }
 }

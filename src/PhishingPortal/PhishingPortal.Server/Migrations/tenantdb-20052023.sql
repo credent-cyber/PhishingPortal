@@ -29,3 +29,4 @@ ADD CONSTRAINT `TrainingQuiz_TrainingQuiz_Question_FK`
 
   ALTER TABLE `t-20220619003439`.`training` 
 ADD COLUMN `TrainingQuizId` INT NULL AFTER `TrainingScheduleId`;
+
