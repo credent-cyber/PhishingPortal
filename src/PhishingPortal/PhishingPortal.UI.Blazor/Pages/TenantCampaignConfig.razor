@@ -27,10 +27,10 @@
 }
 else
 {
-    <div class="pcoded-content" style="padding:0px 0px">
+    <div class="pcoded-content" style="padding:0px">
 
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 p-0">
                 <div class="card">
                     <div class="card-header bg-info" style="padding:15px !important;">
                         <h5 class="text-white">@Title</h5>
@@ -38,9 +38,9 @@ else
                             <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
                         </div>
                     </div>
-                    <div class="card-body" style="padding-top: 20px;">
+                    <div class="card-body" style="padding-top: 10px;">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-6 p-1">
                                 <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
                                     <DataAnnotationsValidator />
                                     @* @if (model.Id > 0)
@@ -334,7 +334,7 @@ else
 
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-6 p-1">
                                 <div class="card" style="margin-bottom: 0;">
                                     <div class="card-body" style="max-height: 850px; overflow-y: scroll;">
                                         @if (model.Detail.CampaignTemplateId.Equals(0))

@@ -19,9 +19,9 @@
 @attribute [Authorize]
 
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12 p-0">
         <div class="card">
-            <div class="card-header" style="padding:25px 25px 0px;">
+            <div class="card-header" style="padding:5px 8px 0px;">
                 <h5 style="top:-5px">All Campaign</h5>
                 <a href="tenant-campaign-config" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Campaign"></i></a>
                 <div style="float:right">
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="card-body">
+            <div class="card-body p-2 mt-n3">
                 <div class="col-md-12" style="padding: 0;">
                     <div class="bt-wizard" id="tabswizard">
                         <ul class="nav nav-pills">
@@ -60,7 +60,7 @@
                             <div class="pt-1 bg-primary"></div>
                             @if (CTab == 1)
                             {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab1">
                                     <div class="table-responsive">
                                         <EmailCampaignGrid />
                                     </div>
@@ -68,7 +68,7 @@
                             }
                             @if (CTab == 2)
                             {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab2">
                                     <div class="table-responsive">
                                         <SmsCampaignGrid />
                                     </div>
@@ -76,7 +76,7 @@
                             }
                             @if (CTab == 3)
                             {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab3">
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab3">
                                     <div class="table-responsive">
                                         <WhatsappCampaignGrid />
                                     </div>
