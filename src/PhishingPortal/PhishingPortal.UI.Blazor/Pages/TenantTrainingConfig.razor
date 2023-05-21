@@ -163,60 +163,61 @@ else
                                                     <ValidationMessage For="() => model.TrainingCategory" />
                                                 </div>
                                             </div>
-                                            <div class="form-group row">
-                                                <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
-                                                <div class="col-md-5">
-                                                    @if (isScheduled == false)
-                                                    {
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                            <label for="radio-i-infill-1" class="cr">Later</label>
-                                                        </div>
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                            <label for="radio-i-infill-2" class="cr">Now</label>
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
-                                                            <label for="radio-i-infill-1" class="cr">Later</label>
-                                                        </div>
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
-                                                            <label for="radio-i-infill-2" class="cr">Now</label>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                            <div class="form-group row" id="divTrainingSchedule">
-                                                <div class="col-md-8 offset-md-4 row" style="padding: 0;">
-                                                    <div class="col-12">
-                                                        @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
-                                                        {
-
-                                                        }
-                                                        @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
-                                                        {
-                                                            <label class="form-label">Scheduled Once</label>
-                                                            <div class="input-group">
-                                                                <div class="input-group-prepend">
-                                                                    <span class="input-group-text" id="">Date & Time</span>
-                                                                </div>
-                                                                <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
-                                                                <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
-                                                            </div>
-
-                                                        }
-
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
                                             @if (!model.TrainingTrigger)
                                             {
+                                                <div class="form-group row">
+                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                    <div class="col-md-5">
+                                                        @if (isScheduled == false)
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Later</label>
+                                                            </div>
+                                                            <div class="radio radio-info radio-fill d-inline">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
+                                                                <label for="radio-i-infill-2" class="cr">Now</label>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            
+                                                <div class="form-group row" id="divTrainingSchedule">
+                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
+                                                        <div class="col-12">
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                                                            {
+
+                                                            }
+                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
+                                                            {
+                                                                <label class="form-label">Scheduled Once</label>
+                                                                <div class="input-group">
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" id="">Date & Time</span>
+                                                                    </div>
+                                                                    <InputDate @bind-Value="TrainingScheduleOff.Date" id="TrainingScheduleoffDate" class="form-control"></InputDate>
+                                                                    <input type="time" @bind="TrainingScheduleOff.Time" id="TrainingScheduleTime" class="form-control"></input>
+                                                                </div>
+
+                                                            }
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
                                                 <div class="form-group row" id="UploadTrainingUsers">
                                                     <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
                                                     <div class="col-md-8">
