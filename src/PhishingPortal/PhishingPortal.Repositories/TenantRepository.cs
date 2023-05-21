@@ -1348,7 +1348,7 @@ namespace PhishingPortal.Repositories
                         {
                             var newAnswer = new TrainingQuizAnswer
                             {
-                                TrainingQuizId = existingQuiz.Id,
+                                TrainingQuizQuestionId = existingQuiz.Id,
                                 AnswerText = answerDto.AnswerText,
                                 OrderNumber = answerDto.OrderNumber,
                                 IsCorrect = answerDto.IsCorrect
@@ -1381,7 +1381,7 @@ namespace PhishingPortal.Repositories
                     {
                         var newAnswer = new TrainingQuizAnswer
                         {
-                            TrainingQuizId = newQuiz.Id,
+                            TrainingQuizQuestionId = newQuiz.Id,
                             AnswerText = answerDto.AnswerText,
                             OrderNumber = answerDto.OrderNumber,
                             IsCorrect = answerDto.IsCorrect
@@ -1403,13 +1403,20 @@ namespace PhishingPortal.Repositories
         }
 
 
-        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuizQuestion> result = null;
+            TrainingQuizResult result;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+            var quiz = TenantDbCtx.TrainingQuiz.FirstOrDefault(i => i.Id == id);
+            var  questions = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            result = new TrainingQuizResult
+            {
+                Quiz = quiz,
+                Questions = questions
+            };
 
             return result;
         }
