@@ -1305,7 +1305,6 @@ namespace PhishingPortal.Repositories
                 throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
             }
             var results = dtos;
-
             var existingQuestions = TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
               .Where(tq => tq.TrainingQuizId == dtos.First().TrainingQuizId).ToList();
             foreach (var existingQuestion in existingQuestions)
@@ -1348,7 +1347,7 @@ namespace PhishingPortal.Repositories
                         {
                             var newAnswer = new TrainingQuizAnswer
                             {
-                                TrainingQuizId = existingQuiz.Id,
+                                TrainingQuizQuestionId = existingQuiz.Id,
                                 AnswerText = answerDto.AnswerText,
                                 OrderNumber = answerDto.OrderNumber,
                                 IsCorrect = answerDto.IsCorrect
@@ -1381,7 +1380,7 @@ namespace PhishingPortal.Repositories
                     {
                         var newAnswer = new TrainingQuizAnswer
                         {
-                            TrainingQuizId = newQuiz.Id,
+                            TrainingQuizQuestionId = newQuiz.Id,
                             AnswerText = answerDto.AnswerText,
                             OrderNumber = answerDto.OrderNumber,
                             IsCorrect = answerDto.IsCorrect

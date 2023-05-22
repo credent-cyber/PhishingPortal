@@ -39,7 +39,7 @@ else
                         <div class="row">
                             <label class="col-form-label col-md-1 bold-font" style="padding-right: 0;">Quiz</label>
                             <div class="input-group col-md-4">
-                                <select @bind="model.TrainingQuizId" class="form-control" id="TrainingQuizId">
+                                <select @bind-value="model.TrainingQuizId" class="form-control" id="TrainingQuizId" @onchange="QuizChangesAsync" @bind-value:event="oninput">
                                     <option selected>-Select-</option>
                                     @foreach (var t in trainingQuizTitles)
                                     {
@@ -57,7 +57,7 @@ else
                             </div>
                         </div>
                     </div>
-    
+
                     <div class="table-responsive mt-3">
                         <table class="table table-striped table-bordered nowrap">
                             <tbody>
@@ -165,7 +165,7 @@ else
 
 </Dailog>
 <Pop_up Title="Add Quiz" Show="AddQuiz" ClosePageDialog="ClosePopUp">
-    <AddQuizTitle/>
+    <AddQuizTitle />
 </Pop_up>
 
 @code {
@@ -262,7 +262,7 @@ else
         TaskCompleted = false;
 
         try
-        {  
+        {
             if (TrainingQuiz.Count == 0)
             {
                 loading = false;
@@ -357,6 +357,22 @@ else
         AddQuiz = false;
         trainingQuizTitles = new List<TrainingQuiz>(await client.GetAllTrainingQuizTitles());
         StateHasChanged();
+    }
+
+    public async void QuizChangesAsync()
+    {
+        if (model.TrainingQuizId > 0)
+        {
+            var Data = await client.GetTrainingQuizById(model.TrainingQuizId);
+            TrainingQuiz = Data.ToList();
+            if (TrainingQuiz.Count() > 0)
+            {
+                model.Id = TrainingQuiz[0].Id;
+                model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
+                model.IsActive = TrainingQuiz[0].IsActive;
+                StateHasChanged();
+            }
+        }
     }
 }
 
