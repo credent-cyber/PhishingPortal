@@ -3,7 +3,7 @@
 
     public static class StringExtensions
     {
-     
+
         /// <summary>
         /// Computes MD5 hash for the input string
         /// </summary>
@@ -31,6 +31,6 @@
             var tempHash = ComputeMd5Hash(value);
             return tempHash == hash;
         }
-        
+
     }
 }

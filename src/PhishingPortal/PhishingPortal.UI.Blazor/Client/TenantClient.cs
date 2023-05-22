@@ -787,15 +787,15 @@ namespace PhishingPortal.UI.Blazor.Client
 
         }
 
-        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuizQuestion> result;
+            TrainingQuizResult result;
 
             try
             {
-                var res = await HttpClient.GetAsync($"api/tenant/TrainingQuiz-by-id/{id}");
+                var res = await HttpClient.GetAsync($"api/tenant/trainingquiz-by-id/{id}");
                 res.EnsureSuccessStatusCode();
-                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuizQuestion>>();
+                result = await res.Content.ReadFromJsonAsync<TrainingQuizResult>();
             }
             catch (Exception ex)
             {
@@ -805,25 +805,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return result;
         }
-
-        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizByTrainingId(int trainingId)
-        {
-            IEnumerable<TrainingQuizQuestion> result;
-            try
-            {
-                var res = await HttpClient.GetAsync($"api/tenant/training-quiz-by-training-id/{trainingId}");
-                res.EnsureSuccessStatusCode();
-                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuizQuestion>>();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return result;
-        }
-
+      
         public async Task<List<MyTraining>> GetMyTrainings()
         {
             var myTrainings = new List<MyTraining>();

@@ -720,7 +720,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpGet]
         [Route("TrainingQuiz-by-id/{id}")]
-        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizById(int id)
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
             return await _tenantRepository.GetTrainingQuizById(id);
         }
