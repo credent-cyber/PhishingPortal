@@ -161,6 +161,7 @@ table.striped > tbody > tr.grid-row:nth-of-type(odd) {
 
 .note-editable {
     background: #ffffff !important;
+    min-height:100px !important;
 }
 
 .bold-font {
@@ -501,5 +502,5 @@ imgs {
         transform: translate(24px, 0);
     }
 }
-
 /**/
+
