@@ -866,5 +866,44 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
         }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
+        {
+            List<TrainingQuiz> result = null;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertTrainingQuizTitle", data);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingQuiz>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuizTitles()
+        {
+            IEnumerable<TrainingQuiz> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/AllTrainingQuiz");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return details;
+        }
+        
+
     }
 }

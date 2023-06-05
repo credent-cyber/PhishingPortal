@@ -123,6 +123,20 @@ else
                                                 </div>
                                             </div>
                                             <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Quiz</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="model.TrainingQuizId" class="form-control" id="TrainingQuizId">
+
+                                                        <option>-Select-</option>
+                                                        @foreach (var tq in TrainingQuiz)
+                                                        {
+                                                            <option value="@tq.Id">@tq.Name</option>
+                                                        }
+                                                    </InputSelect>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
                                                 <label for="" class="col-form-label col-md-4 bold-font">Is Active</label>
                                                 <div class="col-md-5">
                                                     @if (model.IsActive is false || model.Id == 0)
@@ -165,39 +179,38 @@ else
                                             </div>
                                             @if (!model.TrainingTrigger)
                                             {
-                                                <div class="form-group row">
-                                                    <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
-                                                    <div class="col-md-5">
-                                                        @if (isScheduled == false)
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
-                                                                <label for="radio-i-infill-1" class="cr">Later</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
-                                                                <label for="radio-i-infill-2" class="cr">Now</label>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
-                                                                <label for="radio-i-infill-1" class="cr">Later</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
-                                                                <label for="radio-i-infill-2" class="cr">Now</label>
-                                                            </div>
-                                                        }
-                                                    </div>
+                                            <div class="form-group row">
+                                                <label for="" class="col-form-label col-md-4 bold-font">Schedule</label>
+                                                <div class="col-md-5">
+                                                    @if (isScheduled == false)
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange">
+                                                            <label for="radio-i-infill-1" class="cr">Later</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange" checked>
+                                                            <label for="radio-i-infill-2" class="cr">Now</label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="OnScheduleTypeChange" checked>
+                                                            <label for="radio-i-infill-1" class="cr">Later</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="OffScheduleTypeChange">
+                                                            <label for="radio-i-infill-2" class="cr">Now</label>
+                                                        </div>
+                                                    }
                                                 </div>
-                                            
-                                                <div class="form-group row" id="divTrainingSchedule">
-                                                    <div class="col-md-8 offset-md-4 row" style="padding: 0;">
-                                                        <div class="col-12">
-                                                            @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
-                                                            {
+                                            </div>
+                                            <div class="form-group row" id="divTrainingSchedule">
+                                                <div class="col-md-8 offset-md-4 row" style="padding: 0;">
+                                                    <div class="col-12">
+                                                        @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                                                        {
 
                                                             }
                                                             @if (model.TrainingSchedule.ScheduleType == ScheduleTypeEnum.Once && isScheduled == true)
@@ -218,6 +231,7 @@ else
                                                     </div>
                                                 </div>
 
+                                           
                                                 <div class="form-group row" id="UploadTrainingUsers">
                                                     <label for="" class="col-form-label col-md-4 bold-font">Import Training Recipients</label>
                                                     <div class="col-md-8">
@@ -406,6 +420,7 @@ else
     private List<Campaign> campaigns;
     Training model;
     IEnumerable<TrainingVideo> trainingVideos;
+    IEnumerable<TrainingQuiz> TrainingQuiz;
     RecipientSources sources;
 
 
@@ -430,6 +445,7 @@ else
     {
         campaigns = await client.GetCampaignsNames();
         trainingVideos = await client.GetTrainigVideo();
+        TrainingQuiz = await client.GetAllTrainingQuizTitles();
         if (Id != 0)
         {
             Message = string.Empty;

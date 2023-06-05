@@ -1305,7 +1305,6 @@ namespace PhishingPortal.Repositories
                 throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
             }
             var results = dtos;
-
             var existingQuestions = TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
               .Where(tq => tq.TrainingQuizId == dtos.First().TrainingQuizId).ToList();
             foreach (var existingQuestion in existingQuestions)
@@ -1425,6 +1424,35 @@ namespace PhishingPortal.Repositories
         {
             return TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == trainingId && o.IsActive)
                 .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+        }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
+        {
+            List<TrainingQuiz> result = null;
+
+            if (data.Count() == 0)
+                return result;
+
+            foreach (TrainingQuiz tq in data)
+            {
+                var existing = await TenantDbCtx.TrainingQuiz.FirstOrDefaultAsync(c => c.Name.ToUpper() == tq.Name.ToUpper());
+                if (existing != null)
+                {
+                    continue;
+                }
+                TenantDbCtx.TrainingQuiz.Add(tq);
+            }
+            TenantDbCtx.SaveChanges();
+
+            return data;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
+        {
+            IEnumerable<TrainingQuiz> result = null;
+
+            result = TenantDbCtx.TrainingQuiz.ToList();
+            return result;
         }
     }
 }
