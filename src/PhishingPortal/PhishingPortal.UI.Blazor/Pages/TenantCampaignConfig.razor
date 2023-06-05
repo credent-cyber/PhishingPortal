@@ -653,7 +653,7 @@ else
     protected async void OnRecipientSelected(List<RecipientImport> data)
     {
         showAdImportDialog = false;
-        recipients = data;
+        fileimport = recipients = data;
         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
 
