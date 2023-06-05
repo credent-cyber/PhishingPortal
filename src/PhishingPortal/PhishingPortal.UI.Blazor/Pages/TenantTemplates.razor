@@ -15,9 +15,9 @@
 @attribute [Authorize]
 
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12 p-0">
         <div class="card">
-            <div class="card-header" style="padding:25px 25px 0px;">
+            <div class="card-header" style="padding:5px 8px 0px;">
                 <h5 style="top:-5px">All Templates</h5>
                 <a href="tenant-templates-config" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Template"></i></a>
                 <div style="float:right">
@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <div class="card-body">
+            <div class="card-body p-2 mt-n3">
                 <div class="bt-wizard" id="tabswizard">
                     <ul class="nav nav-pills">
                         @if (Tab == 1)
@@ -54,7 +54,7 @@
                         <div class="pt-1 bg-primary"></div>
                         @if (Tab == 1)
                         {
-                            <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab1">
                                 <div class="table-responsive">
                                     <EmailTemplateGrid />
                                 </div>
@@ -62,7 +62,7 @@
                         }
                         @if (Tab == 2)
                         {
-                            <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab2">
                                 <div class="table-responsive">
                                     <SmsTemplateGrid />
                                 </div>
@@ -70,7 +70,7 @@
                         }
                         @if (Tab == 3)
                         {
-                            <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab3">
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab3">
                                 <div class="table-responsive">
                                     <WhatsappTemplateGrid />
                                 </div>

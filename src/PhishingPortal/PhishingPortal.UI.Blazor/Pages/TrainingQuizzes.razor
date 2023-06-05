@@ -21,9 +21,9 @@
 
 
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12 p-0">
         <div class="card">
-            <div class="card-header" style="padding:25px 25px 0px;">
+            @*<div class="card-header" style="padding:5px 8px 0px;">
 
                 <h5 style="top:-5px">Training Quiz</h5>
                 <a style="margin-left:-10px" title="Create Quiz" href="training-quiz"><i class="fa fa-plus-circle fa-2x" aria-hidden="true"></i></a>
@@ -34,16 +34,26 @@
                         <li class="breadcrumb-item active">TrainingQuiz</li>
                     </ol>
                 </div>
+            </div>*@
+            <div class="card-header" style="padding:5px 8px 0px;">
+                <h5 style="top:-5px">Training Quiz</h5>
+                <a href="training-quiz" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Quiz"></i></a>
+                <div style="float:right">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                        <li class="breadcrumb-item active">TrainingQuiz</li>
+                    </ol>
+                </div>
             </div>
 
-            <div class="card-body">
+            <div class="card-body p-2 mt-n3">
                 <div class="bt-wizard" id="tabswizard">
                     <ul class="nav nav-pills">
                         <li class="nav-item"><a href="#tabs-t-tab1" class="nav-link rounded-0 active" data-toggle="tab">Training Quizzes</a></li>
                     </ul>
                     <div class="tab-content card">
                         <div class="pt-1 bg-primary"></div>
-                         <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
+                         <div class="tab-pane card-body pt-4 p-2 active show" id="tabs-t-tab1">
                              <div class="table-responsive">
                                  <TrainingsQuizzesTable />
                              </div>
