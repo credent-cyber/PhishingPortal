@@ -370,8 +370,12 @@ else
                 model.Id = TrainingQuiz[0].Id;
                 model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
                 model.IsActive = TrainingQuiz[0].IsActive;
-                StateHasChanged();
             }
+            else
+            {
+                TrainingQuiz.Add(new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 });
+            }
+            StateHasChanged();
         }
     }
 }

@@ -1326,6 +1326,7 @@ namespace PhishingPortal.Repositories
                     }
 
                     existingQuiz.TrainingQuizId = dto.TrainingQuizId;
+                    existingQuiz.Question = dto.Question;
                     existingQuiz.AnswerType = dto.AnswerType;
                     existingQuiz.OrderNumber = dto.OrderNumber;
                     existingQuiz.Weightage = dto.Weightage;
