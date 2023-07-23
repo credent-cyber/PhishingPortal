@@ -389,31 +389,6 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
-        //[HttpGet]
-        //[Route("GetCampaignlog/{Query}")]
-        //public async Task<CampaignLog> GetCampaignLog(List<string> Query)
-        //{
-        //    var campaignLogs = await _tenantRepository.GetCampaignLogs(Query);
-
-        //    return campaignLogs.ToList();
-        //}
-
-        [HttpPost]
-        [Route("GetCampaignlog")]
-        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(List<string> Query)
-        {
-            try
-            {
-                var result = await _tenantRepository.GetCampaignLogs(Query);
-                return result.ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, ex.Message);
-                throw;
-            }
-        }
-
 
         [HttpPost]
         [Route("upsert-training")]

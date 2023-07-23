@@ -929,34 +929,6 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query)
-        {
-            var result = Enumerable.Empty<CampaignLog>();
-            var results = Enumerable.Empty<CampaignLog>();
-            var data = query.ToList();
-            var logdata = TenantDbCtx.CampaignLogs.Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
-            if (data.Count > 0)
-            {
-                for (int i = 0; i < data.Count; i++)
-                {
-                    var id = Convert.ToInt16(data[i]);
-                    if (i == 0)
-                    {
-                        results = logdata.Where(o => o.CampaignId == id);
-                    }
-                    else
-                    {
-                        result = logdata.Where(o => o.CampaignId == id);
-                        results = results.Concat(result);
-                    }
-                }
-            }
-            else
-                results = TenantDbCtx.CampaignLogs;
-
-            return Task.FromResult(results);
-        }
-
         public async Task<Training> UpsertTraining(Training training)
         {
             try
