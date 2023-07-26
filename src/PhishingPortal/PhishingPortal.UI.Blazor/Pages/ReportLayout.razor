@@ -193,7 +193,7 @@
 
         c.Add(o => o.IsHit).Css("table-bordered").Filterable(filter);
         c.Add(o => o.IsReported).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CreatedOn).Css("table-bordered").Format("{0:dd/MM/yyyy hh:mm:ss tt}").Filterable(filter);
     };
 
 
@@ -376,13 +376,14 @@
 
         try
         {
-            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 3)
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
                 .ChangePageSize(true)
                 .ClearFiltersButton(true)
                 .SetStriped(true)
                 .WithMultipleFilters()
                 .WithGridItemsCount()
                 .SetKeyboard(true)
+                .SetExcelExport(true, true, "Reports")
                 .EmptyText("No Data Available!!")
                 .Searchable(true, false, false);
 
