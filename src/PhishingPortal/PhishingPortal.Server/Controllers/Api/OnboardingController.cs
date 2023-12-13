@@ -55,13 +55,14 @@ namespace PhishingPortal.Server.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Register")]
-        public async Task<Tenant> Register(Tenant tenant)
+        public async Task<ApiResponse<Tenant>> Register(Tenant tenant)
         {
-            Tenant result;
+            var response = new ApiResponse<Tenant>();
+            Tenant t;
 
             try
             {
-                result = await tenatAdminRepo.CreateTenantAsync(tenant);
+                response = await tenatAdminRepo.CreateTenantAsync(tenant);
 
                 if(tenant.RequireDomainVerification)
                     await SendConfirmationEmail(tenant);
@@ -70,9 +71,9 @@ namespace PhishingPortal.Server.Controllers
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
-                throw;
+                return new ApiResponse<Tenant>() { IsSuccess=false, Message = ex.Message };
             }
-            return result;
+            return response;
         }
 
 
@@ -86,8 +87,18 @@ namespace PhishingPortal.Server.Controllers
         [Route("TenantByUniqueId")]
         public async Task<Tenant> GetByUniqueId(string uniqueId)
         {
+
             return await tenatAdminRepo.GetByUniqueId(uniqueId);
         }
+
+        [HttpDelete]
+        [Route("DeleteTenantByUniqueId")]
+        public async Task<(bool, string)> DeleteTenantByUniqueId(string uniqueId)
+        {
+
+            return await tenatAdminRepo.DeleteTenantByUniqueId(uniqueId);
+        }
+
 
         [HttpPost]
         [Route("Provision")]
@@ -167,7 +178,7 @@ namespace PhishingPortal.Server.Controllers
                 {
                     confirmedTenant = await tenatAdminRepo.ConfirmDomainAsync(domain);
                     response.IsSuccess = true;
-                    response.Message = "Sucessfully verified domain";
+                    response.Message = "Sucessfully verified domain, Now create credential to log in the portal.";
                     response.Result = confirmedTenant;
                 }
                 else

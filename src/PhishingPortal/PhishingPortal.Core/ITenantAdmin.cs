@@ -14,7 +14,7 @@ namespace PhishingPortal.Core
         /// </summary>
         /// <param name="tenant"></param>
         /// <returns></returns>
-        Task<Tenant> CreateAsync(Tenant tenant);
+        Task<ApiResponse<Tenant>> CreateAsync(Tenant tenant);
         
     }
 }

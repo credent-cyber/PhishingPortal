@@ -7,88 +7,141 @@
 @inject ILogger<Onboard> Logger
 @inject NavigationManager navMgr
 
-<h3>Onboard New Client</h3>
 
-<div class="row">
+<div class="pcoded-content" style="padding:0px 0px">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <div class="card">
+                <div class="card-header bg-info" style="padding:15px !important;">
+                    <h5 class="text-white">@Title</h5>
+                    <div style="float:right">
+                        <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="card-body" style="padding-top: 10px;">
+                    <div class="row">
 
-    <div class=col-5>
+                        <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            @* <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" /> *@
 
-        <EditForm Model="@model" class="form" OnValidSubmit="@OnValidSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Name">@nameof(model.Name)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+                                </div>
 
-            <div class="form-group">
-                <label for="Name">@nameof(model.Name)</label>
-                <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+                                <label class="col-form-label col-md-2 bold-font" for="Website">@nameof(model.Website)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.Website" id="Website" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="ContactNumber">@nameof(model.ContactNumber)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+                                </div>
+                                <label class="col-form-label col-md-2 bold-font" for="ContactEmail">@nameof(model.ContactEmail)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Domain">@nameof(model.LicenseType)</label>
+                                <div class="col-md-4">
+                                    <InputSelect @bind-Value="model.LicenseType" class="form-control">
+                                        @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
+                                        {
+                                            <option value="@lic">@lic</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+
+                                <label class="col-form-label col-md-2 bold-font" for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
+                                <div class="col-md-4">
+                                    <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="DatabaseOption">@nameof(model.DatabaseOption)</label>
+                                <div class="col-md-4">
+                                    <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+                                        @foreach (var op in Enum.GetValues(typeof(DbOptions)))
+                                        {
+                                            <option value="@op">@op</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Address">@nameof(model.Address)</label>
+                                <div class="col-md-10">
+                                    <InputText @bind-Value="model.Address" id="Address" class="form-control" />
+                                </div>
+
+                            </div>
+
+                            <div class="form-group" style="margin-left:18px;">
+                                <InputCheckbox id="RequireDomainVerification" @bind-Value="model.RequireDomainVerification" class="form-check-input" />
+                                <label for="RequireDomainVerification" class="form-check-label">Require Domain Verification</label>
+                            </div>
+                            <div style="text-align:center;">
+                                <button class="btn btn-secondary mb-1" type="button" @onclick="onClose">Close</button>
+                                <button class="btn btn-primary mb-1" type="submit">Save Changes</button>
+                                <button class="btn btn-danger mr-1 mb-1" type="button" @onclick="DeleteClient">Delete Tenant</button>
+                                @if (model.ConfirmationState == ConfirmationStats.Registered)
+                                {
+                                    <button class="btn btn-info mb-1" type="button" @onclick="OnVerifyClick">Send Verification</button>
+                                }
+
+                                @if (model.ConfirmationState == ConfirmationStats.DomainVerified)
+                                {
+                                    <button class="btn btn-warning mb-1" type="button">Publish Defaults</button>
+                                }
+                            </div>
+                        </EditForm>
+
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="Address">@nameof(model.Address)</label>
-                <InputText @bind-Value="model.Address" id="Address" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label for="Website">@nameof(model.Website)</label>
-                <InputText @bind-Value="model.Website" id="Website" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label for="ContactEmail">@nameof(model.ContactEmail)</label>
-                <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label for="ContactNumber">@nameof(model.ContactNumber)</label>
-                <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
-            </div>
-
-
-            <div class="form-group">
-                <label for="Domain">@nameof(model.LicenseType)</label>
-                <InputSelect @bind-Value="model.LicenseType" class="form-control">
-                    @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
-                    {
-                        <option value="@lic">@lic</option>
-                    }
-                </InputSelect>
-
-            </div>
-
-            <div class="form-group">
-                <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
-                <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
-            </div>
-
-            <div class="form-group">
-                <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
-                <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
-                    @foreach (var op in Enum.GetValues(typeof(DbOptions)))
-                    {
-                        <option value="@op">@op</option>
-                    }
-                </InputSelect>
-            </div>
-
-            <button class="btn btn-primary" type="submit">Save Changes</button>
-
-        </EditForm>
+        </div>
     </div>
-    <div class=col-5>
-        @if (model.ConfirmationState == ConfirmationStats.Registered)
-        {
-               <button type="button" @onclick="OnVerifyClick" >Send Verification</button>
-        }
-        
-        @if(model.ConfirmationState == ConfirmationStats.DomainVerified)
-        {
-             <button type="button">Publish Defaults</button>
-        }
-       
-    </div>
-
 </div>
+<SimpleDialog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (TaskCompleted && !Warning)
+        {
+            <div style="text-align:center;">
+                @MessageBody 
+                <div style="text-align:center">
+                    <button type="button" class="btn btn-outline-secondary col-md-4 mt-3" @onclick="onClose">Close</button>
+                </div>
+            </div>
+        }
+        else if (!TaskCompleted && Warning)
+        {
+            <div style="text-align:center;">
+                @MessageBody <br /> <h5 style="font-family:cursive">@timeRemaining</h5>
+                <div style="text-align:center">
+                    <button class="btn btn-danger mr-1 mt-3" type="button" disabled="@DisableDeleteButton" @onclick="Delete">Delete</button>
+                    <button type="button" class="btn btn-outline-secondary col-md-4 mt-3" @onclick="onClose">Close</button>
+                </div>
+               
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
 
+</SimpleDialog>
 
 @code {
     [Parameter]
@@ -97,6 +150,16 @@
     bool IsError = false;
     bool IsSuccess = false;
     string Message = string.Empty;
+    string MessageBody = "Thank you!";
+    private bool show = false;
+    bool TaskCompleted = false;
+    bool Warning = false;
+    bool DisableDeleteButton = true;
+    private int timeRemaining = 20;
+
+    public string Title = "Update Client";
+
+    bool loading = false;
 
     Tenant model = new Tenant();
 
@@ -126,15 +189,94 @@
 
     public void OnVerifyClick()
     {
-        // send verificatin mail 
+        // send verificatin mail
         // ask user to create admin user
 
     }
 
     public void OnPublishDefaults()
     {
-        // seed database 
+        // seed database
+    }
+
+    protected void onClose()
+    {
+        navMgr.NavigateTo("provision");
     }
 
 
+    protected async Task DeleteClient()
+    {
+        Message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        Warning = true;
+        DisableDeleteButton = true;
+        timeRemaining = 20;
+
+        try
+        {
+            Message = "Warning";
+            MessageBody = $"This will delete all data permanently of this tenant \n";
+            await CountDownTimer();
+            DisableDeleteButton = false;
+           
+            //var responce = await Delete();
+
+            // MessageBody = responce.Item2;
+            // IsSuccess = responce.Item1 == true ? true : false;
+            //TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            Message = "Error!";
+            MessageBody = ex.Message;
+            Message = $"There was an error deleting client, {ex.Message}";
+            TaskCompleted = true;
+        }
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+
+    }
+
+    private async Task Delete()
+    {
+        try
+        {
+            Message = "Please wait";
+            Warning = false;
+            var responce = await AdminClient.DeleteTenantByUniqueId(model.UniqueId);
+            MessageBody = responce.Item2;
+            IsSuccess = responce.Item1 == true ? true : false;
+            TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogCritical(ex, ex.Message);
+            IsError = true;
+            Message = "Error!";
+            MessageBody = ex.Message;
+            Message = $"There was an error deleting client, {ex.Message}";
+            TaskCompleted = true;
+        }
+    }
+
+    private async Task CountDownTimer()
+    {
+        while (timeRemaining > 0)
+        {
+            await Task.Delay(1000);
+            timeRemaining--;
+            StateHasChanged();
+        }
+        DisableDeleteButton = false;
+    }
 }
