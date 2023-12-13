@@ -189,6 +189,7 @@
         c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID").Filterable(filter);
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").Filterable(filter);
         c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email").Filterable(filter);
+        c.Add(o => o.Recipient.Recipient.Mobile).Css("table-bordered").SetWidth("60px").Titled("Recipient Mobile").Filterable(filter);
         c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department").Filterable(filter);
 
         c.Add(o => o.IsHit).Css("table-bordered").Filterable(filter);
