@@ -472,29 +472,6 @@ namespace PhishingPortal.UI.Blazor.Client
 
         #endregion
 
-
-        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(List<string> query)
-        {
-            IEnumerable<CampaignLog> campaignlog;
-            try
-            {
-                var res = await HttpClient.PostAsJsonAsync($"api/tenant/GetCampaignlog", query);
-
-                res.EnsureSuccessStatusCode();
-
-                campaignlog = await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return campaignlog;
-        }
-
-
         public async Task<Training> UpsertTraining(Training training)
         {
             Training result;

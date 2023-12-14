@@ -35,6 +35,7 @@
             builder.EntitySet<TrainingLog>("Traininglog");
             builder.EntitySet<TrainingQuizQuestion>("TrainingQuiz");
             builder.EntitySet<MyTraining>("MyTraining");
+            builder.EntitySet<Tenant>("Tenant");
             return builder.GetEdmModel();
         }
     }

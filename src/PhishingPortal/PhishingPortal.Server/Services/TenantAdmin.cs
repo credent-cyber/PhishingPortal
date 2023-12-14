@@ -16,11 +16,12 @@ namespace PhishingPortal.Server.Services
         public ILogger<TenantAdmin> Logger { get; }
         public ITenantAdminRepository TenantAdminRepo { get; }
 
-        public async Task<Tenant> CreateAsync(Tenant tenant)
+        public async Task<ApiResponse<Tenant>> CreateAsync(Tenant tenant)
         {
+            var response = new ApiResponse<Tenant>();
             try
             {
-                tenant = await TenantAdminRepo.CreateTenantAsync(tenant);
+                response = await TenantAdminRepo.CreateTenantAsync(tenant);
             }
             catch (Exception ex)
             {
@@ -29,7 +30,7 @@ namespace PhishingPortal.Server.Services
 
             }
 
-            return tenant;
+            return response;
         }
     }
 

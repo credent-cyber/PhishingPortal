@@ -192,9 +192,10 @@
 		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
 		<PackageReference Include="Blazored.TextEditor" Version="1.0.8" />
 		<PackageReference Include="Blazored.Video" Version="1.0.1" />
-		<PackageReference Include="GridBlazor" Version="3.4.1" />
-		<PackageReference Include="GridCore" Version="5.4.2" />
+		<PackageReference Include="GridBlazor" Version="4.0.4" />
+		<PackageReference Include="GridCore" Version="6.0.4" />
 		<PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="3.0.0" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(BlazorVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(BlazorVersion)" PrivateAssets="all" />

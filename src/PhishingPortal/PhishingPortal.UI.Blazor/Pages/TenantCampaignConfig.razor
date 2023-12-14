@@ -107,8 +107,11 @@ else
                                                         <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
                                                             <option>- Select -</option>
                                                             @foreach (var val in _returnUrlList.OrderBy(o => o))
-                                                            {
-                                                                <option value="@val">@val</option>
+                                                            { 
+                                                                @if (val != "")
+                                                                {
+                                                                    <option value="@val">@val</option>
+                                                                }
                                                             }
                                                         </InputSelect>
                                                         <ValidationMessage For="() => model.ReturnUrl" />
@@ -1014,7 +1017,7 @@ else
         show = false;
         if (message.Contains("Successfully Added"))
         {
-           // Init();
+            // Init();
         }
     }
     private void CloseDailogBox()
