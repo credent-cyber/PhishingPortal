@@ -1265,10 +1265,7 @@ namespace PhishingPortal.Repositories
         {
             var trainingId = campaignTrainingIdcs.TrainingId;
             var campaignId = campaignTrainingIdcs.CampaignId;
-
-            //var existingMapping = await TenantDbCtx.TrainingCampaignMapping
-            //    .Where(tcm => tcm.TrainingId == trainingId && tcm.CampaignId == campaignId)
-            //    .FirstOrDefaultAsync();
+            int oldTrainingId = 0;
 
             var existingMapping = await TenantDbCtx.TrainingCampaignMapping
                .Where(tcm => tcm.CampaignId == campaignId)
@@ -1276,6 +1273,7 @@ namespace PhishingPortal.Repositories
 
             if (existingMapping != null)
             {
+                oldTrainingId = existingMapping.TrainingId;
                 existingMapping.TrainingId = (int)trainingId;
                 await TenantDbCtx.SaveChangesAsync();
                 //TenantDbCtx.Remove(existingMapping);
@@ -1291,7 +1289,26 @@ namespace PhishingPortal.Repositories
                 TenantDbCtx.Add(newMapping);
                 await TenantDbCtx.SaveChangesAsync();
             }
+            
+            var training = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
+            if (training != null)
+            {
+                training.TrainingTrigger = true;
+                await TenantDbCtx.SaveChangesAsync();
 
+                var existingTrainings = TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.TrainingId == oldTrainingId)
+               .ToList();
+                if (existingTrainings.Count == 0)
+                {
+                    var Check = TenantDbCtx.Training.Where(o => o.Id == oldTrainingId).FirstOrDefault();
+                    if (Check != null)
+                    {
+                        Check.TrainingTrigger = false;
+                    }
+                }
+                await TenantDbCtx.SaveChangesAsync();
+            }
             return true;
         }
 
