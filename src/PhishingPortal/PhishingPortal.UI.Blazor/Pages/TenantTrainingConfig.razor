@@ -609,7 +609,7 @@ else
             stream.Close();
             var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
             var index = 0;
-
+            var validDomains = await client.GetDomains();
             foreach (var item in outputFileString.Split(Environment.NewLine))
             {
                 if (HasHeader && index == 0)
@@ -621,7 +621,7 @@ else
 
                 try
                 {
-
+                    
                     var arr = SplitCSV(item.ToString(), AppConfig.ImportRecipientCsvMinColumns);
                     if (arr != null)
                     {
@@ -638,7 +638,7 @@ else
                                     Branch = arr[6],
                                     Address = arr[7]
                                 };
-                            r.Validate();
+                            r.Validate(validDomains);
                             if (r.ValidationErrMsg is not null)
                             {
                                 IsError = true;

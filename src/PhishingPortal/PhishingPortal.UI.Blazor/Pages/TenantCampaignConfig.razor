@@ -107,7 +107,7 @@ else
                                                         <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
                                                             <option>- Select -</option>
                                                             @foreach (var val in _returnUrlList.OrderBy(o => o))
-                                                            { 
+                                                            {
                                                                 @if (val != "")
                                                                 {
                                                                     <option value="@val">@val</option>
@@ -298,7 +298,7 @@ else
 
                                                     @* <ValidationMessage For="() => model.ReturnUrl" /> *@
                                                 </div>
-                                            </div> 
+                                            </div>
 
 
                                             <div class="form-group row">
@@ -509,8 +509,8 @@ else
 
     RecipientSources sources;
     List<RecipientImport> recipients = new List<RecipientImport>();
-    List<Training> TrainigList = new ();
-    public int ? trainingId { get; set; }
+    List<Training> TrainigList = new();
+    public int? trainingId { get; set; }
     CampaignTrainingIdcs campaignTrainingIdcs = new();
 
 
@@ -582,7 +582,7 @@ else
         else
         {
             Init();
-            
+
         }
     }
 
@@ -617,7 +617,7 @@ else
             campaignTrainingIdcs.TrainingId = trainingId;
             campaignTrainingIdcs.CampaignId = model.Id;
 
-            
+
             var responce = await client.UpsertCampaignTrainingMap(campaignTrainingIdcs);
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
@@ -733,7 +733,7 @@ else
             stream.Close();
             var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
             var index = 0;
-
+            var validDomains = await client.GetDomains();
             foreach (var item in outputFileString.Split(Environment.NewLine))
             {
                 if (HasHeader && index == 0)
@@ -762,7 +762,7 @@ else
                                     Branch = arr[6],
                                     Address = arr[7]
                                 };
-                            r.Validate();
+                            r.Validate(validDomains);
                             if (r.ValidationErrMsg is not null)
                             {
                                 IsError = true;
