@@ -1290,16 +1290,16 @@ namespace PhishingPortal.Repositories
                 await TenantDbCtx.SaveChangesAsync();
             }
             
-            var training = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
-            if (training != null)
+            var UpdateNewTrainingData = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
+            if (UpdateNewTrainingData != null)
             {
-                training.TrainingTrigger = true;
-                await TenantDbCtx.SaveChangesAsync();
+                UpdateNewTrainingData.TrainingTrigger = true;
+                //await TenantDbCtx.SaveChangesAsync();
 
-                var existingTrainings = TenantDbCtx.TrainingCampaignMapping
+                var UpdateOldTrainingData = TenantDbCtx.TrainingCampaignMapping
                .Where(tcm => tcm.TrainingId == oldTrainingId)
                .ToList();
-                if (existingTrainings.Count == 0)
+                if (UpdateOldTrainingData.Count == 0)
                 {
                     var Check = TenantDbCtx.Training.Where(o => o.Id == oldTrainingId).FirstOrDefault();
                     if (Check != null)
