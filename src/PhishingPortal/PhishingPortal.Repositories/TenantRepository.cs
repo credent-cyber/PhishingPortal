@@ -172,7 +172,7 @@ namespace PhishingPortal.Repositories
 
             if (hasChanges)
                 TenantDbCtx.SaveChanges();
-               
+
             else
             {
                 throw new InvalidOperationException("No changes");
@@ -1261,6 +1261,59 @@ namespace PhishingPortal.Repositories
             return true;
         }
 
+        public async Task<bool> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            var trainingId = campaignTrainingIdcs.TrainingId;
+            var campaignId = campaignTrainingIdcs.CampaignId;
+
+            //var existingMapping = await TenantDbCtx.TrainingCampaignMapping
+            //    .Where(tcm => tcm.TrainingId == trainingId && tcm.CampaignId == campaignId)
+            //    .FirstOrDefaultAsync();
+
+            var existingMapping = await TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.CampaignId == campaignId)
+               .FirstOrDefaultAsync();
+
+            if (existingMapping != null)
+            {
+                existingMapping.TrainingId = (int)trainingId;
+                await TenantDbCtx.SaveChangesAsync();
+                //TenantDbCtx.Remove(existingMapping);
+            }
+            else
+            {
+                var newMapping = new TrainingCampaignMapping
+                {
+                    TrainingId = trainingId.Value,
+                    CampaignId = campaignId
+                };
+
+                TenantDbCtx.Add(newMapping);
+                await TenantDbCtx.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
+        {
+            try
+            {
+                var result = await TenantDbCtx.TrainingCampaignMapping
+                    .Where(o => o.CampaignId == id)
+                    .FirstOrDefaultAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"Error in GetTrainingByCampaignId for id: {id}");
+                throw; // Rethrow the exception to propagate it
+            }
+        }
+
+
+
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int id)
         {
             var compaignIds = TenantDbCtx.TrainingCampaignMapping.Where(o => o.TrainingId == id);
@@ -1290,12 +1343,15 @@ namespace PhishingPortal.Repositories
 
         public async Task<List<Training>> GetAllTraining()
         {
+
             int currentYear = DateTime.Now.Year;
             int previousYear = currentYear - 1;
             var result = Enumerable.Empty<Training>();
             //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
             result = TenantDbCtx.Training.OrderByDescending(o => o.Id).ToList();
             return (List<Training>)result;
+
+            //return TenantDbCtx.Training.ToList();
         }
 
         public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> dtos)
@@ -1408,7 +1464,7 @@ namespace PhishingPortal.Repositories
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             var quiz = TenantDbCtx.TrainingQuiz.FirstOrDefault(i => i.Id == id);
-            var  questions = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+            var questions = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             result = new TrainingQuizResult
@@ -1454,5 +1510,7 @@ namespace PhishingPortal.Repositories
             result = TenantDbCtx.TrainingQuiz.ToList();
             return result;
         }
+
+
     }
 }
