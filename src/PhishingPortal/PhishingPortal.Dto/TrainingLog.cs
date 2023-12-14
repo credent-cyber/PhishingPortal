@@ -19,5 +19,6 @@ namespace PhishingPortal.Dto
         public DateTime SentOn { get; set; }
         public string UniqueID { get; set; }
         public int? CampaignLogID { get; set; }
+        public virtual Training Trainings { get; set; }
     }
 }
