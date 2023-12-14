@@ -219,7 +219,7 @@ namespace PhishingPortal.UI.Blazor.Client
             return result;
         }
 
-        
+
         public async Task<CampaignTemplate> UpsertCampaignTemplate(CampaignTemplate template)
         {
             CampaignTemplate result;
@@ -820,7 +820,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return result;
         }
-      
+
         public async Task<List<MyTraining>> GetMyTrainings()
         {
             var myTrainings = new List<MyTraining>();
@@ -854,7 +854,7 @@ namespace PhishingPortal.UI.Blazor.Client
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
-               
+
             }
 
             return default((Training, TrainingLog));
@@ -918,7 +918,69 @@ namespace PhishingPortal.UI.Blazor.Client
             }
             return details;
         }
-        
 
+        public async Task<IEnumerable<TenantDomain>> GetDomains()
+        {
+            IEnumerable<TenantDomain> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetAllDomains");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<TenantDomain>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+            return details;
+        }
+
+        public async Task<(bool Status, TenantDomain data, string Message)> UpsertDomain(TenantDomain domain)
+        {
+            var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertMyDomain", domain);
+
+            res.EnsureSuccessStatusCode();
+
+            var data = await res.Content.ReadFromJsonAsync<ApiResponse<TenantDomain>>();
+
+            return (data.IsSuccess, data.Result, data.Message);
+        }
+
+        public async Task<TenantDomain> VerifyDomain(TenantDomain domain)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/VerifyDomain", domain);
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<TenantDomain>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+
+            return default;
+        }
+
+        public async Task<(bool Success, string Message)> DeleteDomain(int id)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteDomain/{id}", new { });
+
+                res.EnsureSuccessStatusCode();
+
+                var response = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+
+                return (response.IsSuccess, response.Message);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

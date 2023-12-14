@@ -1,4 +1,6 @@
-﻿namespace PhishingPortal.Common
+﻿using System.Text.RegularExpressions;
+
+namespace PhishingPortal.Common
 {
 
     public static class StringExtensions
@@ -30,6 +32,16 @@
         {
             var tempHash = ComputeMd5Hash(value);
             return tempHash == hash;
+        }
+
+        public static bool IsValidDomain(this string str)
+        {
+            string strRegex = @"^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,6}$";
+            Regex re = new Regex(strRegex);
+            if (re.IsMatch(str))
+                return (true);
+            else
+                return (false);
         }
 
     }

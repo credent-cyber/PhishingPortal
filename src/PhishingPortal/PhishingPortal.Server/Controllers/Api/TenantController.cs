@@ -1,22 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PhishingPortal.Dto;
+
+
 using PhishingPortal.Repositories;
-using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Services;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using System.Web.Http.Results;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Graph;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
+    using Microsoft.AspNetCore.Mvc;
+    using PhishingPortal.Common;
+    using PhishingPortal.Dto;
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -28,8 +26,10 @@ namespace PhishingPortal.Server.Controllers.Api
         readonly IAzActDirClientService _adImportClient;
         readonly ITrainingRepository TrainingRepository;
 
+        public INsLookupHelper NsLookupHelper { get; }
+
         public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
-            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
+            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver, INsLookupHelper nsLookupHelper) :
             base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
@@ -38,6 +38,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
             _adImportClient = new AzActDirClientService(logger, _tenantRepository);
             TrainingRepository = new TrainingRepository(logger, TenantDbCtx);
+            NsLookupHelper = nsLookupHelper;
         }
 
         [HttpGet]
@@ -745,6 +746,73 @@ namespace PhishingPortal.Server.Controllers.Api
         public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
         {
             return await _tenantRepository.GetAllTrainingQuiz();
+        }
+
+        [HttpGet]
+        [Route("GetAllDomains")]
+        public async Task<IEnumerable<TenantDomain>> GetAllDomains()
+        {
+            return await AdminRepository.GetDomains(Tenant.Id);
+        }
+
+        [HttpPost]
+        [Route("UpsertMyDomain")]
+        public async Task<ApiResponse<TenantDomain>> UpsertDomain(TenantDomain tenantDomain)
+        {
+            try
+            {
+                if (tenantDomain.Id == 0)
+                {
+                    tenantDomain.TenantId = Tenant.Id;
+                    tenantDomain.DomainVerificationCode = Tenant.UniqueId;
+                    tenantDomain.CreatedBy = CurrentUser;
+                    tenantDomain.CreatedOn = DateTime.Now;
+                }
+
+                var result = await AdminRepository.UpsertTenantDomain(tenantDomain);
+
+                return new ApiResponse<TenantDomain> { Result = result, IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<TenantDomain> { Message = ex.Message };
+            }
+        }
+
+        [HttpPost]
+        [Route("VerifyDomain")]
+        public async Task<TenantDomain> VerifyDomain(TenantDomain entry)
+        {
+
+#if DEBUG
+            var verficationResult = true;
+#else
+            var verficationResult = NsLookupHelper.VerifyDnsRecords("TXT", entry.Domain.Trim().ToLower(), entry.DomainVerificationCode);
+#endif
+            if (verficationResult)
+            {
+                entry.ModifiedBy = CurrentUser;
+                entry.ModifiedOn = DateTime.Now;
+                return await AdminRepository.VerifyDomain(entry);
+            }
+
+            return entry;
+        }
+
+        [HttpPost]
+        [Route("DeleteDomain/{id}")]
+        public async Task<ApiResponse<bool>> DeleteDomain(int id)
+        {
+            try
+            {
+                var result = await AdminRepository.DeleteDomain(id);
+
+                return new ApiResponse<bool> { Result = result, IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<bool> { Message = ex.Message };
+            }
         }
     }
 }

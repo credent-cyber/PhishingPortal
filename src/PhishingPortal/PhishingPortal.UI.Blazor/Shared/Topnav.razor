@@ -29,7 +29,13 @@
                 <a href="tenant-templates" class="nav-link "> <i class="fa fa-envelope-square"></i> Templates </a>
             </li>
             <li class="nav-item custom">
-                <a href="tenant-settings" class="nav-link "> <i class="fa fa-gears"></i> Settings </a>
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+                    <i class="fa fa-gears"></i> Settings </a>
+                <div class="dropdown-menu" style="left:529px;" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="tenant-domains">Domains</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="tenant-settings">Settings</a>
+                </div>
             </li>
             @* <li class="nav-item custom">
             <a href="gridsample" class="nav-link "> <i class="fa fa-link"></i> test </a>

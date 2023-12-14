@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using PhishingPortal.Common;
 using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto;
 using System.Linq;
+using System.Text;
 
 namespace PhishingPortal.Repositories
 {
@@ -414,6 +417,87 @@ namespace PhishingPortal.Repositories
                 throw;
             }
             return demoRequestor;
+        }
+
+        public async Task<IEnumerable<TenantDomain>> GetDomains(int tenantId)
+        {
+            return await CentralDbContext.TenantDomain.Where(o => o.TenantId == tenantId).ToListAsync();
+        } 
+
+        public async Task<TenantDomain> UpsertTenantDomain(TenantDomain domain)
+        {
+            var existing = CentralDbContext.Find<TenantDomain>(domain.Id);
+
+            if (CentralDbContext.TenantDomain.Any(o => o.Domain == domain.Domain))
+                throw new InvalidOperationException($"{domain.Domain} already exists");
+
+            if (!domain.Domain.IsValidDomain() || string.IsNullOrWhiteSpace(domain.DomainVerificationCode))
+                throw new ArgumentException("Invalid Domain address or verification code");
+
+            EntityEntry<TenantDomain>? result;
+            
+            if (existing != null)
+            {
+                if(existing.Domain != domain.Domain 
+                    || existing.DomainVerificationCode != domain.DomainVerificationCode)
+                {
+                    existing.IsDomainVerified = false;
+                }
+                existing.DomainVerificationCode = domain.DomainVerificationCode;
+                existing.Domain = domain.Domain;
+                existing.ModifiedBy = domain.ModifiedBy;
+                existing.ModifiedOn = domain.ModifiedOn;
+                result = CentralDbContext.Update(domain);
+            }
+
+            result = CentralDbContext.Add(domain);
+            await CentralDbContext.SaveChangesAsync();
+
+            return result.Entity;
+        }
+
+        public async Task<TenantDomain> VerifyDomain(TenantDomain domain)
+        {
+            var existing = CentralDbContext.Find<TenantDomain>(domain.Id);
+            try
+            {
+                if (existing == null)
+                {
+                    throw new ArgumentException("Domain information not found");
+                }
+                else
+                {
+                    existing.IsDomainVerified = true;
+                    existing.ModifiedOn = domain.ModifiedOn;
+                    existing.ModifiedBy = domain.ModifiedBy;
+
+                    CentralDbContext.Update(existing);
+                    await CentralDbContext.SaveChangesAsync();
+                    return existing;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while doing domain verification");
+            }
+
+            return existing;
+        }
+
+        public async Task<bool> DeleteDomain(int id)
+        {
+            
+            var existing = CentralDbContext.TenantDomain.First(x => x.Id == id);
+
+            if (CentralDbContext.TenantDomain.Count(o => o.TenantId == existing.TenantId) == 1)
+                throw new InvalidOperationException("You must keep atleast one activated domain");
+
+            if (existing == null)
+                throw new ArgumentException("Domain not found");
+
+            CentralDbContext.TenantDomain.Remove(existing);
+            await CentralDbContext.SaveChangesAsync();
+            return true;
         }
     }
 }
