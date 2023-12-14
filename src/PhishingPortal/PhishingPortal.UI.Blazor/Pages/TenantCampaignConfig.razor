@@ -282,6 +282,24 @@ else
                                                 </div>
                                             </div>
 
+                                            <div class="form-group row">
+                                                <label class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Add Training</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="trainingId" class="form-control" id="Training">
+                                                        <option>- Select -</option>
+                                                        @if (TrainigList != null && TrainigList.Any())
+                                                        {
+                                                            @foreach (var val in TrainigList)
+                                                            {
+                                                                <option value="@val.Id">@val.TrainingName</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+
+                                                    @* <ValidationMessage For="() => model.ReturnUrl" /> *@
+                                                </div>
+                                            </div> 
+
 
                                             <div class="form-group row">
                                                 <label class="col-form-label col-md-4 bold-font">State</label>
@@ -491,9 +509,14 @@ else
 
     RecipientSources sources;
     List<RecipientImport> recipients = new List<RecipientImport>();
+    List<Training> TrainigList = new ();
+    public int ? trainingId { get; set; }
+    CampaignTrainingIdcs campaignTrainingIdcs = new();
+
 
     string content = string.Empty;
     MarkupString previewContent => (MarkupString)content;
+
     public void Init()
     {
         model = new Campaign()
@@ -518,10 +541,11 @@ else
 
 
     }
+
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
-
+        TrainigList = await client.GetAllTrainings();
         #region Bind Return urls
         await BindReturnUrlsAsync();
         #endregion
@@ -551,10 +575,14 @@ else
             {
                 isScheduled = true;
             }
+
+            var trainingCampaignMappingData = await client.GetTrainingByCampaignId(model.Id);
+            trainingId = trainingCampaignMappingData?.TrainingId;
         }
         else
         {
             Init();
+            
         }
     }
 
@@ -585,6 +613,12 @@ else
             {
                 await OnImportRecipientClick();
             }
+
+            campaignTrainingIdcs.TrainingId = trainingId;
+            campaignTrainingIdcs.CampaignId = model.Id;
+
+            
+            var responce = await client.UpsertCampaignTrainingMap(campaignTrainingIdcs);
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
             TaskCompleted = true;

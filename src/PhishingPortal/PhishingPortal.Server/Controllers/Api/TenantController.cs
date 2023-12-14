@@ -638,6 +638,32 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [HttpGet]
+        [Route("GetTrainingByCampaignId/{CampId}")]
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int CampId)
+        {
+            var data =  await _tenantRepository.GetTrainingByCampaignId(CampId);
+            return data;
+        }
+
+        [HttpPost]
+        [Route("UpsertCampaignTrainingMap")]
+        public async Task<ApiResponse<string>> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.UpsertCampaignTrainingMap(campaignTrainingIdcs);
+                result.Message = "Successful";
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
+        [HttpGet]
         [Route("getTrainingCampaignIds/{trainingId}")]
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int trainingId)
         {

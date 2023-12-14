@@ -661,11 +661,49 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
 
-            return false;
+        }
+        public async Task<bool> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertCampaignTrainingMap", campaignTrainingIdcs);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+
+
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
+        {
+            TrainingCampaignMapping trainingCampaign = null;
+            try
+            {
+                var response = await HttpClient.GetAsync($"api/Tenant/GetTrainingByCampaignId/{id}");
+                response.EnsureSuccessStatusCode();
+                var responseContent = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrEmpty(responseContent))
+                    return null;
+                trainingCampaign = await response.Content.ReadFromJsonAsync<TrainingCampaignMapping>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return trainingCampaign;
         }
 
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
-        {
+         {
             List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
