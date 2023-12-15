@@ -474,7 +474,7 @@
                                         <div style="width: 100%;">
 
                                             <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
-                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -489,7 +489,7 @@
                                         <div style="width: 100%;">
 
                                             <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
-                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -826,6 +826,8 @@
                 #endregion
 
                 #region Training Chart data
+                //TrainingBarChartIds = data2.WhatsappEntries.Select(o => o.Campaign.Id).ToArray();
+                TrainingBarChartIds = TrainingData.MonthwiseTrainingEntry.Select(o => (int)o.Month).ToArray();
                 TrainingBarChartLabels = TrainingData.MonthwiseTrainingEntry.Select(o => o.Month.ToString()).ToArray(); //Recent Training Report
                 TrainingBarChartData.Add(new ChartJsDataset
                     {

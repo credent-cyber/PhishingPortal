@@ -1,4 +1,6 @@
 ﻿@page "/tenant-training-report"
+@page "/tenant-training-report/{id:int}/{Label}"
+
 @using PhishingPortal.UI.Blazor.Pages.GridButtons
 @using PhishingPortal.UI.Blazor.Pages.GridComponent
 
@@ -17,8 +19,15 @@
             </div>
             <div class="card-body p-2 mt-n3">
                 <div class="col-sm-12 p-0">
-                    <div class="table-responsive">
-                        <TraininglogsGrid />
+                    <div class="">
+                        @if(Id != 0)
+                        {
+                            <TraininglogsGrid Id="Id" Label="@Label"/>
+                        }
+                        else
+                        {
+                            <TraininglogsGrid />
+                        }
                     </div>
                 </div>
             </div>
@@ -27,5 +36,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
 
+    [Parameter]
+    public string Label { get; set; }
 }
