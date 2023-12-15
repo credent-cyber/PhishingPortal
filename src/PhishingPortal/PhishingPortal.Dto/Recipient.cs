@@ -70,7 +70,7 @@ namespace PhishingPortal.Dto
                 try
                 {
                     var domain = Email.Split("@")[1];
-                    if (!tenantDomains.Any(o => o.Domain == domain))
+                    if (!tenantDomains.Any(o => o.Domain == domain && o.IsDomainVerified))
                     {
                         ValidationErrMsg = $"Campaign can not be sent to [{domain}] domain";
                     }

@@ -1071,7 +1071,7 @@ namespace PhishingPortal.Repositories
             try
             {
                 var Traininglogs = TenantDbCtx.TrainingLog
-                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+                 .Where(i => i.SentOn >= start && i.SentOn < end);
 
                 #region
                 //var trainingGroup = Trainings.ToList().GroupBy(i => i.TrainingID, (key, entries) => new
@@ -1102,7 +1102,7 @@ namespace PhishingPortal.Repositories
                 #endregion
 
 
-                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.CreatedOn.Month, (key, entries) => new
+                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.SentOn.Month, (key, entries) => new
                 {
                     Month = (Months)key,
                     TotalTraining = entries.Count(),

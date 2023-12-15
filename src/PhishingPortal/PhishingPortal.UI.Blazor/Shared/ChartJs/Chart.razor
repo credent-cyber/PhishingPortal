@@ -110,11 +110,18 @@
     }
 
     [JSInvokable]
-    public async Task ChartClick(int CampId, string label, string ChartId)
+    public async Task ChartClick(int Id, string label, string ChartId)
     {
         if (!IsClickable)
             return;
-        NavManager.NavigateTo($"/report/{CampId}/{label}");
+        if (ChartId.Contains("Training"))
+        {
+            NavManager.NavigateTo($"/tenant-training-report/{Id}/{label}");
+        }
+        else
+        {
+            NavManager.NavigateTo($"/report/{Id}/{label}");
+        }
     }
     [JSInvokable]
     public static async Task ChartHover()
