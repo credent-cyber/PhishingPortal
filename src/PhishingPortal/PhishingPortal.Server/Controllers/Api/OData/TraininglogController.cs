@@ -25,25 +25,27 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         [EnableQuery]
         public IQueryable<TrainingLog> Get()
         {
-            return DbContext.TrainingLog.AsQueryable();
-            //var result = from tl in DbContext.TrainingLog.AsQueryable()
-            //             join r in DbContext.Recipients.AsQueryable() on tl.ReicipientID equals r.Id
-            //             select new TrainingLog
-            //             {
-            //                 RecipientName = r.Email,
-            //                 Id = tl.Id,
-            //                 ReicipientID = tl.Id,
-            //                 PercentCompleted = tl.PercentCompleted,
-            //                 Status = tl.Status,
-            //                 CreatedBy = tl.CreatedBy,
-            //                 CreatedOn = tl.CreatedOn,
-            //                 ModifiedBy = tl.ModifiedBy,
+            var result = from tl in DbContext.TrainingLog.AsQueryable()
+                         join r in DbContext.Recipients.AsQueryable() on tl.ReicipientID equals r.Id
+                         join tr in DbContext.Training.AsQueryable() on tl.TrainingID equals tr.Id
+                         select new TrainingLog
+                         {
+                             RecipientName = r.Email,
+                             Id = tl.Id,
+                             ReicipientID = tl.Id,
+                             TrainingID = tl.TrainingID,
+                             PercentCompleted = tl.PercentCompleted,
+                             Status = tl.Status,
+                             CreatedBy = tl.CreatedBy,
+                             CreatedOn = tl.CreatedOn,
+                             ModifiedBy = tl.ModifiedBy,
+                             TrainingName = tr.TrainingName,
+                         };
 
-            //             };
-
-            //return result;
+            return result.AsQueryable();
         }
-   
+
+
 
     }
 }
