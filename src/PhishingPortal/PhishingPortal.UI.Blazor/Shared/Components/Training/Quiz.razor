@@ -10,7 +10,7 @@
 <Card>
 
     <Header>
-        <h4>@Training.TrainingName</h4>
+        <h5>@Training.TrainingName</h5>
         <hr />
     </Header>
 
@@ -24,43 +24,50 @@
                     <ul class="list-unstyled m-4">
                         @foreach (var o in model_.Options)
                         {
-                            <li class="m1 p2">
+                            <li class="m-1 p-2">
                                 @if (model_.TrainingQuiz.AnswerType == "Multiple-Choice")
                                 {
-                                    <input type="checkbox" class="form-check" @bind="o.Selected" /> @o.Option.AnswerText
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" @bind="o.Selected" />
+                                        <label class="form-check-label">@o.Option.AnswerText</label>
+                                    </div>
                                 }
 
                                 @if (model_.TrainingQuiz.AnswerType == "Single-Choice")
                                 {
-                                    <input type="radio" class="form-check" name="SelectedOption" checked="@(model_.SelectedOption == o)" @onchange="@(() => model_.SelectedOption= o)" />
-                                    @o.Option.AnswerText
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="SelectedOption" checked="@(model_.SelectedOption == o)" @onchange="@(() => model_.SelectedOption= o)" />
+                                        <label class="form-check-label">@o.Option.AnswerText</label>
+                                    </div>
                                 }
                             </li>
                         }
                     </ul>
                 </div>
+
             </EditForm>
         }
     </Content>
     <Footer>
-        <div class="row">
+      
+            <div style="text-align:left;">
 
             @if (index_ > 1)
             {
-                <button class="btn btn-outline-secondary col-3" @onclick="PreviousQuestion">Previous</button>
+                <button class="btn btn-outline-secondary ml-2 mb-1 col-md-2" @onclick="PreviousQuestion">Previous</button>
             }
 
             @if (index_ < totalQuestion_)
             {
-                <button class="btn btn-secondary col-3 ml-2" @onclick="NextQuestion">Next</button>
+                <button class="btn btn-secondary ml-2 mb-1 col-md-2" @onclick="NextQuestion">Next</button>
             }
 
             @if (index_ > 0 && index_ == totalQuestion_)
             {
-                <button class="btn btn-primary col-3 ml-2" @onclick="Submit">Submit</button>
+                <button class="btn btn-primary ml-2 mb-1 col-md-2" @onclick="Submit">Submit</button>
             }
 
-            <button class="btn btn-warning col-3 ml-2" @onclick="Quit">Quit</button>
+            <button class="btn btn-warning ml-2 mb-1 col-md-2" @onclick="Quit">Quit</button>
         </div>
     </Footer>
 </Card>
