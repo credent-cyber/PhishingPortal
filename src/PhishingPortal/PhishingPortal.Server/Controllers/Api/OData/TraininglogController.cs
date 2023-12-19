@@ -38,6 +38,8 @@ namespace PhishingPortal.Server.Controllers.Api.OData
                              Status = tl.Status,
                              CreatedBy = tl.CreatedBy,
                              CreatedOn = tl.CreatedOn,
+                             SentOn = tl.SentOn,
+                             ModifiedOn = tl.ModifiedOn,
                              ModifiedBy = tl.ModifiedBy,
                              TrainingName = tr.TrainingName,
                          };
