@@ -7,6 +7,7 @@ using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
 using Humanizer;
 using Org.BouncyCastle.Asn1.Mozilla;
+using IdentityModel.Client;
 
 namespace PhishingPortal.Repositories
 {
@@ -250,19 +251,33 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(new Tuple<bool, string>(true, campaign.ReturnUrl));
 
         }
-        public async Task<Tuple<bool, string>> CampaignSpamReport(string key)
+        public async Task<ApiResponse<string>> CampaignSpamReport(string key)
         {
+            var result = new ApiResponse<string>();
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
                 .FirstOrDefault(o => o.SecurityStamp == key
                                     && o.IsReported == false && o.Status == status);
 
             if (campaignLog == null)
-                throw new Exception("Invalid Url");
+            {
+                 campaignLog = TenantDbCtx.CampaignLogs
+                .FirstOrDefault(o => o.SecurityStamp == key
+                                    && o.IsReported == true);
+                result.IsSuccess = false;
+                result.Message = campaignLog == null ? "Invalid Url" : "You have already reported this mail.";
+                return result;
+            }
+               
+
 
             var campaign = TenantDbCtx.Campaigns.FirstOrDefault(o => o.Id == campaignLog.CampaignId);
             if (campaign == null)
-                throw new Exception("Invalid Campaign");
+            {
+                result.IsSuccess = false;
+                result.Message = "Invalid Campaign";
+                return result;
+            }
 
             campaignLog.Status = CampaignLogStatus.Completed.ToString();
             campaignLog.IsReported = true;
@@ -271,8 +286,8 @@ namespace PhishingPortal.Repositories
 
             TenantDbCtx.Update(campaignLog);
             TenantDbCtx.SaveChanges();
-
-            return await Task.FromResult(new Tuple<bool, string>(true, campaign.ReturnUrl));
+            result.IsSuccess = true;
+            return result;
 
         }
 

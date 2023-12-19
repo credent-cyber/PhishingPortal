@@ -8,12 +8,17 @@ using Microsoft.JSInterop;
 using PhishingPortal.OutlookAddin.Model;
 using PhishingPortal.OutlookAddin.Client;
 
+
+
 namespace PhishingPortal.OutlookAddin.Pages
 {
     public partial class Index
     {
         [Inject]
         public IJSRuntime JSRuntime { get; set; } = default!;
+
+        //[Inject]
+        //public ApiClient ApiClient { get; set; } = default!;
 
         public IJSObjectReference JSModule { get; set; } = default!;
 
@@ -31,8 +36,14 @@ namespace PhishingPortal.OutlookAddin.Pages
         public bool Responce = false;
 
         public bool NoSpam = false;
+
+        public string ErrorMessage =string.Empty;
+
+        public string forDebug { get; set; }
+ 
         public string TrademarkMessage1 { get; set; } = "Copyright © " + @DateTime.Now.Year + " PhishSims.";
         public string TrademarkMessage2 { get; set; } = "All rights reserved.";
+
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -118,16 +129,17 @@ namespace PhishingPortal.OutlookAddin.Pages
             return links;
         }
 
-
+      
         public async void Forward()
         {
+            ErrorMessage = string.Empty;
             NoSpam = false;
             Responce = false;
-
+            EmailForward = false;
             var BaseUrl1 = Configuration.GetValue<string>("ApiBaseUrl1");
 
             var input = WebLink;
-            if (input == null)
+            if (input == null || input.Contains("/training/details"))
             {
                 EmailForward = true;
                 NoSpam = true;
@@ -135,7 +147,6 @@ namespace PhishingPortal.OutlookAddin.Pages
                 return;
             }
             string parts = input.Split($"https://phishsims.com/cmpgn/")[1];
-           //string parts = input.Split($"{BaseUrl}/cmpgn/")[1];
             string TenantId = parts.Split('/')[0];
             string Key = parts.Split('/')[1];
 
@@ -148,23 +159,17 @@ namespace PhishingPortal.OutlookAddin.Pages
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+            EmailForward = true;  
             var response = await client.PostAsync($"api/tenant/campaign-spam-report?t={TenantId}", content);
+            //forDebug = await response.Content.ReadAsStringAsync();
             var responseJson = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<ApiResponse<string>>(responseJson);
-
-            if (result.IsSuccess)
-            {
-                Responce = true;
-            }
-            else
-            {
-                Responce = false;
-            }
-
+            ErrorMessage = result.Message;
+            Responce = responseJson.Contains("true") ? true : false;
             EmailForward = true;
-            StateHasChanged();
-
+            StateHasChanged();          
         }
+
         public void onClose()
         {
             EmailForward = false;
