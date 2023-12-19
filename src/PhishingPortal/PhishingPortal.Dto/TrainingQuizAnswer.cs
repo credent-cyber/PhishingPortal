@@ -10,8 +10,8 @@ namespace PhishingPortal.Dto
 {
     public class TrainingQuizAnswer : BaseEntity
     {
-        [ForeignKey("TrainingQuizId")]
-        public int TrainingQuizId { get; set; }
+        [ForeignKey("TrainingQuizQuestionId")]
+        public int TrainingQuizQuestionId { get; set; }
         public string AnswerText { get; set; }
         public int OrderNumber { get; set; }
         public bool IsCorrect { get; set; }

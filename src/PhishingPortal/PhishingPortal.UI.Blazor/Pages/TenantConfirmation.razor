@@ -9,90 +9,119 @@
 @inject NavigationManager navMgr
 @inject HttpClient httpClient
 
-
-<h3>
-    Onboarding | @if (Action == "c")
-    {
-        <text>Registration Confirmation</text>
-    }
-
-</h3>
-
-<div class="container">
+<div class="pcoded-content" style="padding:0px 0px;margin-top: -5%;">
     <div class="row">
+        <div class="col-md-12 p-0">
+            <div class="card">
+                <div class="card-header bg-info" style="padding:15px !important;">
+                    <h5 class="text-white">
+                        @if (Action == "c")
+                        {
+                            <text>Registration Confirmation</text>
+                        }
+                        else
+                        {
+                            <text>Onboarding</text>
+                        }
+                    </h5>
 
-        <div class=col-10>
+                    <div style="float:right">
+                        <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="card-body" style="padding-top: 10px;">
+                    <div class="row">
+                        <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
 
-            <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+                        @if (IsDone)
+                        {
+                            <button class="btn btn-primary" @onclick="OnGoToHome">Go To Home Page</button>
+                        }
+                        else
+                        {
+                            if (Action == "dv")
+                            {
+                                <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
 
-            @if (IsDone)
-            {
-                <button class="btn btn-primary" @onclick="OnGoToHome">Go To Home Page</button>
-            }
-            else
-            {
-                if (Action == "dv")
-                {
-                    <EditForm Model="@domain" class="form" OnValidSubmit="@OnValidSubmitDomain">
-
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-
-
-                        <div class="form-group">
-                            <label for="Domain">@nameof(domain.Domain)</label>
-                            <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
-                            <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
-                        </div>
-
-
-                        <button class="btn btn-primary" type="submit">Submit</button>
-
-                    </EditForm>
-                }
-
-                if (Action == "mastusr")
-                {
-                    <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
-                        <DataAnnotationsValidator />
-
-                        <ValidationSummary />
-
-                        <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
+                                    <DataAnnotationsValidator />
+                                    <ValidationSummary />
 
 
-                        <div class="form-group">
-                            <label for="Email">@nameof(user.Email)</label>
-                            <InputText @bind-Value="user.Email" id="Email" class="form-control" />
-                        </div>
+                                    <div class="form-group">
+                                        <label for="Domain">@nameof(domain.Domain)</label>
+                                        <InputText @bind-Value="domain.Domain" id="Domain" class="form-control" />
+                                    </div>
 
-                        <div class="form-group">
-                            <label for="Password">@nameof(user.Password)</label>
-                            <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
-                            <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
-                        </div>
-
-                        <button class="btn btn-primary" type="submit">Submit</button>
-
-                    </EditForm>
-                }
-            }
+                                    <div class="form-group">
+                                        <label for="DomainVerificationCode">@nameof(domain.DomainVerificationCode)</label>
+                                        <InputText readonly @bind-Value="domain.DomainVerificationCode" id="DomainVerificationCode" class="form-control" />
+                                    </div>
 
 
+                                    <button class="btn btn-primary" type="submit">Submit</button>
+
+                                </EditForm>
+                            }
+
+                            if (Action == "mastusr")
+                            {
+                                <EditForm Model="@user" class="form" OnValidSubmit="@OnValidSubmitUser">
+                                    <DataAnnotationsValidator />
+
+                                    @* <ValidationSummary /> *@
+
+                                    <InputText type="hidden" @bind-Value="user.TenantUniqueId" id="TenantUniqueId" class="form-control" />
+
+
+                                    <div class="form-group">
+                                        <label for="Email">@nameof(user.Email)</label>
+                                        <InputText @bind-Value="user.Email" id="Email" class="form-control" />
+                                        <ValidationMessage For="() => user.Email" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="Password">@nameof(user.Password)</label>
+                                        <InputText type="password" @bind-Value="user.Password" id="Password" class="form-control" />
+                                        <ValidationMessage For="() => user.Password" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="ConfirmPassword">@nameof(user.ConfirmPassword)</label>
+                                        <InputText type="password" @bind-Value="user.ConfirmPassword" id="ConfirmPassword" class="form-control" />
+                                        <ValidationMessage For="() => user.ConfirmPassword" />
+                                    </div>
+
+                                    <button class="btn btn-primary" type="submit">Submit</button>
+
+                                </EditForm>
+                            }
+                        }
+
+                    </div>
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>
 
+<Dailog Title="@MSG" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
+
+</Dailog>
 
 @code {
     [Parameter]
@@ -104,16 +133,34 @@
     [Parameter]
     public string? Action { get; set; }
 
+    public string Title = "Onboard New Client";
     bool IsError = false;
     bool IsSuccess = false;
     bool IsDone = false;
     string Message = string.Empty;
+
+    string MSG = string.Empty;
+    string MessageBody = "Thank you!";
+    private bool show = false;
+    bool TaskCompleted = false;
 
     Tenant model = new Tenant();
     TenantAdminUser user = new TenantAdminUser();
     DomainVerificationRequest domain = new DomainVerificationRequest();
     TenantAdminClient AdminClient;
 
+    private Timer _timer;
+    private int _delay = 3000;
+
+    private void TimerCallback(Object o)
+    {
+        IsError = false;
+        IsSuccess = false;
+        Message = string.Empty;
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -183,34 +230,49 @@
             Message = ex.Message;
             Logger.LogCritical(ex, ex.Message);
         }
-
+       // _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         await Task.CompletedTask;
     }
 
     protected async Task OnValidSubmitUser()
     {
+        TaskCompleted = false;
+        MSG = "Please wait";
+        show = true;
         if (model.ConfirmationState == ConfirmationStats.DomainVerified)
         {
             var output = await AdminClient.CreateTenandAdminUser(UniqueId, user.Email, user.Password, user.ConfirmPassword);
 
-            if (output)
+            if (output.Item1)
             {
-                IsDone = true;
-                IsSuccess = true;
-                Message = "You have successfully confirmed your details. Please click the button to login to the portal";
+
+                MSG = "Successfully Added";
+                MessageBody = "You have successfully confirmed your details. Now you can log in to the portal";
             }
             else
             {
-                IsSuccess = false;
-                Message = "User couldn't be created please try again or contact support team";
+                MSG = "Error!";
+                MessageBody = output.Item2;
             }
+            TaskCompleted = true;
         }
         await Task.CompletedTask;
     }
 
     protected async Task OnGoToHome()
     {
-            navMgr.NavigateTo("/");
+        navMgr.NavigateTo("/");
+    }
+    protected void onClose()
+    {
+        navMgr.NavigateTo("provision");
     }
 
+    private void ResetForm()
+    {
+      
+        show = false;
+        navMgr.NavigateTo("provision");
+
+    }
 }

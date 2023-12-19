@@ -106,6 +106,15 @@ namespace PhishingPortal.DataContext
                 CreatedBy = "tenantadmin"
             });
 
+            // Adding the new setting for return URLs
+            dbContext.Settings.Add(new TenantSetting()
+            {
+                Key = "return_urls",
+                Value = "{\"return_urls\":[\"https://google.com\",\"https://amazon.in\",\"https://flipkart.com\"]}",
+                CreatedOn = DateTime.Now,
+                CreatedBy = "tenantadmin"
+            });
+
             dbContext.SaveChanges();
 
         }

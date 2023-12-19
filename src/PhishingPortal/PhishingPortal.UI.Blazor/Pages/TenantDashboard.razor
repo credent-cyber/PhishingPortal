@@ -23,7 +23,7 @@
                             <i class="fas fa-paper-plane text-c-green f-30"></i>
                         </div>
                         <div class="col p-l-0">
-                            <h6 class="m-b-0 text-c-green"><span style="font-size:16px">Sent in Last Compaign</span></h6>
+                            <h6 class="m-b-0 text-c-green"><span style="font-size:16px">Sent in Last Campaign</span></h6>
                             @* <h6 class="m-b-5">Sent in Last Compaign</h6>
                             <h6 class="m-b-0 text-c-green">Update</h6>*@
                         </div>
@@ -474,7 +474,7 @@
                                         <div style="width: 100%;">
 
                                             <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData"
-                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -489,7 +489,7 @@
                                         <div style="width: 100%;">
 
                                             <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData"
-                                                   Labels="@TrainingBarChartLabels" IsStacked="false">
+                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -826,6 +826,8 @@
                 #endregion
 
                 #region Training Chart data
+                //TrainingBarChartIds = data2.WhatsappEntries.Select(o => o.Campaign.Id).ToArray();
+                TrainingBarChartIds = TrainingData.MonthwiseTrainingEntry.Select(o => (int)o.Month).ToArray();
                 TrainingBarChartLabels = TrainingData.MonthwiseTrainingEntry.Select(o => o.Month.ToString()).ToArray(); //Recent Training Report
                 TrainingBarChartData.Add(new ChartJsDataset
                     {

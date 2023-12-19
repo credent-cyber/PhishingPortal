@@ -8,80 +8,131 @@
 @inject NavigationManager navMgr
 @attribute [Authorize]
 
-<h3>Onboard New Client</h3>
 
-<EditForm Model="@model" OnValidSubmit="@OnValidSubmit" class="form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" />
+<div class="pcoded-content" style="padding:0px 0px">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <div class="card">
+                <div class="card-header bg-info" style="padding:15px !important;">
+                    <h5 class="text-white">@Title</h5>
+                    <div style="float:right">
+                        <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="card-body" style="padding-top: 10px;">
+                    <div class="row">
+                        <EditForm Model="@model" OnValidSubmit="@OnValidSubmit" class="form">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            @* <Alerts IsError="@IsError" IsSuccess="@IsSuccess" Message="@Message" /> *@
 
-    <div class="form-group">
-        <label for="Name">@nameof(model.Name)</label>
-        <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Name">@nameof(model.Name)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.Name" id="Name" class="form-control" />
+                                </div>
+
+                                <label class="col-form-label col-md-2 bold-font" for="Website">@nameof(model.Website)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.Website" id="Website" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="ContactNumber">@nameof(model.ContactNumber)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
+                                </div>
+                                <label class="col-form-label col-md-2 bold-font" for="ContactEmail">@nameof(model.ContactEmail)</label>
+                                <div class="col-md-4">
+                                    <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Domain">@nameof(model.LicenseType)</label>
+                                <div class="col-md-4">
+                                    <InputSelect @bind-Value="model.LicenseType" class="form-control">
+                                        @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
+                                        {
+                                            <option value="@lic">@lic</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+
+                                <label class="col-form-label col-md-2 bold-font" for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
+                                <div class="col-md-4">
+                                    <InputDate @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="DatabaseOption">@nameof(model.DatabaseOption)</label>
+                                <div class="col-md-4">
+                                    <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
+                                        @foreach (var op in Enum.GetValues(typeof(DbOptions)))
+                                        {
+                                            <option value="@op">@op</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <label class="col-form-label col-md-2 bold-font" for="Address">@nameof(model.Address)</label>
+                                <div class="col-md-10">
+                                    <InputText @bind-Value="model.Address" id="Address" class="form-control" />
+                                </div>
+
+                            </div>
+
+                            <div class="form-group" style="margin-left:18px;">
+                                <InputCheckbox id="RequireDomainVerification" @bind-Value="model.RequireDomainVerification" class="form-check-input" />
+                                <label for="RequireDomainVerification" class="form-check-label">Require Domain Verification</label>
+                            </div>
+                              <div style="text-align:center;">
+                                <button class="btn btn-primary" type="submit">Register</button>
+                                <button class="btn btn-dark" type="reset">Clear</button>
+                                <button class="btn btn-secondary" type="button" @onclick="onClose">Close</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label for="Address">@nameof(model.Address)</label>
-        <InputText @bind-Value="model.Address" id="Address" class="form-control" />
-    </div>
+<Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
 
-    <div class="form-group">
-        <label for="Website">@nameof(model.Website)</label>
-        <InputText @bind-Value="model.Website" id="Website" class="form-control" />
-    </div>
+</Dailog>
 
-    <div class="form-group">
-        <label for="ContactEmail">@nameof(model.ContactEmail)</label>
-        <InputText @bind-Value="model.ContactEmail" id="ContactEmail" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label for="ContactNumber">@nameof(model.ContactNumber)</label>
-        <InputText @bind-Value="model.ContactNumber" id="ContactNumber" class="form-control" />
-    </div>
-
-
-    <div class="form-group">
-        <label for="Domain">@nameof(model.LicenseType)</label>
-         <InputSelect @bind-Value="model.LicenseType" class="form-control">
-            @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
-            {
-                <option value="@lic">@lic</option>
-            }
-        </InputSelect>
-
-    </div>
-
-    <div class="form-group">
-        <label for="LicenseExpiry">@nameof(model.LicenseExpiry)</label>
-        <InputDate  @bind-Value="model.LicenseExpiry" id="LicenseExpiry" class="form-control" />
-
-    </div>
-    
-    <div class="form-group">
-        <label for="DatabaseOption">@nameof(model.DatabaseOption)</label>
-        <InputSelect @bind-Value="model.DatabaseOption" class="form-control">
-            @foreach (var op in Enum.GetValues(typeof(DbOptions)))
-            {
-                <option value="@op">@op</option>
-            }
-        </InputSelect>
-    </div>
-
-      <div class="form-group">
-          <InputCheckbox id="RequireDomainVerification" @bind-Value="model.RequireDomainVerification" class="form-check-input" />
-                    <label for="RequireDomainVerification" class="form-check-label">Require Domain Verification</label>
-    </div>
-    
-    <button class="btn btn-primary" type="submit">Register</button>
-    <button class="btn btn-secondary" type="reset">Clear</button>
-</EditForm>
 
 @code {
 
     bool IsError = false;
     bool IsSuccess = false;
     string Message = string.Empty;
+    string MessageBody = "Thank you!";
+    private bool show = false;
+    bool TaskCompleted = false;
+
+    public string Title = "Onboard New Client";
+
+    bool loading = false;
 
     Tenant model = new Tenant()
         {
@@ -99,18 +150,53 @@
 
     private async Task OnValidSubmit()
     {
+        Message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
         try
         {
-            await AdminClient.CreateTenantAsync(model);
-            IsSuccess = true;
-            Message = "Client successfully registered!";
+            Message = "Please wait";
+            var responce = await AdminClient.CreateTenantAsync(model);
+
+            IsSuccess = responce.IsSuccess;
+            if (IsSuccess)
+            {
+                Message = "Successfully registered!";
+                MessageBody = responce.Message;
+
+            }
+            else
+            {
+                IsError = true;
+                Message = "Error!";
+                MessageBody = responce.Message;
+            }
+            TaskCompleted = true;
         }
         catch (Exception ex)
         {
             Logger.LogCritical(ex, ex.Message);
             IsError = true;
+            Message = "Error!";
+            MessageBody = ex.Message;
             Message = $"There was an error registering client, {ex.Message}";
+            TaskCompleted = true;
         }
     }
 
+    protected void onClose()
+    {
+        navMgr.NavigateTo("provision");
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+        if(IsSuccess)
+            model = new Tenant();
+        
+    }
 }

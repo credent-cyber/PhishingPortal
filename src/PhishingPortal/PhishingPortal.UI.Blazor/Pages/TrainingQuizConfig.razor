@@ -5,13 +5,14 @@
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using System.ComponentModel.DataAnnotations;
+@using PhishingPortal.UI.Blazor.Shared.Pop_up
 @inject ILogger<TrainingQuizConfig> logger
 @inject NavigationManager NavigationManager
 @inject TenantClient client
 @inject IJSRuntime JSRuntime
 @attribute [Authorize]
 
-@if (training == null)
+@if (trainingQuizTitles == null)
 {
 
     <div class="col-sm-12" style="margin-top:45vh">
@@ -24,9 +25,9 @@
 }
 else
 {
-    <div class="pcoded-content" style="padding:10px 10px">
+    <div class="pcoded-content" style="padding:0">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 p-0">
                 <div class="card">
                     <div class="card-header bg-info" style="padding:15px !important;">
                         <h5 class="text-white">@Title</h5>
@@ -36,15 +37,18 @@ else
                     </div>
                     <div class="form-group mt-3" style="padding:0 10px">
                         <div class="row">
-                            <label class="col-form-label col-md-1 bold-font" style="padding-right: 0;">Training ID</label>
-                            <div class="col-md-4">
-                                <select @bind="model.TrainingId" class="form-control" id="TrainingId">
+                            <label class="col-form-label col-md-1 bold-font" style="padding-right: 0;">Quiz</label>
+                            <div class="input-group col-md-4">
+                                <select @bind-value="model.TrainingQuizId" class="form-control" id="TrainingQuizId" @onchange="QuizChangesAsync" @bind-value:event="oninput">
                                     <option selected>-Select-</option>
-                                    @foreach (var t in training)
+                                    @foreach (var t in trainingQuizTitles)
                                     {
-                                        <option value="@t.Id">@t.TrainingName</option>
+                                        <option value="@t.Id">@t.Name</option>
                                     }
                                 </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" @onclick="()=>AddQuiz=true" type="button">Add Quiz Name</button>
+                                </div>
                             </div>
 
                             <label class="col-form-label col-md-1 col-sm-6 col-xs-6 bold-font" style="padding-right: 0;">Is Active</label>
@@ -160,7 +164,9 @@ else
     }
 
 </Dailog>
-
+<Pop_up Title="Add Quiz" Show="AddQuiz" ClosePageDialog="ClosePopUp">
+    <AddQuizTitle />
+</Pop_up>
 
 @code {
     private string _selectedAnswer;
@@ -173,8 +179,9 @@ else
     [Parameter]
     public int Id { get; set; }
     private bool show = false;
-    private List<Training> training = new();
-    TrainingQuiz model = new();
+    private bool AddQuiz = false;
+    private List<TrainingQuiz> trainingQuizTitles = new();
+    TrainingQuizQuestion model = new();
 
     public string Title
     {
@@ -190,15 +197,15 @@ else
     bool loading = false;
     bool isloading = false;
     bool TaskCompleted = false;
-    private List<TrainingQuiz> TrainingQuiz { get; set; } = new List<TrainingQuiz>();
+    private List<TrainingQuizQuestion> TrainingQuiz { get; set; } = new List<TrainingQuizQuestion>();
 
 
     public void Init()
     {
         Message = string.Empty;
-        model = new TrainingQuiz() { };
+        model = new TrainingQuizQuestion() { };
         TrainingQuiz.Clear();
-        TrainingQuiz = new List<TrainingQuiz>() { new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 } };
+        TrainingQuiz = new List<TrainingQuizQuestion>() { new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 } };
     }
 
     protected override async Task OnInitializedAsync()
@@ -206,30 +213,30 @@ else
         if (Id > 0)
         {
             var Data = await client.GetTrainingQuizById(Id);
-            TrainingQuiz = Data.ToList();
+            TrainingQuiz = Data.Questions.ToList();
             model.Id = TrainingQuiz[0].Id;
-            model.TrainingId = TrainingQuiz[0].TrainingId;
+            model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
             model.IsActive = TrainingQuiz[0].IsActive;
         }
         else
         {
             Init();
         }
-        training = await client.GetAllTrainings();
+        trainingQuizTitles = new List<TrainingQuiz>(await client.GetAllTrainingQuizTitles());
     }
     private void AddParent()
     {
-        TrainingQuiz.Add(new TrainingQuiz() { OrderNumber = TrainingQuiz.Count + 1 });
+        TrainingQuiz.Add(new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 });
     }
 
-    private void RemoveParent(TrainingQuiz trainingQuiz)
+    private void RemoveParent(TrainingQuizQuestion trainingQuiz)
     {
         TrainingQuiz.Remove(trainingQuiz);
         UpdateQuestionNumbers(TrainingQuiz);
 
     }
 
-    private void AddChild(TrainingQuiz trainingQuiz)
+    private void AddChild(TrainingQuizQuestion trainingQuiz)
     {
         var newTrainingQuizAnswer = new TrainingQuizAnswer
             {
@@ -239,7 +246,7 @@ else
         UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
     }
 
-    private void RemoveChild(TrainingQuiz trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
+    private void RemoveChild(TrainingQuizQuestion trainingQuiz, TrainingQuizAnswer trainingQuizAnswer)
     {
         trainingQuiz.TrainingQuizAnswer.Remove(trainingQuizAnswer);
         UpdateOrderNumbers(trainingQuiz.TrainingQuizAnswer);
@@ -255,7 +262,7 @@ else
         TaskCompleted = false;
 
         try
-        {  
+        {
             if (TrainingQuiz.Count == 0)
             {
                 loading = false;
@@ -276,7 +283,7 @@ else
             }
             foreach (var quiz in TrainingQuiz)
             {
-                quiz.TrainingId = model.TrainingId;
+                quiz.TrainingQuizId = model.TrainingQuizId;
                 quiz.IsActive = model.IsActive;
             }
             Message = (model.Id != 0) ? "Successfully Updated" : "Successfully Added";
@@ -335,7 +342,7 @@ else
             trainingQuizAnswer.OrderNumber = orderNumber++;
         }
     }
-    private void UpdateQuestionNumbers(IEnumerable<TrainingQuiz> trainingQuiz)
+    private void UpdateQuestionNumbers(IEnumerable<TrainingQuizQuestion> trainingQuiz)
     {
         int orderNumber = 1;
         foreach (var Quiz in trainingQuiz)
@@ -344,6 +351,32 @@ else
         }
     }
 
+    public async void ClosePopUp()
+    {
+        show = false;
+        AddQuiz = false;
+        trainingQuizTitles = new List<TrainingQuiz>(await client.GetAllTrainingQuizTitles());
+        StateHasChanged();
+    }
 
+    public async void QuizChangesAsync()
+    {
+        if (model.TrainingQuizId > 0)
+        {
+            var Data = await client.GetTrainingQuizById(model.TrainingQuizId);
+            TrainingQuiz = Data.Questions.ToList();
+            if (TrainingQuiz.Count() > 0)
+            {
+                model.Id = TrainingQuiz[0].Id;
+                model.TrainingQuizId = TrainingQuiz[0].TrainingQuizId;
+                model.IsActive = TrainingQuiz[0].IsActive;
+            }
+            else
+            {
+                TrainingQuiz.Add(new TrainingQuizQuestion() { OrderNumber = TrainingQuiz.Count + 1 });
+            }
+            StateHasChanged();
+        }
+    }
 }
 

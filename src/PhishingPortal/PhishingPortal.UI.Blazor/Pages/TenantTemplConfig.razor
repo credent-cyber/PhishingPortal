@@ -2,6 +2,7 @@
 @page "/tenant-templates-config/{Id:int}"
 
 @using System.IO
+@using HtmlAgilityPack;
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using System.Text.RegularExpressions
@@ -32,11 +33,11 @@
 }
 else
 {
-    <div class="pcoded-content" style="padding:10px 10px">
+    <div class="pcoded-content" style="padding:0px 0px">
 
         <div class="row">
 
-            <div class="col-md-12">
+            <div class="col-md-12 p-0">
                 <div class="card">
                     <div class="card-header bg-info" style="padding:15px !important;">
                         <h5 class="text-white">@Title</h5>
@@ -44,189 +45,185 @@ else
                             <a @onclick="onClose" style="cursor:pointer;"><i class="fa fa-times-circle" aria-hidden="true"></i></a>
                         </div>
                     </div>
-                    <div class="card-body" style="padding-top: 20px;">
+                    <div class="card-body" style="padding-top: 10px;">
                         <div class="row">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <EditForm Model="@model" OnValidSubmit="@OnSave">
-                                        <DataAnnotationsValidator />
-                                        @*<ValidationSummary />*@
-                                        <div class="card">
-                                            <div class="card-body">
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
-                                                    <div class="col-md-8">
-                                                        <InputText id="Name" @bind-Value="model.Name" class="form-control" />
-                                                        <ValidationMessage For="() => model.Name" />
-                                                    </div>
+                            <div class="col-md-6 p-1">
+                                <EditForm Model="@model" OnValidSubmit="@OnSave">
+                                    <DataAnnotationsValidator />
+                                    @*<ValidationSummary />*@
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Name Of Template</label>
+                                                <div class="col-md-8">
+                                                    <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                                                    <ValidationMessage For="() => model.Name" />
                                                 </div>
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
-                                                    <div class="col-md-8">
-                                                        <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
+                                                <div class="col-md-8">
+                                                    <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
 
-                                                            <option>- Select -</option>
+                                                        <option>- Select -</option>
 
-                                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                                            {
-                                                                <option value="@val">@val</option>
-                                                            }
-                                                        </InputSelect>
-                                                        <ValidationMessage For="() => model.Type" />
-                                                    </div>
+                                                        @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                                        {
+                                                            <option value="@val">@val</option>
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="() => model.Type" />
                                                 </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                <div class="col-md-5">
+                                                    @if (model.IsActive is false || model.Id == 0)
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                            <label for="radio-1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                            <label for="radio-2" class="cr">No</label>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                            <label for="radio-1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                            <label for="radio-2" class="cr">No</label>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                            @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+                                            {
                                                 <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font">Is Active</label>
+                                                    <label class="col-form-label col-md-4 bold-font">Is Html</label>
                                                     <div class="col-md-5">
-                                                        @if (model.IsActive is false || model.Id == 0)
+                                                        @if (model.IsHtml is false || model.Id == 0)
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
-                                                                <label for="radio-1" class="cr">Yes</label>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml">
+                                                                <label for="radio-i-infill-1" class="cr">Yes</label>
                                                             </div>
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
-                                                                <label for="radio-2" class="cr">No</label>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
+                                                                <label for="radio-i-infill-2" class="cr">No</label>
                                                             </div>
                                                         }
                                                         else
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
-                                                                <label for="radio-1" class="cr">Yes</label>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
+                                                                <label for="radio-i-infill-1" class="cr">Yes</label>
                                                             </div>
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
-                                                                <label for="radio-2" class="cr">No</label>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml">
+                                                                <label for="radio-i-infill-2" class="cr">No</label>
                                                             </div>
                                                         }
                                                     </div>
                                                 </div>
-                                                @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
-                                                {
-                                                    <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 bold-font">Is Html</label>
-                                                        <div class="col-md-5">
-                                                            @if (model.IsHtml is false || model.Id == 0)
+                                            }
+
+                                            @if (model.Id == 0)
+                                            {
+
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font">Import Template</label>
+                                                    <div class="col-md-5">
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
+                                                            <label for="radio-i-temp1" class="cr">Yes</label>
+                                                        </div>
+                                                        <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
+                                                            <label for="radio-i-temp2" class="cr">No</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            @if (model.Id == 0 && import is true)
+                                            {
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font">Template</label>
+                                                    <div class="col-md-8">
+                                                        <div class="input-group">
+                                                            @if (model.Type == CampaignType.Sms)
                                                             {
-                                                                <div class="radio radio-info radio-fill d-inline">
-                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml">
-                                                                    <label for="radio-i-infill-1" class="cr">Yes</label>
-                                                                </div>
-                                                                <div class="radio radio-info radio-fill d-inline">
-                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
-                                                                    <label for="radio-i-infill-2" class="cr">No</label>
-                                                                </div>
+                                                                <InputFile OnChange="@LoadFiles" class="form-control" accept=".txt" />
                                                             }
                                                             else
                                                             {
-                                                                <div class="radio radio-info radio-fill d-inline">
-                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
-                                                                    <label for="radio-i-infill-1" class="cr">Yes</label>
-                                                                </div>
-                                                                <div class="radio radio-info radio-fill d-inline">
-                                                                    <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml">
-                                                                    <label for="radio-i-infill-2" class="cr">No</label>
-                                                                </div>
+                                                                <InputFile OnChange="@LoadFiles" class="form-control" accept=".html" />
                                                             }
                                                         </div>
+                                                        <p style="color:red; font-size:8px; padding-top:3px;">
+                                                            Choose Html file for Email, Whatsapp Template Type
+                                                            <br />Choose Text file for Sms Template Type
+                                                        </p>
                                                     </div>
-                                                }
-
-                                                @if (model.Id == 0)
-                                                {
-
-                                                    <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 bold-font">Import Template</label>
-                                                        <div class="col-md-5">
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
-                                                                <label for="radio-i-temp1" class="cr">Yes</label>
-                                                            </div>
-                                                            <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
-                                                                <label for="radio-i-temp2" class="cr">No</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                }
-
-                                                @if (model.Id == 0 && import is true)
-                                                {
-                                                    <div class="form-group row">
-                                                        <label class="col-form-label col-md-4 bold-font">Template</label>
-                                                        <div class="col-md-8">
-                                                            <div class="input-group">
-                                                                @if (model.Type == CampaignType.Sms)
-                                                                {
-                                                                    <InputFile OnChange="@LoadFiles" class="form-control" accept=".txt" />
-                                                                }
-                                                                else
-                                                                {
-                                                                    <InputFile OnChange="@LoadFiles" class="form-control" accept=".html" />
-                                                                }
-                                                            </div>
-                                                            <p style="color:red; font-size:8px; padding-top:3px;">
-                                                                Choose Html file for Email, Whatsapp Template Type
-                                                                <br />Choose Text file for Sms Template Type
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="input-group">
-
-                                                        @* <div class="custom-file">
-                                                <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
-                                                <label class="custom-file-label" for="inputFile">Upload Images </label>
                                                 </div>
-                                                <div class="input-group-append">
-                                                <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
-                                                </div>*@
-                                                    </div>
-                                                    <h>@message</h>
-                                                }
 
+                                                <div class="input-group">
 
-                                                <div style="text-align:center;">
-                                                    <button type="submit" class="btn btn-primary col-md-3 m-1">Save</button>
-                                                    <button type="button" class="btn btn-danger col-md-3 m-1" @onclick="onClose">Close</button>
-                                                </div>
+                                                    @* <div class="custom-file">
+                                            <InputFile class="custom-file-input" multiple OnChange="OnChange" accept="image/png, image/jpeg, image/gif" id="inputFile" />
+                                            <label class="custom-file-label" for="inputFile">Upload Images </label>
                                             </div>
-                                            <br />
+                                            <div class="input-group-append">
+                                            <button class="btn btn-success" @onclick="Upload" disabled="@isDisabled">Upload</button>
+                                            </div>*@
+                                                </div>
+                                                <h>@message</h>
+                                            }
+
+
+                                            <div style="text-align:center;">
+                                                <button type="submit" class="btn btn-primary col-md-3 mb-1">Save</button>
+                                                <button type="button" class="btn btn-danger col-md-3 mb-1" @onclick="onClose">Close</button>
+                                            </div>
                                         </div>
+                                        <br />
+                                    </div>
 
-                                    </EditForm>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card" style="margin-bottom: 0;">
-                                        <div class="card-body ">
-                                            <div class="mb-3">
-                                                <label for="Content" class="form-label">Template Content</label>
+                                </EditForm>
+                            </div>
+                            <div class="col-md-6 p-1">
+                                <div class="card" style="margin-bottom: 0;">
+                                    <div class="card-body ">
+                                        <div class="mb-3">
+                                            <label for="Content" class="form-label">Template Content</label>
 
 
-                                                @if (model.Type == CampaignType.Sms)
-                                                {
+                                            @if (model.Type == CampaignType.Sms)
+                                            {
 
-                                                    <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
-                                                    <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
-                                                }
-                                                else
-                                                {
-                                                    <div class="overflow-auto">
-                                                        <!-- Rich text editor -->
-                                                        <BlazingComponents.Summernote.Editor />
-                                                    </div>
-                                                }
+                                                <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
+                                                <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
+                                            }
+                                            else
+                                            {
+                                                <div class="overflow-auto">
+                                                    <!-- Rich text editor -->
+                                                    <BlazingComponents.Summernote.Editor />
+                                                </div>
+                                            }
 
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
+
                     </div>
                 </div>
 
@@ -363,6 +360,11 @@ else
         {
             model.Content = contents = await GetSummerNoteContent();
         }
+        // if (model.Type == CampaignType.Whatsapp)
+        // {
+        //     contents = await GetSummerNoteContent();
+        //     model.Content = GetPlainText(contents);
+        // }
         if (model.Type == CampaignType.Sms) { model.Content = text; }
 
         if (model.Content == string.Empty)
@@ -378,7 +380,7 @@ else
         {
             show = true;
             message = "Please wait";
-            int Id = model.Id;            
+            int Id = model.Id;
             model = await client.UpsertCampaignTemplate(model);
             IsSuccess = true;
 
@@ -506,7 +508,19 @@ else
         }
     }
 
+    static string GetPlainText(string html)
+    {
+        HtmlDocument doc = new HtmlDocument();
+        doc.LoadHtml(html);
 
+        // Use the Descendants method to get all elements in the HTML
+        IEnumerable<HtmlNode> nodes = doc.DocumentNode.Descendants();
+
+        // Concatenate the InnerText of each element to get plain text
+        string plainText = string.Join(" ", nodes.Select(node => node.InnerText.Trim()));
+
+        return plainText;
+    }
 
 }
 

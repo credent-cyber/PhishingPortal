@@ -68,13 +68,22 @@ namespace PhishingPortal.Services.Notification.Trainings
                     while (!_stopped)
                     {
                         Logger.LogInformation($"Training executor - total pending Training {Queue.Count()}");
-                        if (Queue.TryDequeue(out TraininigInfo trainingInfo))
+                        
+                        if (Queue.TryDequeue(out var trainingInfo))
                         {
                             if (trainingInfo != null)
                             {
                                 Logger.LogInformation($"Sending email for tenantIdentifier:{trainingInfo.Tenantdentifier}, EmailSubject: {trainingInfo.TrainingSubject}");
 
                                 var db = TenantDbConnMgr.GetContext(trainingInfo.Tenantdentifier);
+
+                                // checking training correponding to this campaign log already triggered
+                                if (trainingInfo.TrainingLogEntry.CampaignLogID.HasValue 
+                                        && db.TrainingLog.Any(o => o.CampaignLogID == trainingInfo.TrainingLogEntry.CampaignLogID.Value))
+                                {
+                                    Logger.LogWarning($"Training {trainingInfo.TrainingLogEntry.TrainingID} related to CampaignLogID [{trainingInfo.TrainingLogEntry.CampaignLogID}] already triggered earlier, ignoring...");
+                                    continue;
+                                }
 
                                 if (_mailTrackerConfig.EnableEmbedTracker)
                                     trainingInfo.TrainingContent += EmbedTracker(trainingInfo);
@@ -93,7 +102,7 @@ namespace PhishingPortal.Services.Notification.Trainings
                             }
 
                         }
-
+                        
                         Thread.Sleep(1000 * _executorDelayInSeconds);
 
                     }

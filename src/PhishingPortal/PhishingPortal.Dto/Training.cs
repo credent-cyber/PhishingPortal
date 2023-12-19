@@ -13,6 +13,7 @@ namespace PhishingPortal.Dto
         [Required]
         public string TrainingName { get; set; }
         public bool IsActive { get; set; }
+        public bool TrainingTrigger { get; set; }
         public string Content { get; set; }
         [Required]
         public string TrainingCategory { get; set; }
@@ -20,6 +21,8 @@ namespace PhishingPortal.Dto
         public TrainingState State { get; set; }
 
         public int TrainingScheduleId { get; set; }
+
+        public int? TrainingQuizId { get; set; }
 
         [ForeignKey("TrainingScheduleId")]
         public virtual TrainingSchedule TrainingSchedule { get; set; }

@@ -1,7 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
+using PhishingPortal.Common;
 using PhishingPortal.DataContext;
+using PhishingPortal.Domain;
 using PhishingPortal.Dto;
+using System.Linq;
+using System.Text;
 
 namespace PhishingPortal.Repositories
 {
@@ -9,30 +15,38 @@ namespace PhishingPortal.Repositories
     public class TenantAdminRepository : BaseRepository, ITenantAdminRepository
     {
 
-        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext2 centralDbContext, TenantAdminRepoConfig config)
+        public TenantAdminRepository(ILogger<TenantAdminRepository> logger, PhishingPortalDbContext2 centralDbContext, TenantAdminRepoConfig config, UserManager<PhishingPortalUser> userManager)
             : base(logger)
         {
             CentralDbContext = centralDbContext;
             Config = config;
+            UserManager = userManager;
         }
 
         public PhishingPortalDbContext2 CentralDbContext { get; }
         public TenantAdminRepoConfig Config { get; }
-
+        public UserManager<PhishingPortalUser> UserManager { get; }
 
         /// <summary>
         /// CreateTenantAsync
         /// </summary>
         /// <param name="tenant"></param>
         /// <returns></returns>
-        public async Task<Tenant> CreateTenantAsync(Tenant tenant)
+        public async Task<ApiResponse<Tenant>> CreateTenantAsync(Tenant tenant)
         {
-
-            var t = CentralDbContext.Tenants.FirstOrDefault(t => (t.Id > 0 && t.Id == tenant.Id) 
+            var response = new ApiResponse<Tenant>();
+            var t = CentralDbContext.Tenants.FirstOrDefault(t => (t.Id > 0 && t.Id == tenant.Id)
                 || t.ContactEmail.ToLower() == tenant.ContactEmail.ToLower());
 
             if (t != null)
-                throw new Exception("Already registered");
+            {
+                //throw new Exception("Already registered");
+                response.IsSuccess = false;
+                response.Message = "Already registered for this domain!";
+                response.Result = t;
+                return response; 
+
+            }
 
             tenant.UniqueId = $"{Config.DbNamePrefix}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
             tenant.ConfirmationLink = $"{tenant.GetConfirmationLink(Config.TenantConfirmBaseUrl)}";
@@ -75,7 +89,11 @@ namespace PhishingPortal.Repositories
 
             var result = await CreateDatabase(tenant, tenantSettings.Value);
 
-            return await Task.FromResult(tenant);
+            //return await Task.FromResult(tenant);
+
+            response.IsSuccess = result;
+            response.Message = "Domain succesfully registered.";
+            return response;
         }
 
         /// <summary>
@@ -126,7 +144,7 @@ namespace PhishingPortal.Repositories
             if (tenant.ConfirmationState == ConfirmationStats.Registered && tenant.ConfirmationExpiry < DateTime.Now)
                 throw new InvalidOperationException("Confirmation link is expired, please contant application support");
 
-           
+
             if (tenant.ConfirmationExpiry > DateTime.Now && tenant.ConfirmationLink == link && tenant.ConfirmationState == ConfirmationStats.Registered)
             {
                 tenant.ConfirmationState = ConfirmationStats.Verified;
@@ -161,7 +179,7 @@ namespace PhishingPortal.Repositories
             {
                 if (CentralDbContext.TenantDomain.Any(o => o.Domain.ToLower() == domain.Domain.ToLower()))
                     throw new InvalidDataException("Domain already registered");
-              
+
                 var d = tenant.TenantDomains?.FirstOrDefault(o => o.Domain.Equals(domain.Domain, StringComparison.InvariantCultureIgnoreCase));
 
                 if (d == null)
@@ -187,8 +205,131 @@ namespace PhishingPortal.Repositories
                 CentralDbContext.SaveChanges();
 
             }
-    
+
             return tenant;
+        }
+        public async Task<(bool, string)> DeleteTenantByUniqueId(string uniqueId)
+        {
+            try
+            {
+                var tenant = await CentralDbContext.Tenants
+                    .Where(x => x.UniqueId == uniqueId)
+                    .Include(t => t.Settings)
+                    .Include(t => t.TenantDomains)
+                    .FirstOrDefaultAsync();
+
+                if (tenant != null)
+                {
+
+                    // Delete the associated database
+                    await DeleteDatabase(tenant);
+
+                    var tenantDataToDelete = tenant.Settings.FirstOrDefault(td => td.Value.Contains(tenant.UniqueId));
+                    if (tenantDataToDelete != null)
+                    {
+                        tenant.Settings.Remove(tenantDataToDelete);
+                        CentralDbContext.Entry(tenantDataToDelete).State = EntityState.Deleted;
+                    }
+                    // Remove the TenantDomain
+                    var tenantDomainToDelete = CentralDbContext.TenantDomain.FirstOrDefault(z => z.TenantId == tenant.Id);
+                    if (tenantDomainToDelete != null)
+                    {
+                        CentralDbContext.TenantDomain.Remove(tenantDomainToDelete);
+                        CentralDbContext.Entry(tenantDomainToDelete).State = EntityState.Deleted;
+                    }
+
+
+                    var domain = tenant.ContactEmail?.Split('@').LastOrDefault();
+                    if (domain != null)
+                    {
+                        var usersToDelete = await UserManager.Users
+                            .Where(u => u.Email != null && u.Email.EndsWith("@" + domain))
+                            .ToListAsync();
+
+                        foreach (var user in usersToDelete)
+                        {
+                            // Delete user claims
+                            var claims = await UserManager.GetClaimsAsync(user);
+                            foreach (var claim in claims)
+                            {
+                                var result = await UserManager.RemoveClaimAsync(user, claim);
+                                if (!result.Succeeded)
+                                {
+                                    // Handle the case where user claim removal failed
+                                    throw new Exception($"Error removing user claim: {result.Errors}");
+                                }
+                            }
+
+                            // Delete the user
+                            var resultUserDeletion = await UserManager.DeleteAsync(user);
+                            if (!resultUserDeletion.Succeeded)
+                            {
+                                // Handle the case where user deletion failed
+                                throw new Exception($"Error deleting user: {resultUserDeletion.Errors}");
+                            }
+                        }
+                    }
+
+
+
+
+
+
+                    // Remove the tenant from DbContext
+                    CentralDbContext.Tenants.Remove(tenant);
+
+                    await CentralDbContext.SaveChangesAsync();
+
+                    return (true, "Tenant deleted successfully.");
+                }
+                else
+                {
+                    return (false, "Tenant not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error deleting tenant: {ex.Message}");
+            }
+        }
+
+
+        private async Task<bool> DeleteDatabase(Tenant tenant)
+        {
+            try
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
+
+                if (tenant.DatabaseOption == DbOptions.SqlLite)
+                {
+                    optionsBuilder.UseSqlite(tenant.Settings.FirstOrDefault()?.Value);
+                }
+                else if (tenant.DatabaseOption == DbOptions.MySql)
+                {
+                    var connString = tenant.Settings.FirstOrDefault()?.Value ?? Config.ConnectionString.Replace("####", tenant.UniqueId);
+                    optionsBuilder.UseMySql(connString, ServerVersion.AutoDetect(tenant.Settings.FirstOrDefault()?.Value));
+                }
+                else if (tenant.DatabaseOption == DbOptions.MsSql)
+                {
+                    optionsBuilder.UseSqlServer(tenant.Settings.FirstOrDefault()?.Value);
+                }
+                else
+                {
+                    throw new NotImplementedException("This database provider is not implemented for the tenant");
+                }
+
+                using (var db = new TenantDbContext(optionsBuilder.Options))
+                {
+                    await db.Database.EnsureDeletedAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
 
 
@@ -205,11 +346,11 @@ namespace PhishingPortal.Repositories
                 {
                     optionsBuilder.UseSqlite(connectionString);
                 }
-                else if(tenant.DatabaseOption == DbOptions.MySql)
+                else if (tenant.DatabaseOption == DbOptions.MySql)
                 {
                     optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
                 }
-                else if(tenant.DatabaseOption == DbOptions.MsSql)
+                else if (tenant.DatabaseOption == DbOptions.MsSql)
                 {
                     optionsBuilder.UseSqlServer(connectionString);
                 }
@@ -261,7 +402,7 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(tenant);
 
         }
-        
+
         public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
         {
             try
@@ -276,6 +417,87 @@ namespace PhishingPortal.Repositories
                 throw;
             }
             return demoRequestor;
+        }
+
+        public async Task<IEnumerable<TenantDomain>> GetDomains(int tenantId)
+        {
+            return await CentralDbContext.TenantDomain.Where(o => o.TenantId == tenantId).ToListAsync();
+        } 
+
+        public async Task<TenantDomain> UpsertTenantDomain(TenantDomain domain)
+        {
+            var existing = CentralDbContext.Find<TenantDomain>(domain.Id);
+
+            if (CentralDbContext.TenantDomain.Any(o => o.Domain == domain.Domain))
+                throw new InvalidOperationException($"{domain.Domain} already exists");
+
+            if (!domain.Domain.IsValidDomain() || string.IsNullOrWhiteSpace(domain.DomainVerificationCode))
+                throw new ArgumentException("Invalid Domain address or verification code");
+
+            EntityEntry<TenantDomain>? result;
+            
+            if (existing != null)
+            {
+                if(existing.Domain != domain.Domain 
+                    || existing.DomainVerificationCode != domain.DomainVerificationCode)
+                {
+                    existing.IsDomainVerified = false;
+                }
+                existing.DomainVerificationCode = domain.DomainVerificationCode;
+                existing.Domain = domain.Domain;
+                existing.ModifiedBy = domain.ModifiedBy;
+                existing.ModifiedOn = domain.ModifiedOn;
+                result = CentralDbContext.Update(domain);
+            }
+
+            result = CentralDbContext.Add(domain);
+            await CentralDbContext.SaveChangesAsync();
+
+            return result.Entity;
+        }
+
+        public async Task<TenantDomain> VerifyDomain(TenantDomain domain)
+        {
+            var existing = CentralDbContext.Find<TenantDomain>(domain.Id);
+            try
+            {
+                if (existing == null)
+                {
+                    throw new ArgumentException("Domain information not found");
+                }
+                else
+                {
+                    existing.IsDomainVerified = true;
+                    existing.ModifiedOn = domain.ModifiedOn;
+                    existing.ModifiedBy = domain.ModifiedBy;
+
+                    CentralDbContext.Update(existing);
+                    await CentralDbContext.SaveChangesAsync();
+                    return existing;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while doing domain verification");
+            }
+
+            return existing;
+        }
+
+        public async Task<bool> DeleteDomain(int id)
+        {
+            
+            var existing = CentralDbContext.TenantDomain.First(x => x.Id == id);
+
+            if (CentralDbContext.TenantDomain.Count(o => o.TenantId == existing.TenantId) == 1)
+                throw new InvalidOperationException("You must keep atleast one activated domain");
+
+            if (existing == null)
+                throw new ArgumentException("Domain not found");
+
+            CentralDbContext.TenantDomain.Remove(existing);
+            await CentralDbContext.SaveChangesAsync();
+            return true;
         }
     }
 }

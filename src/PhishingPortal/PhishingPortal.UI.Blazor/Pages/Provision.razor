@@ -1,18 +1,39 @@
-﻿@using PhishingPortal.Dto
+﻿@using Microsoft.Extensions.Primitives;
+@using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using Microsoft.Extensions.Logging
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
 
 @page "/provision"
 @inject TenantAdminClient adminClient
 @inject NavigationManager navMgr
+@inject HttpClient HttpClient
+@inject AuthState authState;
 @attribute [Authorize]
 
 <div class="row">
-            <div class="card-header">
-                <h3>Provision Client</h3>
-                 <a class="btn btn-primary" href="onboard"><span class="oi oi-plus"></span></a>
+    <div class="col-sm-12 p-0">
+        <div class="card">
+            <div class="card-header" style="padding:5px 8px 0px;">
+                <h5 style="top:-5px">Provision Client</h5>
+                <a href="onboard" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="New"></i></a>
+                <div style="float:right; margin-bottom:-6px">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+                        <li class="breadcrumb-item active">Provision Client</li>
+                    </ol>
+                </div>
             </div>
+
+            <div class="card-body p-2 mt-n3">
+               @*  <div style="overflow: hidden;">
+                    <GridComponent @ref="_gridComponent" T="Tenant" Grid="@_grid"></GridComponent>
+                </div> *@
+            </div>
+        </div>
+    </div>
 </div>
+
 <table class="table">
     <thead>
         <tr>
@@ -21,7 +42,7 @@
             <td>LicenseType</td>
             <td>LicenseExpiry</td>
             <td>ConfirmationLink</td>
-            
+
         </tr>
     </thead>
     <tbody>
@@ -32,8 +53,8 @@
                 <td>@t.Name</td>
                 <td>@t.LicenseType</td>
                 <td>@t.LicenseExpiry</td>
-                <td>@if(t.ConfirmationState == ConfirmationStats.Registered 
-                                && t.ConfirmationState != ConfirmationStats.MasterUser 
+                <td>@if(t.ConfirmationState == ConfirmationStats.Registered
+                                && t.ConfirmationState != ConfirmationStats.MasterUser
                                 && t.ConfirmationState != ConfirmationStats.Licensed)
                     {
                         <a class="btn-link" target="_blank" href="@t.ConfirmationLink">Confirm</a>
@@ -47,11 +68,47 @@
             </tr>
         }
     </tbody>
-
 </table>
 
 
 @code {
+    private GridComponent<Tenant> _gridComponent;
+    private CGrid<Tenant> _grid;
+    private Task _task;
+    static bool filter = true;
+
+    // Action<IGridColumnCollection<Tenant>> columns = c =>
+    // {
+    //     c.Add(o => o.UniqueId).SetWidth("30px").Css("table-bordered").Filterable(filter);
+    //     c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
+    //     c.Add(o => o.LicenseType).Css("table-bordered").SetWidth("60px").Filterable(filter);
+    //     c.Add(o => o.LicenseExpiry).Css("table-bordered").Filterable(filter);
+    //     c.Add(o => o.ConfirmationLink).Css("table-bordered").SetWidth("60px").Filterable(filter);
+    //     c.Add().Encoded(false).Sanitized(false).RenderComponentAs<ProvisionEditButton>().SetWidth("50px").Titled("Edit");
+    // };
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     string url = $"odata/Tenant";
+    //     var query = new QueryDictionary<StringValues>();
+       
+
+    //     var client = new GridODataClient<Tenant>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+    //         .ClearFiltersButton(true)
+    //         .SetStriped(true)
+    //         .WithMultipleFilters()
+    //         .WithGridItemsCount()
+    //         .SetExcelExport(true, true, "Provisions")
+    //         .ChangePageSize(true)
+    //         .EmptyText("No Data Available!!")
+    //         .SetKeyboard(true)
+    //         .Searchable(true, false, false);
+
+
+    //     _grid = client.Grid;
+    //     _task = client.UpdateGrid();
+    //     await _task;
+    // }
+
 
     ProvisionTenantRequest request = new();
 

@@ -1,0 +1,2 @@
+﻿ALTER TABLE `t-20220619003439`.`traininglog` 
+ADD COLUMN `CampaignLogID` INT NULL AFTER `UniqueID`;

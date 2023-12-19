@@ -8,7 +8,7 @@ namespace PhishingPortal.Dto.Quiz
 {
     public class Question
     {
-        public TrainingQuiz TrainingQuiz { get; set; }
+        public TrainingQuizQuestion TrainingQuiz { get; set; }
         public List<QuestionOption> Options { get; set; }
         public QuestionOption SelectedOption { get; set; }
     }

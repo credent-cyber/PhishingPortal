@@ -11,14 +11,14 @@
 @if (_task.IsCompleted)
 {
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12 mt-n3">
             <GridComponent T="TrainingLog" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
 else
 {
-    <div class="col-sm-12" style="margin-top:5vh">
+    <div class="col-sm-12">
 
         <div class="card-header">
             <div class="loading-bar"></div>
@@ -35,15 +35,22 @@ else
     [Parameter]
     public bool Desc { get; set; } = false;
 
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public string Label { get; set; }
+
     Action<IGridColumnCollection<TrainingLog>> columns = c =>
     {
         c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.TrainingID).Css("table-bordered");
+        //c.Add(o => o.TrainingID).Css("table-bordered");
+        c.Add(o => o.Trainings.TrainingName).Css("table-bordered").Titled("Training Name");
         c.Add(o => o.ReicipientID).Css("table-bordered");
-        c.Add(o => o.PercentCompleted).Css("table-bordered");
+        c.Add(o => o.PercentCompleted).Css("table-bordered").Format("{0:F2}");
         c.Add(o => o.Status).Css("table-bordered");
         c.Add(o => o.CreatedBy).Titled("CreatedBy").SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.CreatedOn).Css("table-bordered").Titled("CreatedOn");
+        c.Add(o => o.SentOn).Css("table-bordered").Titled("SentOn");
         //c.Add(o => o.ModifiedBy).Css("table-bordered").Titled("ModifiedBy");
         c.Add(o => o.ModifiedOn).Css("table-bordered").Titled("ModifiedOn");
 
@@ -53,9 +60,50 @@ else
     {
         string url = $"odata/Traininglog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
-        
+
         if(Desc == true)
             query.Add("grid-sorting", "Id__1__1");
+
+        if(Id > 0)
+        {
+            var status = string.Empty;
+            if (Label == "Training Assign")
+                status = "Sent";
+            else if (Label == "Completed")
+                status = "Completed";
+            else if (Label == "InProgress")
+                status = "InProgress";
+
+
+            DateTime startDate = new DateTime(DateTime.Now.Year, Id, 1);
+            DateTime endDate = startDate.AddMonths(1).AddDays(-1);
+
+
+            string startDateString = $"{startDate.Year}-{startDate.Month:D2}-{startDate.Day:D2}";
+            string endDateString = $"{endDate.Year}-{endDate.Month:D2}-{endDate.Day:D2}";
+
+            #region filterValue
+            // filterType: string for the selected filter type. It can be one of these characters:
+            // 1: Equals
+            // 2: Contains
+            // 3: StartsWith
+            // 4: EndsWidth
+            // 5: GreaterThan
+            // 6: LessThan
+            // 7: GreaterThanOrEquals
+            // 8: LessThanOrEquals
+            #endregion
+            if (Label != "Training Assign")
+            {
+                var values = new string[] { $"SentOn__7__{startDateString}", $"SentOn__8__{endDateString}", $"Status__1__{status}" };
+                query.Add("grid-filter", new StringValues(values));
+            }
+            else
+            {
+                var values = new string[] { $"SentOn__7__{startDateString}", $"SentOn__8__{endDateString}" };
+                query.Add("grid-filter", new StringValues(values));
+            }
+        }
 
         var client = new GridODataClient<TrainingLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
             //.Sortable()
@@ -64,7 +112,7 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, true, "TrainingReport")
             .ChangePageSize(true)
             .EmptyText("No Data Available!!")
             .SetKeyboard(true)

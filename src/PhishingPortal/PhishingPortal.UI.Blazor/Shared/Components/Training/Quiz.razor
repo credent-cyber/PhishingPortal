@@ -1,6 +1,7 @@
 ﻿@using PhishingPortal.Dto
 @using PhishingPortal.Dto.Quiz
 @using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Common
 
 @inject TenantClient client
 @inject HttpClient httpClient;
@@ -75,7 +76,7 @@
     [Parameter]
     public EventCallback<Scores> OnSubmit { get; set; }
 
-    private IEnumerable<TrainingQuiz> quizCollection_ = new List<TrainingQuiz>();
+    private IEnumerable<TrainingQuizQuestion> quizCollection_ = new List<TrainingQuizQuestion>();
     private List<Question> questions_ = new();
     private Question model_;
     private int index_ = 1;
@@ -87,7 +88,22 @@
     {
         if (firstRender)
         {
-            quizCollection_ = await client.GetTrainingQuizByTrainingId(Training.Id);
+
+            if (!Training.TrainingQuizId.HasValue)
+                throw new ArgumentNullException("Training doesn't consist a quiz");
+
+            var result = await client.GetTrainingQuizById(Training.TrainingQuizId.Value);
+
+            var list = result.Questions.ToList();
+            list.Shuffle<TrainingQuizQuestion>();
+            
+            var i = 1;
+            list.ForEach(o =>
+            {
+                o.OrderNumber = i++;
+            });
+
+            quizCollection_ = list;
 
             if (quizCollection_ == null || !quizCollection_.Any())
                 throw new InvalidOperationException("Error fetching quiz questions");

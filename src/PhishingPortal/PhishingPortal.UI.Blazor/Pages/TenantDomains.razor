@@ -1,0 +1,157 @@
+﻿@page "/tenant-domains"
+
+@using PhishingPortal.Dto;
+@using PhishingPortal.UI.Blazor.Client;
+@using PhishingPortal.UI.Blazor.Models;
+<h3>Domain List</h3>
+
+@inject NavigationManager NavigationManager
+@inject TenantClient client
+@inject IJSRuntime JSRuntime
+@inject AuthState authState;
+
+@attribute [Authorize]
+
+<div class="card-body p-2 mt-n3">
+    <div class="card">
+        <div class="card-header">
+            <h5>Add New Domain</h5>
+            <div class="col-auto" style=" width:300px; text-align:center; line-height:0px; float:right; margin-top: -2px;">
+                <UiAlerts Model="alert"></UiAlerts>
+            </div>
+            <div class="dropdown-divider"></div>
+        </div>
+        <div class="card-body">
+            <EditForm Model="_model" OnValidSubmit="@Upsert">
+                <div class="form-row align-items-center">
+                    <div class="form-group col-md-3">
+                        <InputText name="domain" class="form-control" @bind-Value="_model.Domain" placeholder="website.com"></InputText>
+                    </div>
+                </div>
+                <div class="form-row align-items-center">
+                    <div class="form-group col-md-3" style="margin-top:0px">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </EditForm>
+            <hr />
+
+            <div class="table-responsive">
+                <table id="redirect-urls" class="table table-striped table-bordered">
+                    <thead>
+                        <tr role="row">
+                            <th>ID</th>
+                            <th>Domain</th>
+                            <th>VerificationCode</th>
+                            <th>IsVerified</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var d in _domains)
+                        {
+                            <tr class="odd" role="row">
+                                <td>@d.Id</td>
+                                <td>@d.Domain</td>
+                                <td>@d.DomainVerificationCode</td>
+                                <td>@d.IsDomainVerified</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" @onclick="()=> Verify(d.Id)"><i class="fa fa-check"></i>Verify</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" @onclick="()=> Edit(d.Id)"><i class="fa fa-edit"></i>Edit</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" @onclick="()=> Delete(d.Id)"><i class="fa fa-remove"></i>Remove</button>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private IEnumerable<TenantDomain> _domains = new List<TenantDomain>();
+
+    private TenantDomain _model = new() { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        _domains = await client.GetDomains();
+    }
+
+    protected async Task Upsert()
+    {
+        alert?.Clear();
+
+        var response = await client.UpsertDomain(_model);
+
+        if (response.Status)
+        {
+            _domains = await client.GetDomains();
+            _model = new();
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        StateHasChanged();
+    }
+
+    protected void Edit(int id)
+    {
+        alert?.Clear();
+        _model = _domains?.FirstOrDefault(o => o.Id == id);
+        StateHasChanged();
+    }
+
+    protected async Task Delete(int id)
+    {
+        alert?.Clear();
+        var response = await client.DeleteDomain(id);
+
+        if (response.Success)
+        {
+            alert?.SetSuccess("Deleted Successfully");
+            _domains = await client.GetDomains();
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        StateHasChanged();
+    }
+
+    protected async Task Verify(int id)
+    {
+        alert.Clear();
+        
+        var domain = _domains.FirstOrDefault(o => o.Id == id);
+
+        _model = await client.VerifyDomain(domain);
+
+        if (_model == null || !_model.IsDomainVerified)
+        {
+            alert.SetError("Couldn't verify, please try again");
+        }
+        else
+        {
+            alert.SetSuccess("Successfull Verified");
+            _domains = await client.GetDomains();
+        }
+
+        StateHasChanged();
+    }
+}

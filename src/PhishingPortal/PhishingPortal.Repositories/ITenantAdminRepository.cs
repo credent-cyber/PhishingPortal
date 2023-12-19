@@ -6,11 +6,14 @@ namespace PhishingPortal.Repositories
     {
         Task<List<Tenant>> GetAllAsync(int pageIndex = 0, int pageSize = 10);
 
-        Task<Tenant> CreateTenantAsync(Tenant tenant);
+        //Task<Tenant> CreateTenantAsync(Tenant tenant);
+        Task<ApiResponse<Tenant>> CreateTenantAsync(Tenant tenant);
 
         Task<bool> ProvisionAsync(int tenantId, string connectionString);
 
         Task<Tenant> GetByUniqueId(string uniqueId);
+        
+        Task<(bool,string)> DeleteTenantByUniqueId(string uniqueId);
 
         Task<Tenant> GetByDomain(string domain);
 
@@ -19,6 +22,9 @@ namespace PhishingPortal.Repositories
         Task<Tenant> ConfirmDomainAsync(DomainVerificationRequest domain);
 
         Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor);
-
+        Task<TenantDomain> UpsertTenantDomain(TenantDomain domain);
+        Task<IEnumerable<TenantDomain>> GetDomains(int tenantId);
+        Task<TenantDomain> VerifyDomain(TenantDomain domain);
+        Task<bool> DeleteDomain(int id);
     }
 }

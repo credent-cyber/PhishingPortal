@@ -37,5 +37,10 @@ namespace PhishingPortal.Dto
         {
             return $"{WeekDay}|{ScheduleTime.ToString("HH:mm:ss")}";
         }
+
+        public override double GetElapsedTimeInMinutes()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

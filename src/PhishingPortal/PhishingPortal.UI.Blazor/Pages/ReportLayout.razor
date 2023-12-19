@@ -4,65 +4,130 @@
 @page "/report/{data}/category/{categ}"
 @page "/report/{data}/template/{tempid:int}"
 
-@using GridShared.Events
-@using Newtonsoft.Json.Linq
-@using PhishingPortal.Dto
-@using System.Drawing
-@using GridShared
-@using GridShared.Utility
-@using Microsoft.Extensions.Primitives
+@using GridShared.Columns;
+@using GridShared.Events;
+@using GridShared.Filtering;
+@using Microsoft.AspNetCore.WebUtilities;
+@using Newtonsoft.Json.Linq;
+@using PhishingPortal.Dto;
+@using System.Drawing;
+@using GridShared;
+@using GridShared.Utility;
+@using Microsoft.Extensions.Primitives;
 
-@using PhishingPortal.UI.Blazor.Client
-@using PhishingPortal.UI.Blazor.Helpers
-@using PhishingPortal.UI.Blazor.Models
+@using PhishingPortal.UI.Blazor.Client;
+@using PhishingPortal.UI.Blazor.Helpers;
+@using PhishingPortal.UI.Blazor.Models;
 @using PhishingPortal.UI.Blazor.Shared.ChartJs
-@using PhishingPortal.UI.Blazor.Shared.Components.Reports
+@using PhishingPortal.UI.Blazor.Shared.Components.Reports;
+@using Microsoft.AspNetCore.Components.Web.Virtualization;
 
-@inject TenantClient client
-@inject ILogger<TenantDashboard> logger
-@inject HttpClient HttpClient
-@inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
+@inject TenantClient client;
+@inject ILogger<TenantDashboard> logger;
+@inject HttpClient HttpClient;
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager;
 @inject AuthState authState;
-@attribute [Authorize]
-
-
-@*<div class="form-group row">
-    <label for="colFormLabel" class="col-md-2 col-form-label" style="font-weight:700">Select Year</label>
-    <div class="col-sm-12 col-md-10 d-flex">
-        <select onchange="@ChangeYear" class="form-select" aria-label="Default select example">
-            @if (Years != null)
-            {
-                foreach (var year in Years.OrderByDescending(y => y))
-                {
-                    if (year == Year)
-                    {
-                        <option value="@year" selected>@year</option>
-                    }
-                    else
-                    {
-                        <option value="@year">@year</option>
-                    }
-                }
-            }
-        </select>
-        <button class="btn btn-outline-warning ms-3" style="background:#950f0f; border-radius:5px" @onclick="PrintAsPdf" title="Print this page as pdf">
-            <span class='oi oi-print' aria-hidden='false'> </span>
-        </button>
-    </div>
-</div>*@
-
 
 <div id="myContent">
     <div class="pcoded-content" style="padding: 0 0px !important;">
+        <div>
+            <div class="row row-cols-1 row-cols-md-5 row-cols-lg-5 row-cols-xxl-5">
+                <div class="col p-1">
+                    <select onchange="@ChangeYear" class="form-select" id="selectYear" aria-label="Default select example" style="height:45px;background:brown; color:white">
+                        @if (Years != null)
+                        {
+                            foreach (var year in Years.OrderByDescending(y => y))
+                            {
+                                if (year == Year)
+                                {
+                                    <option value="@year" selected> ▼ Data from @year </option>
+                                }
+                                else
+                                {
+                                    <option value="@year">@year</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col p-1">
+                    <div class="card bg-facebook order-card mb-1">
+                        <div class="card-body" style="padding:5px 25px !important">
+                            <a>
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="text-white mb-0">Total </h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black; margin-bottom: 0;">@total</h3>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col p-1">
+                    <div class="card bg-danger order-card mb-1">
+                        <div class="card-body" style="padding:5px 25px !important">
+                            <a>
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="text-white mb-0">Clicks</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black; margin-bottom: 0;">@hits</h3>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-1">
+                    <div class="card bg-c-green order-card mb-1">
+                        <div class="card-body" style="padding:5px 25px !important">
+                            <a>
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="text-white mb-0">Reported</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black; margin-bottom: 0;">@reported</h3>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col p-1">
+                    <div class="card bg-c-purple order-card mb-1">
+                        <div class="card-body" style="padding:5px 25px !important">
+                            <a>
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col">
+                                        <h6 class="text-white mb-0">Prone %</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black; margin-bottom: 0;">@pronePercent %</h3>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <div class="row">
-            <div class="col-xl-6 col-md-6">
+            <div class="col-xl-12 col-md-12 p-1">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header p-2">
                         <h5>Statistics</h5>
                     </div>
                     <div class="card-body">
-                        <div style="width: 100%;">
+                        <div style="width: 100%; height: 210px;
+}">
                             <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
                                    Labels="@BarChart1Labels" IsStacked="false" IsClickable="false" AspectRatio=false>
                             </Chart>
@@ -71,22 +136,15 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-6 col-md-6">
-                <div class="card">
-                    <div class="card-body" style="padding:9px !important">
-                        <div style="width: 100%;">
-                            <DrillDown_Summary Total="total" Hits="hits" Reported="reported" PronePercent="pronePercent" />
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 
-    <div style="overflow: hidden;width: 100vw;max-width: 95vw;margin-left: calc(50% - 48vw);">
+    <div style="overflow: hidden; margin:-10px; margin-top:-35px">
         <GridComponent @ref="_gridComponent" T="CampaignLog" Grid="@_grid"></GridComponent>
     </div>
 </div>
+
 
 
 @code {
@@ -104,37 +162,24 @@
     [Parameter]
     public string Label { get; set; }
 
-    private List<int> Years;
-    public int Year { get; set; } = DateTime.Now.Year;
-
-    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
-    public string[] BarChart1Labels { get; set; }
-
-    static bool filter = true;
-
-
     private List<CampaignLog> CampaignLogs = new List<CampaignLog>();
+
+    private GridComponent<CampaignLog> _gridComponent;
+    private CGrid<CampaignLog> _grid;
+    private Task _task;
+
     private int total;
     private int hits;
     private int reported;
     private decimal pronePercent;
 
-    public string[] GetBackgroundColors(Color color, int arraySize)
-    {
-        var colors = new List<string>();
-        for (var i = 0; i < arraySize; i++)
-            colors.Add(color.Name.ToString().ToLower());
-        return colors.ToArray();
-    }
+    public List<ChartJsDataset> BarChart1Data { get; set; } = new List<ChartJsDataset>();
+    public string[] BarChart1Labels { get; set; }
 
-    private GridComponent<CampaignLog> _gridComponent;
-    private CGrid<CampaignLog> _grid;
-    private Task _task;
-    private GridODataClient<CampaignLog> _client;
+    private List<int> Years;
+    public int Year { get; set; } = DateTime.Now.Year;
+    static bool filter = true;
 
-    private bool _eventHooked = false;
-    private bool _lock = false;
-    private bool _reload = true;
     Action<IGridColumnCollection<CampaignLog>> columns = c =>
     {
         //c.Add(o => o.Id).Titled("LogID").SetWidth("30px").Css("table-bordered");
@@ -144,110 +189,135 @@
         c.Add(o => o.Camp.Detail.CampaignTemplateId).Css("table-bordered").Titled("TempID").Filterable(filter);
         c.Add(o => o.Camp.Category).Css("table-bordered").SetWidth("60px").Titled("Category").Filterable(filter);
         c.Add(o => o.Recipient.Recipient.Email).Css("table-bordered").SetWidth("60px").Titled("Recipient Email").Filterable(filter);
+        c.Add(o => o.Recipient.Recipient.Mobile).Css("table-bordered").SetWidth("60px").Titled("Recipient Mobile").Filterable(filter);
         c.Add(o => o.Recipient.Recipient.Department).Css("table-bordered").SetWidth("60px").Titled("Department").Filterable(filter);
 
         c.Add(o => o.IsHit).Css("table-bordered").Filterable(filter);
         c.Add(o => o.IsReported).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(filter);
-
+        c.Add(o => o.CreatedOn).Css("table-bordered").Format("{0:dd/MM/yyyy hh:mm:ss tt}").Filterable(filter);
     };
+
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if (!firstRender && _lock == false)
+        if (firstRender)
         {
-            List<string> filterIds = new List<string>();
-            if (depart != null || categ != null || TempId > 0)
+            var initialFilterQuery = _grid.Query.GetValueOrDefault("grid-filter");
+            var initialSearchQuery = _grid.Query.GetValueOrDefault("grid-search");
+
+            _gridComponent.FilterChanged += async (sender, args) =>
             {
-                filterIds.Add(id1.ToString()); filterIds.Add(id2.ToString()); filterIds.Add(id3.ToString()); filterIds.Add(id4.ToString()); filterIds.Add(id5.ToString());
-                Filter(filterIds);
-            }
-            else if (Id > 0)
+                //if (_grid.Query.GetValueOrDefault("grid-filter") != initialFilterQuery)
+                //{
+                //    await OnFilterChanged();
+                //}
+                await OnFilterChanged();
+            };
+
+            _gridComponent.SearchChanged += async (sender, args) =>
             {
-                filterIds.Add(Id.ToString());
-                Filter(filterIds);
-            }
-            else
-            {
-                if (_reload) { Filter(filterIds); _reload = false; }
-                _gridComponent.AfterRefreshGrid += AfterRefreshGrid;
-            }
-            _lock = true;
+                //if (_grid.Query.GetValueOrDefault("grid-search") != initialSearchQuery)
+                //{
+                //    await OnFilterChanged();
+                //}
+                await OnFilterChanged();
+            };
+
         }
+
     }
 
-
-    public async void Filter(List<string> filterId)
+    private async Task OnFilterChanged()
     {
-        IEnumerable<CampaignLog> logs;
-
-        logs = await client.GetCampaignLog(filterId);
-        if (depart != null)
-        {
-            logs = logs.Where(o => o.Recipient.Recipient.Department.Equals(depart, StringComparison.InvariantCultureIgnoreCase)).ToList();
-        }
-        else if (categ != null)
-        {
-            logs = logs.Where(o => o.Camp.Category.Equals(categ, StringComparison.InvariantCultureIgnoreCase)).ToList();
-        }
-        else if (TempId > 0)
-        {
-            logs = logs.Where(o => o.Camp.Detail.CampaignTemplateId == TempId).ToList();
-        }
 
 
-        total = logs.Count();
-        hits = logs.Count(o => o.IsHit);
-        reported = logs.Count(o => o.IsReported);
+        if (!_grid.Query.GetValueOrDefault("grid-filter").Any(o => o.Contains("CreatedOn")))
+        {
+            var year = Int32.Parse(Year.ToString());
+            var yearStartDate = new DateTime(year, 1, 1);
+            var start = yearStartDate.Year + "-" + yearStartDate.Month + "-" + yearStartDate.Day;
+            var yearEndDate = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+            var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+
+            var filter = new FilterCollection();
+            filter.Add("GreaterThanOrEquals", start);
+            filter.Add("LessThan", end);
+            IGridColumn column = _gridComponent.Grid.Columns.FirstOrDefault(c => c.FieldName == "CreatedOn");
+            await _gridComponent.AddFilter(column, filter);
+
+        }
+
+        // Get the filtered query from the GridComponent
+        var filteredQuery = _grid.Query;
+
+        total = 0;
+        hits = 0;
+        reported = 0;
+
+        // Create a new GridODataClient with the filtered query and other settings
+        var client = new GridODataClient<CampaignLog>(
+            HttpClient,
+            "Odata/Campaignlog?t=" + authState.TenantIdentifier,
+            filteredQuery,
+            false,
+            "ordersGrid",
+            columns
+        )
+        .ChangePageSize(false) // Disable page size for counting IsHit records
+        .Filterable()
+        .ClearFiltersButton(true)
+        .SetStriped(true)
+        .WithMultipleFilters()
+        .WithGridItemsCount()
+        .Searchable(true, false, false);
+
+        // Retrieve the data for the filtered query
+        await client.UpdateGrid();
+
+        // Get all the records from the filtered query
+        var filteredRecords = client.Grid.Items;
+
+        hits = filteredRecords.Count(record => record.IsHit);
+        reported = filteredRecords.Count(record => record.IsReported);
+        total = filteredRecords.Count();
         if (total > 0)
-            pronePercent = Math.Round(((decimal)hits / total) * 100, 2);
+        {
+            pronePercent = Math.Round((decimal)hits / total * 100, 2);
+        }
+        CampaignLogs = filteredRecords.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
 
+        var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
+        {
+            CampaignId = k,
+            Logs = v,
+        });
 
+        BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
 
+        BarChart1Data.Clear();
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Total",
+                Data = data.Select(o => o.Logs.Count().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.MediumBlue, data.Select(o => o.CampaignId).Count()),
+            });
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Hits",
+                Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightPink, data.Select(o => o.CampaignId).Count()),
+            });
+
+        BarChart1Data.Add(new ChartJsDataset
+            {
+                Label = "Reported",
+                Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightGreen, data.Select(o => o.CampaignId).Count()),
+            });
         StateHasChanged();
     }
-    private async Task AfterRefreshGrid()
-    {
-        List<string> filterId = new List<string>();
-        var grid = _gridComponent.Grid as CGrid<CampaignLog>;
-        // var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values.ElementAt(0);
-        var fdata = _gridComponent.Grid.Settings.FilterSettings.Query.Values;
-        if (fdata.Count > 0)
-        {
-            foreach (var item in fdata.ElementAt(0))
-            {
-                if (item.Contains("CampaignId") && item.Split("__")[1] == "1")
-                {
-                    var a = item.Split("__")[2];
-                    filterId.Add(a);
-                }
-            }
-        }
-        _lock = false;
-
-        if (grid != null)
-        {
-            Calculate(grid);
-            if (grid.Items.ToList().Count() > 0)
-                Filter(filterId);
-            else
-                total = 0; hits = 0; reported = 0; pronePercent = 0; StateHasChanged();
-        }
-
-
-        await Task.CompletedTask;
-    }
-
-    int id1, id2, id3, id4, id5;
-    public void ExtractIds()
-    {
-        id1 = int.Parse(data.Split("a")[0]);
-        id2 = int.Parse(data.Split("a")[1]);
-        id3 = int.Parse(data.Split("a")[2]);
-        id4 = int.Parse(data.Split("a")[3]);
-        id5 = int.Parse(data.Split("a")[4]);
-    }
-
 
     protected override async Task OnParametersSetAsync()
     {
@@ -294,21 +364,29 @@
             var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
             query.Add("grid-filter", new StringValues(values));
         }
+        else
+        {
+            var year = Int32.Parse(Year.ToString());
+            var yearStartDate = new DateTime(year, 1, 1);
+            var start = yearStartDate.Year + "-" + yearStartDate.Month + "-" + yearStartDate.Day;
+            var yearEndDate = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+            var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+            var values = new string[] { $"CreatedOn__7__{start}", "CampaignId__9__2", $"CreatedOn__6__{end}" };
+            query.Add("grid-filter", new StringValues(values));
+        }
 
         try
         {
-            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 50)
-            //.Sortable()
-            .ChangePageSize(true)
-            .ClearFiltersButton(filter)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            .EmptyText("No Data Available!!")
-            .Searchable(true, false, false)
-            .SetExcelExport(true, "Report.xlsx");
-            //.SetTableLayout(TableLayout.Fixed, "1200px", "400px")
-            //.AddButtonComponent<CampaignLog>("test", "Print as PDF", (MarkupString)"<a href='/'><span class='oi oi-print' aria-hidden='false'></span></a>");
+            var client = new GridODataClient<CampaignLog>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+                .ChangePageSize(true)
+                .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                .SetKeyboard(true)
+                .SetExcelExport(true, true, "Reports")
+                .EmptyText("No Data Available!!")
+                .Searchable(true, false, false);
 
 
             _grid = client.Grid;
@@ -321,78 +399,42 @@
 
         await _task.ContinueWith(async (st) =>
         {
-            Calculate(_grid);
+            await OnFilterChanged();
             await Task.CompletedTask;
         });
-
         Years = await client.GetCampaignLogYears();
     }
 
-    private void Calculate(CGrid<CampaignLog> grid)
-    {
-        CampaignLogs = grid?.Items?.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
-        //total = CampaignLogs.Count();
-        //hits = CampaignLogs.Count(o => o.IsHit);
-        //reported = CampaignLogs.Count(o => o.IsReported);
-
-        if (total > 0)
-        {
-            pronePercent = Math.Round((decimal)hits / total * 100, 2);
-        }
-
-        var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
-        {
-            CampaignId = k,
-            Logs = v,
-        });
-
-        BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
-
-        BarChart1Data.Clear();
-
-        BarChart1Data.Add(new ChartJsDataset
-            {
-                Label = "Total",
-                Data = data.Select(o => o.Logs.Count().ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data.Select(o => o.CampaignId).Count()),
-            });
-
-        BarChart1Data.Add(new ChartJsDataset
-            {
-                Label = "Hits",
-                Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data.Select(o => o.CampaignId).Count()),
-            });
-
-        BarChart1Data.Add(new ChartJsDataset
-            {
-                Label = "Reported",
-                Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Select(o => o.CampaignId).Count()),
-            });
-    }
-
-    protected async Task PrintAsPdf()
-    {
-        // Call StateHasChanged() to ensure the chart is fully rendered before generating the PDF
-        StateHasChanged();
-
-        var element = await JSRuntime.InvokeAsync<IJSObjectReference>("eval", "document.getElementById('myContent')");
-
-        // Create a new html2pdf instance
-        var pdf = await JSRuntime.InvokeAsync<IJSObjectReference>("html2pdf", element, new { filename = "PhishSim-Report.pdf" });
-
-        // Download the PDF file
-        var data = await pdf.InvokeAsync<string>("output", "datauristring");
-        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "PhishSim-Report.pdf", data);
-    }
-
-
-    void ChangeYear(ChangeEventArgs e)
+    async void ChangeYear(ChangeEventArgs e)
     {
         Year = Convert.ToInt32(e.Value);
-        //_gridComponent.AddFilter(Column, filters);
-        //_gridComponent.RemoveFilter(Column);
-        //_ref = 1;
+        var yearStartDate = new DateTime(Year, 1, 1);
+        var start = yearStartDate.Year + "-" + yearStartDate.Month.ToString("00") + "-" + yearStartDate.Day.ToString("00");
+        var yearEndDate = new DateTime(Year, 12, 31).AddHours(24).AddSeconds(-1);
+        var end = yearEndDate.Year + "-" + yearEndDate.Month + "-" + yearEndDate.Day;
+
+
+        var filter = new FilterCollection();
+        filter.Add("GreaterThanOrEquals", start);
+        filter.Add("LessThan", end);
+        IGridColumn column = _gridComponent.Grid.Columns.FirstOrDefault(c => c.FieldName == "CreatedOn");
+
+
+        _grid.RemoveAllFilters();
+        _gridComponent.RemoveAllFilters();
+        await _gridComponent.AddFilter(column, filter);
+
     }
+
+    int id1, id2, id3, id4, id5;
+    public void ExtractIds()
+    {
+        id1 = int.Parse(data.Split("a")[0]);
+        id2 = int.Parse(data.Split("a")[1]);
+        id3 = int.Parse(data.Split("a")[2]);
+        id4 = int.Parse(data.Split("a")[3]);
+        id5 = int.Parse(data.Split("a")[4]);
+    }
+
+
 }

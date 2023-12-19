@@ -1,0 +1,41 @@
+﻿@if (Show)
+{
+    <div class="dialog-container" style="width:100%; height:100vh; z-index: 9999;">
+        <div class="dialog align-items-center">
+
+            <div class="card" style="min-width:400px; max-width:400px">
+
+                <div class="card-header bg-secondary" style="padding: 8px !important; display: flex; align-items: center;">
+                    <h5 style="margin: 0;">@Title</h5>
+                    <a @onclick="Close" title="Close" style="cursor: pointer; margin-left: auto; color: white;">
+                        <i class="fa fa-times-circle fa-lg" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <div class="card-body pb-0">
+                    <div class="row">
+                        <div>
+                            @ChildContent
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public EventCallback<bool> ClosePageDialog { get; set; }
+
+    private async Task Close()
+    {
+        await ClosePageDialog.InvokeAsync(false);
+    }
+
+}

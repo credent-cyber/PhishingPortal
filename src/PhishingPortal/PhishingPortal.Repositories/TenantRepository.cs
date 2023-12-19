@@ -173,7 +173,7 @@ namespace PhishingPortal.Repositories
 
             if (hasChanges)
                 TenantDbCtx.SaveChanges();
-               
+
             else
             {
                 throw new InvalidOperationException("No changes");
@@ -968,34 +968,6 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query)
-        {
-            var result = Enumerable.Empty<CampaignLog>();
-            var results = Enumerable.Empty<CampaignLog>();
-            var data = query.ToList();
-            var logdata = TenantDbCtx.CampaignLogs.Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
-            if (data.Count > 0)
-            {
-                for (int i = 0; i < data.Count; i++)
-                {
-                    var id = Convert.ToInt16(data[i]);
-                    if (i == 0)
-                    {
-                        results = logdata.Where(o => o.CampaignId == id);
-                    }
-                    else
-                    {
-                        result = logdata.Where(o => o.CampaignId == id);
-                        results = results.Concat(result);
-                    }
-                }
-            }
-            else
-                results = TenantDbCtx.CampaignLogs;
-
-            return Task.FromResult(results);
-        }
-
         public async Task<Training> UpsertTraining(Training training)
         {
             try
@@ -1138,7 +1110,7 @@ namespace PhishingPortal.Repositories
             try
             {
                 var Traininglogs = TenantDbCtx.TrainingLog
-                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+                 .Where(i => i.SentOn >= start && i.SentOn < end);
 
                 #region
                 //var trainingGroup = Trainings.ToList().GroupBy(i => i.TrainingID, (key, entries) => new
@@ -1169,7 +1141,7 @@ namespace PhishingPortal.Repositories
                 #endregion
 
 
-                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.CreatedOn.Month, (key, entries) => new
+                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.SentOn.Month, (key, entries) => new
                 {
                     Month = (Months)key,
                     TotalTraining = entries.Count(),
@@ -1286,7 +1258,7 @@ namespace PhishingPortal.Repositories
 
                 if (campaignIdsToAdd.Any())
                 {
-                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCompaignMapping
+                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCampaignMapping
                     {
                         TrainingId = trainingId,
                         CampaignId = c
@@ -1300,7 +1272,77 @@ namespace PhishingPortal.Repositories
             return true;
         }
 
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int id)
+        public async Task<bool> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            var trainingId = campaignTrainingIdcs.TrainingId;
+            var campaignId = campaignTrainingIdcs.CampaignId;
+            int oldTrainingId = 0;
+
+            var existingMapping = await TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.CampaignId == campaignId)
+               .FirstOrDefaultAsync();
+
+            if (existingMapping != null)
+            {
+                oldTrainingId = existingMapping.TrainingId;
+                existingMapping.TrainingId = (int)trainingId;
+                await TenantDbCtx.SaveChangesAsync();
+                //TenantDbCtx.Remove(existingMapping);
+            }
+            else
+            {
+                var newMapping = new TrainingCampaignMapping
+                {
+                    TrainingId = trainingId.Value,
+                    CampaignId = campaignId
+                };
+
+                TenantDbCtx.Add(newMapping);
+                await TenantDbCtx.SaveChangesAsync();
+            }
+            
+            var UpdateNewTrainingData = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
+            if (UpdateNewTrainingData != null)
+            {
+                UpdateNewTrainingData.TrainingTrigger = true;
+                //await TenantDbCtx.SaveChangesAsync();
+
+                var UpdateOldTrainingData = TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.TrainingId == oldTrainingId)
+               .ToList();
+                if (UpdateOldTrainingData.Count == 0)
+                {
+                    var Check = TenantDbCtx.Training.Where(o => o.Id == oldTrainingId).FirstOrDefault();
+                    if (Check != null)
+                    {
+                        Check.TrainingTrigger = false;
+                    }
+                }
+                await TenantDbCtx.SaveChangesAsync();
+            }
+            return true;
+        }
+
+
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
+        {
+            try
+            {
+                var result = await TenantDbCtx.TrainingCampaignMapping
+                    .Where(o => o.CampaignId == id)
+                    .FirstOrDefaultAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"Error in GetTrainingByCampaignId for id: {id}");
+                throw; // Rethrow the exception to propagate it
+            }
+        }
+
+
+
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int id)
         {
             var compaignIds = TenantDbCtx.TrainingCampaignMapping.Where(o => o.TrainingId == id);
             return compaignIds.ToList();
@@ -1329,43 +1371,46 @@ namespace PhishingPortal.Repositories
 
         public async Task<List<Training>> GetAllTraining()
         {
+
             int currentYear = DateTime.Now.Year;
             int previousYear = currentYear - 1;
             var result = Enumerable.Empty<Training>();
             //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
             result = TenantDbCtx.Training.OrderByDescending(o => o.Id).ToList();
             return (List<Training>)result;
+
+            //return TenantDbCtx.Training.ToList();
         }
 
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> dtos)
         {
             if (dtos == null || !dtos.Any())
             {
                 throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
             }
             var results = dtos;
-
-            var existingQuestions = TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
-              .Where(tq => tq.TrainingId == dtos.First().TrainingId).ToList();
+            var existingQuestions = TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
+              .Where(tq => tq.TrainingQuizId == dtos.First().TrainingQuizId).ToList();
             foreach (var existingQuestion in existingQuestions)
             {
                 if (!dtos.Any(dto => dto.Id == existingQuestion.Id))
                 {
-                    TenantDbCtx.TrainingQuiz.Remove(existingQuestion);
+                    TenantDbCtx.TrainingQuizQuestion.Remove(existingQuestion);
                 }
             }
             foreach (var dto in dtos)
             {
                 if (dto.Id > 0)
                 {
-                    var existingQuiz = await TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+                    var existingQuiz = await TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
                                             .FirstOrDefaultAsync(tq => tq.Id == dto.Id);
                     if (existingQuiz == null)
                     {
                         throw new ArgumentException($"No TrainingQuiz found with ID {dto.Id}", nameof(dtos));
                     }
 
-                    existingQuiz.TrainingId = dto.TrainingId;
+                    existingQuiz.TrainingQuizId = dto.TrainingQuizId;
+                    existingQuiz.Question = dto.Question;
                     existingQuiz.AnswerType = dto.AnswerType;
                     existingQuiz.OrderNumber = dto.OrderNumber;
                     existingQuiz.Weightage = dto.Weightage;
@@ -1387,7 +1432,7 @@ namespace PhishingPortal.Repositories
                         {
                             var newAnswer = new TrainingQuizAnswer
                             {
-                                TrainingQuizId = existingQuiz.Id,
+                                TrainingQuizQuestionId = existingQuiz.Id,
                                 AnswerText = answerDto.AnswerText,
                                 OrderNumber = answerDto.OrderNumber,
                                 IsCorrect = answerDto.IsCorrect
@@ -1404,23 +1449,23 @@ namespace PhishingPortal.Repositories
                 }
                 else
                 {
-                    var newQuiz = new TrainingQuiz
+                    var newQuiz = new TrainingQuizQuestion
                     {
-                        TrainingId = dto.TrainingId,
+                        TrainingQuizId = dto.TrainingQuizId,
                         Question = dto.Question,
                         AnswerType = dto.AnswerType,
                         OrderNumber = dto.OrderNumber,
                         Weightage = dto.Weightage,
                         IsActive = dto.IsActive
                     };
-                    TenantDbCtx.TrainingQuiz.Add(newQuiz);
+                    TenantDbCtx.TrainingQuizQuestion.Add(newQuiz);
                     await TenantDbCtx.SaveChangesAsync();
 
                     foreach (var answerDto in dto.TrainingQuizAnswer)
                     {
                         var newAnswer = new TrainingQuizAnswer
                         {
-                            TrainingQuizId = newQuiz.Id,
+                            TrainingQuizQuestionId = newQuiz.Id,
                             AnswerText = answerDto.AnswerText,
                             OrderNumber = answerDto.OrderNumber,
                             IsCorrect = answerDto.IsCorrect
@@ -1442,21 +1487,59 @@ namespace PhishingPortal.Repositories
         }
 
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuiz> result = null;
+            TrainingQuizResult result;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+            var quiz = TenantDbCtx.TrainingQuiz.FirstOrDefault(i => i.Id == id);
+            var questions = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            result = new TrainingQuizResult
+            {
+                Quiz = quiz,
+                Questions = questions
+            };
 
             return result;
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetQuizByTrainingId(int trainingId)
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetQuizByTrainingId(int trainingId)
         {
-            return TenantDbCtx.TrainingQuiz.Where(o => o.TrainingId == trainingId && o.IsActive)
+            return TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == trainingId && o.IsActive)
                 .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
         }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
+        {
+            List<TrainingQuiz> result = null;
+
+            if (data.Count() == 0)
+                return result;
+
+            foreach (TrainingQuiz tq in data)
+            {
+                var existing = await TenantDbCtx.TrainingQuiz.FirstOrDefaultAsync(c => c.Name.ToUpper() == tq.Name.ToUpper());
+                if (existing != null)
+                {
+                    continue;
+                }
+                TenantDbCtx.TrainingQuiz.Add(tq);
+            }
+            TenantDbCtx.SaveChanges();
+
+            return data;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
+        {
+            IEnumerable<TrainingQuiz> result = null;
+
+            result = TenantDbCtx.TrainingQuiz.ToList();
+            return result;
+        }
+
+
     }
 }
