@@ -13,7 +13,7 @@
 @inject ILogger<Detail> logger
 @inject AuthenticationStateProvider authState
 
-<h4 class="align-items-center text-secondary">Training Details</h4>
+<h5 class="align-items-center text-secondary">Training Details</h5>
 
 @if (!string.IsNullOrEmpty(errorMessage_))
 {
@@ -38,7 +38,7 @@
             </div>
             <div class="col-4 text-center">
                 <label class="bold-font">% Completed: </label>
-                <label>@trainingLog_.PercentCompleted</label>
+                <label>@trainingLog_.PercentCompleted.ToString("F2")</label>
             </div>
             <div class="col-4 text-right">
                 @if (trainingLog_.PercentCompleted < 100)
