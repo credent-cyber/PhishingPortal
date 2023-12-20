@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Tracing;
@@ -22,11 +23,7 @@ namespace PhishingPortal.Dto
         public DateTime SentOn { get; set; }
         public string UniqueID { get; set; }
         public int? CampaignLogID { get; set; }
-
-        //[NotMapped]
         public string RecipientName { get; set; }
-
-        //[NotMapped]
         public string TrainingName { get; set; }
     }
 }

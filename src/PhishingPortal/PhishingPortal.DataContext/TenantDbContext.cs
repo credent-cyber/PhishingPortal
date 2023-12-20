@@ -39,9 +39,13 @@ namespace PhishingPortal.DataContext
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<RecipientGroupMapping>().HasKey(o => new { o.GroupId, o.RecipientId });
+            modelBuilder.Entity<TrainingLog>().Ignore(o => o.TrainingName);
+            modelBuilder.Entity<TrainingLog>().Ignore(o => o.RecipientName);
+
+            base.OnModelCreating(modelBuilder);
+
 
         }
 
