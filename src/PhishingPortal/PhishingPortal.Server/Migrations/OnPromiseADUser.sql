@@ -1,0 +1,4 @@
+﻿use `t-20220619003439`;
+
+ALTER TABLE recipients
+ADD COLUMN IsOnPromiseADUser TINYINT(1) DEFAULT 0;

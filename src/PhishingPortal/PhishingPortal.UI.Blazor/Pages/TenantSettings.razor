@@ -3,6 +3,7 @@
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.UI.Blazor.Models
+@using PhishingPortal.UI.Blazor.Pages.Trainings
 
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
@@ -26,8 +27,17 @@
 
             <AzureAppConfigurations />
 
+            <OnPromiseADConfigurations/>
+
             <TenantRedirecUrls />
 
         </div>
     </div>
 </div>
+
+ @* @code{
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await client.GetAllOnPremiseADGroups();
+    }
+ } *@

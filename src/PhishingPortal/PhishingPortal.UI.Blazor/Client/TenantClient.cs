@@ -982,5 +982,31 @@ namespace PhishingPortal.UI.Blazor.Client
                 return (false, ex.Message);
             }
         }
+
+        #region #OnPremise AD
+        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAllOnPremiseADGroups()
+        {
+            Dictionary<string, List<OnPremiseADUsers>> data = new();
+
+            try
+            {
+                var res = await HttpClient.GetAsync("api/Tenant/GetOnPremiseADGroups");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<Dictionary<string, List<OnPremiseADUsers>>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+        #endregion
+
+
     }
 }

@@ -14,6 +14,7 @@ namespace PhishingPortal.Server.Controllers.Api
     using Microsoft.AspNetCore.Mvc;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
+    using System.DirectoryServices.AccountManagement;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -25,6 +26,7 @@ namespace PhishingPortal.Server.Controllers.Api
         readonly string _templateImageRootPath;
         readonly IAzActDirClientService _adImportClient;
         readonly ITrainingRepository TrainingRepository;
+        readonly IOnPremiseADService _onPromiseADService;
 
         public INsLookupHelper NsLookupHelper { get; }
 
@@ -39,6 +41,7 @@ namespace PhishingPortal.Server.Controllers.Api
             _adImportClient = new AzActDirClientService(logger, _tenantRepository);
             TrainingRepository = new TrainingRepository(logger, TenantDbCtx);
             NsLookupHelper = nsLookupHelper;
+            _onPromiseADService = new OnPremiseADService(logger, TenantDbCtx);
         }
 
         [HttpGet]
@@ -285,7 +288,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 var data = await _tenantRepository.GetCategoryWisePhishingReport(startDate, endDate);
                 result.Result = data;
                 result.IsSuccess = true;
-                result.Message = String.Empty;
+                result.Message = string.Empty;
             }
             catch (Exception ex)
             {
@@ -814,5 +817,21 @@ namespace PhishingPortal.Server.Controllers.Api
                 return new ApiResponse<bool> { Message = ex.Message };
             }
         }
+
+        #region OnPromiseAD
+        [HttpGet]
+        [Route("GetOnPremiseADGroups")]
+        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAlGetOnPremiseADGroupslADGroups()
+        {
+          return await _onPromiseADService.GetOnPremiseADGroups();
+        }
+
+        [HttpPost]
+        [Route("GetOnPremiseUsersByADGroup")]
+        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup(string groupName)
+        {
+            return await _onPromiseADService.GetOnPremiseUsersByADGroup(groupName);
+        }
+        #endregion
     }
 }
