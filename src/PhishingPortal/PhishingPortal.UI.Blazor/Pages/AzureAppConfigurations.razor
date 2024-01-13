@@ -5,39 +5,55 @@
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 
-<div class="row">
-    <div class="card-body p-2 mt-n3">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Azure App Configurations</h5>
-                    <div class="col-auto" style=" width:200px; text-align:center; line-height:0px; float:right; margin-top: -2px;">
-                        <UiAlerts Model="alert"></UiAlerts>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                </div>
-                <div class="card-body">
-                    <EditForm Model="model" OnValidSubmit="OnSave">
-                        <div class="form-row align-items-center">
-                            <div class="form-group col-md-3">
-                                <label for="cid">Client ID</label>
-                                <InputText @bind-Value="@model.ClientID" id="ClientID" class="form-control"></InputText>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="key">Client Secret</label>
-                                <InputText  @bind-Value="@model.ClientSecret" id="Clientkey" class="form-control"></InputText>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="tid">Tenant ID</label>
-                                <InputText @bind-Value="@model.TenantID" id="TenantID" class="form-control"></InputText>
-                            </div>
-                            <div class="col-auto" style="margin-top:12px">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </div>
-                    </EditForm>
-                </div>
+<div class="row m-1">
+
+    @* <UiAlerts Model="alert"></UiAlerts> *@
+    <EditForm Model="model" OnValidSubmit="OnSave">
+        <DataAnnotationsValidator />
+        <div class="form-group row mt-1">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Client ID</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.ClientID" id="ClientID" class="form-control"></InputText>
+                <ValidationMessage For="() => model.ClientID" />
             </div>
-    </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Client Secret</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.ClientSecret" id="Clientkey" class="form-control"></InputText>
+                <ValidationMessage For="() => model.ClientSecret" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;" for="cid">Tenant ID</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.TenantID" id="TenantID" class="form-control"></InputText>
+                <ValidationMessage For="() => model.TenantID" />
+            </div>
+        </div>
+        <hr/>
+        <div class="mt-4" style="text-align:left;">
+            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+        </div>
+    </EditForm>
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+
+    </Dailog>
 </div>
 
 
@@ -47,6 +63,13 @@
     protected AlertModel? alert { get; set; }
     private Timer _timer;
     private int _delay = 1500;
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+
+    private bool show = false;
+    string MessageBody = "Thank you!";
 
     private AzureRegistrationSettings model = new AzureRegistrationSettings();
 
@@ -71,11 +94,20 @@
 
     public async void OnSave()
     {
+
         if (model != null)
         {
-            alert?.Clear();
+            message = string.Empty;
+            MessageBody = "Thank you!";
+            IsError = false;
+            IsSuccess = false;
+            show = true;
+            TaskCompleted = false;
+
+            //alert?.Clear();
             try
             {
+                message = "Please wait";
                 if (model.ClientSecret == SecretMask)
                 {
                     model.ClientSecret = secret;
@@ -88,15 +120,22 @@
                 secret = model.ClientSecret;
                 model.ClientSecret = SecretMask;
 
-                alert?.SetSuccess("saved!");
+                //alert?.SetSuccess("saved!");
+                message = "Saved!";
+                TaskCompleted = true;
                 StateHasChanged();
             }
             catch (Exception ex)
             {
-                alert?.SetError("Error while saving!");
+                //alert?.SetError("Error while saving!");
+
                 logger.LogError(ex, ex.Message);
+                IsError = true;
+                message = "Error!";
+                MessageBody = ex.Message;
+                TaskCompleted = true;
             }
-            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+            // _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         }
     }
 
@@ -107,5 +146,8 @@
         StateHasChanged();
 
     }
-
+    private void ResetForm()
+    {
+        show = false;       
+    }
 }
