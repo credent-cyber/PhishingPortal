@@ -24,8 +24,8 @@ namespace PhishingPortal.Services.OnPremiseAD.Helper
                 _useSqlLite = config.GetValue<bool>("UseSqlLite");
                 _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
 
-                logger.LogInformation($"UserSqlLite : {_useSqlLite}");
-                logger.LogInformation($"SqlLiteDbpath  : {_sqlLiteDbPath}");
+                //logger.LogInformation($"UserSqlLite : {_useSqlLite}");
+                //logger.LogInformation($"SqlLiteDbpath  : {_sqlLiteDbPath}");
             }
 
             _logger = logger;

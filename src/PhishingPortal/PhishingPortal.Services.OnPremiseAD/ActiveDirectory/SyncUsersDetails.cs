@@ -94,7 +94,10 @@ namespace PhishingPortal.Services.OnPremiseAD.ActiveDirectory
                             }
                           
                         }
-                      
+                    else
+                    {
+                        Logger.LogInformation($"\nAactive Directory Configuration not found for Tenant {Tenant.UniqueId}.\n");
+                    }
                     
 
                 }
@@ -133,7 +136,7 @@ namespace PhishingPortal.Services.OnPremiseAD.ActiveDirectory
             existingUser.Department = GetPropertyValue(result, "department");
             existingUser.Branch = GetPropertyValue(result, "branch");
 
-            Logger.LogInformation($"Updated user {existingUser.Email} from AD on {DateTime.Now}");
+            Logger.LogInformation($"Updated user {existingUser.Email} from AD on {DateTime.Now} Tenant_UID - {Tenant.UniqueId}");
         }
 
 
