@@ -3,31 +3,106 @@
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 @using PhishingPortal.UI.Blazor.Models
-
+@inject IJSRuntime JSRuntime
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 @inject CustomStateProvider authStateProvider
 @attribute [Authorize(Roles = "tenantadmin")]
 
+
+
 <div class="row">
-    <div class="card">
-        <div class="card-header" style="padding:5px 0px 0px;">
-            <h5 style="color:coral; margin-top: 15px;">Settings <i class="fa fa-cog" aria-hidden="true"></i></h5>
-            <div style="float:right">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-                    <li class="breadcrumb-item active">Settings</li>
-                </ol>
+    <div class="card p-0">
+
+        <div class="setting_sidebar close">
+            <div class="logo-details">
+                <img src="/img/icons/settting.png" style="margin-left: 15px;margin-right: 10px;" height="40" alt="Icon">
+                <span class="logo_name">Settings</span>
             </div>
+
+            <ul class="nav-links p-0">
+                <hr />
+                <li>
+                    <a @onclick='()=> { block = 1; heading = "Azure App Configurations"; }'>
+                        <img src="/img/icons/azure.png" style="margin:5px 5px 5px 15px" height="30" alt="Icon" title="Azure App Configurations">
+                        <span class="link_name">Azure App Configurations</span>
+                    </a>
+                </li>
+                <hr />
+                <li>
+                    <div class="iocn-link">
+                        <a @onclick='()=> { block = 2; heading = "OnPremise AD Configurations"; }'>
+                            <img src="/img/icons/AppCircles-AD.png" style="margin:5px 5px 5px 15px" height="30" alt="Icon" title="OnPremise AD Configurations">
+                            <span class="link_name">OnPremise AD Configurations</span>
+                        </a>
+                    </div>
+                </li>
+                <hr />
+                <li>
+                    <div class="iocn-link">
+                        <a @onclick='()=> { block = 3; heading = "Domain Configurations"; }'>
+                            <img src="/img/icons/domain.png" style="margin:5px 5px 5px 15px" height="30" alt="Icon" title="Domain Configurations">
+                            <span class="link_name">Domain Configurations</span>
+                        </a>
+                    </div>
+                </li>
+                <hr />
+                <li>
+                    <div class="iocn-link">
+                        <a @onclick='()=> { block = 4; heading = "Return Url Configurations"; }'>
+                            <img src="/img/icons/url.png" style="margin:5px 5px 5px 15px" height="30" alt="Icon" title="Return Url Configurations">
+                            <span class="link_name">Return Url Configurations</span>
+                        </a>
+                    </div>
+                </li>
+                <hr />
+            </ul>
         </div>
-
-
-        <div class="card-body p-2">
-
-            <AzureAppConfigurations />
-
-            <TenantRedirecUrls />
-
-        </div>
+        <section class="home-section">
+            <div class="home-content">
+                <a class="bx bx-menu" @onclick="ToggleMenu" />
+                <span class="text">@heading</span>
+            </div>
+            <div style="padding:10px; margin:5px;">
+                @if (block == 1)
+                {
+                    <AzureAppConfigurations />
+                }
+                @if (block == 2)
+                {
+                   
+                }
+                @if (block == 3)
+                {
+                    <TenantDomains/>
+                }
+                @if (block == 4)
+                {
+                    <TenantRedirecUrls />
+                }
+            </div>
+        </section>
+      
     </div>
 </div>
+
+@code {
+
+    int block = 1;
+    string heading = "Azure App Configurations";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+       //await JSRuntime.InvokeAsync<IJSObjectReference>("import", "/scripts/settingPage.js");
+
+    }
+
+    private async Task ToggleMenu()
+    {
+        await JSRuntime.InvokeVoidAsync("menu");
+      
+    }
+
+}
