@@ -7,56 +7,58 @@
 @using System.Threading;
 @attribute [Authorize]
 
-<div class="row">
+<div class="row m-1">
 
-    <div class="card-body p-2 mt-n3">
-        <div class="card">
-            <div class="card-header">
-                <h5>Add New Return Url</h5>
-                <div class="col-auto" style=" width:300px; text-align:center; line-height:0px; float:right; margin-top: -2px;">
-                    <UiAlerts Model="alert"></UiAlerts>
-                </div>
-                <div class="dropdown-divider"></div>
+    <EditForm Model="_nUri" OnValidSubmit="@Add">
+        <div class="form-row align-items-center">
+            <div class="form-group col-md-3">
+                <InputText name="redirecUrl" class="form-control" @bind-Value="_nUri" placeholder="https://website.com"></InputText>
             </div>
-            <div class="card-body">
-                <EditForm Model="_nUri" OnValidSubmit="@Add">
-                    <div class="form-row align-items-center">
-                        <div class="form-group col-md-3">
-                            <InputText name="redirecUrl" class="form-control" @bind-Value="_nUri" placeholder="https://website.com"></InputText>
-                        </div>
-                        <div class="form-group col-md-3" style="margin-top:0px">
-                            <button type="submit" class="btn btn-primary">Add</button>
-                        </div>
-                    </div>
-                </EditForm>
-
-                <div class="table-responsive">
-                    <table id="redirect-urls" class="table table-striped table-bordered">
-                        <thead>
-                            <tr role="row">
-                                <th>External Website Link</th>
-                                <th>&nbsp;</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var url in urls)
-                            {
-                                <tr role="row" class="odd">
-                                    <td>@url</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm" @onclick="()=> Delete(url)"><i class="fa fa-remove"></i></button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+            <div class="form-group col-md-3" style="margin-top:0px">
+                <button type="submit" class="btn btn-primary">Add</button>
             </div>
         </div>
+    </EditForm>
 
-
+    <div class="table-responsive" style="overflow:auto; max-height:60vh">
+        <table id="redirect-urls" class="table table-striped table-bordered">
+            <thead>
+                <tr role="row">
+                    <th>External Website Link</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var url in urls)
+                {
+                    <tr role="row" class="odd">
+                        <td>@url</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" @onclick="()=> Delete(url)"><i class="fa fa-remove"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
 
+    </Dailog>
 
 </div>
 
@@ -75,15 +77,21 @@
     private Timer _timer;
     private int _delay = 1500;
 
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+
+    private bool show = false;
+    string MessageBody = "Thank you!";
+    private string message = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            alert?.Clear();
             var settings = await TenantApi.GetSettings();
             if (settings.ContainsKey("return_urls"))
-            {               
+            {
                 var json = settings[Constants.Keys.RETURN_URL_COLLECTION];
                 var jsonSettings = JsonConvert.DeserializeObject<Settings>(json) ?? null;
 
@@ -94,57 +102,77 @@
         catch (Exception ex)
         {
             Logger.LogCritical(ex, ex.Message);
-            alert?.SetError("Error while loading, please try again");
         }
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 
     protected async void Delete(string item)
     {
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        TaskCompleted = false;
+        show = true;      
         var index = urls.IndexOf(item);
         if (index >= 0 && index <= urls.Count() - 1)
         {
             urls.RemoveAt(index);
             try
             {
-                var result = await TrySave();
-
+                var result = await TrySave();             
                 if (!result)
                 {
                     urls.Insert(index, item);
                 }
+                message = "Successfully Deleted!";
+                TaskCompleted = true;
+                StateHasChanged();
                 return;
 
             }
             catch (Exception ex)
             {
+                
                 var msg = "Error while deleting entry";
                 Logger.LogError(ex, msg);
-                alert?.SetError(msg);
+                IsError = true;
+                message = "Error!";
+                MessageBody = msg;
+                TaskCompleted = true;
             }
-            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+            
         }
     }
 
 
     protected async Task Add()
     {
-        alert?.Clear();
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
         bool isUri = Uri.TryCreate(_nUri, UriKind.Absolute, out Uri? uriResult) && (uriResult?.Scheme == Uri.UriSchemeHttp || uriResult?.Scheme == Uri.UriSchemeHttps);
 
         if (!isUri)
         {
-            alert?.SetError("Invalid URL format");
-            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+            IsError = true;
+            message = "Error!";
+            MessageBody = "Invalid URL format";
+            TaskCompleted = true;
             return;
         }
 
         if (!urls.Select(o => o.ToLower()).Contains(_nUri.ToLower()))
         {
             if (string.IsNullOrWhiteSpace(_nUri))
-            {
-                alert?.SetError("URL can't be empty!");
-                _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+            {              
+                IsError = true;
+                message = "Error!";
+                MessageBody = "URL can't be empty!";
+                TaskCompleted = true;
                 return;
             }
             urls.Add(_nUri);
@@ -152,26 +180,38 @@
             if (saved)
             {
                 _nUri = string.Empty;
-                alert?.SetSuccess("Successfully Saved!");
+                message = "Saved!";
+                TaskCompleted = true;
             }
             else
             {
-                alert?.SetError("Error while saving");
+                IsError = true;
+                message = "Error!";
+                MessageBody = "Error while saving";
+                TaskCompleted = true;
             }
 
         }
         else
         {
-            alert?.SetError("Website link already exists!!");
+            IsError = true;
+            message = "Error!";
+            MessageBody = "Website link already exists!!";
+            TaskCompleted = true;
         }
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 
 
 
     private async Task<bool> TrySave()
     {
-        alert?.Clear();
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
         var settings = new Settings { ReturnUrls = urls.ToArray() };
 
         var json = JsonConvert.SerializeObject(settings);
@@ -185,12 +225,14 @@
         catch (Exception ex)
         {
             Logger.LogError(ex, ex.Message);
-            alert?.SetError("Error while updating, please try again");
-            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+           
+            IsError = true;
+            message = "Error!";
+            MessageBody = "Error while updating, please try again";
+            TaskCompleted = true;
             return false;
         }
 
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         return true;
     }
     private void TimerCallback(Object o)
@@ -202,9 +244,9 @@
     }
 
 
-
-
-
-
+    private void ResetForm()
+    {
+        show = false;
+    }
 
 }
