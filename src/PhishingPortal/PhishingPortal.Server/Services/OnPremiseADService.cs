@@ -29,9 +29,9 @@ namespace PhishingPortal.Server.Services
         public TenantDbContext TenantDbCtx { get; }
         public ITenantRepository _tenantRepository { get; }
 
-        public string Domain="192.168.1.210";
-        public string Username= "administrator";
-        public string Password= "Pass@123";
+        //public string Domain="192.168.1.210";
+        //public string Username= "administrator";
+        //public string Password= "Pass@123";
 
         public OnPremiseADService(ILogger logger, TenantDbContext dbContext, ISettingsRepository settingsRepository,ITenantRepository tenantRepository)
         {
@@ -69,7 +69,7 @@ namespace PhishingPortal.Server.Services
                 username = UsernameResult?.Value;
                 password = PasswordResult?.Value;
             }
-            if (!string.IsNullOrEmpty(domain) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(domain) && string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
             {
                 return groupsWithMembers;
             }
@@ -89,6 +89,7 @@ namespace PhishingPortal.Server.Services
                     string groupName = PrintPropertyValues(groupResult, "sAMAccountName");
                     // Get group members with user details
                     List<OnPremiseADUsers> members = GetGroupMembersWithDetails(groupResult);
+                    
                     groupsWithMembers.Add(groupName, members);
                     
                 }
@@ -115,7 +116,8 @@ namespace PhishingPortal.Server.Services
             {
                 DirectoryEntry memberEntry = new DirectoryEntry(member);
                 OnPremiseADUsers userDetails = GetUserDetails(memberEntry);
-                members.Add(userDetails);
+                if(userDetails.Email != null)
+                    members.Add(userDetails);
             }
 
             return members;
@@ -184,7 +186,7 @@ namespace PhishingPortal.Server.Services
                 username = UsernameResult?.Value;
                 password = PasswordResult?.Value;
             }
-            if (!string.IsNullOrEmpty(domain) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(domain) && string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
             {
                 return users;
             }

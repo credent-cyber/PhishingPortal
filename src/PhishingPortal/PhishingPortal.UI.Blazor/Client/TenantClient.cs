@@ -1005,6 +1005,27 @@ namespace PhishingPortal.UI.Blazor.Client
             return data;
         }
 
+        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup(string groupName)
+        {
+            List<OnPremiseADUsers> data = new();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync("api/Tenant/GetOnPremiseUsersByADGroup", groupName);
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<List<OnPremiseADUsers>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
         #endregion
 
 

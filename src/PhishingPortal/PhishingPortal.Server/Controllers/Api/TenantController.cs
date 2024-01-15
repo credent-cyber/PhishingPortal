@@ -14,7 +14,7 @@ namespace PhishingPortal.Server.Controllers.Api
     using Microsoft.AspNetCore.Mvc;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
-    using System.DirectoryServices.AccountManagement;
+ 
 
     [Route("api/[controller]")]
     [ApiController]
@@ -821,14 +821,14 @@ namespace PhishingPortal.Server.Controllers.Api
         #region OnPromiseAD
         [HttpGet]
         [Route("GetOnPremiseADGroups")]
-        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAlGetOnPremiseADGroupslADGroups()
+        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetOnPremiseADGroups()
         {
           return await _onPromiseADService.GetOnPremiseADGroups();
         }
 
         [HttpPost]
         [Route("GetOnPremiseUsersByADGroup")]
-        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup(string groupName)
+        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup([FromBody] string groupName)
         {
             return await _onPromiseADService.GetOnPremiseUsersByADGroup(groupName);
         }
