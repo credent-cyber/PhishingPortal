@@ -292,4 +292,6 @@
         display: none;
     }
 }
-
+.close {
+    opacity:0.8;
+}
