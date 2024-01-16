@@ -11,7 +11,7 @@
 
     <EditForm Model="_nUri" OnValidSubmit="@Add">
         <div class="form-row align-items-center">
-            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Add Retrun Url</label>
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;margin-top: -10px;">Add Retrun Url</label>
             <div class="form-group col-md-3">
                 <InputText name="redirecUrl" class="form-control" @bind-Value="_nUri" placeholder="https://website.com"></InputText>
             </div>
@@ -26,7 +26,7 @@
             <thead>
                 <tr role="row">
                     <th>External Website Link</th>
-                    <th>&nbsp;</th>
+                    <th>&nbsp;Remove</th>
                 </tr>
             </thead>
             <tbody>
@@ -125,7 +125,7 @@
                 {
                     urls.Insert(index, item);
                 }
-                message = "Successfully Deleted!";
+                message = "Successfully Removed!";
                 TaskCompleted = true;
                 StateHasChanged();
                 return;

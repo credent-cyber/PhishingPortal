@@ -67,23 +67,8 @@
     <!-- Summernote Editor -->
     <script src="./_content/BlazingComponents.Summernote/summernote/jquery-3.4.1.slim.min.js"></script>
     <script src="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.js"></script>
-    <!--<script src="~/scripts/settingPage.js"></script>-->
-    <script>
-        function menu() {
-            let arrow = document.querySelectorAll(".arrow");
-            for (var i = 0; i < arrow.length; i++) {
-                arrow[i].addEventListener("click", (e) => {
-                    let arrowParent = e.target.parentElement.parentElement;
-                });
-            }
-            let sidebar = document.querySelector(".setting_sidebar");
-            let sidebarBtn = document.querySelector(".bx-menu");
-            console.log(sidebarBtn);
-            sidebarBtn.addEventListener("click", () => {
-                sidebar.classList.toggle("close");
-            });
-        }
-    </script>
+    <script src="scripts/settingPage.js"></script>
+  
 </body>
 
 </html>
