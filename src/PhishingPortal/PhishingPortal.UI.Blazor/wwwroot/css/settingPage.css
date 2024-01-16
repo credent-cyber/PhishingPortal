@@ -1,16 +1,16 @@
 ﻿
 .setting_sidebar {
-    position: fixed;
-    height: 86vh;
+    /*height: 78vh;*/
     width: 230px;
     background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);
     transition: all 0.3s ease;
-    left: 12px;
+    /*margin-left: 12px;*/
+    margin: 0;
 }
 
     .setting_sidebar.close {
         width: 70px;
-        left:12px;
+        margin: 0;
     }
 
     .setting_sidebar .logo-details {
@@ -232,17 +232,14 @@
 }
 
 .home-section {
-    position: fixed;
+    flex: 1;
+    /*height: 78vh;*/
     background: #E4E9F7;
-    height: 86vh;
-    left: 238px;
-    width: calc(100% - 250px);
     transition: all 0.3s ease;
 }
 
 .setting_sidebar.close ~ .home-section {
-    left: 82px;
-    width: calc(100% - 94px);
+
 }
 
 .home-section .home-content {
@@ -276,3 +273,11 @@
 .close {
     opacity:0.8;
 }
+.containerClass {
+    display: flex;  
+    margin: 0;
+    padding: 0;
+    height:100%;
+    overflow:hidden
+}
+
