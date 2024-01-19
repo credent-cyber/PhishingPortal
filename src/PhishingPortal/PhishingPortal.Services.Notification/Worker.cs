@@ -116,62 +116,64 @@ namespace PhishingPortal.Services.Notification
                     {
                         foreach (var tenant in tenants)
                         {
-                            var task = await Task.Factory.StartNew(async () =>
-                             {
-                                 try
-                                 {
-                                     // run email campaing for each tenant
-                                     if (_settings.EnableEmailCampaign)
-                                     {
-                                         var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
-                                         provider.Subscribe(_campaignExecutor);
-                                         await provider.CheckAndPublish(stoppingToken);
+                            //var task = await Task.Factory.StartNew(async () =>
+                            var task = Task.Run(async () => 
+                                {
+                                    try
+                                    {
+                                        // run email campaing for each tenant
+                                        if (_settings.EnableEmailCampaign)
+                                        {
+                                            var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                            provider.Subscribe(_campaignExecutor);
+                                            await provider.CheckAndPublish(stoppingToken);
 
-                                     }
+                                        }
 
-                                     //// sms campaign executor
-                                     if (_settings.EnableSmsCampaign)
-                                     {
-                                         var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
-                                         _smsProvider.Subscribe(_smsExecutor);
-                                         await _smsProvider.CheckAndPublish(stoppingToken); 
-                                     }
+                                        //// sms campaign executor
+                                        if (_settings.EnableSmsCampaign)
+                                        {
+                                            var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                            _smsProvider.Subscribe(_smsExecutor);
+                                            await _smsProvider.CheckAndPublish(stoppingToken);
+                                        }
 
-                                     // whatsapp provider 
-                                     if (_settings.EnableWhatsappCampaign)
-                                     {
-                                         var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
-                                         _waProvider.Subscribe(_whatsappCampaignExecutor);
-                                         await _waProvider.CheckAndPublish(stoppingToken); 
-                                     }
+                                        // whatsapp provider 
+                                        if (_settings.EnableWhatsappCampaign)
+                                        {
+                                            var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
+                                            _waProvider.Subscribe(_whatsappCampaignExecutor);
+                                            await _waProvider.CheckAndPublish(stoppingToken);
+                                        }
 
-                                     //training provider
-                                     if (_settings.EnableTrainingProvider)
-                                     {
-                                         var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
-                                         trainingProvider.Subscribe(_trainingExecutor);
-                                         await trainingProvider.CheckAndPublish(stoppingToken); 
-                                     }
+                                        //training provider
+                                        if (_settings.EnableTrainingProvider)
+                                        {
+                                            var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
+                                            trainingProvider.Subscribe(_trainingExecutor);
+                                            await trainingProvider.CheckAndPublish(stoppingToken);
+                                        }
 
-                                     //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
-                                     if (_settings.EnableReportingMonitor)
-                                     {
-                                         var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
-                                         await _reportMonitor.ProcessAsync(); 
-                                     }
+                                        //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
+                                        if (_settings.EnableReportingMonitor)
+                                        {
+                                            var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
+                                            await _reportMonitor.ProcessAsync();
+                                        }
 
-                                 }
-                                 catch (Exception ex)
-                                 {
-                                     _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
-                                 }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                    }
 
-                             });
+                                });
 
                             allTasks.Add(task);
+
                         }
                     }
-
+                
                     if (allTasks.Count > 0)
                     {
                         await Task.WhenAll(allTasks);

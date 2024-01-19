@@ -1,6 +1,6 @@
 ﻿namespace PhishingPortal.Services.Notification.Sms.Deal
 {
-    public class DealSmsGatewayClient : ISmsGatewayClient
+    public class DealSmsGatewayClient //: ISmsGatewayClient
     {
         private const string SmsUri = "/api/sendmsg.php";
         private readonly HttpClient _httpClient;

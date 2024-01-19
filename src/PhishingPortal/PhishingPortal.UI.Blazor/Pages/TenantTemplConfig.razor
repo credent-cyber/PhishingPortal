@@ -356,15 +356,15 @@ else
         IsSuccess = false;
         TaskCompleted = false;
 
-        if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+        if (model.Type == CampaignType.Email)
         {
             model.Content = contents = await GetSummerNoteContent();
         }
-        // if (model.Type == CampaignType.Whatsapp)
-        // {
-        //     contents = await GetSummerNoteContent();
-        //     model.Content = GetPlainText(contents);
-        // }
+        if (model.Type == CampaignType.Whatsapp)
+        {
+            contents = await GetSummerNoteContent();
+            model.Content = GetPlainText(contents);
+        }
         if (model.Type == CampaignType.Sms) { model.Content = text; }
 
         if (model.Content == string.Empty)

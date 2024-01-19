@@ -1,11 +1,17 @@
-﻿using Microsoft.Graph;
+﻿using PhishingPortal.Services.Notification.Whatsapp.Deal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace PhishingPortal.Services.Notification.Whatsapp.Deal
+namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
 {
-    internal class DealWhatsAppGatewayClient //: IWhatsappGatewayClient
+    public class DndWhatsAppGatewayClient : IWhatsappGatewayClient
     {
+        private const string WhatsappUri = "api/send";
         private readonly HttpClient httpClient_;
-        public DealWhatsAppGatewayClient(ILogger<DealWhatsAppGatewayClient> logger, DealWhatsAppGatewayClientConfig config)
+        public DndWhatsAppGatewayClient(ILogger<DndWhatsAppGatewayClient> logger, DndlWhatsAppGatewayClientConfig config)
         {
             Logger = logger;
             Config = config;
@@ -13,9 +19,9 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
             httpClient_.BaseAddress = new Uri(Config.BaseUrl);
         }
 
-        public ILogger<DealWhatsAppGatewayClient> Logger { get; }
+        public ILogger<DndWhatsAppGatewayClient> Logger { get; }
 
-        public DealWhatsAppGatewayClientConfig Config { get; }
+        public DndlWhatsAppGatewayClientConfig Config { get; }
 
         public Task<bool> Send(string to, string from, string message)
         {
@@ -35,7 +41,8 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 
             try
             {
-                var uri = $"{Config.BaseUrl}/api/send.php?number={to}&type=text&message={message}";
+                to = to.Length == 10 ? "91" + to : to;
+                var uri = $"{Config.BaseUrl}/{WhatsappUri}?number={to}&type=text&message={message}";
 
                 if (!string.IsNullOrEmpty(mediaUrl) && !string.IsNullOrEmpty(file))
                 {
@@ -52,11 +59,11 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 
                 if (response.IsSuccessStatusCode)
                     Logger.LogInformation($"Whatsapp message sent");
-               
+
                 var content = await response.Content.ReadAsStringAsync();
-                
+
                 Logger.LogInformation($"WhatsApi Response Message: {content}");
-                
+
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex)
