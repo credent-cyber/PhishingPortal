@@ -248,6 +248,10 @@ else
                                                         {
                                                             <a class="btn btn-info" href="sample-data/Recipient_Sample.csv" target="_top">Template <i class="fas fa-download"></i></a>
                                                         }
+                                                        @if (sources == RecipientSources.OnPremiseAD)
+                                                        {
+                                                            <OnPremiseADRecipientImporter ShowDialog="showOnpremiseAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></OnPremiseADRecipientImporter>
+                                                        }
                                                     </div>
                                                     <br />
                                                     @if (sources == RecipientSources.Csv)
@@ -428,6 +432,7 @@ else
         </DialogTemplate>
 
         <AzAdRecipientImporter ShowDialog="showAdImportDialog" TenantClient="client" Sources="sources" OnRecipientSelected="OnRecipientSelected"></AzAdRecipientImporter>
+       
     </div>
 
     <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
@@ -472,6 +477,7 @@ else
     bool showRecipients = false;
     bool showRecipientss = false;
     bool showAdImportDialog = false;
+    bool showOnpremiseAdImportDialog = false;
     bool showPreview = false;
     bool isloading = false;
     bool isScheduled = false;
@@ -690,6 +696,7 @@ else
     protected async void OnRecipientSelected(List<RecipientImport> data)
     {
         showAdImportDialog = false;
+        showOnpremiseAdImportDialog = false;
         fileimport = recipients = data;
         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
@@ -700,15 +707,22 @@ else
         if (arg.Value?.ToString() == RecipientSources.Csv.ToString())
         {
             this.showAdImportDialog = false;
+            this.showOnpremiseAdImportDialog = false;
             this.showImportDialog = true;
         }
 
         if (arg.Value?.ToString() == RecipientSources.AzureActiveDirectory.ToString())
         {
             this.showAdImportDialog = true;
+            this.showOnpremiseAdImportDialog = false;
             this.showImportDialog = false;
         }
-
+        if (arg.Value?.ToString() == RecipientSources.OnPremiseAD.ToString())
+        {
+            this.showAdImportDialog = false;
+            this.showOnpremiseAdImportDialog = true;
+            this.showImportDialog = false;
+        }
         await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
     }
 
