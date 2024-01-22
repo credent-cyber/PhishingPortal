@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿
+using Newtonsoft.Json.Linq;
+using System.Web;
+using System.Xml;
 
 //Console.WriteLine("DealSms Testing");
 
@@ -38,11 +41,18 @@ var httpClient = new HttpClient();
 //var createInstanceContent = await createInstanceResponse.Content.ReadAsStringAsync();
 //var createInstanceJson = JObject.Parse(createInstanceContent);
 //string instanceId = createInstanceJson["instance_id"].ToString();
+/////////
+////
+///
+
 
 //send message
+//string message = "hello%0Aworld!"; // Use HttpUtility.UrlEncode to encode the message
+string message = "This+is *HTML* HTML text. %0A Second+line."; // Use HttpUtility.UrlEncode to encode the message
+
 string to = "917987163540";
 to = to.Length == 10 ? "91" + to : to;
-string uri = $"https://wa.viralmarketingtools.in/api/send?number={to}&type=text&message=test+message&instance_id=65A7C8B36FE63&access_token=6576c7c6da78d";
+string uri = $"https://wa.viralmarketingtools.in/api/send?number={to}&type=text&message={message}&instance_id=65A7C8B36FE63&access_token=6576c7c6da78d";
 var response = await httpClient.GetAsync(uri);
 response.EnsureSuccessStatusCode();
 var content = await response.Content.ReadAsStringAsync();
