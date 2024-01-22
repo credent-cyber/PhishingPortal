@@ -19,7 +19,8 @@ namespace PhishingPortal.Dto
         [RequiredIfString("Detail.Type", new[] { CampaignType.Email }, "The Description field is required.")]
         public string Description { get; set; }
 
-        [RequiredIfString("Detail.Type", new[] { CampaignType.Email }, "The Subject field is required.")]
+
+        [RequiredIfEmail(ErrorMessage = "Subject is required")]
         public string Subject { get; set; } = string.Empty;
 
 
@@ -43,10 +44,8 @@ namespace PhishingPortal.Dto
         public string ReturnUrl { get; set; }
 
 
-
-        [RequiredIf("Detail.Type", new[] { CampaignType.Email }, "The sender field is required")]
-        [Required(ErrorMessage = "The sender field is required.")]
-        public string FromEmail { get; set; }
+        [RequiredIfEmail(ErrorMessage = "Sender is required")]
+        public string FromEmail { get; set; } = string.Empty;
     }
 
 
@@ -160,7 +159,6 @@ namespace PhishingPortal.Dto
         {
             var campaign = validationContext.ObjectInstance as Campaign;
             if (campaign != null && campaign.Detail?.Type == CampaignType.Email && value == null)
-                //if (value != null && !(value is string))
             {
                 return new ValidationResult(ErrorMessage ?? "This field is Required.", new[] { validationContext.MemberName });               
             }
@@ -169,6 +167,19 @@ namespace PhishingPortal.Dto
         }
     }
 
+    public class RequiredIfEmailAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var model = (Campaign)validationContext.ObjectInstance;
 
+            if (model.Detail.Type == CampaignType.Email && string.IsNullOrEmpty(value as string))
+            {
+                return new ValidationResult(ErrorMessage ?? "This field is Required.", new[] { validationContext.MemberName });
+            }
+
+            return ValidationResult.Success;
+        }
+    }
 
 }
