@@ -125,7 +125,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                                 CreatedBy = "system",
                                 CreatedOn = timestamp,
                                 ReturnUrl = returnUrl,
-                                RecipientId = r.Id,
+                                RecipientId = r.Recipient.Id,
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,
@@ -137,10 +137,10 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
