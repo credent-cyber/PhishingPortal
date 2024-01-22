@@ -124,11 +124,11 @@ namespace PhishingPortal.Repositories
             var hasChanges = false;
             foreach (var r in data)
             {
-                if (!TenantDbCtx.Recipients.Any(o => o.Email == r.Email || o.Mobile == r.Mobile))
+                if (!(TenantDbCtx.Recipients.Any(o => o.Email.Trim() == r.Email.Trim())))
                 {
                     var recipient = new Recipient
                     {
-                        Email = r.Email,
+                        Email = r.Email.Trim(),
                         Mobile = r.Mobile,
                         Name = r.Name,
                         WhatsAppNo = r.Mobile,
@@ -153,15 +153,19 @@ namespace PhishingPortal.Repositories
                 else
                 {
                     var recipient = TenantDbCtx.Recipients
-                        .FirstOrDefault(o => o.Email == r.Email || o.Mobile == r.Mobile);
+                        .FirstOrDefault(o => o.Email.Trim() == r.Email.Trim());
 
                     recipient.Mobile = r.Mobile;
                     recipient.Name = r.Name;
-                    recipient.Email = r.Email;
+                    recipient.EmployeeCode = r.EmployeeCode;
+                    recipient.Branch = r.Branch;
+                    recipient.Department = r.Department;
+                    recipient.DateOfBirth = r.DateOfBirth;
+
 
                     TenantDbCtx.Update(recipient);
                     hasChanges = true;
-                    if (!TenantDbCtx.CampaignRecipients.Any(o => o.CampaignId == campaignId && o.RecipientId == recipient.Id))
+                    if (!(TenantDbCtx.CampaignRecipients.Any(o => o.CampaignId == campaignId && o.RecipientId == recipient.Id)))
                     {
                         TenantDbCtx.CampaignRecipients.Add(new CampaignRecipient
                         {
