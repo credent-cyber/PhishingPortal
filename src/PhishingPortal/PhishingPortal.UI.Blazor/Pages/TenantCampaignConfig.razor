@@ -43,10 +43,8 @@ else
                             <div class="col-md-6 p-1">
                                 <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
                                     <DataAnnotationsValidator />
-                                    @* @if (model.Id > 0)
-                                {
-                                <ValidationSummary />
-                                }*@
+                                    @* <ValidationSummary /> *@
+                                  
                                     <div class="card">
 
                                         <div class="card-body">
@@ -89,34 +87,36 @@ else
                                                 </div>
                                             </div>
 
+
                                             <div class="form-group row">
-                                                <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
+                                                <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
                                                 <div class="col-md-8">
-                                                    <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
-                                                    <ValidationMessage For="@(() => model.FromEmail)" />
+                                                    <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
+                                                        <option>- Select -</option>
+                                                        @foreach (var val in _returnUrlList.OrderBy(o => o))
+                                                        {
+                                                            @if (val != "")
+                                                            {
+                                                                <option value="@val">@val</option>
+                                                            }
+                                                        }
+                                                    </InputSelect>
+                                                    <ValidationMessage For="() => model.ReturnUrl" />
                                                 </div>
                                             </div>
-
 
 
                                             @if (model.Detail.Type == CampaignType.Email)
                                             {
                                                 <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Return Page</label>
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Sender</label>
                                                     <div class="col-md-8">
-                                                        <InputSelect @bind-Value="model.ReturnUrl" class="form-control" id="ReturnUrls">
-                                                            <option>- Select -</option>
-                                                            @foreach (var val in _returnUrlList.OrderBy(o => o))
-                                                            {
-                                                                @if (val != "")
-                                                                {
-                                                                    <option value="@val">@val</option>
-                                                                }
-                                                            }
-                                                        </InputSelect>
-                                                        <ValidationMessage For="() => model.ReturnUrl" />
+                                                        <InputText @bind-Value="@model.FromEmail" id="FromEmail" class="form-control"></InputText>
+                                                        <ValidationMessage For="@(() => model.FromEmail)" />
                                                     </div>
                                                 </div>
+
+                                              
                                                 <div class="form-group row">
                                                     <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Subject</label>
                                                     <div class="col-md-8">
