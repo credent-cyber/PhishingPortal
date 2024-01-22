@@ -93,8 +93,12 @@ namespace PhishingPortal.Repositories
                 campaign.Detail.CreatedOn = now;
                 TenantDbCtx.Campaigns.Add(campaign);
             }
+            try { TenantDbCtx.SaveChanges(); } 
+            catch(Exception e) 
+            {
 
-            TenantDbCtx.SaveChanges();
+            }
+           
             return campaign;
         }
 

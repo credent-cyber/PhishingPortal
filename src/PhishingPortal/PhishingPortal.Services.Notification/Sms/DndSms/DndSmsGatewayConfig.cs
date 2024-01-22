@@ -32,5 +32,7 @@ namespace PhishingPortal.Services.Notification.Sms.DndSms
             logger.LogInformation($"{nameof(IsEnabled)}: {IsEnabled}");
             logger.LogInformation($"{nameof(MaxContentLength)}: {MaxContentLength}");
         }
+
+
     }
 }

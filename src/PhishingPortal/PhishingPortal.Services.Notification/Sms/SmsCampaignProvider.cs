@@ -34,8 +34,8 @@ namespace PhishingPortal.Services.Notification.Sms
 
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
-            await Task.Run(async () =>
-            {
+            //await Task.Run(async () =>
+            //{
 
                 try
                 {
@@ -50,7 +50,7 @@ namespace PhishingPortal.Services.Notification.Sms
                     MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
 
                     allActiveCampaigns = allActiveCampaigns.Where(o => o.Schedule.IsScheduledNow() &&
-                                o.State != CampaignStateEnum.Published).ToList();
+                                o.State == CampaignStateEnum.Published).ToList();
 
                     foreach (var campaign in allActiveCampaigns)
                     {
@@ -67,7 +67,7 @@ namespace PhishingPortal.Services.Notification.Sms
                     Logger.LogCritical(ex, ex.Message);
                 }
 
-            });
+            //});
         }
 
         public IDisposable Subscribe(IObserver<SmsCampaignInfo> observer)
@@ -121,6 +121,8 @@ namespace PhishingPortal.Services.Notification.Sms
                             SmsRecipient = r.Recipient.Mobile,
                             From = campaign.FromEmail,
                             SmsContent = content,
+                            TemplateId = template.TemplateId,
+
                             LogEntry = new CampaignLog
                             {
                                 SecurityStamp = key,
