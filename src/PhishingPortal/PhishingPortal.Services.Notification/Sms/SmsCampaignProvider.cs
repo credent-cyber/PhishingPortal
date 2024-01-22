@@ -143,10 +143,10 @@ namespace PhishingPortal.Services.Notification.Sms
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
