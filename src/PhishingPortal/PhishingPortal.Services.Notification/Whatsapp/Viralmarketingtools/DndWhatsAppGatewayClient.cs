@@ -55,7 +55,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
             try
             {
                 to = to.Length == 10 ? "91" + to : to;
-                var uri = $"{BaseUrl}/{WhatsappUri}?number={to}&type=text&message={message}";
+                var uri = $"{BaseUrl}/{WhatsappUri}?number={to}&type=text&message={formatedMessage}";
 
                 if (!string.IsNullOrEmpty(mediaUrl) && !string.IsNullOrEmpty(file))
                 {
