@@ -76,6 +76,18 @@ else
                                                     <ValidationMessage For="() => model.Type" />
                                                 </div>
                                             </div>
+
+                                            @if (model.Type == CampaignType.Sms)
+                                            {
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Template ID</label>
+                                                    <div class="col-md-8">
+                                                        <InputText id="templid" @bind-Value="model.TemplateId" class="form-control" />
+                                                        <ValidationMessage For="@(() => model.TemplateId)" />
+                                                    </div>
+                                                </div>
+                                            }
+
                                             <div class="form-group row">
                                                 <label class="col-form-label col-md-4 bold-font">Is Active</label>
                                                 <div class="col-md-5">
@@ -133,16 +145,7 @@ else
                                                     </div>
                                                 </div>
                                             }
-                                            @if (model.Type == CampaignType.Sms)
-                                            {
-                                                <div class="form-group row">
-                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Template ID</label>
-                                                    <div class="col-md-8">
-                                                        <InputText id="templid" @bind-Value="model.TemplateId" class="form-control" />
-                                                        <ValidationMessage For="@(() => model.TemplateId)" />
-                                                    </div>
-                                                </div>
-                                            }
+                                           
                                             @if (model.Id == 0)
                                             {
 
