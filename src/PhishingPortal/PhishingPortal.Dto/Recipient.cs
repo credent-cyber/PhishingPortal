@@ -22,7 +22,7 @@ namespace PhishingPortal.Dto
         public string LastWorkingDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsADUser { get; set; } = false;
-
+        public bool IsOnPremiseADUser { get; set; }
 
     }
 
