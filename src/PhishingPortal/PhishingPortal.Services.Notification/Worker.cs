@@ -11,6 +11,7 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.RequestMonitor;
     using PhishingPortal.Services.Notification.Trainings;
     using PhishingPortal.Services.Notification.EmailTemplate;
+    using PhishingPortal.Services.Notification.Email.AppNotifications;
 
     public partial class Worker : BackgroundService
     {
@@ -30,6 +31,7 @@ namespace PhishingPortal.Services.Notification
             IWhatsappGatewayClient waClient,
             ITrainingExecutor trainingExecutor,
             IEmailTemplateProvider emailTemplateProvider,
+            IAppEventNotifier appEventNotifier,
             ApplicationSettings applicationSettings
             )
 
@@ -53,6 +55,7 @@ namespace PhishingPortal.Services.Notification
             this._demoRequestHandler = demoRequestHandler;
             this._trainingExecutor = trainingExecutor;
             this._emailTemplateProvider = emailTemplateProvider;
+            this._appEventNotifier = appEventNotifier;
             this.applicationSettings = applicationSettings;
         }
 
@@ -70,6 +73,7 @@ namespace PhishingPortal.Services.Notification
         private readonly IDemoRequestHandler _demoRequestHandler;
         private readonly ITrainingExecutor _trainingExecutor;
         private readonly IEmailTemplateProvider _emailTemplateProvider;
+        private readonly IAppEventNotifier _appEventNotifier;
         private readonly ApplicationSettings applicationSettings;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
@@ -100,6 +104,10 @@ namespace PhishingPortal.Services.Notification
 
                 if (!_isprocessing)
                 {
+
+                    // notify critical application errors via email
+                    await _appEventNotifier.CheckAndNotifyErrors();
+
                     var tenants = _centralDbContext.Tenants.Include(o => o.Settings).Include(o => o.TenantDomains)
                                .Where(o => o.IsActive);
 
@@ -161,11 +169,12 @@ namespace PhishingPortal.Services.Notification
                                             await _reportMonitor.ProcessAsync();
                                         }
 
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
-                                    }
+
+                                 }
+                                 catch (Exception ex)
+                                 {
+                                     _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                 }
 
                                 });
 
@@ -177,9 +186,10 @@ namespace PhishingPortal.Services.Notification
                     if (allTasks.Count > 0)
                     {
                         await Task.WhenAll(allTasks);
+
                     }
                     _logger.LogInformation($"Worker reset _isProcessing=false, for the next cycle");
-                    _isprocessing = false;
+                    _isprocessing = false; 
                     _demoRequestHandler.Execute();
 
                     await Task.Delay(_settings.WaitIntervalInMinutes * 1000 * 60, stoppingToken);

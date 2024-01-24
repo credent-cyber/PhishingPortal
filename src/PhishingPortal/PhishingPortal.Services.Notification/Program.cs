@@ -104,6 +104,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IDbConnManager, DbConnManager>();
         services.AddSingleton<IDemoRequestHandler, DemoRequestHandler>();
         services.AddSingleton<IRequestEmailSender, RequestEmailSender>();
+        services.AddSingleton<IAppEventNotifier, AppEventNotifier>();
 
         services.AddHostedService<Worker>();
 
