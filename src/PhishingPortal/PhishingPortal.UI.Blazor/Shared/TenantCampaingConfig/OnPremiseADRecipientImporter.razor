@@ -1,0 +1,146 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+
+@inject ILogger<OnPremiseADRecipientImporter> Logger;
+
+<DialogTemplate Title="Import OnPremise AD Recipients" Show="ShowDialog">
+    @if (Sources == RecipientSources.OnPremiseAD)
+    {
+        <div class="form-group " id="divUploadUsers">
+
+            <div class="input-group" style="margin-top:10px;">
+                <label class="form-label" style="margin-top:8px; margin-right:30px; font-weight:700;">Choose Group Name</label>
+                <select id="AdGrp" @bind="seletedAdGroup" class="form-control col-md-8" @oninput="@OnChangeRecipientAdGrp">
+                    @foreach (var val in LstAzAdGroups)
+                    {
+                        <option value="@val">@val</option>
+                    }
+                </select>
+            </div>
+
+            <hr />
+            <div class="row">
+                <Alerts IsError="isError" Message="message"></Alerts>
+                @if (isloading)
+                {
+                    <div class="col-sm-12" style="margin-top:45px">
+
+                        <div class="card-header">
+                            <div class="loading-bar"></div>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <Recipients DataList="_recipients"></Recipients>
+                }
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <button @onclick="OnSave"
+                            class="btn btn-success" type="button">
+                        Import
+                    </button>
+
+                    <button @onclick="OnClose"
+                            class="btn btn-secondary" type="button">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</DialogTemplate>
+
+@code {
+
+    [Parameter]
+    public bool ShowDialog { get; set; }
+
+    [Parameter]
+    public RecipientSources Sources { get; set; }
+
+    [Parameter]
+    public TenantClient TenantClient { get; set; }
+
+    [Parameter]
+    public EventCallback<List<RecipientImport>> OnRecipientSelected { get; set; }
+
+    private List<string> LstAzAdGroups = new List<string>();
+    private string seletedAdGroup = string.Empty;
+    private List<RecipientImport> _recipients = new List<RecipientImport>();
+    private bool isloading = true;
+    private bool isError = false;
+    private string message = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await TenantClient.GetAllOnPremiseADGroups();
+        LstAzAdGroups.Add("--Select--");
+        if (result is not null)
+        {
+
+
+            foreach (var item in result.Where(o=>o.Value.Count() > 0))
+            {
+                LstAzAdGroups.Add(item.Key);
+            }
+
+            seletedAdGroup = LstAzAdGroups?.FirstOrDefault() ?? string.Empty;
+        }
+
+        isloading = false;
+    }
+
+    protected async void OnChangeRecipientAdGrp(ChangeEventArgs args)
+    {
+        isError = false;
+        var grpId = Convert.ToString(args.Value);
+        if(grpId == "--Select--")
+        {
+            _recipients.Clear();
+            return;
+        }
+        try
+        {
+            if (!string.IsNullOrEmpty(grpId))
+            {
+                isloading = !isloading;
+                var result = await TenantClient.GetOnPremiseUsersByADGroup(grpId);
+                _recipients = result.Where(o=>o.Email != null).Select(user => new RecipientImport
+                    {
+                        EmployeeCode = user.EmployeeCode,
+                        Name = user.Name,
+                        Email = user.Email,
+                        Mobile = user.Mobile,
+                        Branch = user.Branch,
+                        Department = user.Department,
+                        Address = user.Address,
+                        DateOfBirth = user.DateOfBirth?.ToString(),
+                        //ValidationErrMsg = string.Empty 
+                    }).ToList();
+              
+                isloading = !isloading;
+                seletedAdGroup = grpId;
+                await InvokeAsync(() => StateHasChanged()).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex) { isError = true; Logger.LogError(ex, ex.Message); }
+    }
+
+    protected async void OnClose()
+    {
+        _recipients.Clear();
+        await OnRecipientSelected.InvokeAsync(_recipients);
+        ShowDialog = false;
+    }
+
+    protected async void OnSave()
+    {
+        ShowDialog = false;
+        await OnRecipientSelected.InvokeAsync(_recipients);
+    }
+}

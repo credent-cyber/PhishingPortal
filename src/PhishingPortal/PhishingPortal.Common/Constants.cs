@@ -35,6 +35,10 @@
             public const string MonitoredMailBoxAccount = "monitored_mail_account";
             public const string RETURN_URL_COLLECTION = "return_urls";
 
+            public const string OnPromiseAD_Doamin = "ad_domain";
+            public const string OnPromiseAD_Username = "ad_username";
+            public const string OnPromiseAD_Password = "ad_password";
+    
             public static string MonitoredMailBoxFilters { get; set; }
         }
     }

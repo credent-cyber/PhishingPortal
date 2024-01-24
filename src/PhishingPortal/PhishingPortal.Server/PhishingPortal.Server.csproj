@@ -43,6 +43,8 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
 		<PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
 		<PackageReference Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
@@ -51,6 +53,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.4.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.4.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.4.0" />
+		<PackageReference Include="System.DirectoryServices.AccountManagement" Version="8.0.0" />
 		<PackageReference Include="WebPush" Version="1.0.11" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
 
@@ -78,6 +81,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="Extensions\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
