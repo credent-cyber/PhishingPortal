@@ -97,6 +97,7 @@ namespace PhishingPortal.Dto
         None = 0,
         Csv = 1,
         AzureActiveDirectory = 2,
-        Imported = 3
+        OnPremiseAD = 3,
+        Imported = 4
     }
 }

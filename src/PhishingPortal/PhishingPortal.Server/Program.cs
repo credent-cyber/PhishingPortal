@@ -11,6 +11,7 @@ using Serilog;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
 using Microsoft.Extensions.FileProviders;
+using PhishingPortal.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +29,23 @@ var aadTenant = config.GetValue<string>("AzureAD:Tenant");
 var aadRedirectUri = config.GetValue<string>("AzureAD:RedirectUri");
 var authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, config.GetValue<string>("AzureAD:Authority"));
 
+var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
+var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
+var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
+
+if (!useSqlLite)
+{
+  conString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
 
 builder.Services.AddLogging((builder) =>
 {
     Serilog.Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
+    .WriteTo.DbSink(conString, useSqlLite)
     .CreateLogger();
+
+    
     builder.AddSerilog();
 });
 
@@ -49,10 +61,6 @@ builder.Services.AddControllers()
 //});
 
 
-var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
-var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
-var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
-
 if (useSqlLite)
 {
     builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
@@ -66,7 +74,6 @@ else
         sqlProvider = "mysql";
     }
 
-    conString = builder.Configuration.GetConnectionString("DefaultConnection");
     switch (sqlProvider)
     {
         case "mysql":
