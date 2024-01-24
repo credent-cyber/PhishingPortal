@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using PhishingPortal.Common;
@@ -8,9 +9,11 @@ namespace PhishingPortal.Dto
 {
     public class AzureRegistrationSettings
     {
-
+        [Required]
         public string ClientID { get; set; }
+        [Required]
         public string ClientSecret { get; set; }
+        [Required]
         public string TenantID { get; set; }
 
         public AzureRegistrationSettings()
