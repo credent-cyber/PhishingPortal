@@ -45,6 +45,7 @@ namespace PhishingPortal.Dto
         public DateTime ReportedOn { get; set; }
         public string Status { get; set; }
         public string SecurityStamp { get; set; }
+        public string MessageId { get; set; }
     }
 
 }

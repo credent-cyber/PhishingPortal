@@ -34,8 +34,8 @@ namespace PhishingPortal.Services.Notification.Sms
 
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
-            await Task.Run(async () =>
-            {
+            //await Task.Run(async () =>
+            //{
 
                 try
                 {
@@ -50,7 +50,7 @@ namespace PhishingPortal.Services.Notification.Sms
                     MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
 
                     allActiveCampaigns = allActiveCampaigns.Where(o => o.Schedule.IsScheduledNow() &&
-                                o.State != CampaignStateEnum.Published).ToList();
+                                o.State == CampaignStateEnum.Published).ToList();
 
                     foreach (var campaign in allActiveCampaigns)
                     {
@@ -67,7 +67,7 @@ namespace PhishingPortal.Services.Notification.Sms
                     Logger.LogCritical(ex, ex.Message);
                 }
 
-            });
+            //});
         }
 
         public IDisposable Subscribe(IObserver<SmsCampaignInfo> observer)
@@ -121,6 +121,8 @@ namespace PhishingPortal.Services.Notification.Sms
                             SmsRecipient = r.Recipient.Mobile,
                             From = campaign.FromEmail,
                             SmsContent = content,
+                            TemplateId = template.TemplateId,
+
                             LogEntry = new CampaignLog
                             {
                                 SecurityStamp = key,
@@ -129,7 +131,7 @@ namespace PhishingPortal.Services.Notification.Sms
                                 CreatedBy = "system",
                                 CreatedOn = timestamp,
                                 ReturnUrl = returnUrl,
-                                RecipientId = r.Id,
+                                RecipientId = r.Recipient.Id,
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,
@@ -141,10 +143,10 @@ namespace PhishingPortal.Services.Notification.Sms
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -165,8 +167,7 @@ namespace PhishingPortal.Services.Notification.Sms
             foreach (var c in allCampaignScheduleExpired)
             {
                 var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
-
-                var allLogs = dbContext.CampaignLogs.Where(c => c.CampaignId == c.Id);
+                var allLogs = dbContext.CampaignLogs.Where(acl => acl.CampaignId == c.Id);
                 var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
              
 
@@ -174,14 +175,27 @@ namespace PhishingPortal.Services.Notification.Sms
                 {
                     var percentSent = (allSent / allCount) * 100;
 
-                    if (percentSent >= 98)
+                    if (percentSent >= 95)
                     {
                         c.State = CampaignStateEnum.Completed;
                     }
-                    else
+                    if (c.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule &&
+                           c.State == CampaignStateEnum.InProgress)
                     {
-                        c.State = CampaignStateEnum.Unknown;
+                        var lastLogTime = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id)?.OrderByDescending(o => o.SentOn)
+                            .Select(o => o.SentOn).FirstOrDefault();
+
+                        if (lastLogTime.HasValue && (DateTime.Now - lastLogTime.Value).TotalMinutes > 15)
+                        {
+                            c.State = CampaignStateEnum.InComplete;
+                        }
+
                     }
+                    else if (c.Schedule.ScheduleType != ScheduleTypeEnum.NoSchedule && c.State == CampaignStateEnum.InProgress
+                        && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
+                    {
+                        c.State = CampaignStateEnum.InComplete;
+                    }                  
 
                     dbContext.Update(c);
                     dbContext.SaveChanges();

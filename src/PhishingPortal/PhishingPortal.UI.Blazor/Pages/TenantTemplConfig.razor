@@ -17,6 +17,7 @@
 @inject HttpClient Http
 @using PhishingPortal.Common
 @using Microsoft.Extensions.Configuration
+@using System.Web;
 @inject IConfiguration _config
 @attribute [Authorize]
 
@@ -50,7 +51,7 @@ else
                             <div class="col-md-6 p-1">
                                 <EditForm Model="@model" OnValidSubmit="@OnSave">
                                     <DataAnnotationsValidator />
-                                    @*<ValidationSummary />*@
+                                    @* <ValidationSummary /> *@
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="form-group row">
@@ -75,6 +76,18 @@ else
                                                     <ValidationMessage For="() => model.Type" />
                                                 </div>
                                             </div>
+
+                                            @if (model.Type == CampaignType.Sms)
+                                            {
+                                                <div class="form-group row">
+                                                    <label class="col-form-label col-md-4 bold-font required-field" style="padding-right: 0;">Template ID</label>
+                                                    <div class="col-md-8">
+                                                        <InputText id="templid" @bind-Value="model.TemplateId" class="form-control" />
+                                                        <ValidationMessage For="@(() => model.TemplateId)" />
+                                                    </div>
+                                                </div>
+                                            }
+
                                             <div class="form-group row">
                                                 <label class="col-form-label col-md-4 bold-font">Is Active</label>
                                                 <div class="col-md-5">
@@ -132,7 +145,7 @@ else
                                                     </div>
                                                 </div>
                                             }
-
+                                           
                                             @if (model.Id == 0)
                                             {
 
@@ -461,6 +474,7 @@ else
         var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
         return result;
     }
+   
 
     //Image Upload
     List<ImageFile> filesBase64 = new List<ImageFile>();
@@ -521,6 +535,9 @@ else
 
         return plainText;
     }
+
+    
+
 
 }
 

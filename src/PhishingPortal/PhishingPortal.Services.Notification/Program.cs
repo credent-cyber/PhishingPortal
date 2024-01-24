@@ -12,6 +12,8 @@ using PhishingPortal.Services.Notification.Trainings;
 using PhishingPortal.Services.Notification.Whatsapp.Deal;
 using PhishingPortal.Services.Notification.Sms.Deal;
 using PhishingPortal.Services.Notification.EmailTemplate;
+using PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools;
+using PhishingPortal.Services.Notification.Sms.DndSms;
 using PhishingPortal.Services.Notification.Email.AppNotifications;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -85,15 +87,20 @@ IHost host = Host.CreateDefaultBuilder(args)
 
         //services.AddSingleton<AmyntraSmsGatewayConfig>();
         services.AddSingleton<DealSmsGatewayConfig>();
+        services.AddSingleton<DndSmsGatewayConfig>();
+
         services.AddSingleton<ISmsCampaignExecutor, SmsCampaignExecutor>();
         //services.AddSingleton<ISmsGatewayClient, DefaultSmsGatewayClient>();
-        services.AddSingleton<ISmsGatewayClient, DealSmsGatewayClient>();
+        //services.AddSingleton<ISmsGatewayClient, DealSmsGatewayClient>();
+        services.AddSingleton<ISmsGatewayClient, DndSmsGatewayClient>();
 
         //services.AddSingleton<WhatsappGatewayConfig>();
         services.AddSingleton<DealWhatsAppGatewayClientConfig>();
+        services.AddSingleton<DndlWhatsAppGatewayClientConfig>();
         services.AddSingleton<IWhatsappCampaignExecutor, WhatsappCampaignExecutor>();
         //services.AddSingleton<IWhatsappGatewayClient, WhatsappMateGatewayClient>();
-        services.AddSingleton<IWhatsappGatewayClient, DealWhatsAppGatewayClient>();
+        //services.AddSingleton<IWhatsappGatewayClient, DealWhatsAppGatewayClient>();
+        services.AddSingleton<IWhatsappGatewayClient, DndWhatsAppGatewayClient>();
 
         services.AddSingleton<IDbConnManager, DbConnManager>();
         services.AddSingleton<IDemoRequestHandler, DemoRequestHandler>();

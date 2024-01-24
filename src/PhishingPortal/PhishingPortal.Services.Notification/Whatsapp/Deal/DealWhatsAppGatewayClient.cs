@@ -2,7 +2,7 @@
 
 namespace PhishingPortal.Services.Notification.Whatsapp.Deal
 {
-    internal class DealWhatsAppGatewayClient : IWhatsappGatewayClient
+    internal class DealWhatsAppGatewayClient //: IWhatsappGatewayClient
     {
         private readonly HttpClient httpClient_;
         public DealWhatsAppGatewayClient(ILogger<DealWhatsAppGatewayClient> logger, DealWhatsAppGatewayClientConfig config)

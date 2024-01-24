@@ -8,6 +8,7 @@ namespace PhishingPortal.Services.Notification.Sms
         public string SmsRecipient { get; set; }
         public string SmsContent { get; set; }
         public string From { get; set; }
+        public string TemplateId { get; set; }
         public CampaignLog LogEntry { get; set; }
 
     }
