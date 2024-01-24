@@ -167,8 +167,7 @@ namespace PhishingPortal.Services.Notification.Sms
             foreach (var c in allCampaignScheduleExpired)
             {
                 var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
-
-                var allLogs = dbContext.CampaignLogs.Where(c => c.CampaignId == c.Id);
+                var allLogs = dbContext.CampaignLogs.Where(acl => acl.CampaignId == c.Id);
                 var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
              
 
@@ -176,14 +175,27 @@ namespace PhishingPortal.Services.Notification.Sms
                 {
                     var percentSent = (allSent / allCount) * 100;
 
-                    if (percentSent >= 98)
+                    if (percentSent >= 95)
                     {
                         c.State = CampaignStateEnum.Completed;
                     }
-                    else
+                    if (c.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule &&
+                           c.State == CampaignStateEnum.InProgress)
                     {
-                        c.State = CampaignStateEnum.Unknown;
+                        var lastLogTime = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id)?.OrderByDescending(o => o.SentOn)
+                            .Select(o => o.SentOn).FirstOrDefault();
+
+                        if (lastLogTime.HasValue && (DateTime.Now - lastLogTime.Value).TotalMinutes > 15)
+                        {
+                            c.State = CampaignStateEnum.InComplete;
+                        }
+
                     }
+                    else if (c.Schedule.ScheduleType != ScheduleTypeEnum.NoSchedule && c.State == CampaignStateEnum.InProgress
+                        && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
+                    {
+                        c.State = CampaignStateEnum.InComplete;
+                    }                  
 
                     dbContext.Update(c);
                     dbContext.SaveChanges();

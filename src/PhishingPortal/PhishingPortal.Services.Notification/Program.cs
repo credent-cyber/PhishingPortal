@@ -14,6 +14,7 @@ using PhishingPortal.Services.Notification.Sms.Deal;
 using PhishingPortal.Services.Notification.EmailTemplate;
 using PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools;
 using PhishingPortal.Services.Notification.Sms.DndSms;
+using PhishingPortal.Services.Notification.Email.AppNotifications;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
