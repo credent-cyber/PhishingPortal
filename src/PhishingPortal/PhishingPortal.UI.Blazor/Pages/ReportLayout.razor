@@ -349,19 +349,19 @@
         else if (categ != null)
         {
             filter = false;
-            var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
+            var values = new string[] { $"Camp.Category__2__{categ}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}", $"IsHit__1__true" };
             query.Add("grid-filter", new StringValues(values));
         }
         else if (depart != null)
         {
             filter = false;
-            var values = new string[] { $"Recipient.Recipient.Department__2__{depart}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
+            var values = new string[] { $"Recipient.Recipient.Department__2__{depart}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}", $"IsHit__1__true" };
             query.Add("grid-filter", new StringValues(values));
         }
         else if (TempId > 0)
         {
             filter = false;
-            var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}" };
+            var values = new string[] { $"Camp.Detail.CampaignTemplateId__1__{TempId}", "CampaignId__9__2", $"CampaignId__1__{id1}", $"CampaignId__1__{id2}", $"CampaignId__1__{id3}", $"CampaignId__1__{id4}", $"CampaignId__1__{id5}", $"IsHit__1__true" };
             query.Add("grid-filter", new StringValues(values));
         }
         else
