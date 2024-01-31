@@ -648,28 +648,28 @@
                     {
                         Label = "Email Count",
                         Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart3Data.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart3Data.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart2Data.Add(new ChartJsDataset
                     {
                         Label = "Phish Prone%",
                         Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data.Entries.Count()), //Trend of Clicks on Email per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Email per Campaign
                     });
 
                 //Email pie chart
@@ -716,21 +716,21 @@
                     {
                         Label = "Sms Count",
                         Data = data2.SmsEntries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.SmsEntries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsLineChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray();
@@ -738,7 +738,7 @@
                     {
                         Label = "Phish Prone%",
                         Data = data2.SmsEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data.Entries.Count()), //Trend of Clicks on Sms per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Sms per Campaign
                     });
 
                 //Sms pie chart
@@ -779,28 +779,28 @@
                     {
                         Label = "Whatsapp Count",
                         Data = data2.WhatsappEntries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 WhatsappBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.WhatsappEntries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 WhatsappBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
                 WhatsappLineChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray();
                 WhatsappLineChartData.Add(new ChartJsDataset
                     {
                         Label = "Phish Prone%",
                         Data = data2.WhatsappEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Entries.Count()), //Trend of Clicks on Whatsapp per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Whatsapp per Campaign
                     });
 
                 //Whatsapp pie chart
