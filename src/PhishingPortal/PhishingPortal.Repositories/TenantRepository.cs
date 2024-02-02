@@ -1509,6 +1509,45 @@ namespace PhishingPortal.Repositories
             return result;
         }
 
+        public async Task<ApiResponse<string>> CampaignSpamReport(string key)
+        {
+            var result = new ApiResponse<string>();
+            var status = CampaignLogStatus.Sent.ToString();
+            var campaignLog = TenantDbCtx.CampaignLogs
+                .FirstOrDefault(o => o.SecurityStamp == key
+                                    && o.IsReported == false && o.Status == status);
+
+            if (campaignLog == null)
+            {
+                campaignLog = TenantDbCtx.CampaignLogs
+               .FirstOrDefault(o => o.SecurityStamp == key
+                                   && o.IsReported == true);
+                result.IsSuccess = false;
+                result.Message = campaignLog == null ? "Invalid Url" : "You have already reported this mail.";
+                return result;
+            }
+
+
+
+            var campaign = TenantDbCtx.Campaigns.FirstOrDefault(o => o.Id == campaignLog.CampaignId);
+            if (campaign == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Invalid Campaign";
+                return result;
+            }
+
+            campaignLog.Status = CampaignLogStatus.Completed.ToString();
+            campaignLog.IsReported = true;
+            campaignLog.ModifiedOn = DateTime.Now;
+            campaignLog.ModifiedBy = nameof(CampaignSpamReport);
+
+            TenantDbCtx.Update(campaignLog);
+            TenantDbCtx.SaveChanges();
+            result.IsSuccess = true;
+            return result;
+
+        }
 
     }
 }

@@ -833,5 +833,15 @@ namespace PhishingPortal.Server.Controllers.Api
             return await _onPromiseADService.GetOnPremiseUsersByADGroup(groupName);
         }
         #endregion
+
+        [HttpPost]
+        [Route("campaign-spam-report")]
+        [AllowAnonymous]
+        public async Task<ApiResponse<string>> CampignLinkReport(GenericApiRequest<string> request)
+        {
+
+            return await _tenantRepository.CampaignSpamReport(request.Param);
+
+        }
     }
 }
