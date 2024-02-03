@@ -5,6 +5,8 @@ using System.Text;
 using System.Xml.Linq;
 using Outlook = Microsoft.Office.Interop.Outlook;
 using Office = Microsoft.Office.Core;
+using Serilog;
+using System.IO;
 
 namespace PhishingPortal.OutlookAddInVSTO
 {
@@ -12,12 +14,23 @@ namespace PhishingPortal.OutlookAddInVSTO
     {
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            string workingDirectory = Environment.CurrentDirectory;
+            string logsDirectory = Path.Combine(workingDirectory, "Logs");
+
+            System.IO.Directory.CreateDirectory(logsDirectory);
+
+            // Configure Serilog to write logs to the "Logs" folder
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File(System.IO.Path.Combine(logsDirectory, $"log_{DateTime.Now:yyyyMMdd}.txt"), rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            Log.Information("Outlook Add-in started.");
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
         {
-            // Note: Outlook no longer raises this event. If you have code that 
-            //    must run when Outlook shuts down, see https://go.microsoft.com/fwlink/?LinkId=506785
+            Log.CloseAndFlush();
         }
 
         #region VSTO generated code

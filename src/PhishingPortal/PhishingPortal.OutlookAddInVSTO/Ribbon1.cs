@@ -1,4 +1,5 @@
 ﻿using Microsoft.Office.Interop.Outlook;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -45,6 +46,7 @@ namespace PhishingPortal.OutlookAddInVSTO
                 string subject = selectedMail.Subject;
                 string senderName = selectedMail.SenderName;
                 string mailBody = selectedMail.Body;
+                
 
                 #region Test
                 var Links = ExtractLinksFromHtml(mailBody);
@@ -59,7 +61,6 @@ namespace PhishingPortal.OutlookAddInVSTO
                 #endregion
                 var result = Forward();
                 // Show a popup message with email details
-                string mailMessage = $"Subject: {subject}\nSender: {senderName}";
                 string message = "You have successfully reported this mail as phishing!";
                 MessageBox.Show(message, "Message");
             }
@@ -160,16 +161,16 @@ namespace PhishingPortal.OutlookAddInVSTO
                     EmailForward = true;
 
                     var response = await client.PostAsync($"api/tenant/campaign-spam-report?t={TenantId}", content);
-                    //forDebug = await response.Content.ReadAsStringAsync();
                     var responseJson = await response.Content.ReadAsStringAsync();
                     var result = JsonSerializer.Deserialize<ApiResponse<string>>(responseJson);
 
                     Responce = responseJson.Contains("true");
+                    Log.Information($"");
                     EmailForward = true;
                 }
                 catch (System.Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Log.Error(ex.ToString());
                 }
 
             }
