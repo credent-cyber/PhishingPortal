@@ -374,6 +374,7 @@
                                         <PieChart Id="SmsPolar" Type="@ChartType.pie" Responsive="true"
                                                   Data="@(SmsPolarData.ToArray())"
                                                   BackgroundColor="@(SmsPolarBackground.ToArray())"
+                                                  Ids="@SmsPolarIds.ToArray()"
                                                   Labels="@(SmsPolarLabels.ToArray())">
                                         </PieChart>
                                     </div>
@@ -454,6 +455,7 @@
                                         <PieChart Id="WhatsappPolar" Type="@ChartType.pie" Responsive="true"
                                                   Data="@(WhatsappPolarData.ToArray())"
                                                   BackgroundColor="@(WhatsappPolarBackground.ToArray())"
+                                                  Ids="@WhatsappPolarIds.ToArray()"
                                                   Labels="@(WhatsappPolarLabels.ToArray())">
                                         </PieChart>
                                     </div>
@@ -574,6 +576,7 @@
     public List<string> SmsPolarData { get; set; } = new List<string>();
     public List<string> SmsPolarBackground { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> SmsPolarLabels { get; set; } = new List<string>();
+    public List<string> SmsPolarIds { get; set; } = new List<string>();
 
     //Whatsapp Chart Data
     public List<ChartJsDataset> WhatsappBarChartData { get; set; } = new List<ChartJsDataset>();
@@ -594,6 +597,7 @@
     public List<string> WhatsappPolarData { get; set; } = new List<string>();
     public List<string> WhatsappPolarBackground { get; set; } = new List<string>() { "#FF5370", "#0e9e4a", "#FFB64D", "#00E396", "#775DD0", "#4099ff", "#f2930a", "#00bcd4" };
     public List<string> WhatsappPolarLabels { get; set; } = new List<string>();
+    public List<string> WhatsappPolarIds { get; set; } = new List<string>();
 
     //Training Chart Data
     public List<ChartJsDataset> TrainingBarChartData { get; set; } = new List<ChartJsDataset>();
@@ -644,28 +648,28 @@
                     {
                         Label = "Email Count",
                         Data = data2.Entries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart3Data.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.Entries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.OrangeRed, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart3Data.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.Entries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 BarChart2Data.Add(new ChartJsDataset
                     {
                         Label = "Phish Prone%",
                         Data = data2.Entries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data.Entries.Count()), //Trend of Clicks on Email per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Email per Campaign
                     });
 
                 //Email pie chart
@@ -712,21 +716,21 @@
                     {
                         Label = "Sms Count",
                         Data = data2.SmsEntries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Green, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.SmsEntries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 SmsLineChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray();
@@ -734,7 +738,7 @@
                     {
                         Label = "Phish Prone%",
                         Data = data2.SmsEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data.Entries.Count()), //Trend of Clicks on Sms per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Sms per Campaign
                     });
 
                 //Sms pie chart
@@ -759,8 +763,10 @@
                 {
                     if (entry.Value != 0)
                     {
+
                         SmsPolarData.Add(entry.Value.ToString());
-                        SmsPolarLabels.Add(entry.Key.ToUpper());
+                        SmsPolarLabels.Add(entry.Key.Split(".")[1]);
+                        SmsPolarIds.Add(entry.Key.Split(".")[0]);
 
                     }
                 }
@@ -773,28 +779,28 @@
                     {
                         Label = "Whatsapp Count",
                         Data = data2.WhatsappEntries.Select(o => o.Count.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 WhatsappBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Click Count",
                         Data = data2.WhatsappEntries.Select(o => o.Hits.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
                 WhatsappBarChartData.Add(new ChartJsDataset
                     {
                         Label = "Reported",
                         Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count()),
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
                 WhatsappLineChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray();
                 WhatsappLineChartData.Add(new ChartJsDataset
                     {
                         Label = "Phish Prone%",
                         Data = data2.WhatsappEntries.Select(o => o.PronePercentage.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data.Entries.Count()), //Trend of Clicks on Whatsapp per Campaign
+                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Whatsapp per Campaign
                     });
 
                 //Whatsapp pie chart
@@ -820,7 +826,8 @@
                     if (entry.Value != 0)
                     {
                         WhatsappPolarData.Add(entry.Value.ToString());
-                        WhatsappPolarLabels.Add(entry.Key.ToUpper());
+                        WhatsappPolarLabels.Add(entry.Key.Split(".")[1]);
+                        WhatsappPolarIds.Add(entry.Key.Split(".")[0]);
                     }
                 }
                 #endregion
