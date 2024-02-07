@@ -12,6 +12,9 @@ using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
 using Microsoft.Extensions.FileProviders;
 using PhishingPortal.Server;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using System.Security.Claims;
+using PhishingPortal.Server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,14 +31,14 @@ var aadClientSecret = config.GetValue<string>("AzureAD:ClientSecret");
 var aadTenant = config.GetValue<string>("AzureAD:Tenant");
 var aadRedirectUri = config.GetValue<string>("AzureAD:RedirectUri");
 var authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, config.GetValue<string>("AzureAD:Authority"));
-
+var useWindowsAuthentication = config.GetValue<bool>("UseWindowsAuthentication");
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
 var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
 
 if (!useSqlLite)
 {
-  conString = builder.Configuration.GetConnectionString("DefaultConnection");
+    conString = builder.Configuration.GetConnectionString("DefaultConnection");
 }
 
 builder.Services.AddLogging((builder) =>
@@ -45,7 +48,7 @@ builder.Services.AddLogging((builder) =>
     .WriteTo.DbSink(conString, useSqlLite)
     .CreateLogger();
 
-    
+
     builder.AddSerilog();
 });
 
@@ -113,36 +116,41 @@ else
 }
 
 builder.Services.AddIdentityCore<PhishingPortalUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
-//builder.Services.AddIdentity<PhishingPortalUser, IdentityRole>()
-//    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
-//    .AddTokenProvider<DataProtectorTokenProvider<PhishingPortalUser>>(TokenOptions.DefaultProvider);
-
-//builder.Services.ConfigureApplicationCookie(options =>
-//{
-//    options.Cookie.HttpOnly = false;
-//    options.Events.OnRedirectToLogin = context =>
-//    {
-//        context.Response.StatusCode = 401;
-//        return Task.CompletedTask;
-//    };
-//});
+   .AddRoles<IdentityRole>()
+   .AddEntityFrameworkStores<PhishingPortalDbContext2>()
+   .AddSignInManager()
+   .AddDefaultTokenProviders();
 
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddMicrosoftAccount(options =>
+if (!useWindowsAuthentication)
+{
+
+   
+    builder.Services
+        .AddAuthentication(IdentityConstants.ApplicationScheme)
+        .AddMicrosoftAccount(options =>
+        {
+            options.SignInScheme = IdentityConstants.ExternalScheme;
+            options.ClientId = aadClientId;
+            options.ClientSecret = aadClientSecret;
+            options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
+            options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
+        })
+        .AddIdentityCookies();
+}
+else
+{
+
+    builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+          .AddNegotiate();
+
+    builder.Services.AddAuthorization(options =>
     {
-        options.SignInScheme = IdentityConstants.ExternalScheme;
-        options.ClientId = aadClientId;
-        options.ClientSecret = aadClientSecret;
-        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
-        options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
-    })
-    .AddIdentityCookies();
+        // By default, all incoming requests will be authorized according to the default policy.
+        options.FallbackPolicy = options.DefaultPolicy;
+    });
+}
+
 
 //.AddOpenIdConnect("oidc", options =>
 //{
@@ -190,7 +198,6 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 // check if picked the correct configurations
 logger.LogInformation($"UseSqlLite: {useSqlLite}");
 logger.LogInformation($"SqlProvider: {sqlProvider}");
-
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
 {
@@ -229,7 +236,11 @@ app.UseStaticFiles(new StaticFileOptions()
 
 app.UseRouting();
 
-app.UseAuthentication();
+if(!useWindowsAuthentication) 
+    app.UseAuthentication();
+else
+    app.UseAdAuthentication();
+
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
