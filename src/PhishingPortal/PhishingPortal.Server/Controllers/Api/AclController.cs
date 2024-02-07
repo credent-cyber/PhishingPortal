@@ -1,23 +1,19 @@
-﻿using DocumentFormat.OpenXml.Office2010.Drawing;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using NPOI.SS.Formula.Functions;
 using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto.Auth;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
-using PhishingPortal.UI.Blazor.Shared.Components;
-using System.DirectoryServices.AccountManagement;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AclController : BaseApiController
@@ -55,11 +51,9 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            if (!_isWindowsAuthentication)
-            {
-                await _signInManager.SignOutAsync();
-            }
-            
+
+            await _signInManager.SignOutAsync();
+
             return Ok();
         }
 
@@ -67,24 +61,29 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("currentUserInfo")]
         public async Task<CurrentUser> CurrentUserInfo()
         {
-            var user = new CurrentUser
+            var userName = User?.Identity?.Name;
+
+            CurrentUser currentUser = new()
             {
                 IsAuthenticated = User?.Identity?.IsAuthenticated ?? false,
-                UserName = User?.Identity?.Name ?? "guest",
+                UserName = User?.Identity?.Name ?? "guest"
             };
 
             try
             {
-                var claims = new Dictionary<string, string>();
-                foreach (var c in User.Claims)
+                if (currentUser.IsAuthenticated)
                 {
-                    if (!claims.ContainsKey(c.Type))
+                    var claims = new Dictionary<string, string>();
+                    foreach (var c in User.Claims)
                     {
-                        claims.Add(c.Type, c.Value);
+                        if (!claims.ContainsKey(c.Type))
+                        {
+                            claims.Add(c.Type, c.Value);
+                        }
                     }
-                }
 
-                user.Claims = claims;
+                    currentUser.Claims = claims; 
+                }
 
             }
             catch (Exception)
@@ -93,7 +92,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 throw;
             }
 
-            return user;
+            return currentUser;
         }
 
         [Route("forgetpassword")]
