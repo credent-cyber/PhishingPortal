@@ -57,9 +57,11 @@ namespace PhishingPortal.Dto
 
     public class OnPromiseADSettings
     {
-
+        [Required]
         public string Domain { get; set; }
+        [Required]
         public string Password { get; set; }
+        [Required]
         public string Username { get; set; }
 
         public OnPromiseADSettings()
