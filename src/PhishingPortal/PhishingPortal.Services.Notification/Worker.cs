@@ -12,6 +12,7 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.Trainings;
     using PhishingPortal.Services.Notification.EmailTemplate;
     using PhishingPortal.Services.Notification.Email.AppNotifications;
+    using PhishingPortal.Services.Notification.UrlShortner;
 
     public partial class Worker : BackgroundService
     {
@@ -32,6 +33,7 @@ namespace PhishingPortal.Services.Notification
             ITrainingExecutor trainingExecutor,
             IEmailTemplateProvider emailTemplateProvider,
             IAppEventNotifier appEventNotifier,
+            IUrlShortner urlShortner,
             ApplicationSettings applicationSettings
             )
 
@@ -57,6 +59,7 @@ namespace PhishingPortal.Services.Notification
             this._emailTemplateProvider = emailTemplateProvider;
             this._appEventNotifier = appEventNotifier;
             this.applicationSettings = applicationSettings;
+            this.urlShortner = urlShortner;
         }
 
         readonly ILogger<Worker> _logger;
@@ -77,6 +80,7 @@ namespace PhishingPortal.Services.Notification
         private readonly ApplicationSettings applicationSettings;
 
         public ITenantDbConnManager TenantDbConnManager { get; }
+        public IUrlShortner urlShortner { get; }
         public ISmsGatewayClient SmsClient { get; }
         public IWhatsappGatewayClient WaClient { get; }
 
@@ -149,7 +153,7 @@ namespace PhishingPortal.Services.Notification
                                         // whatsapp provider 
                                         if (_settings.EnableWhatsappCampaign)
                                         {
-                                            var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager);
+                                            var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager, urlShortner);
                                             _waProvider.Subscribe(_whatsappCampaignExecutor);
                                             await _waProvider.CheckAndPublish(stoppingToken);
                                         }
