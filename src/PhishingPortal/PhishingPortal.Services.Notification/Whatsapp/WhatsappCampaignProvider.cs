@@ -4,7 +4,7 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Extensions;
 using PhishingPortal.Services.Notification.Helper;
-using PhishingPortal.Services.Notification.Sms;
+using PhishingPortal.Services.Notification.UrlShortner;
 
 namespace PhishingPortal.Services.Notification.Whatsapp
 {
@@ -19,15 +19,17 @@ namespace PhishingPortal.Services.Notification.Whatsapp
         public IConfiguration Config { get; }
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
+        public IUrlShortner urlShortner { get; }
 
         public WhatsappCampaignProvider(ILogger logger,
-            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner)
         {
             Logger = logger;
             WaSender = waSender;
             Config = config;
             Tenant = tenant;
             ConnManager = connManager;
+            urlShortner = UrlShortner;
 
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
@@ -108,7 +110,10 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                         var timestamp = DateTime.Now;
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
-                        var content = template.Content.Replace("###RETURN_URL###", returnUrl);
+
+                        string shortReturnUrl = await urlShortner.CallApiAsync(returnUrl);
+
+                        var content = template.Content.Replace("###RETURN_URL###", shortReturnUrl);
 
                         // TODO: calculate short urls
                         var smsInfo = new WhatsappCampaignInfo()

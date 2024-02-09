@@ -36,6 +36,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
 
         public async Task<bool> Send(string to, string from, string message, string mediaUrl, string file)
         {
+
             string BaseUrl = Configuration.GetSection("DndWhatsappGateway:BaseUrl").Value;
             string WhatsappUri = Configuration.GetSection("DndWhatsappGateway:WhatsappUri").Value;
             string InstanceId = Configuration.GetSection("DndWhatsappGateway:InstanceId").Value;
