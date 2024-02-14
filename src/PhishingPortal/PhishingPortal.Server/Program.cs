@@ -243,6 +243,13 @@ else
 
 app.UseAuthorization();
 
+app.Use((context, next) => {
+
+    var cookie = context.Request.Cookies;
+    return next(context);
+
+});
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();

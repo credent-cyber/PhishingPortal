@@ -9,6 +9,7 @@ using PhishingPortal.Dto;
 using PhishingPortal.Server.Services.Interfaces;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using PhishingPortal.Server.Intrastructure.ActionFilters;
 
 namespace PhishingPortal.Server.Controllers.Api.OData
 {
@@ -23,6 +24,7 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
+        [ODataAuthorize]
         public IQueryable<TrainingLog> Get()
         {
             var result = from tl in DbContext.TrainingLog.AsQueryable()

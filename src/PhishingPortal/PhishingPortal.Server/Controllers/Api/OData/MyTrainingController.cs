@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.Dto;
 using PhishingPortal.Server.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using PhishingPortal.Server.Intrastructure.ActionFilters;
 
 namespace PhishingPortal.Server.Controllers.Api.OData
 {
@@ -21,6 +22,7 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
+        [ODataAuthorize]
         public IQueryable<MyTraining> Get()
         {
             var userEmail = HttpContext.GetUserEmail();

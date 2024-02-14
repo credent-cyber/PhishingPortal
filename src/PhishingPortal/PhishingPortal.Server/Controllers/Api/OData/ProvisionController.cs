@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
+using PhishingPortal.Server.Intrastructure.ActionFilters;
 using PhishingPortal.Server.Services;
 using PhishingPortal.Server.Services.Interfaces;
 using System.Web.Http;
@@ -24,6 +25,7 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
+        [ODataAuthorize]
 
         public IQueryable<Tenant> Get()
         {
