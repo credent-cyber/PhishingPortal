@@ -41,9 +41,7 @@ else
                         </div>
                     </div>
                     <div class="card-body" style="padding-top: 10px;">
-                        <p>User's Identity: @authState.User.Identity.Name</p>
 
-                        <AuthorizeView> <p> @context.User.Identity.Name</p></AuthorizeView>
                         <div class="row">
                             <div class="col-md-6 p-1">
                                 <EditForm Model="@model" OnValidSubmit="@OnValidSubmit">
@@ -493,7 +491,6 @@ else
     public bool sms = false;
     string text = "";
 
-    private AuthenticationState authState;
 
     public string Title
     {
@@ -558,7 +555,7 @@ else
     {
         Templates = await client.GetTemplatesByType(type);
         TrainigList = await client.GetAllTrainings();
-        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
         #region Bind Return urls
         await BindReturnUrlsAsync();
         #endregion
@@ -599,6 +596,7 @@ else
         }
     }
 
+    private AuthenticationState authState;
     protected async Task OnValidSubmit()
     {
         message = string.Empty;
@@ -620,6 +618,13 @@ else
         {
             message = "Please wait";
             int Id = model.Id;
+            
+            authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (Id > 0)
+                model.ModifiedBy = authState.User.Identity.Name;
+            else
+                model.CreatedBy = authState.User.Identity.Name;
+
             model = await client.UpsertCampaignAsync(model);
 
             if (fileimport.Count() > 0)

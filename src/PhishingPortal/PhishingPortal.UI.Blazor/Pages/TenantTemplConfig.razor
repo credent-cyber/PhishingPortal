@@ -20,6 +20,7 @@
 @using System.Web;
 @inject IConfiguration _config
 @attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (model == null)
 {
@@ -360,6 +361,7 @@ else
     }
 
 
+    private AuthenticationState authState;
 
     protected async Task OnSave()
     {
@@ -394,6 +396,13 @@ else
             show = true;
             message = "Please wait";
             int Id = model.Id;
+
+            authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (Id > 0)
+                model.ModifiedBy = authState.User.Identity.Name;
+            else
+                model.CreatedBy = authState.User.Identity.Name;
+
             model = await client.UpsertCampaignTemplate(model);
             IsSuccess = true;
 
