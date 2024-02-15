@@ -25,14 +25,14 @@
 
                         <ul class="nav-links p-0">
                             <hr style="margin: 0;" />
-                            <li>
+                            <li class="@((block == 1) ? "active" : "")">
                                 <a @onclick='()=> { block = 1; heading = "Azure App Configurations"; }'>
                                     <img src="/img/icons/azure.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Azure App Configurations">
                                     <span class="link_name">Azure App Configurations</span>
                                 </a>
                             </li>
                             <hr style="margin: 0;" />
-                            <li>
+                            <li class="@((block == 2) ? "active" : "")">
                                 <div class="iocn-link">
                                     <a @onclick='()=> { block = 2; heading = "OnPremise AD Configurations"; }'>
                                         <img src="/img/icons/AppCircles-AD.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="OnPremise AD Configurations">
@@ -41,7 +41,7 @@
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
-                            <li>
+                            <li class="@((block == 3) ? "active" : "")">
                                 <div class="iocn-link">
                                     <a @onclick='()=> { block = 3; heading = "Domain Configurations"; }'>
                                         <img src="/img/icons/domain.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Domain Configurations">
@@ -50,7 +50,7 @@
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
-                            <li>
+                            <li class="@((block == 4) ? "active" : "")">
                                 <div class="iocn-link">
                                     <a @onclick='()=> { block = 4; heading = "Return Url Configurations"; }'>
                                         <img src="/img/icons/url.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Return Url Configurations">
