@@ -65,9 +65,10 @@ else
                                             <div class="form-group row">
                                                 <label class="col-form-label col-md-4 bold-font required-field">Template Type</label>
                                                 <div class="col-md-8">
+
                                                     <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
 
-                                                        <option>- Select -</option>
+                                                        @* <option>- Select -</option> *@
 
                                                         @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                         {
@@ -77,7 +78,7 @@ else
                                                     <ValidationMessage For="() => model.Type" />
                                                 </div>
                                             </div>
-
+                                           
                                             @if (model.Type == CampaignType.Sms)
                                             {
                                                 <div class="form-group row">
@@ -95,22 +96,22 @@ else
                                                     @if (model.IsActive is false || model.Id == 0)
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="@(()=>model.IsActive = true)">
                                                             <label for="radio-1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="@(()=>model.IsActive = false)" checked>
                                                             <label for="radio-2" class="cr">No</label>
                                                         </div>
                                                     }
                                                     else
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="@(()=>model.IsActive = true)" checked>
                                                             <label for="radio-1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="@(()=>model.IsActive = false)">
                                                             <label for="radio-2" class="cr">No</label>
                                                         </div>
                                                     }
@@ -124,29 +125,29 @@ else
                                                         @if (model.IsHtml is false || model.Id == 0)
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="@(()=>model.IsHtml = true)">
                                                                 <label for="radio-i-infill-1" class="cr">Yes</label>
                                                             </div>
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml" checked>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="@(()=>model.IsHtml = false)" checked>
                                                                 <label for="radio-i-infill-2" class="cr">No</label>
                                                             </div>
                                                         }
                                                         else
                                                         {
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="Ishtml" checked>
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-1" @onclick="@(()=>model.IsHtml = true)" checked>
                                                                 <label for="radio-i-infill-1" class="cr">Yes</label>
                                                             </div>
                                                             <div class="radio radio-info radio-fill d-inline">
-                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="Nohtml">
+                                                                <input type="radio" name="radio-i-in-2" id="radio-i-infill-2" @onclick="@(()=>model.IsHtml = false)">
                                                                 <label for="radio-i-infill-2" class="cr">No</label>
                                                             </div>
                                                         }
                                                     </div>
                                                 </div>
                                             }
-                                           
+
                                             @if (model.Id == 0)
                                             {
 
@@ -154,11 +155,11 @@ else
                                                     <label class="col-form-label col-md-4 bold-font">Import Template</label>
                                                     <div class="col-md-5">
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="Ytemp">
+                                                            <input type="radio" name="radio-itemp" id="radio-i-temp1" @onclick="@(()=>import = true)">
                                                             <label for="radio-i-temp1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="Ntemp" checked>
+                                                            <input type="radio" name="radio-itemp" id="radio-i-temp2" @onclick="@(()=>import = false)" checked>
                                                             <label for="radio-i-temp2" class="cr">No</label>
                                                         </div>
                                                     </div>
@@ -211,31 +212,32 @@ else
 
                                 </EditForm>
                             </div>
+
                             <div class="col-md-6 p-1">
                                 <div class="card" style="margin-bottom: 0;">
                                     <div class="card-body ">
                                         <div class="mb-3">
                                             <label for="Content" class="form-label">Template Content</label>
 
-
-                                            @if (model.Type == CampaignType.Sms)
-                                            {
-
-                                                <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
-                                                <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
-                                            }
-                                            else
+                                            @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
                                             {
                                                 <div class="overflow-auto">
                                                     <!-- Rich text editor -->
                                                     <BlazingComponents.Summernote.Editor />
                                                 </div>
+                                                SummerNoteEditorRefresh();
                                             }
-
+                                            @if (model.Type == CampaignType.Sms)
+                                            {
+                                                <textarea class="col-sm-12" style="background-color:lavender; height:243px;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
+                                                <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
+                                            }
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+
                         </div>
 
                     </div>
@@ -307,6 +309,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         Templates = await client.GetTemplatesByType(type);
+
         if (Id != 0)
         {
             message = string.Empty;
@@ -320,6 +323,7 @@ else
             message = string.Empty;
             model = new CampaignTemplate();
             model.Version = "1";
+            model.Type = CampaignType.Email;
 
         }
 
@@ -370,7 +374,8 @@ else
         IsError = false;
         IsSuccess = false;
         TaskCompleted = false;
-
+        show = true;
+        message = "Please wait";
         if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
         {
             model.Content = contents = await GetSummerNoteContent();
@@ -386,14 +391,12 @@ else
         {
             IsError = true;
             message = "Template Content can't be null.";
-            show = true;
             TaskCompleted = true;
             return;
         }
 
         try
-        {
-            show = true;
+        {           
             message = "Please wait";
             int Id = model.Id;
 
@@ -426,14 +429,12 @@ else
     {
         NavigationManager.NavigateTo("tenant-templates");
     }
-    protected void OnActive() { model.IsActive = true; }
-    protected void OnNoActive() { model.IsActive = false; }
 
-    protected void Ishtml() { model.IsHtml = true; }
-    protected void Nohtml() { model.IsHtml = false; }
-
-    protected void Ytemp() { import = true; }
-    protected void Ntemp() { import = false; }
+    public async Task SummerNoteEditorRefresh()
+    {
+        string content = await GetSummerNoteContent();
+        UpdateSummerNoteContent(content);
+    }
 
     string result = "";
     public async Task LoadFiles(InputFileChangeEventArgs e)
@@ -483,7 +484,7 @@ else
         var result = await JSRuntime.InvokeAsync<string>("getSummernoteEditorContent", selector);
         return result;
     }
-   
+
 
     //Image Upload
     List<ImageFile> filesBase64 = new List<ImageFile>();
@@ -528,6 +529,7 @@ else
             model = new CampaignTemplate();
             contents = string.Empty;
             model.Content = null;
+            model.Type = CampaignType.Email;
         }
     }
 
@@ -544,9 +546,6 @@ else
 
         return plainText;
     }
-
-    
-
 
 }
 
