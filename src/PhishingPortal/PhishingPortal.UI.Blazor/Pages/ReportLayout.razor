@@ -255,7 +255,7 @@
         reported = 0;
 
         // Create a new GridODataClient with the filtered query and other settings
-        var client = new GridODataClient<CampaignLog>(
+        var Client = new GridODataClient<CampaignLog>(
             HttpClient,
             "Odata/Campaignlog?t=" + authState.TenantIdentifier,
             filteredQuery,
@@ -272,49 +272,64 @@
         .Searchable(true, false, false);
 
         // Retrieve the data for the filtered query
-        await client.UpdateGrid();
+        await Client.UpdateGrid();
 
         // Get all the records from the filtered query
-        var filteredRecords = client.Grid.Items;
-
+        var filteredRecords = Client.Grid.Items;
         hits = filteredRecords.Count(record => record.IsHit);
         reported = filteredRecords.Count(record => record.IsReported);
         total = filteredRecords.Count();
+        IEnumerable<CampaignLog> CountData = null;
+        if(Id > 0)
+        {      
+            var campId = filteredRecords.FirstOrDefault().CampaignId;
+            CountData = await client.DrillDownReportCount(campId);
+            hits = CountData.Count(record => record.IsHit);
+            reported = CountData.Count(record => record.IsReported);
+            total = CountData.Count();
+        }
+        else if ( data != null)
+        {
+            
+        }
+
+        
         if (total > 0)
         {
             pronePercent = Math.Round((decimal)hits / total * 100, 2);
         }
         CampaignLogs = filteredRecords.ToList() ?? Enumerable.Empty<CampaignLog>().ToList();
 
-        var data = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
+        var campaignLogData = CampaignLogs.GroupBy(o => o.CampaignId, v => v, (k, v) => new
         {
             CampaignId = k,
             Logs = v,
         });
 
-        BarChart1Labels = data.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
+        BarChart1Labels = campaignLogData.Select(o => o.Logs.First()?.Camp.Name ?? string.Empty).Distinct().ToArray();
 
         BarChart1Data.Clear();
 
         BarChart1Data.Add(new ChartJsDataset
             {
                 Label = "Total",
-                Data = data.Select(o => o.Logs.Count().ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.MediumBlue, data.Select(o => o.CampaignId).Count()),
+                Data = Id > 0 ? new[] { CountData.Count().ToString() } : campaignLogData.Select(o => o.Logs.Count().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.MediumBlue, campaignLogData.Select(o => o.CampaignId).Count())
             });
+
 
         BarChart1Data.Add(new ChartJsDataset
             {
                 Label = "Hits",
-                Data = data.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightPink, data.Select(o => o.CampaignId).Count()),
+                Data = Id > 0 ? new[] { CountData.Count(o=>o.IsHit).ToString() } : campaignLogData.Select(o => o.Logs.Count(o => o.IsHit).ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightPink, campaignLogData.Select(o => o.CampaignId).Count()),
             });
 
         BarChart1Data.Add(new ChartJsDataset
             {
                 Label = "Reported",
-                Data = data.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightGreen, data.Select(o => o.CampaignId).Count()),
+                Data = Id > 0 ? new[] { CountData.Count(o => o.IsReported).ToString() } : campaignLogData.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightGreen, campaignLogData.Select(o => o.CampaignId).Count()),
             });
         StateHasChanged();
     }

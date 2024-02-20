@@ -14,7 +14,6 @@ namespace PhishingPortal.Server.Controllers.Api
     using Microsoft.AspNetCore.Mvc;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
- 
 
     [Route("api/[controller]")]
     [ApiController]
@@ -843,5 +842,14 @@ namespace PhishingPortal.Server.Controllers.Api
             return await _tenantRepository.CampaignSpamReport(request.Param);
 
         }
+
+        #region Report
+        [HttpGet]
+        [Route("DrillDownReportCount/{campaignId}")]
+        public async Task<IEnumerable<CampaignLog>> DrillDownReportCount(int campaignId)
+        {
+            return await _tenantRepository.DrillDownReportCount(campaignId);
+        }
+        #endregion
     }
 }

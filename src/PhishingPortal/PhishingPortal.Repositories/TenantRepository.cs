@@ -294,7 +294,8 @@ namespace PhishingPortal.Repositories
                 var totatPhishingTests = TenantDbCtx.CampaignLogs
                   .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
 
-                var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region EMAIL CHART ANALYSIS
+                var campaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -326,7 +327,7 @@ namespace PhishingPortal.Repositories
 
                 //email campaign - department wise data 
 
-                int count = 0, id1 = 1, id2 = 1, id3 = 1, id4 = 1, id5 = 1;
+                int count = 0, id1 = 0, id2 = 0, id3 = 0, id4 = 0, id5 = 0;
                 foreach (var id in ids)
                 {
                     count += 1;
@@ -343,14 +344,13 @@ namespace PhishingPortal.Repositories
 
                 }
 
-                var filterData = TenantDbCtx.CampaignLogs
-                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
+                var filterData = totatPhishingTests.Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
 
                 var phishtestWithRecipients = from log in filterData
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
 
-                var depatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.Department, (key, entries) => new
+                var depatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
@@ -380,7 +380,7 @@ namespace PhishingPortal.Repositories
                                         join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
                                         select new { logEntry = log, template = ctem.Name, templateId = ctem.Id };
 
-                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
 
@@ -429,9 +429,10 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
+                #endregion
 
-                //Ext for sms
-                var SmscampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region SMS CHART ANALYSIS
+                var SmsCampaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -439,7 +440,7 @@ namespace PhishingPortal.Repositories
                     TotalReported = entries.Count(i => i.IsReported),
                 });
 
-                foreach (var c in SmscampaignGroup)
+                foreach (var c in SmsCampaignGroup)
                 {
                     var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
 
@@ -458,17 +459,41 @@ namespace PhishingPortal.Repositories
                 }
                 data.SmsEntries = data.SmsEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
                 data.TotalSmsCampaigns = data.SmsEntries.Sum(i => i.Count);
+                var sIds = data.SmsEntries;
+                int sCount = 0, sId1 = 0, sId2 = 0, sId3 = 0, sId4 = 0, sId5 = 0;
+                foreach (var id in sIds)
+                {
+                    sCount += 1;
+                    if (sCount == 1)
+                        sId1 = id.Campaign.Id;
+                    if (sCount == 2)
+                        sId2 = id.Campaign.Id;
+                    if (sCount == 3)
+                        sId3 = id.Campaign.Id;
+                    if (sCount == 4)
+                        sId4 = id.Campaign.Id;
+                    if (sCount == 5)
+                        sId5 = id.Campaign.Id;
+
+                }
+
+                var filterSmsData = totatPhishingTests.Where(o => o.CampaignId == sId1 || o.CampaignId == sId2 || o.CampaignId == sId3 || o.CampaignId == sId4 || o.CampaignId == sId5);
+
+                var smsPhishtestWithRecipients = from log in filterSmsData
+                                                      join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                                      select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Sms camp**************************************************
-                var SmsdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.Department, (key, entries) => new
+
+                var SmsDepatwiseCount = smsPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
                     Hits = entries.Count(o => o.logEntry.IsHit),
                     Reported = entries.Count(o => o.logEntry.IsReported),
                 });
-                var SmsDtotalHits = SmsdepatwiseCnt.Sum(o => o.Hits);
+                var SmsDtotalHits = SmsDepatwiseCount.Sum(o => o.Hits);
 
-                foreach (var dep in SmsdepatwiseCnt)
+                foreach (var dep in SmsDepatwiseCount)
                 {
                     if (dep.Total > 0)
                     {
@@ -483,7 +508,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Sms Template wise**********************************
-                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
@@ -504,7 +529,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************** Sms category wise********************************************
-                var SmscategoryWiseGrp = data.SmsEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                var SmsCategoryWiseGrp = data.SmsEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
                 {
                     Category = key,
                     Count = values.Sum(o => o.Count),
@@ -512,10 +537,10 @@ namespace PhishingPortal.Repositories
                     ReportedCount = values.Sum(o => o.Reported),
                 });
 
-                var SmstotalHits = SmscategoryWiseGrp.Sum(o => o.HitCount);
+                var SmstotalHits = SmsCategoryWiseGrp.Sum(o => o.HitCount);
 
                 // calc phishing percentage out of total hits
-                foreach (var category in SmscategoryWiseGrp)
+                foreach (var category in SmsCategoryWiseGrp)
                 {
                     if (category.Count > 0 && data.TotalSmsCampaigns > 0)
                     {
@@ -529,9 +554,10 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
+                #endregion
 
-                //Ext for Whatsapp
-                var WhatsappcampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region WHATSAPP CHART ANALYSIS
+                var WhatsappcampaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -558,17 +584,40 @@ namespace PhishingPortal.Repositories
                 }
                 data.WhatsappEntries = data.WhatsappEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
                 data.TotalWhatsappCampaigns = data.WhatsappEntries.Sum(i => i.Count);
+                var WhatsappIds = data.WhatsappEntries;
+                int wCount = 0, wid1 = 0, wid2 = 0, wid3 = 0, wid4 = 0, wid5 = 0;
+                foreach (var id in WhatsappIds)
+                {
+                    wCount += 1;
+                    if (wCount == 1)
+                        wid1 = id.Campaign.Id;
+                    if (wCount == 2)
+                        wid2 = id.Campaign.Id;
+                    if (wCount == 3)
+                        wid3 = id.Campaign.Id;
+                    if (wCount == 4)
+                        wid4 = id.Campaign.Id;
+                    if (wCount == 5)
+                        wid5 = id.Campaign.Id;
+
+                }
+
+                var filterWhatsappData = totatPhishingTests.Where(o => o.CampaignId == wid1 || o.CampaignId == wid2 || o.CampaignId == wid3 || o.CampaignId == wid4 || o.CampaignId == wid5);
+
+                var whatsappPhishtestWithRecipients = from log in filterWhatsappData
+                                                      join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                              select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Whatsapp camp**************************************************
-                var WhatsappdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.Department, (key, entries) => new
+                var WhatsappDepatwiseCount = whatsappPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
                     Hits = entries.Count(o => o.logEntry.IsHit),
                     Reported = entries.Count(o => o.logEntry.IsReported),
                 });
-                var WhatsappDtotalHits = WhatsappdepatwiseCnt.Sum(o => o.Hits);
+                var WhatsappDtotalHits = WhatsappDepatwiseCount.Sum(o => o.Hits);
 
-                foreach (var dep in WhatsappdepatwiseCnt)
+                foreach (var dep in WhatsappDepatwiseCount)
                 {
                     if (dep.Total > 0)
                     {
@@ -583,15 +632,16 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Whatsapp Template wise**********************************
-                var WhatsapptempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+
+                var WhatsappTempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
                     THits = tentries.Count(o => o.logEntry.IsHit)
                 });
-                var WhatsappTemptotalHits = WhatsapptempwiseCnt.Sum(o => o.THits);
+                var WhatsappTemptotalHits = WhatsappTempwiseCnt.Sum(o => o.THits);
 
-                foreach (var tem in WhatsapptempwiseCnt)
+                foreach (var tem in WhatsappTempwiseCnt)
                 {
                     if (tem.TTotal > 0)
                     {
@@ -605,7 +655,7 @@ namespace PhishingPortal.Repositories
                 }
 
                 //*************************** Whatsapp category wise********************************************
-                var WhatsappcategoryWiseGrp = data.WhatsappEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                var WhatsappCategoryWiseGrp = data.WhatsappEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
                 {
                     Category = key,
                     Count = values.Sum(o => o.Count),
@@ -613,10 +663,10 @@ namespace PhishingPortal.Repositories
                     ReportedCount = values.Sum(o => o.Reported),
                 });
 
-                var WhatsapptotalHits = WhatsappcategoryWiseGrp.Sum(o => o.HitCount);
+                var WhatsapptotalHits = WhatsappCategoryWiseGrp.Sum(o => o.HitCount);
 
                 // calc phishing percentage out of total hits
-                foreach (var category in WhatsappcategoryWiseGrp)
+                foreach (var category in WhatsappCategoryWiseGrp)
                 {
                     if (category.Count > 0 && data.TotalWhatsappCampaigns > 0)
                     {
@@ -630,7 +680,7 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
-
+                #endregion
             }
             catch (Exception ex)
             {
@@ -1549,5 +1599,12 @@ namespace PhishingPortal.Repositories
 
         }
 
+        #region Report
+        public async Task<IEnumerable<CampaignLog>> DrillDownReportCount(int campId)
+        { 
+             var data = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == campId);
+             return data;
+        }
+        #endregion
     }
 }

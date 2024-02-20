@@ -672,7 +672,7 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Email per Campaign
                     });
 
-                //Email pie chart
+                //Email Category Wise Failure %
                 foreach (var entry in data2.CategoryClickRatioDictionary)
                 {
                     if (entry.Value != 0)
@@ -681,7 +681,7 @@
                         PieChart1Labels.Add(entry.Key.ToUpper());
                     }
                 }
-
+                //Email Clicks % by Department
                 foreach (var entry in data2.DepartEntries)
                 {
                     if (entry.Value != 0)
@@ -690,6 +690,7 @@
                         Donut1Labels.Add(entry.Key.ToUpper());
                     }
                 }
+                //Email Percentage of Email Campaign Template
                 foreach (var entry in data2.TemplateClickEntries)
                 {
                     if (entry.Value != 0)
@@ -741,7 +742,7 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Blue, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Sms per Campaign
                     });
 
-                //Sms pie chart
+                //SMS Category Wise Failure %
                 foreach (var entry in data2.SmsCategoryClickRatioDictionary)
                 {
                     if (entry.Value != 0)
@@ -750,7 +751,7 @@
                         SmsPieChartLabels.Add(entry.Key.ToUpper());
                     }
                 }
-
+                //SMS Clicks % by Department
                 foreach (var entry in data2.SmsDepartEntries)
                 {
                     if (entry.Value != 0)
@@ -759,6 +760,7 @@
                         SmsDonutLabels.Add(entry.Key.ToUpper());
                     }
                 }
+                //SMS Percentage of Email Campaign Template
                 foreach (var entry in data2.SmsTemplateClickEntries)
                 {
                     if (entry.Value != 0)
@@ -803,7 +805,7 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.BlueViolet, data2.Entries.Count > 0 ? data2.Entries.Count : 1), //Trend of Clicks on Whatsapp per Campaign
                     });
 
-                //Whatsapp pie chart
+                //Whatsapp Category Wise Failure %
                 foreach (var entry in data2.WhatsappCategoryClickRatioDictionary)
                 {
                     if (entry.Value != 0)
@@ -812,7 +814,7 @@
                         WhatsappPieChartLabels.Add(entry.Key.ToUpper());
                     }
                 }
-
+                //Whatsapp Clicks % by Department
                 foreach (var entry in data2.WhatsappDepartEntries)
                 {
                     if (entry.Value != 0)
@@ -821,6 +823,7 @@
                         WhatsappDonutLabels.Add(entry.Key.ToUpper());
                     }
                 }
+                //Whatasapp Percentage of Email Campaign Template
                 foreach (var entry in data2.WhatsappTemplateClickEntries)
                 {
                     if (entry.Value != 0)
