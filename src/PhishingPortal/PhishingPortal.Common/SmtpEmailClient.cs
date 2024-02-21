@@ -47,7 +47,7 @@
         /// <param name="correlationId"></param>
         /// <param name="from"></param>
         /// <returns></returns>
-        public async Task sendEmailAsync(string email, string subject, string content, bool isHtml = true, string correlationId = "", string from = "")
+        public async Task SendEmailAsync(string email, string subject, string content, bool isHtml = true, string correlationId = "", string from = "")
         {
             
             Logger.LogInformation($"SendEmailAsync - Start");
