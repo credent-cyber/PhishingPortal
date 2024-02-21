@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhishingPortal.Common;
@@ -11,7 +12,7 @@ public class EmailSender : IEmailSender
 {
     private readonly ILogger _logger;
     private readonly IEmailClient _emailClient;
-
+    
     public EmailSender(ILogger<EmailSender> logger, IEmailClient emailClient)
     {
         _logger = logger;
@@ -20,13 +21,15 @@ public class EmailSender : IEmailSender
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        await Execute(email, subject, htmlMessage);
+        //await Execute(email, subject, htmlMessage);
+
+        await _emailClient.sendEmailAsync(email, subject, htmlMessage, true, string.Empty, string.Empty);
     }
 
     public async Task Execute(string email, string subject, string message)
     {
         _logger.LogInformation("Sending email");
-
+        
         var mailMessage = new MailMessage();
         mailMessage.IsBodyHtml = true;
         mailMessage.Body = message;

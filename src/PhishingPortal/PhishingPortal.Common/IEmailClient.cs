@@ -5,7 +5,7 @@
 
     public interface IEmailClient
     {
-        Task SendEmailAsync(string email, string subject, string content, bool isHtml = true, string correlationId = "", string from = "");
+        Task sendEmailAsync(string email, string subject, string content, bool isHtml = true, string correlationId = "", string from = "");
         Task SendEmailAsync(MailMessage message, string correlationId = "");
     }
 }
