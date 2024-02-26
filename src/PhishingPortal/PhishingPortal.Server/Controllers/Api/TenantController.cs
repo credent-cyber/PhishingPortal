@@ -845,10 +845,18 @@ namespace PhishingPortal.Server.Controllers.Api
 
         #region Report
         [HttpGet]
-        [Route("DrillDownReportCount/{campaignId}")]
-        public async Task<IEnumerable<CampaignLog>> DrillDownReportCount(int campaignId)
+        [Route("BarChartDrillDownReportCount/{campaignId}")]
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campaignId)
         {
-            return await _tenantRepository.DrillDownReportCount(campaignId);
+            return await _tenantRepository.BarChartDrillDownReportCount(campaignId);
+        }
+
+
+        [HttpPost]
+        [Route("PieChartDrillDownReportCount")]
+        public async Task<IQueryable<ReportDataCounts>> PieChartDrillDownReportCount([FromBody] DrillDownReportCountParameter parameters)
+        {
+                return await _tenantRepository.PieChartDrillDownReportCount(parameters);        
         }
         #endregion
     }

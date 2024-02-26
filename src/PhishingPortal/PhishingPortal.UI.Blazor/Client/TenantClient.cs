@@ -1030,11 +1030,11 @@ namespace PhishingPortal.UI.Blazor.Client
         #endregion
 
         #region Report
-        public async Task<IEnumerable<CampaignLog>> DrillDownReportCount(int campaignId)
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campaignId)
         {
             try
             {
-                var res = await HttpClient.GetAsync($"api/tenant/DrillDownReportCount/{campaignId}");
+                var res = await HttpClient.GetAsync($"api/tenant/BarChartDrillDownReportCount/{campaignId}");
 
                 res.EnsureSuccessStatusCode();
 
@@ -1046,6 +1046,16 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 return null;
             }
+        }
+
+        public async Task<IEnumerable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter filters)
+        {
+            var res = await HttpClient.PostAsJsonAsync("api/tenant/PieChartDrillDownReportCount", filters);
+
+            res.EnsureSuccessStatusCode();
+
+            var data = await res.Content.ReadFromJsonAsync<IEnumerable<ReportDataCounts>>();
+            return data;
         }
 
         #endregion

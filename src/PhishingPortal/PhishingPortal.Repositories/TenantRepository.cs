@@ -1600,11 +1600,53 @@ namespace PhishingPortal.Repositories
         }
 
         #region Report
-        public async Task<IEnumerable<CampaignLog>> DrillDownReportCount(int campId)
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campId)
         { 
              var data = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == campId);
              return data;
         }
+
+        public async Task<IQueryable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter parameters)
+        {
+            var allIds = parameters.Ids.Split('a').Select(x => int.Parse(x)).ToList();
+
+            var data = await TenantDbCtx.CampaignLogs
+                .Include(o => o.Camp)
+                .ThenInclude(o => o.Detail)
+                .Include(o => o.Recipient)
+                .ThenInclude(o => o.Recipient)
+                .Where(x => allIds.Contains(x.CampaignId))
+                .ToListAsync();
+
+            var campaignLogs = data.AsQueryable();
+
+            if (parameters.type == "Department")
+            {
+                campaignLogs = campaignLogs.Where(o => o.Recipient.Recipient.Department.Equals(parameters.filter, StringComparison.OrdinalIgnoreCase));
+            }
+            else if (parameters.type == "Category")
+            {
+                campaignLogs = campaignLogs.Where(o => o.Camp.Category.Equals(parameters.filter, StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                campaignLogs = campaignLogs.Where(o => o.Camp.Detail.CampaignTemplateId == int.Parse(parameters.filter));
+            }
+
+            var filterData = campaignLogs.GroupBy(i => i.CampaignId)
+                .Select(group => new ReportDataCounts
+                {
+                    CampaignId = group.Key,
+                    CampaignName = string.Join(", ", group.Where(o => o.CampaignId == group.Key).Select(o => o.Camp.Name).Distinct()),
+                    Total = group.Count(),
+                    Hits = group.Count(g => g.IsHit),
+                    Reported = group.Count(g => g.IsReported),
+                });
+
+            return filterData.AsQueryable();
+        }
+
+
         #endregion
     }
 }
