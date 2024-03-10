@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
@@ -1028,6 +1029,35 @@ namespace PhishingPortal.UI.Blazor.Client
 
         #endregion
 
+        #region Report
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campaignId)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/BarChartDrillDownReportCount/{campaignId}");
 
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
+
+                
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter filters)
+        {
+            var res = await HttpClient.PostAsJsonAsync("api/tenant/PieChartDrillDownReportCount", filters);
+
+            res.EnsureSuccessStatusCode();
+
+            var data = await res.Content.ReadFromJsonAsync<IEnumerable<ReportDataCounts>>();
+            return data;
+        }
+
+        #endregion
     }
 }

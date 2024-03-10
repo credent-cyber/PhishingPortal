@@ -16,6 +16,7 @@
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
 @attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 
 @if (model == null)
@@ -64,22 +65,22 @@ else
                                                     @if (model.TrainingTrigger is false || model.Id == 0)
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger">
+                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="@(()=>model.TrainingTrigger = true)">
                                                             <label for="radio-t1" class="cr">Yes</label>
                                                         </div>
-                                                        <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger" checked>
+                                                    <div class="radio radio-info radio-fill d-inline">
+                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="@(() => { model.TrainingTrigger = true; SelectedCampaigns.Clear(); })" checked>
                                                             <label for="radio-t2" class="cr">No</label>
                                                         </div>
                                                     }
                                                     else
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="OnTrigger" checked>
+                                                            <input type="radio" name="trigger" id="radio-t1" @onclick="@(()=>model.TrainingTrigger = true)" checked>
                                                             <label for="radio-t1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="OffTrigger">
+                                                            <input type="radio" name="trigger" id="radio-t2" @onclick="@(() => { model.TrainingTrigger = true; SelectedCampaigns.Clear(); })">
                                                             <label for="radio-t2" class="cr">No</label>
                                                         </div>
                                                     }
@@ -142,22 +143,22 @@ else
                                                     @if (model.IsActive is false || model.Id == 0)
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="@(()=>model.IsActive = true)">
                                                             <label for="radio-1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive" checked>
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="@(()=>model.IsActive = false)" checked>
                                                             <label for="radio-2" class="cr">No</label>
                                                         </div>
                                                     }
                                                     else
                                                     {
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="OnActive" checked>
+                                                        <input type="radio" name="radio-i-in-1" id="radio-1" @onclick="@(()=>model.IsActive = true)" checked>
                                                             <label for="radio-1" class="cr">Yes</label>
                                                         </div>
                                                         <div class="radio radio-info radio-fill d-inline">
-                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="OnNoActive">
+                                                            <input type="radio" name="radio-i-in-1" id="radio-2" @onclick="@(()=>model.IsActive = false)">
                                                             <label for="radio-2" class="cr">No</label>
                                                         </div>
                                                     }
@@ -306,6 +307,7 @@ else
                                                 <!-- Rich text editor -->
                                                 <BlazingComponents.Summernote.Editor />
                                             </div>
+                                            @{SummerNoteEditorRefresh();}
                                         </div>
                                     </div>
                                 </div>
@@ -495,7 +497,7 @@ else
         showPreview = false;
     }
 
-
+    private AuthenticationState authState;
     protected async Task OnSave()
     {
         message = string.Empty;
@@ -516,6 +518,13 @@ else
         {
             message = "Please wait";
             int Id = model.Id;
+
+            authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (Id > 0)
+                model.ModifiedBy = authState.User.Identity.Name;
+            else
+                model.CreatedBy = authState.User.Identity.Name;
+
             contents = await GetSummerNoteContent();
             model.Content = contents;
             UpdateModelScheduleInfo();
@@ -560,13 +569,12 @@ else
     {
         NavigationManager.NavigateTo("training");
     }
-    protected void OnActive() { model.IsActive = true; }
-    protected void OnNoActive() { model.IsActive = false; }
 
-    protected void OnTrigger() { model.TrainingTrigger = true; }
-    protected void OffTrigger() { model.TrainingTrigger = false; SelectedCampaigns.Clear(); }
-
-
+    public async Task SummerNoteEditorRefresh()
+    {
+        string content = await GetSummerNoteContent();
+        UpdateSummerNoteContent(content);
+    }
     protected void UpdateSummerNoteContent(string content)
     {
         var selector = "div[id^=BlazingSummerNote]";
