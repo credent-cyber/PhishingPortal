@@ -1,0 +1,109 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+<div class="row m-1">
+    <EditForm Model="model" OnValidSubmit="@OnSubmit">
+        <DataAnnotationsValidator />
+        <div class="form-group row mt-1">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Enable Weekly Report</label>
+            <div class="col-md-10">
+                <input type="checkbox" @bind="@model.IsEnabled" style="margin-top: 10px;"></input>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Report Recipients Email</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.ReportRecipentsEmails" id="ReportRecipentsEmails" class="form-control"></InputText>
+                <ValidationMessage For="() => model.ReportRecipentsEmails" />
+                <i style="font-size:10px;">For multiple emails, they should be separated with ";"</i>
+            </div>
+        </div>
+
+        <hr />
+        <div class="mt-4" style="text-align:left;">
+            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+        </div>
+    </EditForm>
+
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+    </Dailog>
+
+</div>
+
+@code {
+    private WeeklySummaryReportSettings model = new();
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+
+    private bool show = false;
+    private string message = string.Empty;
+    string MessageBody = "Thank you!";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await client.GetSettings();
+
+        if (settings.ContainsKey("weekly_report_recipients"))
+            model = new WeeklySummaryReportSettings(settings);
+    }
+
+    public async Task OnSubmit()
+    {
+        if (model != null)
+        {
+            message = string.Empty;
+            MessageBody = "Thank you!";
+            IsError = false;
+            IsSuccess = false;
+            show = true;
+            TaskCompleted = false;
+
+            try
+            {
+                message = "Please wait";
+
+                var result = await client.UpsertSettings(model.ToSettingsDictionary());
+
+                model = new WeeklySummaryReportSettings(result);
+
+                message = "Saved!";
+                TaskCompleted = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                IsError = true;
+                message = "Error!";
+                MessageBody = ex.Message;
+                TaskCompleted = true;
+            }
+        }
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+    }
+}

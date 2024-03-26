@@ -68,6 +68,15 @@
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
+                            <li class="@((block == 6) ? "active" : "")">
+                                <div class="iocn-link">
+                                    <a @onclick='()=> { block = 6; heading = "Email Settings"; }'>
+                                        <img src="/img/icons/emailSetting.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Email Settings">
+                                        <span class="link_name">Email Settings</span>
+                                    </a>
+                                </div>
+                            </li>
+                            <hr style="margin: 0;" />
                         </ul>
                     </div>
                     <section class="home-section">
@@ -95,6 +104,10 @@
                             @if (block == 5)
                             {
                                 <WeeklySummarySetting />
+                            }
+                            @if (block == 6)
+                            {
+                               <EmailSetting />
                             }
                         </div>
                     </section>
