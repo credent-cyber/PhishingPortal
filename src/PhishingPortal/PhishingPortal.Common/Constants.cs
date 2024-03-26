@@ -38,6 +38,10 @@
             public const string OnPromiseAD_Doamin = "ad_domain";
             public const string OnPromiseAD_Username = "ad_username";
             public const string OnPromiseAD_Password = "ad_password";
+
+            //Weekly Summary Report setting
+            public const string WeeklyReport_IsEnabled = "weekly_report_enable";
+            public const string WeeklyReport_RecipientsMail = "weekly_report_recipients";
     
             public static string MonitoredMailBoxFilters { get; set; }
         }

@@ -104,4 +104,41 @@ namespace PhishingPortal.Dto
 
        
     }
+
+    public class WeeklySummaryReportSettings
+    {
+        public bool IsEnabled { get; set; }
+
+        [Required]
+        public string ReportRecipentsEmails { get; set; }
+
+        public WeeklySummaryReportSettings()
+        {
+             IsEnabled = false;
+             ReportRecipentsEmails = string.Empty;
+        }
+
+        public WeeklySummaryReportSettings(bool isEnabled, string reportRecipentsEmails)
+        {
+            IsEnabled = isEnabled;
+            ReportRecipentsEmails = reportRecipentsEmails;
+        }
+
+        public WeeklySummaryReportSettings(Dictionary<string, string> values)
+        {
+            IsEnabled = bool.Parse(values.GetValueOrDefault(Constants.Keys.WeeklyReport_IsEnabled, "false"));
+            ReportRecipentsEmails = values.GetValueOrDefault(Constants.Keys.WeeklyReport_RecipientsMail, String.Empty);
+        }
+
+        public Dictionary<string, string> ToSettingsDictionary()
+        {
+            var result = new Dictionary<string, string>();
+
+            result[Constants.Keys.WeeklyReport_IsEnabled] = IsEnabled.ToString();
+            result[Constants.Keys.WeeklyReport_RecipientsMail] = ReportRecipentsEmails;
+
+            return result;
+        }
+
+    }
 }
