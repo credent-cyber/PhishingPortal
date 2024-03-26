@@ -12,6 +12,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="wwwroot\img\email\**" />
+	  <Content Remove="wwwroot\img\email\**" />
+	  <EmbeddedResource Remove="wwwroot\img\email\**" />
+	  <None Remove="wwwroot\img\email\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.chartjs\6.0.8\contentFiles\any\net6.0\wwwroot\Chart.js" />
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.chartjs\6.0.8\contentFiles\any\net6.0\wwwroot\lib\Chart.js\chart.esm.js" />
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.chartjs\6.0.8\contentFiles\any\net6.0\wwwroot\lib\Chart.js\chart.esm.min.js" />
@@ -223,12 +230,6 @@
 	  <Content Update="wwwroot\scripts\bootstrap.bundle.min.js">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\img\email\" />
-	  <Folder Include="wwwroot\img\email\" />
-	  <Folder Include="wwwroot\timg\" />
 	</ItemGroup>
 
 	

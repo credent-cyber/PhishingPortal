@@ -59,6 +59,15 @@
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
+                            <li class="@((block == 5) ? "active" : "")">
+                                <div class="iocn-link">
+                                    <a @onclick='()=> { block = 5; heading = "Weekly Report Setting"; }'>
+                                        <img src="/img/icons/weekly-report.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Weekly Report Setting">
+                                        <span class="link_name">Weekly Report Setting</span>
+                                    </a>
+                                </div>
+                            </li>
+                            <hr style="margin: 0;" />
                         </ul>
                     </div>
                     <section class="home-section">
@@ -82,6 +91,10 @@
                             @if (block == 4)
                             {
                                 <TenantRedirecUrls />
+                            }
+                            @if (block == 5)
+                            {
+                                <WeeklySummarySetting />
                             }
                         </div>
                     </section>
