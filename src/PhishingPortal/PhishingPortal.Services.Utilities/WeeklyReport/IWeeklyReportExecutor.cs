@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace PhishingPortal.Services.Utilities.WeeklyReport
 {
-    public interface IWeeklySummaryReports : IReportProvider, IObservable<EmailCampaignInfo> { }
+    public interface IWeeklyReportExecutor : IObserver<EmailCampaignInfo>
+    {
+        IEmailClient EmailSender { get; }
 
+        void Start();
+        void Stop();
+    }
 }

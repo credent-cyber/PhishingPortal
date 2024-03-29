@@ -16,7 +16,9 @@ namespace PhishingPortal.Services.Utilities
             IEmailClient emailClient,
             IConfiguration configuration,
             IWeeklySummaryReports weeklySummaryReports,
+            IWeeklyReportExecutor weeklyReportExecutor,
             CentralDbContext centralDbContext,
+            ITenantDbConnManager tenantDbConnManager,
             ApplicationSettings applicationSettings
             )
 
@@ -28,16 +30,20 @@ namespace PhishingPortal.Services.Utilities
             _settings = applicationSettings;
             this._emailClient = emailClient;
             this._weeklySummaryReports = weeklySummaryReports;
+            this._weeklyReportExecutor = weeklyReportExecutor;
             _configuration = configuration;
             _centralDbContext = centralDbContext;
+            TenantDbConnManager = tenantDbConnManager;
 
         }
 
         readonly ILogger<Worker> _logger;
+        private readonly ILogger<WeeklySummaryReports> providerLogger;
         readonly ApplicationSettings _settings;
         readonly IEmailClient _emailClient;
         readonly IConfiguration _configuration;
         readonly IWeeklySummaryReports _weeklySummaryReports;
+        readonly IWeeklyReportExecutor _weeklyReportExecutor;
         readonly CentralDbContext _centralDbContext;
         bool _isprocessing = false;
         private readonly ApplicationSettings applicationSettings;
@@ -49,7 +55,7 @@ namespace PhishingPortal.Services.Utilities
         {
 
             if (_settings.EnableWeeklyReportService)
-                _weeklySummaryReports.Start();
+                _weeklyReportExecutor.Start();
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -75,26 +81,25 @@ namespace PhishingPortal.Services.Utilities
                         foreach (var tenant in tenants)
                         {
                             //var task = await Task.Factory.StartNew(async () =>
-                            var task = Task.Run(async () =>
+                            var task = Task.Run((Func<Task?>)(async () =>
                                 {
                                     try
                                     {
-                                        // run email campaing for each tenant
                                         if (_settings.EnableWeeklyReportService)
                                         {
-                                            //var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
-                                            //provider.Subscribe(_campaignExecutor);
-                                            //await provider.CheckAndPublish(stoppingToken);
+                                            var provider = new WeeklySummaryReports(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                            provider.Subscribe((IObserver<EmailCampaignInfo>)this._weeklyReportExecutor);
+                                            await provider.CheckAndPublish(stoppingToken);
 
                                         }
 
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                        _logger.LogCritical(ex, $"Error while executing Weekly Report for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
                                     }
 
-                                });
+                                }));
 
                             allTasks.Add(task);
 
@@ -117,6 +122,7 @@ namespace PhishingPortal.Services.Utilities
                 }
             }
 
+            _weeklyReportExecutor.Stop();
         }
 
     }

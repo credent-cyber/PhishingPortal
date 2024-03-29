@@ -4,8 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PhishingPortal.Common;
 using PhishingPortal.DataContext;
 using PhishingPortal.Services.Utilities;
+using PhishingPortal.Services.Utilities.Helper;
+using PhishingPortal.Services.Utilities.WeeklyReport;
 using Serilog;
 
 class Program
@@ -73,8 +76,12 @@ class Program
 
                     services.AddSingleton<CentralDbContext>(new CentralDbContext(ctxBuilder.Options));
                 }
+                services.AddTransient<PhishingPortal.Dto.Tenant>();
                 services.AddScoped<ApplicationSettings>();
-                //services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
+                services.AddSingleton<IEmailClient, SmtpEmailClient>();
+                services.AddSingleton<IWeeklySummaryReports, WeeklySummaryReports>();
+                services.AddSingleton<IWeeklyReportExecutor, WeeklyReportExecutor>();
+                services.AddSingleton<ITenantDbConnManager, TenantDbConnManager>();
                 services.AddHostedService<PhishingPortal.Services.Utilities.Worker>();
             })
             .Build();
