@@ -9,18 +9,18 @@
     <EditForm Model="model" OnValidSubmit="@OnSubmit">
         <DataAnnotationsValidator />
         <div class="form-group row mt-1">
-            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Enable Weekly Report</label>
-            <div class="col-md-10">
+            <label class="col-form-label col-md-3 bold-font" style="padding-right: 0;">Enable Training Reminder</label>
+            <div class="col-md-9">
                 <input type="checkbox" @bind="@model.IsEnabled" style="margin-top: 10px;"></input>
             </div>
         </div>
 
         <div class="form-group row">
-            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Report Recipients Email</label>
-            <div class="col-md-10">
+            <label class="col-form-label col-md-3 bold-font" style="padding-right: 0;">Training Reminder Mail-Id</label>
+            <div class="col-md-9">
                 <InputText @bind-Value="@model.ReportRecipentsEmails" id="ReportRecipentsEmails" class="form-control"></InputText>
                 <ValidationMessage For="() => model.ReportRecipentsEmails" />
-                <i style="font-size:10px;">For multiple emails, they should be separated with ";"</i>
+              
             </div>
         </div>
 
