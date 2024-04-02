@@ -141,4 +141,112 @@ namespace PhishingPortal.Dto
         }
 
     }
+
+    public class ProviderSettings
+    {
+        //Email Config
+        public string SmtpServer {  get; set; }
+        public int Port { get; set; }
+
+        //Sms Config
+        public string SmsBaseUrl { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string SenderId { get; set; }
+        public string EntityId { get; set; }
+        public int MaxContentLength { get; set; }
+        public string SmsSendUri { get; set; }
+        public string SmsDeliveryUri { get; set; }
+
+        //Whatsapp Config
+        public string WhatsappBaseUri {  get; set; }
+        public string WhatsappUri { get; set; }
+        public string InstanceId { get; set; }
+
+        public string AccessToken {  get; set; }
+
+        //Training Config
+        public bool TrainingReminder { get; set; }
+        public string TrainingMailId {  get; set; }
+
+        public ProviderSettings()
+        {
+            // Initialize properties with default values if needed
+        }
+
+        // Constructor to initialize all properties
+        public ProviderSettings(
+            string smtpServer, int port,
+            string smsBaseUrl, string username, string password,
+            string senderId, string entityId, int maxContentLength,
+            string smsSendUri, string smsDeliveryUri,
+            string whatsappBaseUri, string whatsappUri, string instanceId,
+            string accessToken, bool trainingReminder, string trainingMailId)
+        {
+            SmtpServer = smtpServer;
+            Port = port;
+            SmsBaseUrl = smsBaseUrl;
+            Username = username;
+            Password = password;
+            SenderId = senderId;
+            EntityId = entityId;
+            MaxContentLength = maxContentLength;
+            SmsSendUri = smsSendUri;
+            SmsDeliveryUri = smsDeliveryUri;
+            WhatsappBaseUri = whatsappBaseUri;
+            WhatsappUri = whatsappUri;
+            InstanceId = instanceId;
+            AccessToken = accessToken;
+            TrainingReminder = trainingReminder;
+            TrainingMailId = trainingMailId;
+        }
+
+        // Constructor to initialize from dictionary
+        public ProviderSettings(Dictionary<string, string> values)
+        {
+            // Initialize properties from dictionary values
+            SmtpServer = values.GetValueOrDefault(Constants.Keys.SMTP_SERVER, "");
+            Port = int.Parse(values.GetValueOrDefault(Constants.Keys.PORT, "0"));
+            SmsBaseUrl = values.GetValueOrDefault(Constants.Keys.SMS_BASE_URL, "");
+            Username = values.GetValueOrDefault(Constants.Keys.SMS_USERNAME, "");
+            Password = values.GetValueOrDefault(Constants.Keys.SMS_PASSWORD, "");
+            SenderId = values.GetValueOrDefault(Constants.Keys.SMS_SENDER_ID, "");
+            EntityId = values.GetValueOrDefault(Constants.Keys.SMS_ENTITY_ID, "");
+            MaxContentLength = int.Parse(values.GetValueOrDefault(Constants.Keys.SMS_MAX_CONTENT_LENGTH, "0"));
+            SmsSendUri = values.GetValueOrDefault(Constants.Keys.SMS_SEND_URI, "");
+            SmsDeliveryUri = values.GetValueOrDefault(Constants.Keys.SMS_DELIVERY_URI, "");
+            WhatsappBaseUri = values.GetValueOrDefault(Constants.Keys.WHATSAPP_BASE_URI, "");
+            WhatsappUri = values.GetValueOrDefault(Constants.Keys.WHATSAPP_URI, "");
+            InstanceId = values.GetValueOrDefault(Constants.Keys.WHATSAPP_INSTANCE_ID, "");
+            AccessToken = values.GetValueOrDefault(Constants.Keys.ACCESS_TOKEN, "");
+            TrainingReminder = bool.Parse(values.GetValueOrDefault(Constants.Keys.TRAINING_REMINDER, "false"));
+            TrainingMailId = values.GetValueOrDefault(Constants.Keys.TRAINING_MAIL_ID, "");
+        }
+
+
+        // Method to convert to dictionary
+        public Dictionary<string, string> ToSettingsDictionary()
+        {
+            var result = new Dictionary<string, string>();
+            result[Constants.Keys.SMTP_SERVER] = SmtpServer;
+            result[Constants.Keys.PORT] = Port.ToString();
+            result[Constants.Keys.SMS_BASE_URL] = SmsBaseUrl;
+            result[Constants.Keys.SMS_USERNAME] = Username;
+            result[Constants.Keys.SMS_PASSWORD] = Password;
+            result[Constants.Keys.SMS_SENDER_ID] = SenderId;
+            result[Constants.Keys.SMS_ENTITY_ID] = EntityId;
+            result[Constants.Keys.SMS_MAX_CONTENT_LENGTH] = MaxContentLength.ToString();
+            result[Constants.Keys.SMS_SEND_URI] = SmsSendUri;
+            result[Constants.Keys.SMS_DELIVERY_URI] = SmsDeliveryUri;
+            result[Constants.Keys.WHATSAPP_BASE_URI] = WhatsappBaseUri;
+            result[Constants.Keys.WHATSAPP_URI] = WhatsappUri;
+            result[Constants.Keys.WHATSAPP_INSTANCE_ID] = InstanceId;
+            result[Constants.Keys.ACCESS_TOKEN] = AccessToken;
+            result[Constants.Keys.TRAINING_REMINDER] = TrainingReminder.ToString();
+            result[Constants.Keys.TRAINING_MAIL_ID] = TrainingMailId;
+
+            return result;
+        }
+
+    }
 }

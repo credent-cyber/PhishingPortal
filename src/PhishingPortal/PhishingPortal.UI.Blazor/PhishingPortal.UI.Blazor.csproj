@@ -232,6 +232,10 @@
 	  </Content>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Pages\SettingComponent\" />
+	</ItemGroup>
+
 	
 
 </Project>

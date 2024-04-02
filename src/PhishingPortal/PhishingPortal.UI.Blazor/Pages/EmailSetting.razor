@@ -6,29 +6,197 @@
 @inject ILogger<TenantCampaigns> logger
 
 <div class="row m-1">
-    <EditForm Model="model" OnValidSubmit="@OnSubmit">
-        <DataAnnotationsValidator />
-        <div class="form-group row mt-1">
-            <label class="col-form-label col-md-3 bold-font" style="padding-right: 0;">Enable Training Reminder</label>
-            <div class="col-md-9">
-                <input type="checkbox" @bind="@model.IsEnabled" style="margin-top: 10px;"></input>
-            </div>
-        </div>
+    <div class="p-2 mt-n3">
+        <div class="bt-wizard" id="tabswizard">
+            <ul class="nav nav-pills">
+                @if (Tab == 1)
+                {
+                    <li class="nav-item"><a href="#tabs-t-tab1" @onclick="()=> Tab = 1" class="nav-link rounded-0 active" data-toggle="tab">Email Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab2" @onclick="()=> Tab = 2" class="nav-link rounded-0" data-toggle="tab">SMS Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab3" @onclick="()=> Tab = 3" class="nav-link rounded-0" data-toggle="tab">Whatsapp Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab4" @onclick="()=> Tab = 4" class="nav-link rounded-0" data-toggle="tab">Training Configuration</a></li>
+                }
+                @if (Tab == 2)
+                {
+                    <li class="nav-item"><a href="#tabs-t-tab1" @onclick="()=> Tab = 1" class="nav-link rounded-0" data-toggle="tab">Email Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab2" @onclick="()=> Tab = 2" class="nav-link rounded-0 active" data-toggle="tab">SMS Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab3" @onclick="()=> Tab = 3" class="nav-link rounded-0" data-toggle="tab">Whatsapp Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab4" @onclick="()=> Tab = 4" class="nav-link rounded-0" data-toggle="tab">Training Configuration</a></li>
+                }
+                @if (Tab == 3)
+                {
+                    <li class="nav-item"><a href="#tabs-t-tab1" @onclick="()=> Tab = 1" class="nav-link rounded-0" data-toggle="tab">Email Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab2" @onclick="()=> Tab = 2" class="nav-link rounded-0" data-toggle="tab">SMS Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab3" @onclick="()=> Tab = 3" class="nav-link rounded-0 active" data-toggle="tab">Whatsapp Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab4" @onclick="()=> Tab = 4" class="nav-link rounded-0 " data-toggle="tab">Training Configuration</a></li>
+                }
+                @if (Tab == 4)
+                {
+                    <li class="nav-item"><a href="#tabs-t-tab1" @onclick="()=> Tab = 1" class="nav-link rounded-0" data-toggle="tab">Email Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab2" @onclick="()=> Tab = 2" class="nav-link rounded-0" data-toggle="tab">SMS Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab3" @onclick="()=> Tab = 3" class="nav-link rounded-0" data-toggle="tab">Whatsapp Configuration</a></li>
+                    <li class="nav-item"><a href="#tabs-t-tab4" @onclick="()=> Tab = 4" class="nav-link rounded-0 active" data-toggle="tab">Training Configuration</a></li>
+                }
+            </ul>
+            <div class="tab-content">
+                <div class="pt-1 bg-primary"></div>
+                <div>
 
-        <div class="form-group row">
-            <label class="col-form-label col-md-3 bold-font" style="padding-right: 0;">Training Reminder Mail-Id</label>
-            <div class="col-md-9">
-                <InputText @bind-Value="@model.ReportRecipentsEmails" id="ReportRecipentsEmails" class="form-control"></InputText>
-                <ValidationMessage For="() => model.ReportRecipentsEmails" />
-              
-            </div>
-        </div>
+                    <EditForm Model="model" OnValidSubmit="@OnSubmit">
+                        <DataAnnotationsValidator />
 
-        <hr />
-        <div class="mt-4" style="text-align:left;">
-            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+                        @if (Tab == 1)
+                        {
+                            <div class="tab-pane mt-4 active show bg-transparent" id="tabs-t-tab1">
+                                <div class="">
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="server" style="padding-right: 0;">SMTP Server</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.SmtpServer" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Port</label>
+                                        <div class="col-md-10">
+                                            <InputNumber @bind-Value="@model.Port" id="port" class="form-control"></InputNumber>
+                                            <ValidationMessage For="() => model.Port" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Allow listing</label>
+                                        <div class="col-md-10">
+                                            <p class="mb-0">To ensure you receive campaign email campaigns:</p>
+                                            <p class="mb-0"><strong>1.</strong> White list this IP in your Email environment:</p>
+                                            <p class="mb-0"><mark><b>103.166.62.86</b></mark></p><br/>
+                                            <p class="mb-1" style="margin-top:-12px;"><mark><b>https://phishsims.com</b></mark></p>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Tab == 2)
+                        {
+                            <div class="tab-pane mt-4 active show bg-transparent" id="tabs-t-tab2">
+                                <div class="">
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="Username" style="padding-right: 0;">Username</label>
+                                        <div class="col-md-4">
+                                            <InputText @bind-Value="@model.Username" class="form-control"></InputText>
+                                        </div>
+                                
+                                        <label class="col-form-label col-md-2 bold-font" id="Password" style="padding-right: 0;">Password</label>
+                                        <div class="col-md-4">
+                                            <InputText @bind-Value="@model.Password" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="SenderId" style="padding-right: 0;">Sender ID</label>
+                                        <div class="col-md-4">
+                                            <InputText @bind-Value="@model.SenderId" class="form-control"></InputText>
+                                        </div>
+                                   
+                                        <label class="col-form-label col-md-2 bold-font" id="EntityId" style="padding-right: 0;">Entity ID</label>
+                                        <div class="col-md-4">
+                                            <InputText @bind-Value="@model.EntityId" class="form-control"></InputText>
+                                        </div>
+                                        </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="SmsBaseUrl" style="padding-right: 0;">BaseUrl</label>
+                                        <div class="col-md-4">
+                                            <InputText @bind-Value="@model.SmsBaseUrl" class="form-control"></InputText>
+                                        </div>
+
+                                        <label class="col-form-label col-md-2 bold-font" id="MaxContentLength" style="padding-right: 0;">Max Content Length</label>
+                                        <div class="col-md-4">
+                                            <InputNumber @bind-Value="@model.MaxContentLength" id="MaxContentLength" class="form-control"></InputNumber>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="SmsSendUri" style="padding-right: 0;">Send Uri</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.SmsSendUri" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="SmsDeliveryUri" style="padding-right: 0;">Delivery Status Uri</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.SmsDeliveryUri" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                        @if (Tab == 3)
+                        {
+                            <div class="tab-pane mt-4 active show bg-transparent" id="tabs-t-tab3">
+                                <div class="">
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="WhatsappBaseUri" style="padding-right: 0;">Base Url</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.WhatsappBaseUri" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="WhatsappUri" style="padding-right: 0;">Send Uri</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.WhatsappUri" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="InstanceId" style="padding-right: 0;">Instance ID</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.InstanceId" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="AccessToken" style="padding-right: 0;">Access Token</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.AccessToken" class="form-control"></InputText>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        }
+                        @if (Tab == 4)
+                        {
+                            <div class="tab-pane mt-4 active show bg-transparent" id="tabs-t-tab4">
+                                <div class="">
+                                    <div class="form-group row mt-1">
+                                        <label class="col-form-label col-md-2 bold-font" id="TrainingReminder" style="padding-right: 0;">Enable Reminder</label>
+                                        <div class="col-md-10">
+                                            <input type="checkbox" @bind="@model.TrainingReminder" style="margin-top: 10px;"></input>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Training Mail-ID</label>
+                                        <div class="col-md-10">
+                                            <InputText @bind-Value="@model.TrainingMailId" id="TrainingMailId" class="form-control"></InputText>
+
+                                            <ValidationMessage For="() => model.TrainingMailId" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <hr />
+                        <div class="mt-4" style="text-align:left;">
+                            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+
+
+
         </div>
-    </EditForm>
+    </div>
 
     <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
         @if (show)
@@ -51,10 +219,11 @@
 </div>
 
 @code {
-    private WeeklySummaryReportSettings model = new();
+    private ProviderSettings model = new();
     bool IsError = false;
     bool IsSuccess = false;
     bool TaskCompleted = false;
+    int Tab = 1;
 
     private bool show = false;
     private string message = string.Empty;
@@ -64,8 +233,8 @@
     {
         var settings = await client.GetSettings();
 
-        if (settings.ContainsKey("weekly_report_recipients"))
-            model = new WeeklySummaryReportSettings(settings);
+        //if (settings.ContainsKey("weekly_report_recipients"))
+        model = new ProviderSettings(settings);
     }
 
     public async Task OnSubmit()
@@ -85,7 +254,7 @@
 
                 var result = await client.UpsertSettings(model.ToSettingsDictionary());
 
-                model = new WeeklySummaryReportSettings(result);
+                model = new ProviderSettings(result);
 
                 message = "Saved!";
                 TaskCompleted = true;

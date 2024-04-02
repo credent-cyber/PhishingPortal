@@ -44,6 +44,24 @@
             public const string WeeklyReport_RecipientsMail = "weekly_report_recipients";
     
             public static string MonitoredMailBoxFilters { get; set; }
+
+            // Provider settings
+            public const string SMTP_SERVER = "smtp_server";
+            public const string PORT = "port";
+            public const string SMS_BASE_URL = "sms_base_url";
+            public const string SMS_USERNAME = "sms_username";
+            public const string SMS_PASSWORD = "sms_password";
+            public const string SMS_SENDER_ID = "sms_sender_id";
+            public const string SMS_ENTITY_ID = "sms_entity_id";
+            public const string SMS_MAX_CONTENT_LENGTH = "sms_max_content_length";
+            public const string SMS_SEND_URI = "sms_send_uri";
+            public const string SMS_DELIVERY_URI = "sms_delivery_uri";
+            public const string WHATSAPP_BASE_URI = "whatsapp_base_uri";
+            public const string WHATSAPP_URI = "whatsapp_uri";
+            public const string WHATSAPP_INSTANCE_ID = "whatsapp_instance_id";
+            public const string ACCESS_TOKEN = "access_token";
+            public const string TRAINING_REMINDER = "training_reminder";
+            public const string TRAINING_MAIL_ID = "training_mail_id";
         }
     }
 }
