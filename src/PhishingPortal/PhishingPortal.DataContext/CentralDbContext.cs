@@ -14,6 +14,7 @@
         public DbSet<TenantDomain> TenantDomain { get; set; }
         public DbSet<DemoRequestor> DemoRequestor { get; set; }
         public DbSet<AppLog> AppLogs { get; set; }
+        public DbSet<WeeklyReport> WeeklyReport { get; set; }
     }
 
 }

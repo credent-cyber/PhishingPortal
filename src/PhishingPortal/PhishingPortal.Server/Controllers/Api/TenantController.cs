@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-
-
 using PhishingPortal.Repositories;
 using PhishingPortal.Dto.Dashboard;
 using HtmlAgilityPack;
