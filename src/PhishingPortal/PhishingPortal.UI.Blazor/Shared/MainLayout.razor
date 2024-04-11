@@ -4,14 +4,15 @@
 @using PhishingPortal.UI.Blazor.Pages
 
 
-<div class="page">
+<div class="">
     <main>
         <AuthorizeView Roles="superadmin">
             <Admin_topnav />
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantadmin">
-            <Topnav />
+            @* <Topbar /> *@
+            <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantuser">
@@ -25,10 +26,12 @@
             </NotAuthorized>
         </AuthorizeView>
 
-        <article class="content px-4">
+        <article class="content">
             <CascadingValue TValue="AlertModel" Value="alerts">
-                <div style="margin-top:0px">
-                    @Body
+                <div class="pcoded-main-container mt-4" style="@($"margin-left: {(IsCollapsed ? "70px" : "235px")};")">
+                    <div class="pcoded-content">
+                        @Body
+                    </div>
                 </div>
             </CascadingValue>
         </article>
@@ -38,4 +41,11 @@
 
 @code {
     private AlertModel alerts = new AlertModel();
+
+    private bool IsCollapsed = false;
+
+    private void HandleIsCollapsedChanged(bool newValue)
+    {
+        IsCollapsed = newValue;
+    }
 }
