@@ -16,6 +16,7 @@ using PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools;
 using PhishingPortal.Services.Notification.Sms.DndSms;
 using PhishingPortal.Services.Notification.Email.AppNotifications;
 using PhishingPortal.Services.Notification.UrlShortner;
+using PhishingPortal.Services.Notification.WeeklySummaryReport;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -108,6 +109,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IRequestEmailSender, RequestEmailSender>();
         services.AddSingleton<IAppEventNotifier, AppEventNotifier>();
         services.AddSingleton<IUrlShortner, UrlShortner>();
+        services.AddSingleton<IWeeklyReportExecutor, WeeklyReportExecutor>();
 
         services.AddHostedService<Worker>();
 
