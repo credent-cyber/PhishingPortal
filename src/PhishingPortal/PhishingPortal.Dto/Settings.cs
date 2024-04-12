@@ -104,4 +104,59 @@ namespace PhishingPortal.Dto
 
        
     }
+
+    public class ApplicationSettings
+    {
+        public bool IsTrainingReminderEnabled { get; set; }
+        public bool IsWeeklyReportEnabled { get; set; }
+
+        [RequiredIfReportEnable(ErrorMessage = "This is required")]
+        public string WeeklyReportRecipients { get; set; }
+
+        public ApplicationSettings()
+        {
+            IsTrainingReminderEnabled = false;
+            IsWeeklyReportEnabled = false;
+            WeeklyReportRecipients = string.Empty;
+        }
+
+        public ApplicationSettings(bool isTrainingReminderEnabled,bool isWeeklyReportEnabled, string weeklyReportRecipients)
+        {
+            IsTrainingReminderEnabled = isTrainingReminderEnabled;
+            IsWeeklyReportEnabled = isWeeklyReportEnabled;
+            WeeklyReportRecipients = weeklyReportRecipients;
+        }
+        public ApplicationSettings(Dictionary<string, string> values)
+        {
+            IsTrainingReminderEnabled = bool.Parse(values.GetValueOrDefault(Constants.Keys.TrainingReminder_IsEnabled, "false"));
+            IsWeeklyReportEnabled = bool.Parse(values.GetValueOrDefault(Constants.Keys.WeeklyReport_IsEnabled, "false"));
+            WeeklyReportRecipients = values.GetValueOrDefault(Constants.Keys.WeeklyReport_Recipients, String.Empty);
+        }
+
+        public Dictionary<string, string> ToSettingsDictionary()
+        {
+            var result = new Dictionary<string, string>();
+
+            result[Constants.Keys.TrainingReminder_IsEnabled] = IsTrainingReminderEnabled.ToString();
+            result[Constants.Keys.WeeklyReport_IsEnabled] = IsWeeklyReportEnabled.ToString();
+            result[Constants.Keys.WeeklyReport_Recipients] = WeeklyReportRecipients;
+
+            return result;
+        }
+    }
+
+    public class RequiredIfReportEnableAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            var model = (ApplicationSettings)validationContext.ObjectInstance;
+
+            if (model.IsWeeklyReportEnabled == true && string.IsNullOrEmpty(value as string))
+            {
+                return new ValidationResult(ErrorMessage ?? "This field is Required.", new[] { validationContext.MemberName });
+            }
+
+            return ValidationResult.Success;
+        }
+    }
 }
