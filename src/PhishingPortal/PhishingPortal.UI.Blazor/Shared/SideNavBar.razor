@@ -10,7 +10,7 @@
                         <label>Phish</label>
                     </li>
                     <li class="nav-item">
-                        <a href="/" class="nav-link">
+                        <a href="/" class="nav-link" @onclick="ToggleDashboard">
                             <span class="pcoded-micon">
                                 <i class="feather icon-home"></i>
                             </span><span class="pcoded-mtext">Dashboard</span>
@@ -61,7 +61,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="training/my-trainings" class="nav-link ">
+                        <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining">
                             <span class="pcoded-micon">
                                 <i class="feather icon-book"></i>
                             </span><span class="pcoded-mtext">My Training</span>
@@ -319,29 +319,77 @@
     private bool OpenChat = false;
     private bool RemoveHelpCard = false;
 
+    private void ToggleDashboard(MouseEventArgs e)
+    {
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
+    }
     private void ToggleTemplate(MouseEventArgs e)
     {
         IsTemplateExpanded = !IsTemplateExpanded;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
     }
     private void ToggleCampaign(MouseEventArgs e)
     {
         IsCampaignExpanded = !IsCampaignExpanded;
+        IsTemplateExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
     }
     private void ToggleTraining(MouseEventArgs e)
     {
         IsTrainingExpanded = !IsTrainingExpanded;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
+    }
+    private void ToggleMyTraining(MouseEventArgs e)
+    {
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
     }
     private void ToggleReport(MouseEventArgs e)
     {
         IsReportExpanded = !IsReportExpanded;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsSettingExpanded = false;
+        IsFaqExpanded = false;
     }
     private void ToggleSetting(MouseEventArgs e)
     {
         IsSettingExpanded = !IsSettingExpanded;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsFaqExpanded = false;
     }
     private void ToggleFaq(MouseEventArgs e)
     {
         IsFaqExpanded = !IsFaqExpanded;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
     }
     protected override async Task OnInitializedAsync()
     {
