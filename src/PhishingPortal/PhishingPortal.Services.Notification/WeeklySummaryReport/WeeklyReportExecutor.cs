@@ -76,23 +76,23 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
                         {
                             if (ecinfo != null)
                             {
-                                Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
+                                //Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
 
-                                var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
+                                //var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
 
-                                //if (_mailTrackerConfig.EnableEmbedTracker)
-                                //    ecinfo.EmailContent += EmbedTracker(ecinfo);
+                                ////if (_mailTrackerConfig.EnableEmbedTracker)
+                                ////    ecinfo.EmailContent += EmbedTracker(ecinfo);
 
-                                await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
+                                //await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
 
-                                Logger.LogInformation($"Email sent");
+                                //Logger.LogInformation($"Email sent");
 
-                                ecinfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
-                                ecinfo.LogEntry.SentOn = DateTime.Now;
+                                //ecinfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
+                                //ecinfo.LogEntry.SentOn = DateTime.Now;
 
-                                db.Add(ecinfo.LogEntry);
-                                db.SaveChanges();
-                                Logger.LogInformation($"CampaignLog with id: [{ecinfo.LogEntry.Id}] updated");
+                                //db.Add(ecinfo.LogEntry);
+                                //db.SaveChanges();
+                                //Logger.LogInformation($"CampaignLog with id: [{ecinfo.LogEntry.Id}] updated");
                             }
 
                         }

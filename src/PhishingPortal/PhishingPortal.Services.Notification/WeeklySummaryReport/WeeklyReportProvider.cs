@@ -45,13 +45,30 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
                 {
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
 
-                    var CompletedCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => (o.State == CampaignStateEnum.Completed) && o.IsActive).ToList();
+                    // Get the start date and end date of the current week
+                    DateTime currentDate = DateTime.Now.Date;
+                    DateTime startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek);
+                    DateTime endOfWeek = startOfWeek.AddDays(6);
 
+                    // Filter CompletedCampaigns based on the current week's dates
+                    var CompletedCampaigns = dbContext.Campaigns
+                        .Include(o => o.Detail)
+                        .Where(o => o.State == CampaignStateEnum.Completed &&
+                                    o.CreatedOn >= startOfWeek &&
+                                    o.CreatedOn <= endOfWeek)
+                        .ToList();
 
-                    foreach (var campaign in CompletedCampaigns)
+                    var campignLogs = dbContext.CampaignLogs.Where(o => (o.CreatedOn >= startOfWeek && o.CreatedOn <= endOfWeek)||(o.ModifiedOn >= startOfWeek && o.ModifiedOn <= endOfWeek)).Distinct();
+
+                    WeeklyReportInfo weeklyReportInfo = new WeeklyReportInfo();
+                    weeklyReportInfo.CampaignStatistics.EmailStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Email).Count();
+                    weeklyReportInfo.CampaignStatistics.SmsStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Sms).Count();
+                    weeklyReportInfo.CampaignStatistics.WhatsappStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Whatsapp).Count();
+
+                    foreach (var campaign in CompletedCampaigns.Where(o=>o.Detail.Type ==CampaignType.Email))
                     {
-                        await Send(campaign, dbContext, Tenant.UniqueId);
+                        //await Send(campaign, dbContext, Tenant.UniqueId);
+                        campignLogs = campignLogs.Where(o => o.CampaignId == campaign.Id);
                     }
 
                 }
@@ -91,38 +108,15 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
                         // TODO: calculate short urls
 
 
-                        var ecinfo = new WeeklyReportInfo()
-                        {
-                            Tenantdentifier = tenantIdentifier,
-                            EmailRecipients = r.Recipient.Email,
-                            EmailSubject = campaign.Subject,
-                            EmailContent = content,
-                            EmailFrom = campaign.FromEmail,
-                            LogEntry = new CampaignLog
-                            {
-                                SecurityStamp = key,
-                                CampaignId = campaign.Id,
-                                IsHit = false,
-                                CreatedBy = "system",
-                                CreatedOn = timestamp,
-                                ReturnUrl = returnUrl,
-                                RecipientId = r.Recipient.Id,
-                                CampignType = campaign.Detail.Type.ToString(),
-                                SentBy = "system",
-                                SentOn = timestamp,
-                                Status = CampaignLogStatus.Queued.ToString()
-                            }
-                        };
+                        
 
-                        o.OnNext(ecinfo);
+                       // o.OnNext(ecinfo);
                     }
                 };
             }
             catch (Exception ex)
             {
-                campaign.State = CampaignStateEnum.Aborted;
-                dbContext.Update(campaign);
-                dbContext.SaveChanges();
+              
                 Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
             }
 

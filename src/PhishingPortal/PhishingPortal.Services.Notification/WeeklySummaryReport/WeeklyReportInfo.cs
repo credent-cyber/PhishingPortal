@@ -1,21 +1,70 @@
-﻿using PhishingPortal.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace PhishingPortal.Services.Notification.WeeklySummaryReport
 {
     public class WeeklyReportInfo
     {
-        public string Tenantdentifier { get; set; }
-        public string EmailRecipients { get; set; }
-        public string EmailSubject { get; set; }
-        public string EmailContent { get; set; }
-        public string EmailFrom { get; set; }
-        public CampaignLog LogEntry { get; set; }
+        // Tenant identifier
+        public string TenantIdentifier { get; set; }
 
-        public TrainingLog TrainingLog { get; set; }
+        // Email details
+        public EmailDetails EmailDetails { get; set; }
+
+        // Campaign statistics
+        public CampaignStatistics CampaignStatistics { get; set; }
+
+        // Training statistics
+        public TrainingStatistics TrainingStatistics { get; set; }
+    }
+
+    // Class for email details
+    public class EmailDetails
+    {
+        public string Recipients { get; set; }
+        public string Subject { get; set; }
+        public string Content { get; set; }
+        public string From { get; set; }
+    }
+
+    // Class for campaign statistics
+    public class CampaignStatistics
+    {
+        // Email campaign statistics
+        public CampaignTypeStatistics EmailStatistics { get; set; }
+
+        // SMS campaign statistics
+        public CampaignTypeStatistics SmsStatistics { get; set; }
+
+        // WhatsApp campaign statistics
+        public CampaignTypeStatistics WhatsappStatistics { get; set; }
+    }
+
+    // Class for training statistics
+    public class TrainingStatistics
+    {
+        public int Total { get; set; }
+        public int Completed { get; set; }
+        public int Incomplete { get; set; }
+        public decimal CompletionPercentage { get; set; }
+
+        // Most completion and incompletion by department
+        public DepartmentCompletionInfo MostCompletionByDepartment { get; set; }
+        public DepartmentCompletionInfo MostIncompletionByDepartment { get; set; }
+    }
+
+    // Class for campaign type statistics
+    public class CampaignTypeStatistics
+    {
+        public int TotalCampaigns { get; set; }
+        public int TotalHits { get; set; }
+        public decimal PronePercentage { get; set; }
+        public string MostPhishingDepartment { get; set; }
+    }
+
+    // Class for department completion information
+    public class DepartmentCompletionInfo
+    {
+        public string DepartmentName { get; set; }
+        public int CompletionCount { get; set; }
     }
 }
