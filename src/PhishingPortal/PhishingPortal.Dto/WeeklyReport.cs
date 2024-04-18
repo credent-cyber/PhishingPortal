@@ -8,9 +8,8 @@ namespace PhishingPortal.Dto
 {
     public class WeeklyReport : BaseEntity
     {
-        public string Tenant { get; set; }
+        public string ReportContent { get; set; }
         public DateTime CreatedOn { get; set; }
-        public DateTime ModifiedOn { get; set; }
         public bool IsReportSent { get; set; }
     }
 

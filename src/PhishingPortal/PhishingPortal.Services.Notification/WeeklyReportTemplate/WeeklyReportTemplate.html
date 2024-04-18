@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card-body {
+            padding: 0.25rem !important;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container p-4">
+        <div class="card-header mb-1">
+            <i class="fas fa-chart-pie mr-1"></i>
+            Email Campaign Report with Most Breached Department Chart
+        </div>
+        <!-- Email Campaign -->
+        <div class="row mb-4" style="align-items: center;">
+            <div class="col-md-6 col-sm-6">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">Total Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###EmailTotalCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-warning text-white mb-4">
+                            <div class="card-body">Hit Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###EmailHitCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">Reported as Spam</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###EmailTotalReported###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">Prone %</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###EmailProne%###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 ">
+                <div class="card mb-4">
+                    <div class="card-body" style="height: 194px;">
+                        <canvas id="pie-chart-canvas1" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-header mb-1">
+            <i class="fas fa-chart-pie mr-1"></i>
+            SMS Campaign Report with Most Breached Department Chart
+        </div>
+        <!-- SMS Campaign -->
+        <div class="row mb-4" style="align-items: center;">
+            <div class="col-md-6 col-sm-6">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">Total Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###SmsTotalCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-warning text-white mb-4">
+                            <div class="card-body">Hit Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###SmsHitCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">Reported as Spam</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###SmsTotalReported###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">Prone %</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###SmsProne%###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 ">
+                <div class="card mb-4">
+                    <div class="card-body" style="height: 194px;">
+                        <canvas id="pie-chart-canvas2" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-header mb-1">
+            <i class="fas fa-chart-pie mr-1"></i>
+            Whatsapp Campaign Report with Most Breached Department Chart
+        </div>
+        <!-- WhatsApp Campaign -->
+        <div class="row mb-4" style="align-items: center;">
+            <div class="col-md-6 col-sm-6">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">Total Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###WhatsappTotalCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-warning text-white mb-4">
+                            <div class="card-body">Hit Count</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###WhatsappHitCount###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">Reported as Spam</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###WhatsappTotalReported###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">Prone %</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###WhatsappProne%###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 ">
+                <div class="card mb-4">
+                    <div class="card-body" style="height: 194px;">
+                        <canvas id="pie-chart-canvas3" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-header mb-1">
+            <i class="fas fa-chart-pie mr-1"></i>
+            Training Report 
+        </div>
+        <!-- Training Chart -->
+        <div class="row mb-4" style="align-items: center;">
+            <div class="col-md-6 col-sm-6">
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-primary text-white mb-4">
+                            <div class="card-body">Total Assigned</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###TotalTrainingAssigned###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-warning text-white mb-4">
+                            <div class="card-body">Completed</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###TrainingCompleted###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-success text-white mb-4">
+                            <div class="card-body">In Progress</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###TrainingInProgress###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">TrainingCompletion %</div>
+                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                <span class="small text-white"><b style="color: black;">###Completion%###</b></span>
+                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 ">
+                <div class="card mb-4">
+                    <div class="card-body" style="height: 194px;">
+                        <canvas id="pie-chart-canvas4" width="400" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Email Campaign Pie Chart Data
+            const pieChartData1 = {
+                // labels: ['Opened', 'Not Opened', 'Clicked', 'Not Clicked'],
+                labels: ###EmailCampDepartmentLabel###,
+                datasets: [{
+                    label: 'Email Campaign',
+                    // data: [40, 30, 20, 10],
+                    data: ###EmailReportData###,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // SMS Campaign Pie Chart Data
+            const pieChartData2 = {
+                labels: ###SMSCampDepartmentLabel###,
+                datasets: [{
+                    label: 'SMS Campaign',
+                    data: ###SMSReportData###,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // WhatsApp Campaign Pie Chart Data
+            const pieChartData3 = {
+                labels: ###WhatsappCampDepartmentLabel###,
+                datasets: [{
+                    label: 'WhatsApp Campaign',
+                    data: ###WhatsappReportData###,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // Training Pie Chart Data
+            const pieChartData4 = {
+                labels: ###TrainingDepartmentLabel###,
+                datasets: [{
+                    label: 'Training',
+                    data: ###TrainingReportData###,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // Render Pie Charts
+            const pieChartCanvas1 = document.getElementById("pie-chart-canvas1");
+            const pieChart1 = new Chart(pieChartCanvas1, {
+                type: 'pie',
+                data: pieChartData1,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (context.parsed) {
+                                        label += ': ' + context.parsed.toFixed(2) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function (value, context) {
+                                return context.chart.data.labels[context.dataIndex] + ": " + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                }
+            });
+
+            const pieChartCanvas2 = document.getElementById("pie-chart-canvas2");
+            const pieChart2 = new Chart(pieChartCanvas2, {
+                type: 'pie',
+                data: pieChartData2,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (context.parsed) {
+                                        label += ': ' + context.parsed.toFixed(2) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function (value, context) {
+                                return context.chart.data.labels[context.dataIndex] + ": " + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                }
+            });
+
+            const pieChartCanvas3 = document.getElementById("pie-chart-canvas3");
+            const pieChart3 = new Chart(pieChartCanvas3, {
+                type: 'pie',
+                data: pieChartData3,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (context.parsed) {
+                                        label += ': ' + context.parsed.toFixed(2) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function (value, context) {
+                                return context.chart.data.labels[context.dataIndex] + ": " + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                }
+            });
+
+            const pieChartCanvas4 = document.getElementById("pie-chart-canvas4");
+            const pieChart4 = new Chart(pieChartCanvas4, {
+                type: 'pie',
+                data: pieChartData4,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    if (context.parsed) {
+                                        label += ': ' + context.parsed.toFixed(2) + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#000000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: function (value, context) {
+                                return context.chart.data.labels[context.dataIndex] + ": " + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

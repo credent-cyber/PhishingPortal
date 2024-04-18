@@ -8,4 +8,5 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
 {
     public interface IWeeklyReportProvider : IReportProvider, IObservable<WeeklyReportInfo> { }
 
+
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace PhishingPortal.Services.Notification.WeeklySummaryReport
 {
@@ -23,6 +24,7 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
         private readonly List<IObserver<WeeklyReportInfo>> observers;
 
         private string BaseUrl = "http://localhost:7081/cmp";
+        private string _weeklyReportTemplatePath = "";
 
         public WeeklyReportProvider(ILogger<WeeklyReportProvider> logger,
             IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
@@ -33,90 +35,305 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
             ConnManager = connManager;
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
+            _weeklyReportTemplatePath = config.GetValue<string>("WeeklyReportTemplatePath");
             observers = new();
         }
 
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
-            await Task.Run(async () =>
-            {
+            WeeklyReportInfo weeklyReportInfo = new WeeklyReportInfo();
 
+            await Task.Run(() =>
+            {
                 try
                 {
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
 
-                    // Get the start date and end date of the current week
                     DateTime currentDate = DateTime.Now.Date;
                     DateTime startOfWeek = currentDate.AddDays(-(int)currentDate.DayOfWeek);
                     DateTime endOfWeek = startOfWeek.AddDays(6);
 
-                    // Filter CompletedCampaigns based on the current week's dates
-                    var CompletedCampaigns = dbContext.Campaigns
+                    var completedCampaigns = dbContext.Campaigns
                         .Include(o => o.Detail)
                         .Where(o => o.State == CampaignStateEnum.Completed &&
                                     o.CreatedOn >= startOfWeek &&
                                     o.CreatedOn <= endOfWeek)
                         .ToList();
 
-                    var campignLogs = dbContext.CampaignLogs.Where(o => (o.CreatedOn >= startOfWeek && o.CreatedOn <= endOfWeek)||(o.ModifiedOn >= startOfWeek && o.ModifiedOn <= endOfWeek)).Distinct();
+                    var trainingLogs = dbContext.TrainingLog
+                        .Where(o => o.CreatedOn >= startOfWeek &&
+                                    o.CreatedOn <= endOfWeek);
 
-                    WeeklyReportInfo weeklyReportInfo = new WeeklyReportInfo();
-                    weeklyReportInfo.CampaignStatistics.EmailStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Email).Count();
-                    weeklyReportInfo.CampaignStatistics.SmsStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Sms).Count();
-                    weeklyReportInfo.CampaignStatistics.WhatsappStatistics.TotalCampaigns = CompletedCampaigns.Where(o => o.Detail.Type == CampaignType.Whatsapp).Count();
+                    var campaignLogs = dbContext.CampaignLogs
+                        .Where(o => (o.CreatedOn >= startOfWeek && o.CreatedOn <= endOfWeek) ||
+                                    (o.ModifiedOn >= startOfWeek && o.ModifiedOn <= endOfWeek))
+                        .Distinct();
 
-                    foreach (var campaign in CompletedCampaigns.Where(o=>o.Detail.Type ==CampaignType.Email))
+                    var RecipientsByCampaignlog = from log in campaignLogs
+                                                  join crec in dbContext.Recipients on log.RecipientId equals crec.Id
+                                                  select new { logEntry = log, Department = crec.Department };
+
+                    // Grouping department-wise data for each campaign type
+                    var departmentsHitsViaEmail = GroupDepartmentStatistics(RecipientsByCampaignlog, CampaignType.Email.ToString());
+                    var departmentsHitsViaSms = GroupDepartmentStatistics(RecipientsByCampaignlog, CampaignType.Sms.ToString());
+                    var departmentsHitsViaWhatsapp = GroupDepartmentStatistics(RecipientsByCampaignlog, CampaignType.Whatsapp.ToString());
+
+                    weeklyReportInfo.TenantIdentifier = Tenant.UniqueId;
+                    weeklyReportInfo.EmailDetails = new EmailDetails();
+                    weeklyReportInfo.CampaignStatistics = new CampaignStatistics
                     {
-                        //await Send(campaign, dbContext, Tenant.UniqueId);
-                        campignLogs = campignLogs.Where(o => o.CampaignId == campaign.Id);
-                    }
+                        EmailStatistics = MapDepartmentStatistics(departmentsHitsViaEmail),
+                        SmsStatistics = MapDepartmentStatistics(departmentsHitsViaSms),
+                        WhatsappStatistics = MapDepartmentStatistics(departmentsHitsViaWhatsapp),
+                        departmentHitReport = new DepartmentHitReport
+                        {
+                            EmailCampaignDepartmentReport = departmentsHitsViaEmail,
+                            SmsCampaignDepartmentReport = departmentsHitsViaSms,
+                            WhatsappCampaignDepartmentReport = departmentsHitsViaWhatsapp
+                        }
+                    };
+                    weeklyReportInfo.TrainingStatistics = new TrainingStatistics();
 
+
+                    // Populate campaign statistics
+                    PopulateCampaignStatistics(weeklyReportInfo.CampaignStatistics, completedCampaigns, campaignLogs);
+
+                    // Populate training statistics
+                    IQueryable<Recipient> recipients = dbContext.Recipients;
+                    PopulateTrainingStatistics(weeklyReportInfo.TrainingStatistics, trainingLogs, recipients);
+                    Send(weeklyReportInfo, dbContext);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogCritical(ex, ex.Message);
                 }
-
             });
         }
+        private DepartmentReport MapDepartmentReport(IEnumerable<dynamic> departmentStatistics)
+        {
+            var departmentReport = new DepartmentReport();
 
-        protected async Task Send(Campaign campaign, TenantDbContext dbContext, string tenantIdentifier)
+            // Check if there are any department statistics available
+            if (departmentStatistics.Any())
+            {
+                // Get the department with the highest number of hits
+                var departmentWithMostHits = departmentStatistics.OrderByDescending(d => d.Hits).FirstOrDefault();
+
+                // Assign properties to the department report
+                departmentReport.DepartmentName = departmentWithMostHits.Department;
+                departmentReport.TotalSent = departmentWithMostHits.TotalSent;
+                departmentReport.TotalHits = departmentWithMostHits.Hits;
+                departmentReport.TotalReported = departmentWithMostHits.Reported;
+                departmentReport.PronePercentage = CalculatePronePercentage(departmentWithMostHits.Hits, departmentReport.TotalSent);
+                departmentReport.MostPhishingDepartment = departmentWithMostHits.Department;
+            }
+
+            return departmentReport;
+        }
+
+        private List<DepartmentReport> GroupDepartmentStatistics(IEnumerable<dynamic> recipientsByCampaignlog, string campaignType)
+        {
+            var data = recipientsByCampaignlog
+                .Where(a => a.logEntry.CampignType == campaignType)
+                .GroupBy(i => i.Department, (key, entries) => new DepartmentReport
+                {
+                    DepartmentName = key ?? "UNKNOWN",
+                    TotalHits = entries.Count(o => o.logEntry.IsHit),
+                    TotalReported = entries.Count(o => o.logEntry.IsReported),
+                    PronePercentage = CalculatePronePercentage(entries.Count(o => o.logEntry.IsHit), entries.Count())
+                })
+                .ToList();
+            return data;
+        }
+
+        private decimal CalculatePronePercentage(int hits, int count)
+        {
+            if (count > 0)
+            {
+                return Math.Round(((decimal)hits / count) * 100, 2);
+            }
+            return 0;
+        }
+
+        private CampaignTypeStatistics MapDepartmentStatistics(List<DepartmentReport> departmentReports)
+        {
+            return new CampaignTypeStatistics
+            {
+                TotalCampaigns = departmentReports.Sum(x => x.TotalHits),
+                TotalHits = departmentReports.Sum(x => x.TotalHits),
+                TotalReported = departmentReports.Sum(x => x.TotalReported),
+                PronePercentage = departmentReports.Any() ? departmentReports.Max(x => x.PronePercentage) : 0,
+                MostPhishingDepartment = departmentReports.Any() ? departmentReports.OrderByDescending(x => x.PronePercentage).First().DepartmentName : "UNKNOWN"
+            };
+        }
+
+
+        private void PopulateCampaignStatistics(CampaignStatistics campaignStatistics, List<Campaign> completedCampaigns, IQueryable<CampaignLog> campaignLogs)
+        {
+            campaignStatistics.EmailStatistics = PopulateCampaignTypeStatistics(completedCampaigns, campaignLogs, CampaignType.Email);
+            campaignStatistics.SmsStatistics = PopulateCampaignTypeStatistics(completedCampaigns, campaignLogs, CampaignType.Sms);
+            campaignStatistics.WhatsappStatistics = PopulateCampaignTypeStatistics(completedCampaigns, campaignLogs, CampaignType.Whatsapp);
+        }
+
+        private CampaignTypeStatistics PopulateCampaignTypeStatistics(List<Campaign> completedCampaigns, IQueryable<CampaignLog> campaignLogs, CampaignType type)
+        {
+            var typeCampaigns = completedCampaigns.Where(o => o.Detail.Type == type);
+            int totalCampaigns = typeCampaigns.Count();
+            int totalCampaignLogs = campaignLogs.Count();
+            int totalHits = 0;
+            int totalReported = 0;
+            foreach (var campaign in typeCampaigns)
+            {
+                totalHits += campaignLogs.Count(o => o.CampaignId == campaign.Id && o.IsHit);
+                totalReported += campaignLogs.Count(o => o.CampaignId == campaign.Id && o.IsReported);
+            }
+            decimal pronePercentage = 0;
+            if (totalCampaignLogs > 0) // Only calculate prone percentage if there are hits
+            {
+                pronePercentage = Math.Round(((decimal)totalHits / totalCampaignLogs) * 100, 2);
+            }
+            return new CampaignTypeStatistics
+            {
+                TotalCampaigns = totalCampaigns,
+                TotalHits = totalHits,
+                TotalReported = totalReported,
+                PronePercentage = pronePercentage
+            };
+        }
+
+        private void PopulateTrainingStatistics(TrainingStatistics trainingStatistics, IQueryable<TrainingLog> trainingLogs, IQueryable<Recipient> recipients)
+        {
+            // Initialize the department-wise training statistics list
+            trainingStatistics.departmentWiseTrainingStatistics = new List<DepartmentWiseTrainingStatistics>();
+
+            // Group training logs by department
+            var departmentTrainingLogs = from log in trainingLogs
+                                         join recipient in recipients on log.ReicipientID equals recipient.Id
+                                         group log by recipient.Department into departmentLogs
+                                         select new
+                                         {
+                                             DepartmentName = departmentLogs.Key,
+                                             Assigned = departmentLogs.Count(),
+                                             Completed = departmentLogs.Count(x => x.Status == TrainingLogStatus.Completed.ToString()),
+                                             InCompleted = departmentLogs.Count(x => x.Status == TrainingLogStatus.InProgress.ToString()),
+                                             NotAttempted = departmentLogs.Count(x => x.Status == TrainingLogStatus.Assigned.ToString()),
+                                             CompletionPercentage = departmentLogs.Any() ? Math.Round((decimal)departmentLogs.Count(x => x.Status == TrainingLogStatus.Completed.ToString()) / departmentLogs.Count() * 100, 2) : 0
+                                         };
+
+            // Populate the department-wise training statistics list
+            foreach (var departmentLog in departmentTrainingLogs)
+            {
+                trainingStatistics.departmentWiseTrainingStatistics.Add(new DepartmentWiseTrainingStatistics
+                {
+                    DepartmentName = departmentLog.DepartmentName,
+                    Assigned = departmentLog.Assigned,
+                    Completed = departmentLog.Completed,
+                    InCompleted = departmentLog.InCompleted,
+                    NotAttempt = departmentLog.NotAttempted,
+                    CompletionPercentage = departmentLog.CompletionPercentage
+                });
+            }
+
+            // Populate total, completed, and incomplete counts
+            trainingStatistics.Total = trainingLogs.Count();
+            trainingStatistics.Completed = trainingLogs.Count(x => x.Status == TrainingLogStatus.Completed.ToString());
+            trainingStatistics.Incomplete = trainingLogs.Count(x => x.Status == TrainingLogStatus.Assigned.ToString());
+
+            // Calculate overall completion percentage
+            if (trainingStatistics.Total > 0)
+            {
+                trainingStatistics.CompletionPercentage = Math.Round((decimal)trainingStatistics.Completed / trainingStatistics.Total * 100, 2);
+            }
+            else
+            {
+                trainingStatistics.CompletionPercentage = 0;
+            }
+        }
+
+
+
+        protected async Task Send(WeeklyReportInfo weeklyReportInfo, TenantDbContext dbContext)
         {
             try
             {
 
-                var template = dbContext.CampaignTemplates.Find(campaign.Detail.CampaignTemplateId);
+                var settings = dbContext.Settings.ToList();
+                var isWeeklyReportEnable = settings.Where(x => x.Key == Constants.Keys.WeeklyReport_IsEnabled).FirstOrDefault().Value;
+                var Recipients = settings.Where(x => x.Key == Constants.Keys.WeeklyReport_Recipients).FirstOrDefault().Value;
+                weeklyReportInfo.EmailDetails.Recipients = Recipients;
 
-                if (template == null)
-                    throw new Exception("Template not found");
+                var parameter = new Dictionary<string, string>();
+                parameter.Add("###EmailTotalCount###", weeklyReportInfo.CampaignStatistics.EmailStatistics.TotalCampaigns.ToString());
+                parameter.Add("###EmailHitCount###", weeklyReportInfo.CampaignStatistics.EmailStatistics.TotalHits.ToString());
+                parameter.Add("###EmailTotalReported###", weeklyReportInfo.CampaignStatistics.EmailStatistics.TotalReported.ToString());
+                parameter.Add("###EmailProne%###", weeklyReportInfo.CampaignStatistics.EmailStatistics.PronePercentage.ToString());
 
-                var recipients = dbContext.CampaignRecipients.Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
+                parameter.Add("###SmsTotalCount###", weeklyReportInfo.CampaignStatistics.SmsStatistics.TotalCampaigns.ToString());
+                parameter.Add("###SmsHitCount###", weeklyReportInfo.CampaignStatistics.SmsStatistics.TotalHits.ToString());
+                parameter.Add("###SmsTotalReported###", weeklyReportInfo.CampaignStatistics.SmsStatistics.TotalReported.ToString());
+                parameter.Add("###SmsProne%###", weeklyReportInfo.CampaignStatistics.SmsStatistics.PronePercentage.ToString());
 
-                foreach (var r in recipients)
+                parameter.Add("###WhatsappTotalCount###", weeklyReportInfo.CampaignStatistics.WhatsappStatistics.TotalCampaigns.ToString());
+                parameter.Add("###WhatsappHitCount###", weeklyReportInfo.CampaignStatistics.WhatsappStatistics.TotalHits.ToString());
+                parameter.Add("###WhatsappTotalReported###", weeklyReportInfo.CampaignStatistics.WhatsappStatistics.TotalReported.ToString());
+                parameter.Add("###WhatsappProne%###", weeklyReportInfo.CampaignStatistics.WhatsappStatistics.PronePercentage.ToString());
+
+                parameter.Add("###TotalTrainingAssigned###", weeklyReportInfo.TrainingStatistics.Total.ToString());
+                parameter.Add("###TrainingCompleted###", weeklyReportInfo.TrainingStatistics.Completed.ToString());
+                parameter.Add("###TrainingInProgress###", weeklyReportInfo.TrainingStatistics.Incomplete.ToString());
+                parameter.Add("###Completion%###", weeklyReportInfo.TrainingStatistics.CompletionPercentage.ToString());
+
+                var EmailCampDepartmentLabel = weeklyReportInfo.CampaignStatistics.departmentHitReport.EmailCampaignDepartmentReport.Select(x => x.DepartmentName).ToArray(); // Convert to array
+                var EmailCampDepartmentData = weeklyReportInfo.CampaignStatistics.departmentHitReport.EmailCampaignDepartmentReport.Select(x => x.PronePercentage).ToArray(); // Convert to array
+
+                var SMSCampDepartmentLabel = weeklyReportInfo.CampaignStatistics.departmentHitReport.SmsCampaignDepartmentReport.Select(x => x.DepartmentName).ToArray(); // Convert to array
+                var SMSCampDepartmentData = weeklyReportInfo.CampaignStatistics.departmentHitReport.SmsCampaignDepartmentReport.Select(x => x.PronePercentage).ToArray(); // Convert to array
+
+                var WhastappCampDepartmentLabel = weeklyReportInfo.CampaignStatistics.departmentHitReport.WhatsappCampaignDepartmentReport.Select(x => x.DepartmentName).ToArray(); // Convert to array
+                var WhastappCampDepartmentData = weeklyReportInfo.CampaignStatistics.departmentHitReport.WhatsappCampaignDepartmentReport.Select(x => x.PronePercentage).ToArray(); // Convert to array
+
+                //var TrainingDepartmentLabel = weeklyReportInfo.TrainingStatistics.departmentWiseTrainingStatistics.Select(x => x.DepartmentName).ToArray(); // Convert to array
+                //var TrainingDepartmentData = weeklyReportInfo.TrainingStatistics.departmentWiseTrainingStatistics.Select(x => x.Completed).ToArray(); // Convert to array
+
+                parameter.Add("###EmailCampDepartmentLabel###", $"[{string.Join(", ", EmailCampDepartmentLabel.Select(d => $"'{d}'"))}]");
+                parameter.Add("###EmailReportData###", $"[{string.Join(", ", EmailCampDepartmentData.Select(d => Convert.ToInt32(d)))}]");
+
+                parameter.Add("###SMSCampDepartmentLabel###", $"[{string.Join(", ", SMSCampDepartmentLabel.Select(d => $"'{d}'"))}]");
+                parameter.Add("###SMSReportData###", $"[{string.Join(", ", SMSCampDepartmentData.Select(d => Convert.ToInt32(d)))}]");
+
+
+                parameter.Add("###WhatsappCampDepartmentLabel###", $"[{string.Join(", ", WhastappCampDepartmentLabel.Select(d => $"'{d}'"))}]");
+                parameter.Add("###WhatsappReportData###", $"[{string.Join(", ", WhastappCampDepartmentData.Select(d => Convert.ToInt32(d)))}]");
+
+                parameter.Add("###TrainingDepartmentLabel###", $"[]");
+                parameter.Add("###TrainingReportData###", $"[]");
+
+                _weeklyReportTemplatePath = @"C:\Users\ChhaganSinha\Downloads\apex\WeeklyReportTemplate - Copy.html";
+
+                //var templateDirectory = Path.GetDirectoryName(_weeklyReportTemplatePath);
+                //if (!Directory.Exists(templateDirectory))
+                //    throw new Exception("Template directory does not exist: " + templateDirectory);
+
+                if (!File.Exists(_weeklyReportTemplatePath))
+                    throw new Exception("Template File doesn't exist");
+
+                var content = File.ReadAllText(_weeklyReportTemplatePath);
+
+                foreach (var item in parameter)
                 {
-                    if (string.IsNullOrEmpty(r.Recipient.Email))
-                        continue;
+                    content = content.Replace(item.Key, item.Value);
+                }
 
-                    foreach (var o in observers)
-                    {
+                weeklyReportInfo.EmailDetails.Content = content;
 
-                        var timestamp = DateTime.Now;
-                        var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
-                        var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
-                        var content = template.Content.Replace("###RETURN_URL###", returnUrl);
-
-                        // TODO: calculate short urls
-
-
-                        
-
-                       // o.OnNext(ecinfo);
-                    }
-                };
+                foreach (var o in observers)
+                {
+                    o.OnNext(weeklyReportInfo);
+                }
             }
             catch (Exception ex)
             {
-              
+
                 Logger.LogCritical(ex, $"Error executing campaign - {ex.Message}, StackTrace :{ex.StackTrace}");
             }
 

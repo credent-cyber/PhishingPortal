@@ -72,27 +72,31 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
                     while (!_stopped)
                     {
                         Logger.LogInformation($"Weekly Report executor - total pending campaigns {Queue.Count()}");
-                        if (Queue.TryDequeue(out WeeklyReportInfo ecinfo))
+                        if (Queue.TryDequeue(out WeeklyReportInfo weeklyReportInfo))
                         {
-                            if (ecinfo != null)
+                            if (weeklyReportInfo != null)
                             {
-                                //Logger.LogInformation($"Sending email for tenantIdentifier:{ecinfo.Tenantdentifier}, EmailSubject: {ecinfo.EmailSubject}");
+                                Logger.LogInformation($"Sending email for tenantIdentifier:{weeklyReportInfo.TenantIdentifier}, EmailSubject: Weekly Phishing Simulation Report");
 
-                                //var db = TenantDbConnMgr.GetContext(ecinfo.Tenantdentifier);
+                                var db = TenantDbConnMgr.GetContext(weeklyReportInfo.TenantIdentifier);
 
-                                ////if (_mailTrackerConfig.EnableEmbedTracker)
-                                ////    ecinfo.EmailContent += EmbedTracker(ecinfo);
+                                //if (_mailTrackerConfig.EnableEmbedTracker)
+                                //    ecinfo.EmailContent += EmbedTracker(ecinfo);
 
-                                //await EmailSender.SendEmailAsync(ecinfo.EmailRecipients, ecinfo.EmailSubject, ecinfo.EmailContent, true, ecinfo.LogEntry.SecurityStamp, ecinfo.EmailFrom);
+                                foreach(var recipient in weeklyReportInfo.EmailDetails.Recipients.Split(';'))
+                                {
+                                    await EmailSender.SendEmailAsync(recipient, weeklyReportInfo.EmailDetails.Subject, weeklyReportInfo.EmailDetails.Content, true, "", weeklyReportInfo.EmailDetails.From);
+                                    Logger.LogInformation($"Weekly Report for {weeklyReportInfo.TenantIdentifier} sent to {recipient}");
+                                }
 
-                                //Logger.LogInformation($"Email sent");
-
-                                //ecinfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
-                                //ecinfo.LogEntry.SentOn = DateTime.Now;
-
-                                //db.Add(ecinfo.LogEntry);
-                                //db.SaveChanges();
-                                //Logger.LogInformation($"CampaignLog with id: [{ecinfo.LogEntry.Id}] updated");
+                                WeeklyReport weeklyReport = new WeeklyReport
+                                {
+                                    CreatedOn = DateTime.Now.Date,
+                                    IsReportSent = true,
+                                    ReportContent = weeklyReportInfo.EmailDetails.Content
+                                };
+                                db.WeeklyReport.Add(weeklyReport);
+                                db.SaveChanges();
                             }
 
                         }
