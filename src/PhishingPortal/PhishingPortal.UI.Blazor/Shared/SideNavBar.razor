@@ -1,6 +1,12 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @inject IJSRuntime JS
 
+<style>
+    .menu-styler{
+        display: block !important; 
+    }
+</style>
+
 <div>
     <nav class="pcoded-navbar menupos-fixed @(layout) @(IsSidebarCollapsed ? "navbar-collapsed" : "")">
         <div class="navbar-wrapper non-selectable">
