@@ -1,0 +1,81 @@
+﻿@page "/get-started-home"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Pages.FAQ
+@using PhishingPortal.UI.Blazor.Models
+@inject IJSRuntime JSRuntime
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+@inject CustomStateProvider authStateProvider3w
+@attribute [Authorize]
+
+
+
+
+<div class="row">
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Introduction</h3>
+        <p>Full Detail about Phishsims.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">What is Phishsims?</button>
+            <button class="custom-button" onclick="window.location.href = 'page2.html';">Quick Start Guide</button>
+            <button class="custom-button" onclick="window.location.href = 'page3.html';">How we support you?</button>
+        </div>
+    </div>
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Adding Admin User</h3>
+        <p>It contains the data which have the explanation of how to add admin user.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to add Admin User?</button>
+        </div>
+    </div>
+
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Allow Listing</h3>
+        <p>Full Detail about Phishsims.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">Ensure your phishsims sims and Course enrollments get delivered</button>
+            <button class="custom-button" onclick="window.location.href = 'page2.html';">Allow listing in Microsoft 365</button>
+            <button class="custom-button" onclick="window.location.href = 'page3.html';">Ensuring access to our services</button>
+        </div>
+    </div>
+
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Configure And Customisation</h3>
+        <p>Full Detail about Phishsims.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to create Campaign?</button>
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to create custom Campaign Template?</button>
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to add return URL?</button>
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to create Training Campaign an Quiz?</button>
+        </div>
+    </div>
+
+
+
+
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Adding and Importing End Users</h3>
+        <p>Full Detail about Phishsims.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page3.html';">How to create Campaign?</button>
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">How to add Users?</button>
+            <button class="custom-button" onclick="window.location.href = 'page2.html';">How to Import Users?</button>
+           
+        </div>
+    </div>
+
+  
+
+    <div class="col-md-4" style="border: 1px solid #ccc; padding: 20px; text-align: center;">
+        <h3>Microsoft 365 Integration</h3>
+        <p>Full Detail about Phishsims.</p>
+        <div class="button-container">
+            <button class="custom-button" onclick="window.location.href = 'page1.html';">Introduction Microsoft 365 integration</button>
+            <button class="custom-button" onclick="window.location.href = 'page2.html';">Setting up Microsoft 365 synchronisation</button>
+            <button class="custom-button" onclick="window.location.href = 'page3.html';">Troubleshooting Microsoft 365 sync issuees</button>
+        </div>
+    </div>
+
+</div>
