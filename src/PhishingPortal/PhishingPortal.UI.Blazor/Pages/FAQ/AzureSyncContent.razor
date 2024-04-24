@@ -1,0 +1,139 @@
+﻿@page "/sync-with-azure"
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        ol {
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+    img {
+        max-width: 100%;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #777;
+        }
+    </style>
+
+
+
+    <div>
+        <h1>Syncing with Azure: A Comprehensive Guide</h1>
+
+        <p>Welcome to the guide on syncing with Azure. This document will walk you through the steps to sync your applications and data with Microsoft Azure for seamless integration and management.</p>
+        <h2>Sync with Azure</h2>
+    <p>Use your username and password to access your account.</p>
+    <p>Locate and click on the "Setting" section in the dashboard menu.</p>
+    <p>Setting page will open where you have to write the Client ID, Client Secret Key and Tenant ID but from where you will get all these is mentioned below after the screenshot.</p>
+    <img src="/img/SettingAzure.png" alt="Screenshot of accessing campaign creation page">
+
+    <h2>1. Sign in to Azure Portal</h2>
+    <p>Begin by signing in to the Azure Portal <a>https://portal.azure.com/</a> using your Azure account credentials. If you don't have an account, you can create one on the Azure website.</p>
+    <img src="/img/Azure1.png" alt="Screenshot of accessing campaign creation page">
+
+        <h2>2. Navigate to Azure Active Directory</h2>
+        <p>Once logged in, navigate to the Azure Active Directory (AAD) section in search bar. This is where you'll manage users, groups, and applications.</p>
+    <img src="/img/AzureAD.png" alt="Screenshot of accessing campaign creation page">
+
+        <h2>3. Configure App Registrations</h2>
+        <p>Under the Azure Active Directory section, configure app registrations for your applications. This step involves creating and registering your applications to integrate with Azure services.</p>
+    <p>Step 1 : Search App Registration in search bar and open it.</p>
+        <img src="/img/Azure2.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 2 : After opening the App Registration, Click on "New registration".</p>
+    <img src="/img/Azure3.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 3 : New Registration page will open.</p>
+    <img src="/img/Azure4.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 4 : Write down the application which you want to register and after that click on Register button.</p>
+    <img src="/img/Azure5.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 5 : Now the registered application page will open where application named "PhishSims" is registered with its "Client ID" and "Tenant ID" </p>
+    <img src="/img/Azure6.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 6 : Now in application "PhishSims" search "API permission" and click on it.</p>
+    <img src="/img/Azure7.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 7 : After clicking on "API permission", page will open and on that page, Click on "Add a permission" button.</p>
+    <img src="/img/Azure8.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 8 :Request API permission will open.</p>
+    <img src="/img/Azure9.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 9 : Click on "Microsoft Graph" button.</p>
+    <img src="/img/Azure10.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 10 :Then Click on "Application permission" button.</p>
+    <img src="/img/Azure11.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 11 : Search for "Group", open its drop down and check "Group.Read.All" and Click on "Add permission" button.</p>
+    <img src="/img/Azure12.png" alt="Screenshot of accessing campaign creation page">
+    <img src="/img/Azure15.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 12 : Search for "Mail", open its drop down and check "Mail.Read" and Click on "Add permission" button.</p>
+    <img src="/img/Azure13.png" alt="Screenshot of accessing campaign creation page">
+    <img src="/img/Azure15.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 13 : Search for "User", open its drop down and check "User.Read.All" and Click on "Add permission" button.</p>
+    <img src="/img/Azure14.png" alt="Screenshot of accessing campaign creation page">
+    <img src="/img/Azure15.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 14 :Then Click on "Delegated permission" button.</p>
+    <img src="/img/Azure16.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 15 : Search for "email", and check "email" and Click on "Add permission" button.</p>
+    <img src="/img/Azure17.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 16 : Search for "profile", and check "profile" and Click on "Add permission" button.</p>
+    <img src="/img/Azure18.png" alt="Screenshot of accessing campaign creation page">
+    <img src="/img/Azure15.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 17 : Now on Configured permissions page, to grant the permission, click on "Grant admin consent for "<Your Orgination Name>" Credent Infotech Solutions.</Your>".</p>
+    <img src="/img/Azure19.png" alt="Screenshot of accessing campaign creation page">    
+    <p>Step 18 : After giving grant permission, the status changed to "Granted"" from "Not granted".</p>
+    <img src="/img/Azure20.png" alt="Screenshot of accessing campaign creation page">
+
+        <h2>4. Set up Client Secret Key</h2>
+    <p>Step 1 :Now in application "PhishSims" search "Certificates & secrets" and click on it.</p>
+    <img src="/img/Azure21.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 2 :Click on "New client secret".</p>
+    <img src="/img/Azure22.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 3 :Popup screen will open named "Add a client secret" write description and select expires from the drop down and then click on "Add" button.</p>
+    <img src="/img/Azure23.png" alt="Screenshot of accessing campaign creation page">
+    <p>Step 4 :Now you will get the Description, Expires, Value, and Secret ID and the "Value" is the secret key for the Application, copy the "Value" and save it in your system.</p>
+    <img src="/img/Azure24.png" alt="Screenshot of accessing campaign creation page">
+
+    <h2>5. Configure Client ID, Client Secret Key and Tenant ID in Setting</h2>
+    <p>Step 1 :Locate and click on the "Setting" section in the dashboard menu of PhishSims App.</p>
+    <p>Step 2 :Write down the Client ID, Client Secret Key and Tenant ID which you get from above and click on "Save" button.</p>
+    <img src="/img/SettingAzure2.png" alt="Screenshot of accessing campaign creation page">
+
+
+        <footer>&copy; 2024 AzureSyncGuide. All rights reserved.</footer>
+    </div>
