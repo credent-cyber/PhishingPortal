@@ -1,0 +1,91 @@
+﻿@page "/login-home"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@inject CustomStateProvider StateProvider
+@inject IJSRuntime jsRuntime
+
+
+<!-- Header Start -->
+<header class="sticky-header">
+    <nav class="homenav">
+        <h2 class="homenav_logo">
+            <a href="/">
+                <img src="assets/images/logo.png" alt="PhishSims Logo" style="width: 100px;
+            position: relative; margin-left: 30px;">
+            </a>
+        </h2>
+
+        <ul class="homemenu_items" onclick="toggleMobileMenu()">
+            <img src="/img/times.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()"  />
+            <li><a href="/" class="nav_link">Home</a></li>
+            <li><a href="#" class="nav_link">About</a></li>
+            <li><a href="login?ReturnUrl=@(Navigation.Uri)" class="nav_link">Login</a></li>
+        </ul>
+        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()" />
+    </nav>
+</header>
+<!-- Header End -->
+<!-- Hero Start -->
+<section class="hero">
+    <div class="row container" style="padding:20px;">
+        <div class="column">
+            <h2>Why Phishsims?</h2>
+            <h3 style="color:"darkblue">Assessing human risk is crucial for safeguarding your business.</h3>
+            <p>PhishSims is a powerful phishing simulation platform designed to empower organizations in their cybersecurity efforts. By simulating real-world phishing attacks, PhishSims helps organizations identify vulnerabilities in their systems and educate employees on the importance of cybersecurity best practices.</p>
+            <div class="Lgnbuttons">
+                <button class="Lgnbtn" onclick="scrollToContent()">Read More</button>
+                <a href="/request_demo" class="Lgnbtn">Request Demo</a>
+            </div>
+        </div>
+        <div class="column1">
+            <img src="/img/phishing.png" alt="heroImg" class="hero_img" />
+        </div>
+    </div>
+    <img src="/img/bg-bottom-hero.png" alt="" class="curveImg" />
+</section>
+<!-- Hero End-->
+
+<section id="content-section" class="content-section">
+    <div >
+        <h1 class="content-heading">Revolutionize Security Awareness: Human Risk Management as the Solution</h1>
+        <div class="content-wrapper left">
+            <img src="/img/tenor.gif" alt="Image 1" class="content-image">
+            <div class="content-text">
+                <h2 class="content-subheading">Key Features of Cyber Awareness Training</h2>
+                <p class="content-paragraph">Discover and address the unique security knowledge gaps of each user by automatically implementing tailored training programs aimed at mitigating their specific risks.</p>
+            </div>
+        </div>
+        <div class="content-wrapper right">
+            <img src="/img/image_processing20190826-7904-38ozuq.gif" alt="Image 2" class="content-image">
+            <div class="content-text">
+                <h2 class="content-subheading">Effortless Deployment: Seamlessly Automate and Onboard</h2>
+                <p class="content-paragraph">Deploying PhishSims is effortless thanks to its fully cloud-based infrastructure, smooth integrations, and user-friendly onboarding process.</p>
+            </div>
+        </div>
+        <div class="content-wrapper left">
+            <img src="/img/Round6.gif" alt="Image 3" class="content-image">
+            <div class="content-text">
+                <h2 class="content-subheading">Streamline Ongoing Learning with PhishSims</h2>
+                <p class="content-paragraph">Generic training that applies to everyone is ineffective. That's why PhishSims takes a personalized approach, identifying each user's specific risk areas.</p>
+            </div>
+        </div>
+        <div class="content-wrapper right">
+            <img src="/img/website.gif" alt="Image 4" class="content-image">
+            <div class="content-text">
+                <h2 class="content-subheading">Instant Human Support When You Need It</h2>
+                <p class="content-paragraph">With PhishSims, you get real-time support that prioritizes fast resolutions over mere responses.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await jsRuntime.InvokeVoidAsync("import", "/scripts/LoginHome.js");
+    }
+}

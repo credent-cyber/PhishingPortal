@@ -1,31 +1,36 @@
 ﻿@page "/request_demo"
 
 @using PhishingPortal.UI.Blazor.Models
+@using PhishingPortal.UI.Blazor.Pages.Auth
 @using PhishingPortal.UI.Blazor.Shared
 @using PhishingPortal.Dto;
 @using PhishingPortal.Common;
 @using PhishingPortal.UI.Blazor.Client;
 @using System.Text.RegularExpressions
 @inject RequestClient client
-@inject NavigationManager NavManager
+@inject NavigationManager navigationManager
 @inject TenantAdminClient AdminClient
 @inject ILogger<DemoRequestor> logger
-@layout BlankLayout
+@layout NoLayout
 
-
-<div class="auth-wrapper" style="background:white !important; margin-bottom: 20px;">
-    <div style="width:500px;">
-        <div class="card text-center">
-
-            <img src="custom/assets/images/ps.png" alt="logo" class="img-fluid mb-1" style="height:35px; width:100px; margin: 0 auto;">
-            <div style="background: rgb(121,199,233); border-radius:25px">
-                <h3 style="margin:0 !important; padding:5px"><span style="color:white">Request a Demo</span></h3>
+<div class="auth-wrapper align-items-stretch aut-bg-img">
+    <div class="flex-grow-1">
+        <div class="h-100 d-md-flex align-items-center auth-side-img">
+            <div class="col-sm-10 auth-content w-auto">
+                <img src="/img/psNewLogo.png" alt="" class="img-fluid" style="width: 300px;">
+                <h1 class="text-white my-4">Welcome to PhishSims!</h1>
+                <h4 class="text-white font-weight-normal">A powerful phishing simulation platform designed to empower organizations in their cybersecurity efforts.<br />Request a Demo with your details to use all PhishSims features.</h4>
             </div>
-
-            <br />
-            <div class="card-body" style="padding:0 15px !important">
+        </div>
+        <div class="auth-side-form">
+            <div class=" auth-content" style="width: 515px;">
+                <div class="text-center">
+                    <img src="/img/psNewLogo.png" alt="" class="img-fluid mb-4 d-block d-xl-none d-lg-none mx-auto" style="width: 120px;">
+                </div>
+                <h3 class="mb-4 f-w-400" style="text-align: center;">Request Demo</h3>
                 <EditForm Model="@Model" OnInvalidSubmit="@OnValidSubmit">
                     <DataAnnotationsValidator />
+                    <UiAlerts Model="alert"></UiAlerts>
                     <div class="form-group row">
                         <label class="col-md-4 col-form-label bold-font required-field text-left">Your Name</label>
                         <div class="col-sm-8">
@@ -57,61 +62,50 @@
                     <div class="form-group row">
                         <label class="col-md-4 col-form-label bold-font text-left">Message</label>
                         <div class="col-sm-8">
-                            <InputTextArea class="form-control" placeholder="..." @bind-Value="@Model.Messages" style="height:100px;"></InputTextArea>
+                            <InputTextArea class="form-control" placeholder="Write a message..." @bind-Value="@Model.Messages" style="height:100px;"></InputTextArea>
                             <ValidationMessage style="text-align: left;" For="() => Model.Messages" />
                         </div>
                     </div>
-                    <div class="col-12">
-                        @if (submit is true)
-                        {
-                            <button @onclick="OnValidSubmit" class="btn btn-primary" disabled>Submit</button>
+                    <div class="text-center">
+                        <div class="col-12">
+                            <button type="submit" @onclick="OnValidSubmit" class="btn btn-primary">Submit</button>
                             <button @onclick="Close" class="btn btn-secondary">Close</button>
-                        }
-                        else
-                        {
-                            <button @onclick="OnValidSubmit" class="btn btn-primary">Submit</button>
-                            <button @onclick="Close" class="btn btn-secondary">Close</button>
-                        }
+                           
+                            <div class="text-center" style="margin-top: 20px;">
+                                <p class="mb-0 text-muted">Already have an account? <a href="/login" class="f-w-400">Log In</a></p>
+                            </div>
+                        </div>
                     </div>
                 </EditForm>
-
-
-                <div style="text-align:center;"><a href="/login">Already have login credential?</a></div>
             </div>
         </div>
     </div>
 </div>
 
-<Dailog Title="Successfully Submitted!" Show="show" OnCloseDialog="Close">
-    @if (show)
-    {
-        <div style="text-align:center;">
-            We'll get back to you soon...
-        </div>
-    }
-</Dailog>
 
 @code {
 
-    private bool isError = false;
-    private bool isSucess = false;
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 3000;
     private string message = string.Empty;
-    private bool show = false;
     private bool submit = false;
 
     DemoRequestor Model = new DemoRequestor();
 
 
-    protected async Task OnValidSubmit()
+    protected override async Task OnInitializedAsync()
     {
+        alert ??= new AlertModel();
+    }
+    private async Task OnValidSubmit()
+    {
+        if (string.IsNullOrEmpty(Model.FullName) || string.IsNullOrEmpty(Model.Company) || string.IsNullOrEmpty(Model.Email)) { return; }
+        alert?.Clear();
         message = string.Empty;
-        if (@Model.FullName is null || @Model.Company is null || @Model.Email is null)
-        {
-            isError = true;
-            isSucess = false;
-            message = "Name, Company and Email can't be empty!";
-            return;
-        }
+        alert?.SetSuccess("Please wait..");
+
         if (@Model.Email is not null)
         {
             var formate = Regex.IsMatch(@Model.Email, @".+@.+\..+");
@@ -121,18 +115,16 @@
             {
                 if (email.Contains(mail))
                 {
-                    isSucess = false;
-                    isError = true;
                     message = "Please provide your Company Email!";
+                    alert?.SetError(message);
                     return;
                 }
             }
 
             if (!formate)
             {
-                isSucess = false;
-                isError = true;
                 message = "Invalid Email!";
+                alert?.SetError(message);
                 return;
             }
         }
@@ -140,26 +132,30 @@
         try
         {
             var result = await client.CreateDemoRequest(Model);
-            isSucess = true;
-            isError = false;
-            message = "Saved!";
-            show = true;
+            message = result;
             submit = true;
+            alert?.SetSuccess(message);
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
-            isError = true;
             message = "Error while Submitting!";
+            alert?.SetError(message);
         }
-
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 
 
     private void Close()
     {
-        show = false;
-        NavManager.NavigateTo("/");
+        navigationManager.NavigateTo("/");
+    }
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
     }
 
 }
