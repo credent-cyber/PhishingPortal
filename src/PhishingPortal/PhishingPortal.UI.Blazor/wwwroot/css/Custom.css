@@ -502,5 +502,28 @@ imgs {
         transform: translate(24px, 0);
     }
 }
-/**/
-
+/*ChartJS*/
+#bar2 {
+    height: 200px !important;
+}
+#bar3 {
+    height: 200px !important;
+}
+#SmsBar {
+    height: 200px !important;
+}
+#SmsLine {
+    height: 200px !important;
+}
+#WhatsappBar {
+    height: 200px !important;
+}
+#WhatsappLine {
+    height: 200px !important;
+}
+#TrainingBar {
+    height: 200px !important;
+}
+#TrainingLine {
+    height: 200px !important;
+}

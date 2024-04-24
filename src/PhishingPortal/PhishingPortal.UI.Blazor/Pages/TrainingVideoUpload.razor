@@ -13,61 +13,70 @@
 @inject ILogger<Index> Logger
 @attribute [Authorize]
 
-<div class="row">
-    <div class="card-body p-1">
-        <div class="card">
-            <div class="card-header" style="padding:5px 8px 0px;">
-                <h5 style="line-height:55px">Add New Training Video</h5>
-                <div style="float:right">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-                        <li class="breadcrumb-item active">Training Video</li>
-                    </ol>
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Training Videos
+                    </h5>
                 </div>
-            </div>
-
-            <div class="dropdown-divider mt-n1"></div>
- 
-            <div class="card-body p-2 mt-n2">
-                <TrainingVideoUploader RefreshTrainingVideos="@RefreshTrainingVideos" />
-
-                <div class="table-responsive">
-                    @if (_isLoading)
-                    {
-                        <div class="col-sm-12" style="margin-top:40vh">
-                            <div class="card-header">
-                                <div class="loading-bar"></div>
-                            </div>
-                        </div>
-                    }
-
-                    else
-                    {
-                        <table id="redirect-urls" class="table table-striped table-bordered">
-                            <thead>
-                                <tr role="row">
-                                    <th>Id</th>
-                                    <th>Video Title</th>
-                                    <th>Path</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                                @foreach (var video in trainingVideos)
-                                {
-                                    <tr role="row" class="odd">
-                                        <td>@video.Id</td>
-                                        <td>@video.VideoTitle</td>
-                                        <td>@video.FilePath</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-
-                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Training</a></li>
+                    <li class="breadcrumb-item"><a>Training-Video</a></li>
+                </ul>
             </div>
         </div>
+    </div>
+</div>
+<div class="row">
+    <div class="card-body p-1">
+
+        <div class="card-body p-2 mt-n2">
+            <TrainingVideoUploader RefreshTrainingVideos="@RefreshTrainingVideos" />
+
+            <div class="dt-responsive table-responsive">
+                @if (_isLoading)
+                {
+                    <div class="col-sm-12" style="margin-top:40vh">
+                        <div class="card-header">
+                            <div class="loading-bar"></div>
+                        </div>
+                    </div>
+                }
+
+                else
+                {
+                    <table id="redirect-urls" class="table table-striped table-bordered nowrap">
+                        <thead>
+                            <tr role="row">
+                                <th>Id</th>
+                                <th>Video Title</th>
+                                <th>Path</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var video in trainingVideos)
+                            {
+                                <tr role="row" class="odd">
+                                    <td>@video.Id</td>
+                                    <td>@video.VideoTitle</td>
+                                    <td>@video.FilePath</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                }
+
+            </div>
+        </div>
+
     </div>
 </div>
 
