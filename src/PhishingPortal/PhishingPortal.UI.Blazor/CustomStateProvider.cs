@@ -73,4 +73,11 @@ public class CustomStateProvider : AuthenticationStateProvider
         var message = success ? "Your password has been successfully reset." : "There was a problem reseting your password, please try again";
         return await Task.FromResult((success, message));
     }
+
+    public async Task<(bool, string)> ChangePassword(ChangePassword request)
+    {
+        var success = await api.ChangePassword(request);
+        var message = success.Item1 ? "Your password has been successfully Changed." : "There was a problem in changing your password, please try again";
+        return await Task.FromResult((success.Item1, message));
+    }
 }

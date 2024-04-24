@@ -10,6 +10,19 @@ namespace PhishingPortal.UI.Blazor.Services
         {
             _httpClient = httpClient;
         }
+
+        public async Task<(bool, string)> ChangePassword(ChangePassword param)
+        {
+            var result = await _httpClient.PostAsJsonAsync("api/acl/changepassword", param);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                var errorMessage = await result.Content.ReadAsStringAsync();
+                return (false, errorMessage);
+            }
+
+            return (true, "Success!");
+        }
         public async Task<CurrentUser> CurrentUserInfo()
         {
             var result = await _httpClient.GetFromJsonAsync<CurrentUser>("api/acl/currentuserinfo");
