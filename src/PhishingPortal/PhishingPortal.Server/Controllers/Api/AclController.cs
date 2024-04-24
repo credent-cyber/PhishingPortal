@@ -103,7 +103,7 @@ namespace PhishingPortal.Server.Controllers.Api
             if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
             {
                 Logger.LogError($"{request.Email} - user not found or email is not confirmed");
-                return BadRequest();
+                return BadRequest("user not found or email is not confirmed"); // Return the message
             }
 
             try
@@ -128,6 +128,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
             return Ok();
         }
+
 
 
         [Route("resetpassword")]

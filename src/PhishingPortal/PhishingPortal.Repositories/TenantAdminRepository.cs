@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -403,20 +404,32 @@ namespace PhishingPortal.Repositories
 
         }
 
-        public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
+        public async Task<string> UpsertDemoRequestor(DemoRequestor demoRequestor)
         {
+            string message = string.Empty;
             try
             {
-
-                CentralDbContext.DemoRequestor.Add(demoRequestor);
-                CentralDbContext.SaveChanges();
+                var domain = demoRequestor.Email.Split('@').LastOrDefault(); // Get the domain part of the email
+                if (!string.IsNullOrEmpty(domain))
+                {
+                    var requestorExists = CentralDbContext.DemoRequestor.Any(x => x.Email.Contains(domain));
+                    if (requestorExists) 
+                    {
+                        message = "Request already Submitted!";
+                    }
+                }
+                else
+                {
+                    CentralDbContext.DemoRequestor.Add(demoRequestor);
+                    CentralDbContext.SaveChanges();
+                    message = "Request Submitted";
+                }
             }
             catch (Exception ex)
             {
-
-                throw;
+                return ex.Message;
             }
-            return demoRequestor;
+            return message;
         }
 
         public async Task<IEnumerable<TenantDomain>> GetDomains(int tenantId)

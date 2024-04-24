@@ -24,31 +24,10 @@
         </div>
         <div class="auth-side-form">
             <div class=" auth-content" style="width: 515px;">
-                
                 <div class="text-center">
-                    
                     <img src="/img/psNewLogo.png" alt="" class="img-fluid mb-4 d-block d-xl-none d-lg-none mx-auto" style="width: 120px;">
                 </div>
                 <h3 class="mb-4 f-w-400" style="text-align: center;">Request Demo</h3>
-                @*<div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="feather icon-mail"></i></span>
-                    </div>
-                    <input type="email" class="form-control" placeholder="Email address">
-                </div>
-                <div class="input-group mb-4">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="feather icon-lock"></i></span>
-                    </div>
-                    <input type="password" class="form-control" placeholder="Password">
-                </div>
-                <div class="form-group text-left mt-2">
-                    <div class="checkbox checkbox-primary d-inline">
-                        <input type="checkbox" name="checkbox-p-1" id="checkbox-p-1" checked="">
-                        <label for="checkbox-p-1" class="cr">Save credentials</label>
-                    </div>
-                </div>
-                <button class="btn btn-block btn-primary mb-0">Signin</button>*@
                 <EditForm Model="@Model" OnInvalidSubmit="@OnValidSubmit">
                     <DataAnnotationsValidator />
                     <UiAlerts Model="alert"></UiAlerts>
@@ -88,47 +67,29 @@
                         </div>
                     </div>
                     <div class="text-center">
-                    <div class="col-12">
-                        @if (submit is true)
-                        {
-                            <button @onclick="OnValidSubmit" class="btn btn-primary" disabled>Submit</button>
+                        <div class="col-12">
+                            <button type="submit" @onclick="OnValidSubmit" class="btn btn-primary">Submit</button>
                             <button @onclick="Close" class="btn btn-secondary">Close</button>
-                        }
-                        else
-                        {
-                            <button @onclick="OnValidSubmit" class="btn btn-primary">Submit</button>
-                            <button @onclick="Close" class="btn btn-secondary">Close</button>
-
-                        }
-                        <div class="text-center" style="margin-top: 20px;">
-
-
-                            <p class="mb-0 text-muted">Already have an account? <a href="/login" class="f-w-400">Log In</a></p>
+                           
+                            <div class="text-center" style="margin-top: 20px;">
+                                <p class="mb-0 text-muted">Already have an account? <a href="/login" class="f-w-400">Log In</a></p>
+                            </div>
                         </div>
                     </div>
-                    </div>
-
                 </EditForm>
-
-                
             </div>
         </div>
     </div>
 </div>
 
-   
+
 @code {
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
     private Timer _timer;
     private int _delay = 3000;
-
-
-    private bool isError = false;
-    private bool isSucess = false;
     private string message = string.Empty;
-    private bool show = false;
     private bool submit = false;
 
     DemoRequestor Model = new DemoRequestor();
@@ -138,18 +99,13 @@
     {
         alert ??= new AlertModel();
     }
-    protected async Task OnValidSubmit()
+    private async Task OnValidSubmit()
     {
+        if (string.IsNullOrEmpty(Model.FullName) || string.IsNullOrEmpty(Model.Company) || string.IsNullOrEmpty(Model.Email)) { return; }
         alert?.Clear();
         message = string.Empty;
-        if (@Model.FullName is null || @Model.Company is null || @Model.Email is null)
-        {
-            isError = true;
-            isSucess = false;
-            message = "Name, Company and Email can't be empty!";
-            alert?.SetError(message);
-            return;
-        }
+        alert?.SetSuccess("Please wait..");
+
         if (@Model.Email is not null)
         {
             var formate = Regex.IsMatch(@Model.Email, @".+@.+\..+");
@@ -159,8 +115,6 @@
             {
                 if (email.Contains(mail))
                 {
-                    isSucess = false;
-                    isError = true;
                     message = "Please provide your Company Email!";
                     alert?.SetError(message);
                     return;
@@ -169,8 +123,6 @@
 
             if (!formate)
             {
-                isSucess = false;
-                isError = true;
                 message = "Invalid Email!";
                 alert?.SetError(message);
                 return;
@@ -180,17 +132,13 @@
         try
         {
             var result = await client.CreateDemoRequest(Model);
-            isSucess = true;
-            isError = false;
-            message = "Saved!";
-            show = true;
+            message = result;
             submit = true;
             alert?.SetSuccess(message);
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
-            isError = true;
             message = "Error while Submitting!";
             alert?.SetError(message);
         }
@@ -200,7 +148,6 @@
 
     private void Close()
     {
-        show = false;
         navigationManager.NavigateTo("/");
     }
     private void TimerCallback(Object o)
