@@ -20733,7 +20733,7 @@ pre[class*=language-]:after, pre[class*=language-]:before {
                 color: #fff;
                 padding: 18px 15px 5px;
                 position: relative;
-                text-transform: lowercase;
+                /*text-transform: lowercase;*/
                 letter-spacing: 1px;
                 border-top: 1px solid #496178;
                 margin-top: 10px
