@@ -27,6 +27,7 @@ namespace PhishingPortal.Dto
         public bool IsHtml { get; set; }
         public bool IsActive { get; set; }
         public string Content { get; set; }
+        public string Design { get; set; }
         public string Version { get; set; }
 
         [TemplateIdRequiredIfSms(ErrorMessage = "Template ID is required")]

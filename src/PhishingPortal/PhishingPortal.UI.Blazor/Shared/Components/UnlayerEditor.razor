@@ -1,0 +1,27 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div>
+    <div style="height: 95vh;" id="editor-container"></div>
+</div>
+
+@code {
+    [Parameter]
+    public string ? Design { get; set; } // Property to store the design JSON string
+
+    private bool editorReady = false;
+
+    private async Task InitializeEditor()
+    {
+        await JSRuntime.InvokeVoidAsync("initializeEditor", Design);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeEditor();
+        }
+    }
+
+}
+
