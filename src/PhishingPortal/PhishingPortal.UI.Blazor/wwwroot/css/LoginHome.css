@@ -1,4 +1,10 @@
-﻿
+﻿.homecontainer {
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
 
 header {
     position: sticky;
@@ -18,7 +24,7 @@ header {
 }
 
 .homenav_logo {
-    padding: 10px 0;
+    padding: 15px 0;
     width: 50px;
     position: relative;
     margin-left: -100px;
@@ -30,12 +36,27 @@ header {
     gap: 20px;
 }
 
-a {
-    color: #fff;
-    text-decoration: none;
+
+.nav_links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
+.nav_link {
+    text-decoration: none;
+    color: #fff;
+    transition: color 0.3s;
+    font-size: large;
+}
+
+    .nav_link:hover {
+        color: #000;
+    }
+
+
 /* Hero */
+
 .hero {
     position: relative;
     min-height: 100vh;
@@ -44,8 +65,8 @@ a {
     background-position: 10px 10px, bottom 215px right 10px, left 55% top -1%, left 45% bottom -1px;
     background-repeat: no-repeat;
     background-color: #5ba7ff;
-    display: flex; /* Add flex display */
-    justify-content: space-between; /* Space between columns */
+    display: flex;
+    justify-content: space-between;
 }
 
 .curveImg {
@@ -56,12 +77,12 @@ a {
 }
 
 .hero .row {
-    align-items: center; /* Align items vertically */
+    align-items: center;
     width: 100%;
     gap: 30px;
     padding: 0 60px;
-    position: relative; /* Add relative positioning */
-    z-index: 1; /* Ensure content is above background */
+    position: relative;
+    z-index: 1;
 }
 
     .hero .row h2,
@@ -78,6 +99,7 @@ a {
     width: 50%;
     z-index: 2;
 }
+
 .hero .column1 {
     width: 47%;
     z-index: 2;
@@ -120,21 +142,25 @@ a {
 }
 
 /* Reponsive */
+
 /* CSS for responsive design */
+
 @media (max-width: 860px) {
+
     /* Styles for menu toggle and navigation */
+
     #menu_toggle {
         display: block;
         width: 20px;
         cursor: pointer;
     }
 
-    .nav {
+    .homenav {
         padding: 0 20px;
         background-color: #fff;
     }
 
-    .menu_items {
+    .homemenu_items {
         position: fixed;
         top: 0;
         width: 260px;
@@ -146,16 +172,19 @@ a {
         transition: all 0.5s ease;
     }
 
-    .showMenu .menu_items {
+
+    .showMenu .homemenu_items {
         left: 0;
     }
 
-    .menu_items #menu_toggle {
+    .homemenu_items #menu_toggle {
         position: absolute;
         top: 20px;
         right: 20px;
     }
+
     /* Responsive styles for hero section */
+
     .hero {
         padding-top: 130px;
     }
@@ -169,13 +198,16 @@ a {
             .hero .row .column {
                 width: 100%;
             }
+
             .hero .row .column1 {
                 width: 100%;
             }
 }
 
 @media (max-width: 600px) {
+
     /* Responsive styles for smaller screens */
+
     .hero {
         padding-top: 80px;
     }
@@ -184,27 +216,29 @@ a {
             font-size: 26px;
         }
 
-    .buttons {
+    .Lgnbuttons {
         justify-content: center;
     }
 
-    .btn {
+    .Lgnbtn {
         padding: 10px 16px;
     }
 }
 
 /* Additional styles for content section */
+
 .content-text h1 {
-    font-size: 2em; /* Larger font size for the heading */
+    font-size: 2em;
 }
 
 .content-section {
     background-color: #5ba7ff;
     padding: 80px 0;
-    position: relative; /* Position relative for curved background */
+    position: relative;
     overflow: hidden;
     border-radius: 80px;
 }
+
 .content-heading {
     font-size: 2.5rem;
     font-weight: bold;
@@ -213,48 +247,51 @@ a {
     font-style: oblique;
     color: lightgoldenrodyellow;
 }
+
 .content-subheading {
     font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 20px;
 }
+
 .content-section::before {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px; /* Adjust height as needed */
-    background: #6610f2; /* Same as the first section */
+    height: 100px;
+    background: #6610f2;
     clip-path: ellipse(100% 70% at 50% 100%);
-    z-index: -1; /* Behind content */
+    z-index: -1;
 }
 
 .content-paragraph {
     font-size: 1.2rem;
     line-height: 1.6;
 }
+
 .content-wrapper {
     display: flex;
     align-items: center;
-    
-    margin-bottom: 40px; /* Space between content blocks */
+    margin-bottom: 40px;
 }
 
     .content-wrapper img {
-        width: 45%; /* Adjust image width */
-        border-radius: 8px; /* Optional: Add border-radius */
+        width: 45%;
+        border-radius: 8px;
     }
 
 .content-text {
-    width: 50%; /* Adjust text width */
+    width: 50%;
 }
+
 .left {
-    flex-direction: row-reverse; /* Reverse order for left-aligned content */
+    flex-direction: row-reverse;
 }
 
 .right {
-    flex-direction: row; /* Default order for right-aligned content */
+    flex-direction: row;
 }
 
 
@@ -263,15 +300,18 @@ a {
     border-radius: 8px;
     margin-right: 20px;
 }
+
 @media (max-width: 768px) {
+
     /* Responsive styles for smaller screens */
+
     .content-wrapper {
-        flex-direction: column; /* Stack content on mobile */
+        flex-direction: column;
     }
 
         .content-wrapper img,
         .content-text {
-            width: 100%; /* Full width on mobile */
-            margin-bottom: 20px; /* Space between image and text */
+            width: 100%;
+            margin-bottom: 20px;
         }
 }
