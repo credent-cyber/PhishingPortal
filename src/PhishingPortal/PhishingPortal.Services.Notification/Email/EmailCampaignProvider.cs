@@ -107,9 +107,7 @@ namespace PhishingPortal.Services.Notification.Email
                         var timestamp = DateTime.Now;
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
-                        //var content = template.Content.Replace("###RETURN_URL###", returnUrl);
-                        var design = template.Design ?? template.Content;
-                        var content = design.Replace("###RETURN_URL###", returnUrl);
+                        var content = template.Content.Replace("###RETURN_URL###", returnUrl);
 
                         // TODO: calculate short urls
 
