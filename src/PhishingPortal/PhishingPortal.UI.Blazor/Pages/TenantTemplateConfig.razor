@@ -46,7 +46,6 @@
 </div>
 @if (model == null)
 {
-
     <div class="col-sm-12" style="margin-top:45vh">
 
         <div class="card-header">
@@ -66,33 +65,73 @@ else
                         @* <ValidationSummary /> *@
                         <div class="row">
 
-                            <div class="form-group row mb-2">
-                                <label class="col-form-label col-md-1 bold-font required-field" style="padding-right: 0;">Name</label>
-                                <div class="col-md-4">
-                                    <InputText id="Name" @bind-Value="model.Name" class="form-control" />
-                                    <ValidationMessage For="() => model.Name" />
-                                </div>
-                                <label class="col-form-label col-md-1 bold-font required-field">Type</label>
-                                <div class="col-md-2">
+                            @if (model.Type == CampaignType.Sms)
+                            {
+                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
+                                    <label class="col-form-label col-md-2 bold-font required-field" style="padding-right: 0;">Name</label>
+                                    <div class="col-md-4">
+                                        <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                                        <ValidationMessage For="() => model.Name" />
+                                    </div>
 
-                                    <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
-                                        @foreach (var val in Enum.GetValues(typeof(CampaignType)))
-                                        {
-                                            <option value="@val">@val</option>
-                                        }
-                                    </InputSelect>
-                                    <ValidationMessage For="() => model.Type" />
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="col-form-label bold-font">Is Active</label>
-                                    <input type="checkbox" @bind="@model.IsActive" class="ml-4" />
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="col-form-label bold-font">Is HTML</label>
-                                    <input type="checkbox" @bind="@model.IsHtml" class="ml-4" />
+                                    <label class="col-form-label col-md-1 bold-font required-field">Type</label>
+                                    <div class="col-md-3">
+                                        <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                            {
+                                                <option value="@val">@val</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => model.Type" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="col-form-label bold-font">Is Active</label>
+                                        <input type="checkbox" @bind="@model.IsActive" class="ml-4" />
+                                    </div>
                                 </div>
 
-                            </div>
+                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
+                                    <label class="col-form-label col-md-2 bold-font required-field" style="padding-right: 0;">TemplateID</label>
+                                    <div class="col-md-4">
+                                        <InputText id="templid" @bind-Value="model.TemplateId" class="form-control" />
+                                        <ValidationMessage For="@(() => model.TemplateId)" />
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+
+                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
+                                    <label class="col-form-label col-md-1 bold-font required-field" style="padding-right: 0;">Name</label>
+                                    <div class="col-md-3">
+                                        <InputText id="Name" @bind-Value="model.Name" class="form-control" />
+                                        <ValidationMessage For="() => model.Name" />
+                                    </div>
+                                    <label class="col-form-label col-md-1 bold-font required-field">Type</label>
+                                    <div class="col-md-2">
+
+                                        <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
+                                            @foreach (var val in Enum.GetValues(typeof(CampaignType)))
+                                            {
+                                                <option value="@val">@val</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => model.Type" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="col-form-label bold-font">Is HTML</label>
+                                        <input type="checkbox" @bind="@model.IsHtml" class="ml-4" />
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="col-form-label bold-font">Is Active</label>
+                                        <input type="checkbox" @bind="@model.IsActive" class="ml-4" />
+                                    </div>
+                                </div>
+                            }
+
 
                             @*    <div class="form-group row">
                         @if (model.Type == CampaignType.Sms)
@@ -166,7 +205,7 @@ else
 
                             @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
                             {
-                                <div style="max-width:100%; overflow-x:auto;">
+                                <div style="max-width:100%; overflow-x:auto;" class="col-md-12">
                                     <UnlayerEditor Design="@model.Design" />
                                 </div>
                             }
@@ -175,12 +214,15 @@ else
                                 <textarea class="col-sm-12" style="background-color:lavender; height:200px;margin-left: 17px; max-width: 96% !important;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
                                 <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
                             }
-                            <hr/>
+
+                            <div style="text-align:center; margin-top:5px; margin-left: 14px; width: 98.2%; padding: 6px;">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-danger" @onclick="onClose">Close</button>
+                            </div>
+
+                            <br />
                         </div>
-                        <div style="text-align:center;">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                            <button type="button" class="btn btn-danger" @onclick="onClose">Close</button>
-                        </div>
+
                     </EditForm>
                 </div>
 
