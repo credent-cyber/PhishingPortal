@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using PhishingPortal.Common;
@@ -8,9 +9,11 @@ namespace PhishingPortal.Dto
 {
     public class AzureRegistrationSettings
     {
-
+        [Required]
         public string ClientID { get; set; }
+        [Required]
         public string ClientSecret { get; set; }
+        [Required]
         public string TenantID { get; set; }
 
         public AzureRegistrationSettings()
@@ -50,5 +53,55 @@ namespace PhishingPortal.Dto
             return result;
 
         }
+    }
+
+    public class OnPromiseADSettings
+    {
+        [Required]
+        public string Domain { get; set; }
+        [Required]
+        public string Password { get; set; }
+        [Required]
+        public string Username { get; set; }
+
+        public OnPromiseADSettings()
+        {
+            Domain = string.Empty;
+            Password = string.Empty;
+            Username = string.Empty;
+        }
+
+        public OnPromiseADSettings(string clientId, string clientSecret, string tenantID)
+        {
+            Domain = clientId;
+            Password = clientSecret;
+            Username = tenantID;
+        }
+
+        public OnPromiseADSettings(Dictionary<string, string> values)
+        {
+            Domain = values[Constants.Keys.OnPromiseAD_Doamin] ?? String.Empty;
+            Password = values[Constants.Keys.OnPromiseAD_Password] ?? String.Empty;
+            Username = values[Constants.Keys.OnPromiseAD_Username] ?? String.Empty;
+        }
+
+        public Dictionary<string, string> ToSettingsDictionary()
+        {
+            var result = new Dictionary<string, string>();
+
+            if (Domain != null)
+                result.Add(Constants.Keys.OnPromiseAD_Doamin, Domain);
+
+            if (Password != null)
+                result[Constants.Keys.OnPromiseAD_Password] = Password;
+
+            if (Username != null)
+                result[Constants.Keys.OnPromiseAD_Username] = Username;
+
+            return result;
+
+        }
+
+       
     }
 }

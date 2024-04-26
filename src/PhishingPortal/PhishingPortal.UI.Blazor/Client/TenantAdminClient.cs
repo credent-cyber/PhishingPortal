@@ -18,25 +18,17 @@ namespace PhishingPortal.UI.Blazor.Client
         /// </summary>
         /// <param name="tenant"></param>
         /// <returns></returns>
-        public async Task<Tenant> CreateTenantAsync(Tenant tenant)
+        public async Task<ApiResponse<Tenant>> CreateTenantAsync(Tenant tenant)
         {
-            Tenant? o;
-            try
-            {
-                var res = await HttpClient.PostAsJsonAsync("api/Onboarding/Register", tenant);
+            ApiResponse<Tenant> content;
 
-                res.EnsureSuccessStatusCode();
+            var res = await HttpClient.PostAsJsonAsync("api/Onboarding/Register", tenant);
 
-                o = await res.Content.ReadFromJsonAsync<Tenant>();
+            res.EnsureSuccessStatusCode();
+            content = await res.Content.ReadFromJsonAsync<ApiResponse<Tenant>>();
+            return content;
 
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
 
-            return o ?? tenant;
 
         }
 
@@ -55,23 +47,46 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 res.EnsureSuccessStatusCode();
 
-                list = await res.Content.ReadFromJsonAsync<List<Tenant>>() ;
+                list = await res.Content.ReadFromJsonAsync<List<Tenant>>();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.LogError(ex, ex.Message);
             }
 
-            return  list ?? Enumerable.Empty<Tenant>().ToList();
+            return list ?? Enumerable.Empty<Tenant>().ToList();
         }
 
-        
+
         public async Task<Tenant> GetTenantByUniqueId(string uniqueId)
         {
             var res = await HttpClient.GetAsync($"api/onboarding/TenantByUniqueId?uniqueId={uniqueId}");
             res.EnsureSuccessStatusCode();
-            var val = await res.Content.ReadFromJsonAsync<Tenant>() ;
+            var val = await res.Content.ReadFromJsonAsync<Tenant>();
             return val;
+        }
+        public async Task<(bool, string)> DeleteTenantByUniqueId(string uniqueId)
+        {
+            var res = await HttpClient.DeleteAsync($"api/onboarding/DeleteTenantByUniqueId?uniqueId={uniqueId}");
+
+
+
+            res.EnsureSuccessStatusCode();
+
+            var result = await res.Content.ReadAsStringAsync();
+
+            var jsonDocument = JsonDocument.Parse(result);
+
+            // Access the root element
+            var rootElement = jsonDocument.RootElement;
+
+            // Access the values of item1 and item2
+            bool item1 = rootElement.GetProperty("item1").GetBoolean();
+            string item2 = rootElement.GetProperty("item2").GetString();
+
+            return (item1, item2);
+
+
         }
         /// <summary>
         /// Provision
@@ -94,7 +109,7 @@ namespace PhishingPortal.UI.Blazor.Client
                 var res = await HttpClient.PostAsJsonAsync($"api/onboarding/provision", payload);
                 res.EnsureSuccessStatusCode();
 
-                if(res.IsSuccessStatusCode)
+                if (res.IsSuccessStatusCode)
                     result = true;
 
 
@@ -146,7 +161,7 @@ namespace PhishingPortal.UI.Blazor.Client
         /// <param name="password"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> CreateTenandAdminUser(string uniqueId, string email, string password, string confirmPass)
+        public async Task<(bool, string)> CreateTenandAdminUser(string uniqueId, string email, string password, string confirmPass)
         {
             ApiResponse<bool> content = new ApiResponse<bool>();
             var res = await HttpClient.PostAsJsonAsync($"api/onboarding/CreateDefaultUser", new TenantAdminUser
@@ -155,11 +170,11 @@ namespace PhishingPortal.UI.Blazor.Client
                 Email = email,
                 Password = password,
                 ConfirmPassword = confirmPass
-            }) ;
+            });
 
             res.EnsureSuccessStatusCode();
             content = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
-            return content?.Result ?? false;
+            return (content?.Result ?? false, content.Message);
         }
 
     }

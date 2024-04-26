@@ -4,7 +4,7 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Extensions;
 using PhishingPortal.Services.Notification.Helper;
-using PhishingPortal.Services.Notification.Sms;
+using PhishingPortal.Services.Notification.UrlShortner;
 
 namespace PhishingPortal.Services.Notification.Whatsapp
 {
@@ -19,20 +19,24 @@ namespace PhishingPortal.Services.Notification.Whatsapp
         public IConfiguration Config { get; }
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
+        public IUrlShortner urlShortner { get; }
 
         public WhatsappCampaignProvider(ILogger logger,
-            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner)
         {
             Logger = logger;
             WaSender = waSender;
             Config = config;
             Tenant = tenant;
             ConnManager = connManager;
+            urlShortner = UrlShortner;
 
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
         }
+
+
         public async Task CheckAndPublish(CancellationToken stopppingToken)
         {
             await Task.Run(async () =>
@@ -45,15 +49,18 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
+                                            .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
                                                 && o.Detail.Type == CampaignType.Whatsapp).ToList();
 
-                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
+                    MarkExpiredOrCompleted(dbContext, campaigns);
+
+                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow() 
+                            && o.State == CampaignStateEnum.Published).ToList();
 
                     foreach (var campaign in campaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
-
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await QueueSms(campaign, dbContext, Tenant.UniqueId);
@@ -103,7 +110,10 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                         var timestamp = DateTime.Now;
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
-                        var content = template.Content.Replace("###RETURN_URL###", returnUrl);
+
+                        string shortReturnUrl = await urlShortner.CallApiAsync(returnUrl);
+
+                        var content = template.Content.Replace("###RETURN_URL###", shortReturnUrl);
 
                         // TODO: calculate short urls
                         var smsInfo = new WhatsappCampaignInfo()
@@ -120,11 +130,11 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                                 CreatedBy = "system",
                                 CreatedOn = timestamp,
                                 ReturnUrl = returnUrl,
-                                RecipientId = r.Id,
+                                RecipientId = r.Recipient.Id,
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,
-                                Status = CampaignLogStatus.Sent.ToString()
+                                Status = CampaignLogStatus.Queued.ToString()
                             }
                         };
 
@@ -132,10 +142,10 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -147,5 +157,57 @@ namespace PhishingPortal.Services.Notification.Whatsapp
 
             await Task.CompletedTask;
         }
+
+        private static void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Campaign> allActiveCampaigns)
+        {
+            var allCampaignScheduleExpired = allActiveCampaigns.Where(o => (!o.Schedule.IsScheduledNow() || o.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                && o.State == CampaignStateEnum.InProgress);
+
+            foreach (var c in allCampaignScheduleExpired)
+            {
+                var allLogs = dbContext.CampaignLogs.Where(acl => acl.CampaignId == c.Id);
+                var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
+                var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
+
+                if (allCount > 0)
+                {
+                    var percentSent = (allSent / allCount) * 100;
+
+                    if (percentSent >= 95)
+                    {
+                        c.State = CampaignStateEnum.Completed;
+                    }
+                    if (c.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule &&
+                            c.State == CampaignStateEnum.InProgress)
+                    {
+                        var lastLogTime = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id)?.OrderByDescending(o => o.SentOn)
+                            .Select(o => o.SentOn).FirstOrDefault();
+
+                        if (lastLogTime.HasValue && (DateTime.Now - lastLogTime.Value).TotalMinutes > 15)
+                        {
+                            c.State = CampaignStateEnum.InComplete;
+                        }
+
+                    }
+                    else if (c.Schedule.ScheduleType != ScheduleTypeEnum.NoSchedule && c.State == CampaignStateEnum.InProgress
+                        && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
+                    {
+                        c.State = CampaignStateEnum.InComplete;
+                    }
+
+
+                    dbContext.Update(c);
+                    dbContext.SaveChanges();
+                }
+                else
+                {
+                    c.State = CampaignStateEnum.Completed;
+                    dbContext.Update(c);
+                    dbContext.SaveChanges();
+                }
+
+            }
+        }
+
     }
 }

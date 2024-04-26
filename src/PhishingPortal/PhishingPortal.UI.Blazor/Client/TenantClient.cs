@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
@@ -472,29 +473,6 @@ namespace PhishingPortal.UI.Blazor.Client
 
         #endregion
 
-
-        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(List<string> query)
-        {
-            IEnumerable<CampaignLog> campaignlog;
-            try
-            {
-                var res = await HttpClient.PostAsJsonAsync($"api/tenant/GetCampaignlog", query);
-
-                res.EnsureSuccessStatusCode();
-
-                campaignlog = await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return campaignlog;
-        }
-
-
         public async Task<Training> UpsertTraining(Training training)
         {
             Training result;
@@ -684,19 +662,57 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
 
-            return false;
+        }
+        public async Task<bool> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertCampaignTrainingMap", campaignTrainingIdcs);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
         }
 
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignIDs(int id)
+
+
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
         {
-            List<TrainingCompaignMapping> Trainingcampaign = null;
+            TrainingCampaignMapping trainingCampaign = null;
+            try
+            {
+                var response = await HttpClient.GetAsync($"api/Tenant/GetTrainingByCampaignId/{id}");
+                response.EnsureSuccessStatusCode();
+                var responseContent = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrEmpty(responseContent))
+                    return null;
+                trainingCampaign = await response.Content.ReadFromJsonAsync<TrainingCampaignMapping>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return trainingCampaign;
+        }
+
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
+         {
+            List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
                 var res = await HttpClient.GetAsync($"api/Tenant/getTrainingCampaignIds/{id}");
 
                 res.EnsureSuccessStatusCode();
 
-                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCompaignMapping>>();
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<TrainingCampaignMapping>>();
 
             }
             catch (Exception ex)
@@ -766,12 +782,113 @@ namespace PhishingPortal.UI.Blazor.Client
 
             return training;
         }
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuizAsync(List<TrainingQuiz> trainingQuiz)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuizAsync(List<TrainingQuizQuestion> trainingQuiz)
+        {
+            List<TrainingQuizQuestion> result = null;
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertTrainingQuiz", trainingQuiz);
+
+                res.EnsureSuccessStatusCode();
+
+                result = await res.Content.ReadFromJsonAsync<List<TrainingQuizQuestion>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return result;
+
+        }
+
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
+        {
+            TrainingQuizResult result;
+
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/trainingquiz-by-id/{id}");
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync<TrainingQuizResult>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<List<MyTraining>> GetMyTrainings()
+        {
+            var myTrainings = new List<MyTraining>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetMyTrainings");
+                res.EnsureSuccessStatusCode();
+                myTrainings = await res.Content.ReadFromJsonAsync<List<MyTraining>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return myTrainings;
+        }
+
+        public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingDetails(string uniqueID)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
+                res.EnsureSuccessStatusCode();
+                var str = await res.Content.ReadAsStringAsync();
+
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<(Training, TrainingLog)>(str);
+                return (result.Item1, result.Item2);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+
+            }
+
+            return default((Training, TrainingLog));
+        }
+
+        public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync<TrainingProgress>($"api/tenant/UpdateTrainingProgress", new TrainingProgress
+                {
+                    UniqueID = uniqueID,
+                    CheckPoint = checkpoint,
+                    Value = percentage
+                });
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<TrainingLog>();
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
         {
             List<TrainingQuiz> result = null;
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/Tenant/UpsertTrainingQuiz", trainingQuiz);
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertTrainingQuizTitle", data);
 
                 res.EnsureSuccessStatusCode();
 
@@ -784,18 +901,101 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
             return result;
-
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuizTitles()
         {
-            IEnumerable<TrainingQuiz> result;
+            IEnumerable<TrainingQuiz> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/AllTrainingQuiz");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return details;
+        }
+
+        public async Task<IEnumerable<TenantDomain>> GetDomains()
+        {
+            IEnumerable<TenantDomain> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetAllDomains");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<TenantDomain>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+            return details;
+        }
+
+        public async Task<(bool Status, TenantDomain data, string Message)> UpsertDomain(TenantDomain domain)
+        {
+            var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertMyDomain", domain);
+
+            res.EnsureSuccessStatusCode();
+
+            var data = await res.Content.ReadFromJsonAsync<ApiResponse<TenantDomain>>();
+
+            return (data.IsSuccess, data.Result, data.Message);
+        }
+
+        public async Task<TenantDomain> VerifyDomain(TenantDomain domain)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/VerifyDomain", domain);
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<TenantDomain>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+
+            return default;
+        }
+
+        public async Task<(bool Success, string Message)> DeleteDomain(int id)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteDomain/{id}", new { });
+
+                res.EnsureSuccessStatusCode();
+
+                var response = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+
+                return (response.IsSuccess, response.Message);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        #region #OnPremise AD
+        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAllOnPremiseADGroups()
+        {
+            Dictionary<string, List<OnPremiseADUsers>> data = new();
 
             try
             {
-                var res = await HttpClient.GetAsync($"api/tenant/TrainingQuiz-by-id/{id}");
+                var res = await HttpClient.GetAsync("api/Tenant/GetOnPremiseADGroups");
+
                 res.EnsureSuccessStatusCode();
-                result = await res.Content.ReadFromJsonAsync<IEnumerable<TrainingQuiz>>();
+
+                data = await res.Content.ReadFromJsonAsync<Dictionary<string, List<OnPremiseADUsers>>>();
             }
             catch (Exception ex)
             {
@@ -803,7 +1003,61 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
 
-            return result;
+            return data;
         }
+
+        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup(string groupName)
+        {
+            List<OnPremiseADUsers> data = new();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync("api/Tenant/GetOnPremiseUsersByADGroup", groupName);
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<List<OnPremiseADUsers>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+        #endregion
+
+        #region Report
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campaignId)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/BarChartDrillDownReportCount/{campaignId}");
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
+
+                
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter filters)
+        {
+            var res = await HttpClient.PostAsJsonAsync("api/tenant/PieChartDrillDownReportCount", filters);
+
+            res.EnsureSuccessStatusCode();
+
+            var data = await res.Content.ReadFromJsonAsync<IEnumerable<ReportDataCounts>>();
+            return data;
+        }
+
+        #endregion
     }
 }

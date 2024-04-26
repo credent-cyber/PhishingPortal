@@ -191,13 +191,16 @@
 		<PackageReference Include="BlazingComponents.Summernote" Version="0.0.6" />
 		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
 		<PackageReference Include="Blazored.TextEditor" Version="1.0.8" />
-		<PackageReference Include="GridBlazor" Version="3.4.1" />
-		<PackageReference Include="GridCore" Version="5.4.2" />
+		<PackageReference Include="Blazored.Video" Version="1.0.1" />
+		<PackageReference Include="GridBlazor" Version="4.0.4" />
+		<PackageReference Include="GridCore" Version="6.0.4" />
 		<PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="3.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.9" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.26" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(BlazorVersion)" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(BlazorVersion)" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="$(BlazorVersion)" />
+		<PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="$(SystemNetHttpJsonVersion)" />
 		<PackageReference Include="NPOI" Version="2.5.6" />
 		<PackageReference Include="System.Net.Http.Json" Version="$(SystemNetHttpJsonVersion)" />
@@ -214,6 +217,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Update="wwwroot\appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="wwwroot\scripts\bootstrap.bundle.min.js">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>

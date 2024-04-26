@@ -21,7 +21,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                         @* <li><a class="dropdown-item" href="authentication/profile">Profile</a></li>*@
-                        <li><a @onclick="BeginSignOut" class="dropdown-item" href="#">Logout</a></li>
+                        <li><a @onclick="BeginSignOut" class="dropdown-item">Logout</a></li>
                     </ul>
                 </div>
             </Authorized>
@@ -34,7 +34,7 @@
                         </a>
                     </div>
                     <div class="d-flex align-items-center justify-content-center">
-                        <a class="btn btn-secondary btn-outline-warning mr-3" href="login">Login</a>
+                        <a class="btn btn-secondary btn-outline-warning mr-3" href="login?ReturnUrl=@(Navigation.Uri)">Login</a>
                         <a class="btn btn-secondary btn-outline-info mr-3" href="request_demo">Request Demo</a>
                     </div>
                 </header>

@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PhishingPortal.Dto;
+
+
 using PhishingPortal.Repositories;
-using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Services;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using System.Web.Http.Results;
+using Microsoft.Graph;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
+    using Microsoft.AspNetCore.Mvc;
+    using PhishingPortal.Common;
+    using PhishingPortal.Dto;
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -25,9 +24,13 @@ namespace PhishingPortal.Server.Controllers.Api
         readonly TenantRepository _tenantRepository;
         readonly string _templateImageRootPath;
         readonly IAzActDirClientService _adImportClient;
+        readonly ITrainingRepository TrainingRepository;
+        readonly IOnPremiseADService _onPromiseADService;
+
+        public INsLookupHelper NsLookupHelper { get; }
 
         public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
-            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver) :
+            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver, INsLookupHelper nsLookupHelper) :
             base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
@@ -35,6 +38,9 @@ namespace PhishingPortal.Server.Controllers.Api
             _templateImageRootPath = appConfig.GetValue<string>("TemplateImgRootPath");
 
             _adImportClient = new AzActDirClientService(logger, _tenantRepository);
+            TrainingRepository = new TrainingRepository(logger, TenantDbCtx);
+            NsLookupHelper = nsLookupHelper;
+            _onPromiseADService = new OnPremiseADService(logger, TenantDbCtx);
         }
 
         [HttpGet]
@@ -93,7 +99,7 @@ namespace PhishingPortal.Server.Controllers.Api
             else
             {
                 campaign.CreatedOn = DateTime.Now;
-                campaign.State = CampaignStateEnum.Draft;
+                // campaign.State = CampaignStateEnum.Draft;
             }
 
             return await _tenantRepository.UpsertCampaign(campaign);
@@ -145,6 +151,11 @@ namespace PhishingPortal.Server.Controllers.Api
         [Route("upsert-template")]
         public async Task<CampaignTemplate> UpsertTemplate(CampaignTemplate template)
         {
+            if (template.Id > 0)
+                template.ModifiedOn = DateTime.Now;
+            else
+                template.CreatedOn = DateTime.Now;
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(template.Content);
@@ -276,7 +287,7 @@ namespace PhishingPortal.Server.Controllers.Api
                 var data = await _tenantRepository.GetCategoryWisePhishingReport(startDate, endDate);
                 result.Result = data;
                 result.IsSuccess = true;
-                result.Message = String.Empty;
+                result.Message = string.Empty;
             }
             catch (Exception ex)
             {
@@ -381,36 +392,16 @@ namespace PhishingPortal.Server.Controllers.Api
             return result;
         }
 
-        //[HttpGet]
-        //[Route("GetCampaignlog/{Query}")]
-        //public async Task<CampaignLog> GetCampaignLog(List<string> Query)
-        //{
-        //    var campaignLogs = await _tenantRepository.GetCampaignLogs(Query);
-
-        //    return campaignLogs.ToList();
-        //}
-
-        [HttpPost]
-        [Route("GetCampaignlog")]
-        public async Task<IEnumerable<CampaignLog>> GetCampaignLog(List<string> Query)
-        {
-            try
-            {
-                var result = await _tenantRepository.GetCampaignLogs(Query);
-                return result.ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, ex.Message);
-                throw;
-            }
-        }
-
 
         [HttpPost]
         [Route("upsert-training")]
         public async Task<Training> UpsertTraining(Training training)
         {
+            if (training.Id > 0)
+                training.ModifiedOn = DateTime.Now;
+            else
+                training.CreatedOn = DateTime.Now;
+
             var htmlDoc = new HtmlDocument();
 
             htmlDoc.LoadHtml(training.Content);
@@ -564,6 +555,58 @@ namespace PhishingPortal.Server.Controllers.Api
             return result.ToList();
         }
 
+        #region MyTraining
+
+        [HttpGet]
+        [Route("GetMyTrainings")]
+        public async Task<List<MyTraining>> GetMyTrainings()
+        {
+            var output = new List<MyTraining>();
+
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                Forbid("Unauthorized user");
+
+            var result = await TrainingRepository.GetMyTrainings(email);
+
+            foreach (var r in result)
+            {
+                output.Add(new MyTraining()
+                {
+                    Training = r.Training,
+                    TrainingLog = r.TrainingLog
+                });
+            }
+
+            return output;
+        }
+
+        [HttpGet]
+        [Route("GetTrainingByUniqueId")]
+        public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingByUniqueId(string uniqueID)
+        {
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                Forbid("Unauthorized user");
+
+            return await TrainingRepository.GetTrainingByUniqueID(new Guid(uniqueID), email);
+        }
+
+        [HttpPost]
+        [Route("UpdateTrainingProgress")]
+        public async Task<TrainingLog> UpdateTrainingProgress([FromBody] TrainingProgress progress)
+        {
+            var email = HttpContextAccessor?.HttpContext?.GetUserEmail();
+
+            if (string.IsNullOrEmpty(email))
+                throw new InvalidOperationException("User not authorized");
+
+            return await TrainingRepository.UpdateTrainingProgress(new Guid(progress.UniqueID), progress.Value, email, progress.CheckPoint);
+        }
+        #endregion
+
         [HttpGet]
         [Route("GetCampaignsNames")]
         public async Task<List<Campaign>> GetCompaignNames()
@@ -598,8 +641,34 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [HttpGet]
+        [Route("GetTrainingByCampaignId/{CampId}")]
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int CampId)
+        {
+            var data =  await _tenantRepository.GetTrainingByCampaignId(CampId);
+            return data;
+        }
+
+        [HttpPost]
+        [Route("UpsertCampaignTrainingMap")]
+        public async Task<ApiResponse<string>> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _tenantRepository.UpsertCampaignTrainingMap(campaignTrainingIdcs);
+                result.Message = "Successful";
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
+        [HttpGet]
         [Route("getTrainingCampaignIds/{trainingId}")]
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int trainingId)
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int trainingId)
         {
             var result = await _tenantRepository.GetTrainingCampaignsId(trainingId);
             return await Task.FromResult(result);
@@ -647,7 +716,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpPost]
         [Route("UpsertTrainingQuiz")]
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> trainingQuiz)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> trainingQuiz)
         {
 
             return await _tenantRepository.UpsertTrainingQuiz(trainingQuiz);
@@ -655,9 +724,140 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpGet]
         [Route("TrainingQuiz-by-id/{id}")]
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
             return await _tenantRepository.GetTrainingQuizById(id);
         }
+
+        [HttpGet]
+        [Route("training-quiz-by-training-id/{trainingId}")]
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetTrainingQuizByTrainingId(int trainingId)
+        {
+            return await _tenantRepository.GetQuizByTrainingId(trainingId);
+        }
+
+        [HttpPost]
+        [Route("UpsertTrainingQuizTitle")]
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> Quiz)
+        {
+            return await _tenantRepository.UpsertTrainingQuizTitle(Quiz);
+        }
+
+        [HttpGet]
+        [Route("AllTrainingQuiz")]
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
+        {
+            return await _tenantRepository.GetAllTrainingQuiz();
+        }
+
+        [HttpGet]
+        [Route("GetAllDomains")]
+        public async Task<IEnumerable<TenantDomain>> GetAllDomains()
+        {
+            return await AdminRepository.GetDomains(Tenant.Id);
+        }
+
+        [HttpPost]
+        [Route("UpsertMyDomain")]
+        public async Task<ApiResponse<TenantDomain>> UpsertDomain(TenantDomain tenantDomain)
+        {
+            try
+            {
+                if (tenantDomain.Id == 0)
+                {
+                    tenantDomain.TenantId = Tenant.Id;
+                    tenantDomain.DomainVerificationCode = Tenant.UniqueId;
+                    tenantDomain.CreatedBy = CurrentUser;
+                    tenantDomain.CreatedOn = DateTime.Now;
+                }
+
+                var result = await AdminRepository.UpsertTenantDomain(tenantDomain);
+
+                return new ApiResponse<TenantDomain> { Result = result, IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<TenantDomain> { Message = ex.Message };
+            }
+        }
+
+        [HttpPost]
+        [Route("VerifyDomain")]
+        public async Task<TenantDomain> VerifyDomain(TenantDomain entry)
+        {
+
+#if DEBUG
+            var verficationResult = true;
+#else
+            var verficationResult = NsLookupHelper.VerifyDnsRecords("TXT", entry.Domain.Trim().ToLower(), entry.DomainVerificationCode);
+#endif
+            if (verficationResult)
+            {
+                entry.ModifiedBy = CurrentUser;
+                entry.ModifiedOn = DateTime.Now;
+                return await AdminRepository.VerifyDomain(entry);
+            }
+
+            return entry;
+        }
+
+        [HttpPost]
+        [Route("DeleteDomain/{id}")]
+        public async Task<ApiResponse<bool>> DeleteDomain(int id)
+        {
+            try
+            {
+                var result = await AdminRepository.DeleteDomain(id);
+
+                return new ApiResponse<bool> { Result = result, IsSuccess = true };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<bool> { Message = ex.Message };
+            }
+        }
+
+        #region OnPromiseAD
+        [HttpGet]
+        [Route("GetOnPremiseADGroups")]
+        public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetOnPremiseADGroups()
+        {
+          return await _onPromiseADService.GetOnPremiseADGroups();
+        }
+
+        [HttpPost]
+        [Route("GetOnPremiseUsersByADGroup")]
+        public async Task<List<OnPremiseADUsers>> GetOnPremiseUsersByADGroup([FromBody] string groupName)
+        {
+            return await _onPromiseADService.GetOnPremiseUsersByADGroup(groupName);
+        }
+        #endregion
+
+        [HttpPost]
+        [Route("campaign-spam-report")]
+        [AllowAnonymous]
+        public async Task<ApiResponse<string>> CampignLinkReport(GenericApiRequest<string> request)
+        {
+
+            return await _tenantRepository.CampaignSpamReport(request.Param);
+
+        }
+
+        #region Report
+        [HttpGet]
+        [Route("BarChartDrillDownReportCount/{campaignId}")]
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campaignId)
+        {
+            return await _tenantRepository.BarChartDrillDownReportCount(campaignId);
+        }
+
+
+        [HttpPost]
+        [Route("PieChartDrillDownReportCount")]
+        public async Task<IQueryable<ReportDataCounts>> PieChartDrillDownReportCount([FromBody] DrillDownReportCountParameter parameters)
+        {
+                return await _tenantRepository.PieChartDrillDownReportCount(parameters);        
+        }
+        #endregion
     }
 }

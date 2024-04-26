@@ -1,0 +1,194 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.Dto.Quiz
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Common
+
+@inject TenantClient client
+@inject HttpClient httpClient;
+@inject NavigationManager navigation
+
+<Card>
+
+    <Header>
+        <h5>@Training.TrainingName</h5>
+        <hr />
+    </Header>
+
+    <Content>
+        @if (model_ != null)
+        {
+            <EditForm Model="model_">
+                <DataAnnotationsValidator />
+                <div class="container">
+                    <h4 class="form-label bold-font p-2">(@model_.TrainingQuiz.OrderNumber). @model_.TrainingQuiz.Question</h4>
+                    <ul class="list-unstyled m-4">
+                        @foreach (var o in model_.Options)
+                        {
+                            <li class="m-1 p-2">
+                                @if (model_.TrainingQuiz.AnswerType == "Multiple-Choice")
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input type="checkbox" class="form-check-input" @bind="o.Selected" />
+                                        <label class="form-check-label">@o.Option.AnswerText</label>
+                                    </div>
+                                }
+
+                                @if (model_.TrainingQuiz.AnswerType == "Single-Choice")
+                                {
+                                    <div class="form-check form-check-inline">
+                                        <input type="radio" class="form-check-input" name="SelectedOption" checked="@(model_.SelectedOption == o)" @onchange="@(() => model_.SelectedOption= o)" />
+                                        <label class="form-check-label">@o.Option.AnswerText</label>
+                                    </div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+            </EditForm>
+        }
+    </Content>
+    <Footer>
+      
+            <div style="text-align:left;">
+
+            @if (index_ > 1)
+            {
+                <button class="btn btn-outline-secondary ml-2 mb-1 col-md-2" @onclick="PreviousQuestion">Previous</button>
+            }
+
+            @if (index_ < totalQuestion_)
+            {
+                <button class="btn btn-secondary ml-2 mb-1 col-md-2" @onclick="NextQuestion">Next</button>
+            }
+
+            @if (index_ > 0 && index_ == totalQuestion_)
+            {
+                <button class="btn btn-primary ml-2 mb-1 col-md-2" @onclick="Submit">Submit</button>
+            }
+
+            <button class="btn btn-warning ml-2 mb-1 col-md-2" @onclick="Quit">Quit</button>
+        </div>
+    </Footer>
+</Card>
+
+@code {
+
+    [Parameter]
+    public Training Training { get; set; }
+
+    [Parameter]
+    public TrainingLog TrainingLog { get; set; }
+
+    [Parameter]
+    public EventCallback<Scores> OnSubmit { get; set; }
+
+    private IEnumerable<TrainingQuizQuestion> quizCollection_ = new List<TrainingQuizQuestion>();
+    private List<Question> questions_ = new();
+    private Question model_;
+    private int index_ = 1;
+    private int totalQuestion_;
+    private decimal scores_;
+    private bool pass_;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            if (!Training.TrainingQuizId.HasValue)
+                throw new ArgumentNullException("Training doesn't consist a quiz");
+
+            var result = await client.GetTrainingQuizById(Training.TrainingQuizId.Value);
+
+            var list = result.Questions.ToList();
+            list.Shuffle<TrainingQuizQuestion>();
+            
+            var i = 1;
+            list.ForEach(o =>
+            {
+                o.OrderNumber = i++;
+            });
+
+            quizCollection_ = list;
+
+            if (quizCollection_ == null || !quizCollection_.Any())
+                throw new InvalidOperationException("Error fetching quiz questions");
+
+            questions_ = quizCollection_.Select(i => new Question
+                {
+
+                    TrainingQuiz = i,
+
+                    Options = i.TrainingQuizAnswer.Select(o => new QuestionOption
+                    {
+                        Option = o,
+                        Selected = false,
+                    }).ToList()
+
+                }).ToList();
+
+            model_ = questions_.FirstOrDefault();
+
+            totalQuestion_ = questions_.Count;
+
+            InvokeAsync(StateHasChanged);
+        }
+        await Task.CompletedTask;
+    }
+
+    private void NextQuestion()
+    {
+        if (index_ < totalQuestion_)
+        {
+            index_++;
+            model_ = questions_.Skip(index_ - 1).FirstOrDefault();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private void PreviousQuestion()
+    {
+        if (index_ > 1)
+        {
+            index_--;
+            model_ = questions_.Skip(index_ - 1).FirstOrDefault();
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task Submit()
+    {
+        var incorrectMultichoice = questions_.Where(o => o.TrainingQuiz.AnswerType == "Multiple-Choice" &&
+                o.Options.Any(i => i.Option.IsCorrect != i.Selected));
+
+        var correctMultipleChoice = questions_.Except(incorrectMultichoice);
+
+        var incoorectSingleChoice = questions_.Where(o => o.TrainingQuiz.AnswerType == "Single-Choice" &&
+                o.Options.Any(i => i.Option.IsCorrect && o.SelectedOption.Option != i.Option));
+
+        var correctSingleChoie = questions_.Except(incorrectMultichoice)
+                                           .Except(correctMultipleChoice)
+                                           .Except(incoorectSingleChoice);
+
+        var totalWeigtage = questions_.Sum(o => o.TrainingQuiz.Weightage < 1 ? 1 : o.TrainingQuiz.Weightage);
+        var totalCorrectScores = correctMultipleChoice.Sum(o => o.TrainingQuiz.Weightage) + correctSingleChoie.Sum(o => o.TrainingQuiz.Weightage);
+        var percentage = Math.Round((totalCorrectScores / totalWeigtage) * 100, 2) ;
+
+        await OnSubmit.InvokeAsync(new Scores
+            {
+                Score = percentage,
+                Pass = percentage > 70
+            });
+    }
+
+    private async Task Quit()
+    {
+        await OnSubmit.InvokeAsync(new Scores
+            {
+                Score = 0,
+                Pass = false
+            });
+    }
+
+}

@@ -1,0 +1,151 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+<div class="row m-1">
+
+    <EditForm Model="model" OnValidSubmit="OnSave">
+        <DataAnnotationsValidator />
+        <div class="form-group row mt-1">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Domain</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.Domain" id="Domain" class="form-control"></InputText>
+                <ValidationMessage For="() => model.Domain" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Username</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.Username" id="Username" class="form-control"></InputText>
+                <ValidationMessage For="() => model.Username" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Password</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.Password" id="Password" class="form-control"></InputText>
+                <ValidationMessage For="() => model.Password" />
+            </div>
+        </div>
+        <hr />
+
+        <div class="mt-4" style="text-align:left;">
+            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+        </div>
+    </EditForm>
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+
+    </Dailog>
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 1500;
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+
+    private bool show = false;
+    string MessageBody = "Thank you!";
+
+    private OnPromiseADSettings model = new OnPromiseADSettings();
+
+    private string message = string.Empty;
+    private string password = string.Empty;
+
+    private const string SecretMask = "*******************************************";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await client.GetSettings();
+        //alert?.Clear();
+        if (settings.ContainsKey("ad_domain"))
+            model = new OnPromiseADSettings(settings);
+
+
+        password = model.Password;
+        model.Password = SecretMask;
+    }
+
+    public async void OnSave()
+    {
+        if (model != null)
+        {
+            //alert?.Clear();
+            message = string.Empty;
+            MessageBody = "Thank you!";
+            IsError = false;
+            IsSuccess = false;
+            show = true;
+            TaskCompleted = false;
+
+            try
+            {
+                message = "Please wait";
+                if (model.Password == SecretMask)
+                {
+                    model.Password = password;
+                }
+
+                var result = await client.UpsertSettings(model.ToSettingsDictionary());
+
+                model = new OnPromiseADSettings(result);
+
+                password = model.Password;
+                model.Password = SecretMask;
+
+                //alert?.SetSuccess("saved!");
+                message = "Saved!";
+                TaskCompleted = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                //alert?.SetError("Error while saving!");
+                logger.LogError(ex, ex.Message);
+                logger.LogError(ex, ex.Message);
+                IsError = true;
+                message = "Error!";
+                MessageBody = ex.Message;
+                TaskCompleted = true;
+            }
+            //_timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        }
+
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+    }
+}

@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto.Dashboard;
 using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
+using Humanizer;
+using Org.BouncyCastle.Asn1.Mozilla;
 
 namespace PhishingPortal.Repositories
 {
@@ -91,9 +93,12 @@ namespace PhishingPortal.Repositories
                 campaign.Detail.CreatedOn = now;
                 TenantDbCtx.Campaigns.Add(campaign);
             }
+            try { TenantDbCtx.SaveChanges(); } 
+            catch(Exception e) 
+            {
 
-            TenantDbCtx.SaveChanges();
-
+            }
+           
             return campaign;
         }
 
@@ -119,11 +124,11 @@ namespace PhishingPortal.Repositories
             var hasChanges = false;
             foreach (var r in data)
             {
-                if (!TenantDbCtx.Recipients.Any(o => o.Email == r.Email || o.Mobile == r.Mobile))
+                if (!(TenantDbCtx.Recipients.Any(o => o.Email.Trim() == r.Email.Trim())))
                 {
                     var recipient = new Recipient
                     {
-                        Email = r.Email,
+                        Email = r.Email.Trim(),
                         Mobile = r.Mobile,
                         Name = r.Name,
                         WhatsAppNo = r.Mobile,
@@ -148,15 +153,19 @@ namespace PhishingPortal.Repositories
                 else
                 {
                     var recipient = TenantDbCtx.Recipients
-                        .FirstOrDefault(o => o.Email == r.Email || o.Mobile == r.Mobile);
+                        .FirstOrDefault(o => o.Email.Trim() == r.Email.Trim());
 
                     recipient.Mobile = r.Mobile;
                     recipient.Name = r.Name;
-                    recipient.Email = r.Email;
+                    recipient.EmployeeCode = r.EmployeeCode;
+                    recipient.Branch = r.Branch;
+                    recipient.Department = r.Department;
+                    recipient.DateOfBirth = r.DateOfBirth;
+
 
                     TenantDbCtx.Update(recipient);
                     hasChanges = true;
-                    if (!TenantDbCtx.CampaignRecipients.Any(o => o.CampaignId == campaignId && o.RecipientId == recipient.Id))
+                    if (!(TenantDbCtx.CampaignRecipients.Any(o => o.CampaignId == campaignId && o.RecipientId == recipient.Id)))
                     {
                         TenantDbCtx.CampaignRecipients.Add(new CampaignRecipient
                         {
@@ -171,6 +180,7 @@ namespace PhishingPortal.Repositories
 
             if (hasChanges)
                 TenantDbCtx.SaveChanges();
+
             else
             {
                 throw new InvalidOperationException("No changes");
@@ -284,7 +294,8 @@ namespace PhishingPortal.Repositories
                 var totatPhishingTests = TenantDbCtx.CampaignLogs
                   .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
 
-                var campaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region EMAIL CHART ANALYSIS
+                var campaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -316,7 +327,7 @@ namespace PhishingPortal.Repositories
 
                 //email campaign - department wise data 
 
-                int count = 0, id1 = 1, id2 = 1, id3 = 1, id4 = 1, id5 = 1;
+                int count = 0, id1 = 0, id2 = 0, id3 = 0, id4 = 0, id5 = 0;
                 foreach (var id in ids)
                 {
                     count += 1;
@@ -333,14 +344,13 @@ namespace PhishingPortal.Repositories
 
                 }
 
-                var filterData = TenantDbCtx.CampaignLogs
-                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end).Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
+                var filterData = totatPhishingTests.Where(o => o.CampaignId == id1 || o.CampaignId == id2 || o.CampaignId == id3 || o.CampaignId == id4 || o.CampaignId == id5);
 
                 var phishtestWithRecipients = from log in filterData
                                               join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
                                               select new { logEntry = log, Department = crec.Recipient.Department };
 
-                var depatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.Department, (key, entries) => new
+                var depatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
@@ -370,7 +380,7 @@ namespace PhishingPortal.Repositories
                                         join ctem in TenantDbCtx.CampaignTemplates on cdet.CampaignTemplateId equals ctem.Id
                                         select new { logEntry = log, template = ctem.Name, templateId = ctem.Id };
 
-                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Email).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+                var tempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Email.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
 
@@ -419,9 +429,10 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
+                #endregion
 
-                //Ext for sms
-                var SmscampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region SMS CHART ANALYSIS
+                var SmsCampaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -429,7 +440,7 @@ namespace PhishingPortal.Repositories
                     TotalReported = entries.Count(i => i.IsReported),
                 });
 
-                foreach (var c in SmscampaignGroup)
+                foreach (var c in SmsCampaignGroup)
                 {
                     var campaign = TenantDbCtx.Campaigns.Find(c.CampaignId);
 
@@ -448,17 +459,41 @@ namespace PhishingPortal.Repositories
                 }
                 data.SmsEntries = data.SmsEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
                 data.TotalSmsCampaigns = data.SmsEntries.Sum(i => i.Count);
+                var sIds = data.SmsEntries;
+                int sCount = 0, sId1 = 0, sId2 = 0, sId3 = 0, sId4 = 0, sId5 = 0;
+                foreach (var id in sIds)
+                {
+                    sCount += 1;
+                    if (sCount == 1)
+                        sId1 = id.Campaign.Id;
+                    if (sCount == 2)
+                        sId2 = id.Campaign.Id;
+                    if (sCount == 3)
+                        sId3 = id.Campaign.Id;
+                    if (sCount == 4)
+                        sId4 = id.Campaign.Id;
+                    if (sCount == 5)
+                        sId5 = id.Campaign.Id;
+
+                }
+
+                var filterSmsData = totatPhishingTests.Where(o => o.CampaignId == sId1 || o.CampaignId == sId2 || o.CampaignId == sId3 || o.CampaignId == sId4 || o.CampaignId == sId5);
+
+                var smsPhishtestWithRecipients = from log in filterSmsData
+                                                      join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                                      select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Sms camp**************************************************
-                var SmsdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.Department, (key, entries) => new
+
+                var SmsDepatwiseCount = smsPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
                     Hits = entries.Count(o => o.logEntry.IsHit),
                     Reported = entries.Count(o => o.logEntry.IsReported),
                 });
-                var SmsDtotalHits = SmsdepatwiseCnt.Sum(o => o.Hits);
+                var SmsDtotalHits = SmsDepatwiseCount.Sum(o => o.Hits);
 
-                foreach (var dep in SmsdepatwiseCnt)
+                foreach (var dep in SmsDepatwiseCount)
                 {
                     if (dep.Total > 0)
                     {
@@ -473,7 +508,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Sms Template wise**********************************
-                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Sms).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+                var SmstempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
@@ -494,7 +529,7 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************** Sms category wise********************************************
-                var SmscategoryWiseGrp = data.SmsEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                var SmsCategoryWiseGrp = data.SmsEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
                 {
                     Category = key,
                     Count = values.Sum(o => o.Count),
@@ -502,10 +537,10 @@ namespace PhishingPortal.Repositories
                     ReportedCount = values.Sum(o => o.Reported),
                 });
 
-                var SmstotalHits = SmscategoryWiseGrp.Sum(o => o.HitCount);
+                var SmstotalHits = SmsCategoryWiseGrp.Sum(o => o.HitCount);
 
                 // calc phishing percentage out of total hits
-                foreach (var category in SmscategoryWiseGrp)
+                foreach (var category in SmsCategoryWiseGrp)
                 {
                     if (category.Count > 0 && data.TotalSmsCampaigns > 0)
                     {
@@ -519,9 +554,10 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
+                #endregion
 
-                //Ext for Whatsapp
-                var WhatsappcampaignGroup = totatPhishingTests.Where(o => o.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
+                #region WHATSAPP CHART ANALYSIS
+                var WhatsappcampaignGroup = totatPhishingTests.Where(o => o.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.CampaignId, (key, entries) => new
                 {
                     CampaignId = key,
                     Total = entries.Count(),
@@ -548,17 +584,40 @@ namespace PhishingPortal.Repositories
                 }
                 data.WhatsappEntries = data.WhatsappEntries.OrderByDescending(o => o.Campaign.ModifiedOn).Take(5).ToList();
                 data.TotalWhatsappCampaigns = data.WhatsappEntries.Sum(i => i.Count);
+                var WhatsappIds = data.WhatsappEntries;
+                int wCount = 0, wid1 = 0, wid2 = 0, wid3 = 0, wid4 = 0, wid5 = 0;
+                foreach (var id in WhatsappIds)
+                {
+                    wCount += 1;
+                    if (wCount == 1)
+                        wid1 = id.Campaign.Id;
+                    if (wCount == 2)
+                        wid2 = id.Campaign.Id;
+                    if (wCount == 3)
+                        wid3 = id.Campaign.Id;
+                    if (wCount == 4)
+                        wid4 = id.Campaign.Id;
+                    if (wCount == 5)
+                        wid5 = id.Campaign.Id;
+
+                }
+
+                var filterWhatsappData = totatPhishingTests.Where(o => o.CampaignId == wid1 || o.CampaignId == wid2 || o.CampaignId == wid3 || o.CampaignId == wid4 || o.CampaignId == wid5);
+
+                var whatsappPhishtestWithRecipients = from log in filterWhatsappData
+                                                      join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                              select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Whatsapp camp**************************************************
-                var WhatsappdepatwiseCnt = phishtestWithRecipients.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.Department, (key, entries) => new
+                var WhatsappDepatwiseCount = whatsappPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
                     Department = key ?? "UNKNOWN",
                     Total = entries.Count(),
                     Hits = entries.Count(o => o.logEntry.IsHit),
                     Reported = entries.Count(o => o.logEntry.IsReported),
                 });
-                var WhatsappDtotalHits = WhatsappdepatwiseCnt.Sum(o => o.Hits);
+                var WhatsappDtotalHits = WhatsappDepatwiseCount.Sum(o => o.Hits);
 
-                foreach (var dep in WhatsappdepatwiseCnt)
+                foreach (var dep in WhatsappDepatwiseCount)
                 {
                     if (dep.Total > 0)
                     {
@@ -573,15 +632,16 @@ namespace PhishingPortal.Repositories
                     }
                 }
                 //*************************Whatsapp Template wise**********************************
-                var WhatsapptempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.Camp.Detail.Type == CampaignType.Whatsapp).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
+
+                var WhatsappTempwiseCnt = phishtestWithTemp.Where(a => a.logEntry.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.templateId + "." + i.template, (key, tentries) => new
                 {
                     template = key,
                     TTotal = tentries.Count(),
                     THits = tentries.Count(o => o.logEntry.IsHit)
                 });
-                var WhatsappTemptotalHits = WhatsapptempwiseCnt.Sum(o => o.THits);
+                var WhatsappTemptotalHits = WhatsappTempwiseCnt.Sum(o => o.THits);
 
-                foreach (var tem in WhatsapptempwiseCnt)
+                foreach (var tem in WhatsappTempwiseCnt)
                 {
                     if (tem.TTotal > 0)
                     {
@@ -595,7 +655,7 @@ namespace PhishingPortal.Repositories
                 }
 
                 //*************************** Whatsapp category wise********************************************
-                var WhatsappcategoryWiseGrp = data.WhatsappEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
+                var WhatsappCategoryWiseGrp = data.WhatsappEntries.GroupBy(o => o.Campaign.Category, (key, values) => new
                 {
                     Category = key,
                     Count = values.Sum(o => o.Count),
@@ -603,10 +663,10 @@ namespace PhishingPortal.Repositories
                     ReportedCount = values.Sum(o => o.Reported),
                 });
 
-                var WhatsapptotalHits = WhatsappcategoryWiseGrp.Sum(o => o.HitCount);
+                var WhatsapptotalHits = WhatsappCategoryWiseGrp.Sum(o => o.HitCount);
 
                 // calc phishing percentage out of total hits
-                foreach (var category in WhatsappcategoryWiseGrp)
+                foreach (var category in WhatsappCategoryWiseGrp)
                 {
                     if (category.Count > 0 && data.TotalWhatsappCampaigns > 0)
                     {
@@ -620,7 +680,7 @@ namespace PhishingPortal.Repositories
 
                     }
                 }
-
+                #endregion
             }
             catch (Exception ex)
             {
@@ -927,34 +987,6 @@ namespace PhishingPortal.Repositories
         }
         #endregion
 
-        public Task<IEnumerable<CampaignLog>> GetCampaignLogs(List<string> query)
-        {
-            var result = Enumerable.Empty<CampaignLog>();
-            var results = Enumerable.Empty<CampaignLog>();
-            var data = query.ToList();
-            var logdata = TenantDbCtx.CampaignLogs.Include(o => o.Recipient.Recipient).Include(o => o.Camp).Include(o => o.Camp.Detail.Template);
-            if (data.Count > 0)
-            {
-                for (int i = 0; i < data.Count; i++)
-                {
-                    var id = Convert.ToInt16(data[i]);
-                    if (i == 0)
-                    {
-                        results = logdata.Where(o => o.CampaignId == id);
-                    }
-                    else
-                    {
-                        result = logdata.Where(o => o.CampaignId == id);
-                        results = results.Concat(result);
-                    }
-                }
-            }
-            else
-                results = TenantDbCtx.CampaignLogs;
-
-            return Task.FromResult(results);
-        }
-
         public async Task<Training> UpsertTraining(Training training)
         {
             try
@@ -1068,7 +1100,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<Tuple<bool, string>> Training(string key)
         {
-            var status = TrainingStatus.Sent.ToString();
+            var status = TrainingLogStatus.Sent.ToString();
             var trainingLog = await TenantDbCtx.TrainingLog.FirstOrDefaultAsync(o => o.SecurityStamp == key && o.Status == status);
 
             if (trainingLog == null)
@@ -1097,7 +1129,7 @@ namespace PhishingPortal.Repositories
             try
             {
                 var Traininglogs = TenantDbCtx.TrainingLog
-                 .Where(i => i.CreatedOn >= start && i.CreatedOn < end);
+                 .Where(i => i.SentOn >= start && i.SentOn < end);
 
                 #region
                 //var trainingGroup = Trainings.ToList().GroupBy(i => i.TrainingID, (key, entries) => new
@@ -1128,12 +1160,12 @@ namespace PhishingPortal.Repositories
                 #endregion
 
 
-                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.CreatedOn.Month, (key, entries) => new
+                var trainingGroup = Traininglogs.ToList().GroupBy(i => i.SentOn.Month, (key, entries) => new
                 {
                     Month = (Months)key,
                     TotalTraining = entries.Count(),
-                    Completed = entries.Count(i => i.Status == (TrainingStatus.Completed).ToString()),
-                    Inprogress = entries.Count(i => i.Status == (TrainingStatus.InProgress).ToString()),
+                    Completed = entries.Count(i => i.Status == (TrainingLogStatus.Completed).ToString()),
+                    Inprogress = entries.Count(i => i.Status == (TrainingLogStatus.InProgress).ToString()),
 
                 });
 
@@ -1186,12 +1218,12 @@ namespace PhishingPortal.Repositories
             if (lastTraining != null)
             {
                 var logs = TenantDbCtx.TrainingLog.Where(o => o.TrainingID == lastTraining.Id
-                             && (o.Status == TrainingStatus.Sent.ToString() || o.Status == TrainingStatus.Completed.ToString()));
+                             && (o.Status == TrainingLogStatus.Sent.ToString() || o.Status == TrainingLogStatus.Completed.ToString()));
 
                 outcome.TotalTrainingAssign = logs.Count();
-                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingStatus.Completed.ToString());
-                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingStatus.InProgress.ToString());
-                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingStatus.Sent.ToString());
+                outcome.TrainingCompleted = logs.Count(o => o.Status == TrainingLogStatus.Completed.ToString());
+                outcome.TrainingInprogess = logs.Count(o => o.Status == TrainingLogStatus.InProgress.ToString());
+                outcome.TrainingNotAttampt = logs.Count(o => o.Status == TrainingLogStatus.Sent.ToString());
 
                 if (outcome.TotalTrainingAssign > 0)
                 {
@@ -1245,7 +1277,7 @@ namespace PhishingPortal.Repositories
 
                 if (campaignIdsToAdd.Any())
                 {
-                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCompaignMapping
+                    var mappingsToAdd = campaignIdsToAdd.Select(c => new TrainingCampaignMapping
                     {
                         TrainingId = trainingId,
                         CampaignId = c
@@ -1259,7 +1291,77 @@ namespace PhishingPortal.Repositories
             return true;
         }
 
-        public async Task<List<TrainingCompaignMapping>> GetTrainingCampaignsId(int id)
+        public async Task<bool> UpsertCampaignTrainingMap(CampaignTrainingIdcs campaignTrainingIdcs)
+        {
+            var trainingId = campaignTrainingIdcs.TrainingId;
+            var campaignId = campaignTrainingIdcs.CampaignId;
+            int oldTrainingId = 0;
+
+            var existingMapping = await TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.CampaignId == campaignId)
+               .FirstOrDefaultAsync();
+
+            if (existingMapping != null)
+            {
+                oldTrainingId = existingMapping.TrainingId;
+                existingMapping.TrainingId = (int)trainingId;
+                await TenantDbCtx.SaveChangesAsync();
+                //TenantDbCtx.Remove(existingMapping);
+            }
+            else
+            {
+                var newMapping = new TrainingCampaignMapping
+                {
+                    TrainingId = trainingId.Value,
+                    CampaignId = campaignId
+                };
+
+                TenantDbCtx.Add(newMapping);
+                await TenantDbCtx.SaveChangesAsync();
+            }
+            
+            var UpdateNewTrainingData = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
+            if (UpdateNewTrainingData != null)
+            {
+                UpdateNewTrainingData.TrainingTrigger = true;
+                //await TenantDbCtx.SaveChangesAsync();
+
+                var UpdateOldTrainingData = TenantDbCtx.TrainingCampaignMapping
+               .Where(tcm => tcm.TrainingId == oldTrainingId)
+               .ToList();
+                if (UpdateOldTrainingData.Count == 0)
+                {
+                    var Check = TenantDbCtx.Training.Where(o => o.Id == oldTrainingId).FirstOrDefault();
+                    if (Check != null)
+                    {
+                        Check.TrainingTrigger = false;
+                    }
+                }
+                await TenantDbCtx.SaveChangesAsync();
+            }
+            return true;
+        }
+
+
+        public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
+        {
+            try
+            {
+                var result = await TenantDbCtx.TrainingCampaignMapping
+                    .Where(o => o.CampaignId == id)
+                    .FirstOrDefaultAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"Error in GetTrainingByCampaignId for id: {id}");
+                throw; // Rethrow the exception to propagate it
+            }
+        }
+
+
+
+        public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignsId(int id)
         {
             var compaignIds = TenantDbCtx.TrainingCampaignMapping.Where(o => o.TrainingId == id);
             return compaignIds.ToList();
@@ -1288,39 +1390,58 @@ namespace PhishingPortal.Repositories
 
         public async Task<List<Training>> GetAllTraining()
         {
+
             int currentYear = DateTime.Now.Year;
             int previousYear = currentYear - 1;
             var result = Enumerable.Empty<Training>();
             //result = TenantDbCtx.Campaigns.Where(o => o.CreatedOn.Year == currentYear || o.CreatedOn.Year == previousYear).OrderByDescending(o => o.Id);
             result = TenantDbCtx.Training.OrderByDescending(o => o.Id).ToList();
             return (List<Training>)result;
+
+            //return TenantDbCtx.Training.ToList();
         }
 
-        public async Task<List<TrainingQuiz>> UpsertTrainingQuiz(List<TrainingQuiz> dtos)
+        public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuiz(List<TrainingQuizQuestion> dtos)
         {
             if (dtos == null || !dtos.Any())
             {
                 throw new ArgumentNullException(nameof(dtos), "Invalid TrainingQuiz data");
             }
-
             var results = dtos;
+            var existingQuestions = TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
+              .Where(tq => tq.TrainingQuizId == dtos.First().TrainingQuizId).ToList();
+            foreach (var existingQuestion in existingQuestions)
+            {
+                if (!dtos.Any(dto => dto.Id == existingQuestion.Id))
+                {
+                    TenantDbCtx.TrainingQuizQuestion.Remove(existingQuestion);
+                }
+            }
             foreach (var dto in dtos)
             {
                 if (dto.Id > 0)
                 {
-                    var existingQuiz = await TenantDbCtx.TrainingQuiz.Include(tq => tq.TrainingQuizAnswer)
+                    var existingQuiz = await TenantDbCtx.TrainingQuizQuestion.Include(tq => tq.TrainingQuizAnswer)
                                             .FirstOrDefaultAsync(tq => tq.Id == dto.Id);
                     if (existingQuiz == null)
                     {
                         throw new ArgumentException($"No TrainingQuiz found with ID {dto.Id}", nameof(dtos));
                     }
 
-                    existingQuiz.TrainingId = dto.TrainingId;
+                    existingQuiz.TrainingQuizId = dto.TrainingQuizId;
                     existingQuiz.Question = dto.Question;
                     existingQuiz.AnswerType = dto.AnswerType;
                     existingQuiz.OrderNumber = dto.OrderNumber;
                     existingQuiz.Weightage = dto.Weightage;
                     existingQuiz.IsActive = dto.IsActive;
+
+                    foreach (var answer in existingQuiz.TrainingQuizAnswer.ToList())
+                    {
+                        if (!dto.TrainingQuizAnswer.Any(a => a.Id == answer.Id))
+                        {
+                            TenantDbCtx.TrainingQuizAnswer.Remove(answer);
+                        }
+                    }
 
                     foreach (var answerDto in dto.TrainingQuizAnswer)
                     {
@@ -1328,32 +1449,42 @@ namespace PhishingPortal.Repositories
                                                 .FirstOrDefault(a => a.Id == answerDto.Id);
                         if (existingAnswer == null)
                         {
-                            throw new ArgumentException($"No TrainingQuizAnswer found with ID {answerDto.Id}", nameof(dtos));
+                            var newAnswer = new TrainingQuizAnswer
+                            {
+                                TrainingQuizQuestionId = existingQuiz.Id,
+                                AnswerText = answerDto.AnswerText,
+                                OrderNumber = answerDto.OrderNumber,
+                                IsCorrect = answerDto.IsCorrect
+                            };
+                            TenantDbCtx.TrainingQuizAnswer.Add(newAnswer);
                         }
-                        existingAnswer.AnswerText = answerDto.AnswerText;
-                        existingAnswer.OrderNumber = answerDto.OrderNumber;
-                        existingAnswer.IsCorrect = answerDto.IsCorrect;
+                        else
+                        {
+                            existingAnswer.AnswerText = answerDto.AnswerText;
+                            existingAnswer.OrderNumber = answerDto.OrderNumber;
+                            existingAnswer.IsCorrect = answerDto.IsCorrect;
+                        }
                     }
                 }
                 else
                 {
-                    var newQuiz = new TrainingQuiz
+                    var newQuiz = new TrainingQuizQuestion
                     {
-                        TrainingId = dto.TrainingId,
+                        TrainingQuizId = dto.TrainingQuizId,
                         Question = dto.Question,
                         AnswerType = dto.AnswerType,
                         OrderNumber = dto.OrderNumber,
                         Weightage = dto.Weightage,
                         IsActive = dto.IsActive
                     };
-                    TenantDbCtx.TrainingQuiz.Add(newQuiz);
+                    TenantDbCtx.TrainingQuizQuestion.Add(newQuiz);
                     await TenantDbCtx.SaveChangesAsync();
 
                     foreach (var answerDto in dto.TrainingQuizAnswer)
                     {
                         var newAnswer = new TrainingQuizAnswer
                         {
-                            TrainingQuizId = newQuiz.Id,
+                            TrainingQuizQuestionId = newQuiz.Id,
                             AnswerText = answerDto.AnswerText,
                             OrderNumber = answerDto.OrderNumber,
                             IsCorrect = answerDto.IsCorrect
@@ -1365,7 +1496,7 @@ namespace PhishingPortal.Repositories
                 {
                     await TenantDbCtx.SaveChangesAsync();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }
@@ -1374,16 +1505,148 @@ namespace PhishingPortal.Repositories
             return results;
         }
 
-        public async Task<IEnumerable<TrainingQuiz>> GetTrainingQuizById(int id)
+
+        public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
-            IEnumerable<TrainingQuiz> result = null;
+            TrainingQuizResult result;
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            result = TenantDbCtx.TrainingQuiz.Where(o => o.Id == id).Include(o => o.TrainingQuizAnswer);
+            var quiz = TenantDbCtx.TrainingQuiz.FirstOrDefault(i => i.Id == id);
+            var questions = TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == id).Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            result = new TrainingQuizResult
+            {
+                Quiz = quiz,
+                Questions = questions
+            };
 
             return result;
         }
-    }
 
+        public async Task<IEnumerable<TrainingQuizQuestion>> GetQuizByTrainingId(int trainingId)
+        {
+            return TenantDbCtx.TrainingQuizQuestion.Where(o => o.TrainingQuizId == trainingId && o.IsActive)
+                .Include(o => o.TrainingQuizAnswer).OrderBy(o => o.OrderNumber);
+        }
+
+        public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
+        {
+            List<TrainingQuiz> result = null;
+
+            if (data.Count() == 0)
+                return result;
+
+            foreach (TrainingQuiz tq in data)
+            {
+                var existing = await TenantDbCtx.TrainingQuiz.FirstOrDefaultAsync(c => c.Name.ToUpper() == tq.Name.ToUpper());
+                if (existing != null)
+                {
+                    continue;
+                }
+                TenantDbCtx.TrainingQuiz.Add(tq);
+            }
+            TenantDbCtx.SaveChanges();
+
+            return data;
+        }
+
+        public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuiz()
+        {
+            IEnumerable<TrainingQuiz> result = null;
+
+            result = TenantDbCtx.TrainingQuiz.ToList();
+            return result;
+        }
+
+        public async Task<ApiResponse<string>> CampaignSpamReport(string key)
+        {
+            var result = new ApiResponse<string>();
+            var status = CampaignLogStatus.Sent.ToString();
+            var campaignLog = TenantDbCtx.CampaignLogs
+                .FirstOrDefault(o => o.SecurityStamp == key
+                                    && o.IsReported == false && o.Status == status);
+
+            if (campaignLog == null)
+            {
+                campaignLog = TenantDbCtx.CampaignLogs
+               .FirstOrDefault(o => o.SecurityStamp == key
+                                   && o.IsReported == true);
+                result.IsSuccess = false;
+                result.Message = campaignLog == null ? "Invalid Url" : "You have already reported this mail.";
+                return result;
+            }
+
+
+
+            var campaign = TenantDbCtx.Campaigns.FirstOrDefault(o => o.Id == campaignLog.CampaignId);
+            if (campaign == null)
+            {
+                result.IsSuccess = false;
+                result.Message = "Invalid Campaign";
+                return result;
+            }
+
+            campaignLog.Status = CampaignLogStatus.Completed.ToString();
+            campaignLog.IsReported = true;
+            campaignLog.ModifiedOn = DateTime.Now;
+            campaignLog.ModifiedBy = nameof(CampaignSpamReport);
+
+            TenantDbCtx.Update(campaignLog);
+            TenantDbCtx.SaveChanges();
+            result.IsSuccess = true;
+            return result;
+
+        }
+
+        #region Report
+        public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campId)
+        { 
+             var data = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == campId);
+             return data;
+        }
+
+        public async Task<IQueryable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter parameters)
+        {
+            var allIds = parameters.Ids.Split('a').Select(x => int.Parse(x)).ToList();
+
+            var data = await TenantDbCtx.CampaignLogs
+                .Include(o => o.Camp)
+                .ThenInclude(o => o.Detail)
+                .Include(o => o.Recipient)
+                .ThenInclude(o => o.Recipient)
+                .Where(x => allIds.Contains(x.CampaignId))
+                .ToListAsync();
+
+            var campaignLogs = data.AsQueryable();
+
+            if (parameters.type == "Department")
+            {
+                campaignLogs = campaignLogs.Where(o => o.Recipient.Recipient.Department.Equals(parameters.filter, StringComparison.OrdinalIgnoreCase));
+            }
+            else if (parameters.type == "Category")
+            {
+                campaignLogs = campaignLogs.Where(o => o.Camp.Category.Equals(parameters.filter, StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                campaignLogs = campaignLogs.Where(o => o.Camp.Detail.CampaignTemplateId == int.Parse(parameters.filter));
+            }
+
+            var filterData = campaignLogs.GroupBy(i => i.CampaignId)
+                .Select(group => new ReportDataCounts
+                {
+                    CampaignId = group.Key,
+                    CampaignName = string.Join(", ", group.Where(o => o.CampaignId == group.Key).Select(o => o.Camp.Name).Distinct()),
+                    Total = group.Count(),
+                    Hits = group.Count(g => g.IsHit),
+                    Reported = group.Count(g => g.IsReported),
+                });
+
+            return filterData.AsQueryable();
+        }
+
+
+        #endregion
+    }
 }

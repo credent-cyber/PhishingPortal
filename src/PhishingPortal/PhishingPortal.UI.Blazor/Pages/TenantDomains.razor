@@ -1,0 +1,214 @@
+﻿@page "/tenant-domains"
+
+@using PhishingPortal.Dto;
+@using PhishingPortal.UI.Blazor.Client;
+@using PhishingPortal.UI.Blazor.Models;
+
+@inject NavigationManager NavigationManager
+@inject TenantClient client
+@inject IJSRuntime JSRuntime
+@inject AuthState authState;
+@attribute [Authorize]
+
+
+<div class="row m-1">
+
+    <EditForm Model="_model" OnValidSubmit="@Upsert">
+        <div class="form-row align-items-center">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;margin-top: -10px;">Add Domain</label>
+            <div class="form-group col-md-3">
+                <InputText name="domain" class="form-control" @bind-Value="_model.Domain" placeholder="website.com"></InputText>
+            </div>
+            <div class="form-group col-md-3" style="margin-top:0px">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+        <hr />
+    </EditForm>
+   
+
+    <div class="table-responsive" style="overflow:auto; max-height:50vh">
+        <table id="redirect-urls" class="table table-striped table-bordered">
+            <thead>
+                <tr role="row">
+                    <th>ID</th>
+                    <th>Domain</th>
+                    <th>VerificationCode</th>
+                    <th>IsVerified</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in _domains)
+                {
+                    <tr class="odd" role="row">
+                        <td>@d.Id</td>
+                        <td>@d.Domain</td>
+                        <td>@d.DomainVerificationCode</td>
+                        <td>@d.IsDomainVerified</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" @onclick="()=> Verify(d.Id)"><i class="fa fa-check"></i>Verify</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" @onclick="()=> Edit(d.Id)"><i class="fa fa-edit"></i>Edit</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" @onclick="()=> Delete(d.Id)"><i class="fa fa-remove"></i>Remove</button>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+
+    </Dailog>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private IEnumerable<TenantDomain> _domains = new List<TenantDomain>();
+
+    private TenantDomain _model = new() { };
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+    private string message = string.Empty;
+    private bool show = false;
+    string MessageBody = "Thank you!";
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        _domains = await client.GetDomains();
+    }
+
+    protected async Task Upsert()
+    {
+        //alert?.Clear();
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+        var response = await client.UpsertDomain(_model);
+
+        if (response.Status)
+        {
+            _domains = await client.GetDomains();
+            _model = new();
+            message = "Saved!";
+            TaskCompleted = true;
+        }
+        else
+        {
+            //alert?.SetError(response.Message);
+            IsError = true;
+            message = "Error!";
+            MessageBody = response.Message;
+            TaskCompleted = true;
+        }
+
+        StateHasChanged();
+    }
+
+    protected void Edit(int id)
+    {
+        //alert?.Clear();
+        _model = _domains?.FirstOrDefault(o => o.Id == id);
+        StateHasChanged();
+    }
+
+    protected async Task Delete(int id)
+    {
+        //alert?.Clear();
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+        var response = await client.DeleteDomain(id);
+
+        if (response.Success)
+        {
+            //alert?.SetSuccess("Deleted Successfully");
+            _domains = await client.GetDomains();
+            message = "Deleted Successfully";
+            TaskCompleted = true;
+        }
+        else
+        {
+            //alert?.SetError(response.Message);
+            IsError = true;
+            message = "Error!";
+            MessageBody = response.Message;
+            TaskCompleted = true;
+        }
+
+        StateHasChanged();
+    }
+
+    protected async Task Verify(int id)
+    {
+        //alert.Clear();
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+
+        var domain = _domains.FirstOrDefault(o => o.Id == id);
+
+        _model = await client.VerifyDomain(domain);
+
+        if (_model == null || !_model.IsDomainVerified)
+        {
+            //alert.SetError("Couldn't verify, please try again");
+            IsError = true;
+            message = "Error!";
+            MessageBody = "Couldn't verify, please try again";
+            TaskCompleted = true;
+        }
+        else
+        {
+            //alert.SetSuccess("Successfull Verified");
+            _domains = await client.GetDomains();
+            message = "Successfully Verified";
+            TaskCompleted = true;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        show = false;
+    }
+}

@@ -18,81 +18,81 @@
 @inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @attribute [Authorize]
 
-  <div class="row">
-     <div class="col-sm-12">
+<div class="row">
+    <div class="col-sm-12 p-0">
         <div class="card">
-            <div class="card-header" style="padding:25px 25px 0px;">
+            <div class="card-header" style="padding:5px 8px 0px;">
                 <h5 style="top:-5px">All Campaign</h5>
                 <a href="tenant-campaign-config" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Campaign"></i></a>
                 <div style="float:right">
-                        <ol class="breadcrumb float-sm-right">
+                    <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-                            <li class="breadcrumb-item active">Campaigns</li>
-                        </ol>
+                        <li class="breadcrumb-item active">Campaigns</li>
+                    </ol>
                 </div>
             </div>
-       
-            <div class="card-body">
+
+            <div class="card-body p-2 mt-n3">
                 <div class="col-md-12" style="padding: 0;">
                     <div class="bt-wizard" id="tabswizard">
-                           <ul class="nav nav-pills">
-                                @if(CTab == 1)
-                                {
+                        <ul class="nav nav-pills">
+                            @if (CTab == 1)
+                            {
                                 <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
-                                }
-                                @if(CTab == 2)
-                                {
+                            }
+                            @if (CTab == 2)
+                            {
                                 <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0 active" data-toggle="tab">SMS</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab">Whatsapp</a></li>
-                                }
-                                @if(CTab == 3)
-                                {
+                            }
+                            @if (CTab == 3)
+                            {
                                 <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
                                 <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0 active" data-toggle="tab">Whatsapp</a></li>
-                                }
+                            }
 
-                           </ul>
-                           <div class="tab-content card">
-                               <div class="pt-1 bg-primary"></div>
-                                @if(CTab == 1)
-                                {                                    
-                                   <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
-                                      <div class="table-responsive">
-                                           <EmailCamp />
-                                      </div>
-                                   </div>
-                                }
-                                @if(CTab == 2)
-                                {                                                 
-                                      <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
-                                           <div class="table-responsive">
-                                            <SmsCamp />
-                                           </div>
-                                      </div>
-                                }
-                                @if(CTab == 3)
-                                {                                    
-                                        <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab3">
-                                           <div class="table-responsive">
-                                              <WhatsappCamp />
-                                           </div>
-                                        </div>                       
-                                }
-                           </div>
+                        </ul>
+                        <div class="tab-content card">
+                            <div class="pt-1 bg-primary"></div>
+                            @if (CTab == 1)
+                            {
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab1">
+                                    <div class="table-responsive">
+                                        <EmailCampaignGrid />
+                                    </div>
+                                </div>
+                            }
+                            @if (CTab == 2)
+                            {
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab2">
+                                    <div class="table-responsive">
+                                        <SmsCampaignGrid />
+                                    </div>
+                                </div>
+                            }
+                            @if (CTab == 3)
+                            {
+                                <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab3">
+                                    <div class="table-responsive">
+                                        <WhatsappCampaignGrid />
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-     </div>
-  </div>
+    </div>
+</div>
 
 
 @code {
-    
+
     string message = string.Empty;
     int CTab = 1;
 
@@ -107,7 +107,7 @@
     }
 
 
-    public void Emailc() { CTab = 1;  SaveSession(); }
+    public void Emailc() { CTab = 1; SaveSession(); }
     public void Smsc() { CTab = 2; SaveSession(); }
     public void Whatsappc() { CTab = 3; SaveSession(); }
 
@@ -126,7 +126,7 @@
         c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info");
         c.Add(o => o.State).Css("table-bordered").Titled("Status");
         //c.Add(o => o.IsActive, true).SetWidth("50px").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampEdit>();
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampaignEditButton>();
     };
 
     protected override async Task OnParametersSetAsync()
@@ -144,17 +144,17 @@
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Report.xlsx")
+            .SetExcelExport(true, "EmailCampaigns.xlsx")
             .ChangePageSize(true)
-            .EmptyText("-")
+            .EmptyText("No Data Available!!")
             .SetKeyboard(true)
             .Searchable(true, false, false);
-           //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
+        //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
 
         _grid = client.Grid;
         // Set new items to grid
         _task = client.UpdateGrid();
         await _task;
     }
-   
+
 }

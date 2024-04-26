@@ -1,0 +1,23 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Dto
+@implements ICustomGridComponent<Training>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+
+@code {
+    [Parameter]
+    public Training Item { get; set; }
+
+    [Parameter]
+    public CGrid<Training> Grid { get; set; }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo($"/tenant-training-config/{Item.Id}");
+    }
+}

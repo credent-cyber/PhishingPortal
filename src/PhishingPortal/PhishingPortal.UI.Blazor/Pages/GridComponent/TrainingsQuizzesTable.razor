@@ -12,7 +12,7 @@
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent T="TrainingQuiz" Grid="@_grid"></GridComponent>
+            <GridComponent T="TrainingQuizQuestion" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
@@ -29,17 +29,18 @@ else
 
 @code
 {
-    private CGrid<TrainingQuiz> _grid;
+    private CGrid<TrainingQuizQuestion> _grid;
     private Task _task;
 
-    Action<IGridColumnCollection<TrainingQuiz>> columns = c =>
+    Action<IGridColumnCollection<TrainingQuizQuestion>> columns = c =>
     {
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.TrainingId).Css("table-bordered");
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").SetWidth("50px");
+        c.Add(o => o.TrainingQuizId).Titled("QuizID").Css("table-bordered").SetWidth("50px");
+        c.Add(o => o.OrderNumber).Css("table-bordered").Titled("QuestionNumber").SetWidth("50px");
         c.Add(o => o.Question).Css("table-bordered");
-        c.Add(o => o.AnswerType).Titled("CreatedBy").SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.IsActive).Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TrainingQuizzesEdit>();
+        c.Add(o => o.AnswerType).SetWidth("50px").Css("table-bordered");
+        c.Add(o => o.IsActive).Css("table-bordered").SetWidth("50px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TrainingQuizzesEditButton>().SetWidth("50px").Titled("Edit");
     };
 
     protected override async Task OnParametersSetAsync()
@@ -48,16 +49,16 @@ else
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<TrainingQuiz>(HttpClient, url, query, false, "ordersGrid", columns, 10)
+        var client = new GridODataClient<TrainingQuizQuestion>(HttpClient, url, query, false, "ordersGrid", columns, 10)
             //.Sortable()
             .Filterable(true)
             .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            .SetExcelExport(true, "Quizzes.xlsx")
+            .SetExcelExport(true, true, "Quizzes")
             .ChangePageSize(true)
-            .EmptyText("-")
+            .EmptyText("No Data Available!!")
             .SetKeyboard(true)
             .Searchable(true, false, false);
 
@@ -65,6 +66,5 @@ else
         _task = client.UpdateGrid();
         await _task;
     }
-
 
 }

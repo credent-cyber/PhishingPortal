@@ -14,81 +14,81 @@
 @inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @attribute [Authorize]
 
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-header" style="padding:25px 25px 0px;">
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card">
+            <div class="card-header" style="padding:5px 8px 0px;">
                 <h5 style="top:-5px">All Templates</h5>
                 <a href="tenant-templates-config" style="line-height:55px; margin-left:-10px"><i class="fa fa-plus-circle fa-2x" aria-hidden="true" title="Create Template"></i></a>
                 <div style="float:right">
-                        <ol class="breadcrumb float-sm-right">
+                    <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-                          <li class="breadcrumb-item active">Templates</li>
-                        </ol>
-                     </div>
+                        <li class="breadcrumb-item active">Templates</li>
+                    </ol>
                 </div>
-            
-                <div class="card-body" >
-                    <div class="bt-wizard" id="tabswizard">
-                        <ul class="nav nav-pills">
-                            @if (Tab == 1)
-                            {
-                                <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 " data-toggle="tab">Whatsapp</a></li>
-                            }
-                            @if (Tab == 2)
-                            {
-                                <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0" data-toggle="tab">Email</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0 active" data-toggle="tab">SMS</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 " data-toggle="tab">Whatsapp</a></li>
-                            }
-                            @if (Tab == 3)
-                            {
-                                <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
-                                <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 active" data-toggle="tab">Whatsapp</a></li>
-                            }
-                        </ul>
-                        <div class="tab-content card">
-                            <div class="pt-1 bg-primary"></div>
-                            @if (Tab == 1)
-                            {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab1">
-                                    <div class="table-responsive">
-                                        <EmailTemp/>
-                                    </div>
-                                </div>                              
-                            }
-                            @if (Tab == 2)
-                            {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab2">
-                                    <div class="table-responsive">
-                                        <SmsTemp />
-                                    </div>
+            </div>
+
+            <div class="card-body p-2 mt-n3">
+                <div class="bt-wizard" id="tabswizard">
+                    <ul class="nav nav-pills">
+                        @if (Tab == 1)
+                        {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0 active" data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 " data-toggle="tab">Whatsapp</a></li>
+                        }
+                        @if (Tab == 2)
+                        {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0" data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0 active" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 " data-toggle="tab">Whatsapp</a></li>
+                        }
+                        @if (Tab == 3)
+                        {
+                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailt" class="nav-link rounded-0 " data-toggle="tab">Email</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smst" class="nav-link rounded-0" data-toggle="tab">SMS</a></li>
+                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappt" class="nav-link rounded-0 active" data-toggle="tab">Whatsapp</a></li>
+                        }
+                    </ul>
+                    <div class="tab-content card">
+                        <div class="pt-1 bg-primary"></div>
+                        @if (Tab == 1)
+                        {
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab1">
+                                <div class="table-responsive">
+                                    <EmailTemplateGrid />
                                 </div>
-                            }
-                            @if (Tab == 3)
-                            {
-                                <div class="tab-pane card-body pt-4 active show" id="tabs-t-tab3">
-                                    <div class="table-responsive">
-                                        <WhatsTemp />
-                                    </div>
+                            </div>
+                        }
+                        @if (Tab == 2)
+                        {
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab2">
+                                <div class="table-responsive">
+                                    <SmsTemplateGrid />
                                 </div>
-                            }
-
-                        </div>
-
-
+                            </div>
+                        }
+                        @if (Tab == 3)
+                        {
+                            <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab3">
+                                <div class="table-responsive">
+                                    <WhatsappTemplateGrid />
+                                </div>
+                            </div>
+                        }
 
                     </div>
+
+
+
                 </div>
-
-
-         
             </div>
-        </div>  
+
+
+
+        </div>
     </div>
+</div>
 
 <DialogTemplate Show="showPreview" Title="Template Preview">
     <br />
@@ -130,18 +130,18 @@
 
 
     public void OnPreviewClick(CampaignTemplate template)
-    {   
+    {
 
-        if(template.Type==CampaignType.Email)
+        if (template.Type == CampaignType.Email)
         {
 
             sms = false;
             content = template.Content;
         }
-        if(template.Type==CampaignType.Sms)
+        if (template.Type == CampaignType.Sms)
         {
             sms = true;
-            text = template.Content;           
+            text = template.Content;
         }
 
         showPreview = true;
@@ -155,7 +155,7 @@
         content = string.Empty;
         showPreview = false;
     }
-   
+
     public int Tab = 1;
     public async void SaveSession()
     {
@@ -166,5 +166,5 @@
     public void Whatsappt() { Tab = 3; SaveSession(); }
 
 
-    
+
 }

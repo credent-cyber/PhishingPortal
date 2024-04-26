@@ -34,13 +34,13 @@
             return 0M;
         }
 
-        public virtual async Task<bool> Send(string to, string from, string message)
+        public virtual async Task<(bool,string)> Send(string to, string from, string message, string TemplateId)
         {
 
             if (!Config.IsEnabled)
             {
                 Logger.LogWarning($"Sms sending is not enabled at this moment, refer to appsettings.json");
-                return false;
+                return (false,null);
             }
 
             try
@@ -56,12 +56,12 @@
 
                 var msg = response.EnsureSuccessStatusCode();
 
-                return msg.IsSuccessStatusCode;
+                return (msg.IsSuccessStatusCode,null);
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, ex.Message);
-                return false;
+                return (false,null);
             }
 
             

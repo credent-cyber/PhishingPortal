@@ -2,6 +2,15 @@
 {
     public class Constants
     {
+        public class EmailTemplate
+        {
+            public const string TRAINING_CAMPAIGN = "Training";
+        }
+
+        public class Literals
+        {
+            public const string CREATED_BY = "system";
+        }
 
         public class LocalStorage
         {
@@ -26,6 +35,10 @@
             public const string MonitoredMailBoxAccount = "monitored_mail_account";
             public const string RETURN_URL_COLLECTION = "return_urls";
 
+            public const string OnPromiseAD_Doamin = "ad_domain";
+            public const string OnPromiseAD_Username = "ad_username";
+            public const string OnPromiseAD_Password = "ad_password";
+    
             public static string MonitoredMailBoxFilters { get; set; }
         }
     }

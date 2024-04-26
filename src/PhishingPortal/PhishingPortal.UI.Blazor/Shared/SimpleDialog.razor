@@ -1,0 +1,61 @@
+﻿@if (Show)
+{
+    string cssClass;
+    if (Title.Contains("Added") || Title.Contains("Submitted") || Title.Contains("Uploaded") || Title.Contains("registered"))
+    {
+        cssClass = "bg-success";
+    }
+    else if (Title.Contains("Updated") || Title.Contains("Uploading"))
+    {
+        cssClass = "bg-warning";
+    }
+    else if (Title.Contains("Please wait"))
+    {
+        cssClass = "bg-info";
+    }
+    else
+    {
+        cssClass = "bg-danger";
+    }
+
+    <div class="dialog-container" style="width:100%; height:100vh; z-index: 9999;">
+
+        <div class="dialog" style="width:320px">
+            @*popup screen size*@
+
+            <div class="card">
+
+                <div class="card-header @cssClass" style="padding:8px !important;">
+                    <div>
+                        <h5 style="">@Title</h5>
+                        <a @onclick="onClose" title="Close" style="cursor:pointer; float:right; padding-right:5px; color:white"><i class="fa fa-times-circle  fa-lg" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="mt-2">
+                            @ChildContent
+                        </div>
+                    </div>                 
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public EventCallback<bool> OnCloseDialog { get; set; }
+
+    private async Task onClose()
+    {
+        await OnCloseDialog.InvokeAsync(false);
+    }
+
+
+}

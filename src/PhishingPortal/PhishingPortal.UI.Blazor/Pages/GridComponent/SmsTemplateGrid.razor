@@ -1,0 +1,78 @@
+﻿@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthState authState;
+
+
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <GridComponent T="CampaignTemplate" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:5vh">
+
+        <div class="card-header">
+            <div class="loading-bar"></div>
+        </div>
+
+    </div>
+}
+
+@code
+{
+    private CGrid<CampaignTemplate> _grid;
+    private Task _task;
+
+    Action<IGridColumnCollection<CampaignTemplate>> columns = c =>
+    {
+        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Filterable(true);
+        c.Add(o => o.Name).Css("table-bordered").Titled("Template Name").Filterable(true);
+        c.Add(o => o.IsActive).SetWidth("50px").Css("table-bordered").Filterable(true);
+        c.Add(o => o.IsHtml).SetWidth("50px").Css("table-bordered").Filterable(true);
+        c.Add(o => o.Type).Css("table-bordered").Titled("Template Type");
+        c.Add(o => o.Version).SetWidth("50px").Css("table-bordered").Filterable(true);
+        //c.Add().RenderComponentAs(typeof(TenantTemplates)).Titled("View").Css("table-bordered");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TemplateViewButton>().SetWidth("50px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TemplateEditButton>().SetWidth("50px");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string url = $"odata/template?t={authState.TenantIdentifier}";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-filter", "Type__1__Sms");
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<CampaignTemplate>(HttpClient, url, query, false, "CampaignTemplateGrid", columns, 10)
+            //.Sortable(true)
+            //.Filterable(true)
+            //.SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .SetExcelExport(true, true, "SmsTemplateList")
+            .ChangePageSize(true)
+            .EmptyText("No Data Available!!")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+        //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
+
+        _grid = client.Grid;
+
+        // Set new items to grid
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+
+}

@@ -2,15 +2,18 @@
 
 @using PhishingPortal.Dto.Auth
 @using PhishingPortal.UI.Blazor.Models
+@using Microsoft.AspNetCore.WebUtilities
+
 @layout AuthLayout
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
+@inject AuthenticationStateProvider authState
 
 
 <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="loginRequest">
-    <div class="card-body">
-        <img src="custom/assets/images/ps.png" alt="" class="img-fluid mb-4">
-        <h3 class="mb-3">Welcome to <br /><span class="text-c-blue">Phish Sims</span></h3>
+    <div class="card-body" style="padding: 32px 6px;">
+        <img src="custom/assets/images/ps.png" alt="" class="img-fluid mb-1" style="max-width: 50% !important;">
+        <h3 class="mb-3" style="font-size:24px;font-family: cursive;">Welcome to <span class="text-c-blue"> PhishSims</span></h3>
 
         <DataAnnotationsValidator />
         <UiAlerts Model="Alerts"></UiAlerts>
@@ -37,7 +40,7 @@
                 </div>
             </div>
             <button class="btn  btn-primary mb-2 col" type="submit">Signin</button>
-            <a class="btn  btn-primary mb-4 col" href="/oidc/challenge?returnUrl=/&provider=Microsoft">Office 365 User</a>
+            <a class="btn  btn-warning mb-4 col" href="/oidc/challenge?returnUrl=@(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl)&provider=Microsoft">Office 365 User</a>
             <p class="mb-2 text-muted">
                 Forgot password?
                 <span @onclick="ResetPasswordClick" class="f-w-400 font-weight-bold" style="cursor: pointer">Reset</span>
@@ -50,19 +53,38 @@
 </EditForm>
 
 @code {
-
     [Parameter]
-    public string Oidc { get; set; }
+    public string Oidc { get; set; } = string.Empty;
+
+    public string ReturnUrl { get; protected set; } = string.Empty;
 
     [CascadingParameter]
     public AlertModel Alerts { get; set; } = new();
 
     LoginRequest loginRequest { get; set; } = new LoginRequest();
 
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Alerts.Clear();
+
+        var uri = navigationManager.ToAbsoluteUri(navigationManager.Uri);
+        var queryStrings = QueryHelpers.ParseQuery(uri.Query);
+        if (queryStrings.TryGetValue("ReturnUrl", out var url))
+        {
+            ReturnUrl = url;
+        }
+
+        try
+        {
+            var state = await authState.GetAuthenticationStateAsync();
+
+            if (state?.User?.Identity?.IsAuthenticated ?? false)
+            {
+                navigationManager.NavigateTo("/");
+            }
+        }
+        catch { }
+
     }
 
     private void ResetPasswordClick()
@@ -78,7 +100,10 @@
 
             await authStateProvider.Login(loginRequest);
 
-            navigationManager.NavigateTo("/", true);
+            if (string.IsNullOrEmpty(ReturnUrl))
+                navigationManager.NavigateTo("/", true);
+            else
+                navigationManager.NavigateTo(ReturnUrl);
         }
         catch (Exception)
         {

@@ -6,7 +6,7 @@ namespace PhishingPortal.Services.Notification.Helper
 {
     public class TenantDbConnManager : ITenantDbConnManager
     {
-        private readonly Dictionary<string, TenantDbContext> _dicConnections;
+        private readonly Dictionary<string, Tenant> _dicConnections;
         private readonly ILogger<TenantDbConnManager> _logger;
         private readonly CentralDbContext centralDbContext;
 
@@ -15,7 +15,7 @@ namespace PhishingPortal.Services.Notification.Helper
 
         public TenantDbConnManager(ILogger<TenantDbConnManager> logger, IConfiguration config, CentralDbContext centralDbContext)
         {
-            _dicConnections = new Dictionary<string, TenantDbContext>();
+            _dicConnections = new Dictionary<string, Tenant>();
 
             if (config != null)
             {
@@ -32,38 +32,28 @@ namespace PhishingPortal.Services.Notification.Helper
 
         public TenantDbContext GetContext(string tenantUniqueId)
         {
-            lock (this)
+            Tenant? tenant;
+            if (!_dicConnections.ContainsKey(tenantUniqueId))
             {
-                if (!_dicConnections.ContainsKey(tenantUniqueId))
-                {
-                    _logger.LogInformation($"Dbcontext not found in the dictionary");
+                tenant = centralDbContext.Tenants.Include(o => o.Settings)
+                            .FirstOrDefault(o => o.UniqueId == tenantUniqueId);
 
-                    var tenant = centralDbContext.Tenants.Include(o => o.Settings)
-                                .FirstOrDefault(o => o.UniqueId == tenantUniqueId);
-
-                    if (tenant == null)
-                        throw new InvalidDataException();
-
-                    var tenantData = tenant.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.ConnString);
-
-                    if (tenantData == null)
-                        throw new InvalidOperationException();
-
-                    var dbCtxOptions = SetupDbContextBuilder(tenant, tenantData.Value);
-
-                    var dbcontext = new TenantDbContext(dbCtxOptions.Options);
-
-                    _dicConnections[tenantUniqueId] = dbcontext;
-
-                    return dbcontext;
-
-                }
-                else
-                {
-                    _logger.LogInformation($"Dbcontext from cache, TenantId: {tenantUniqueId}");
-                    return _dicConnections[tenantUniqueId];
-                }
+                if(tenant != null) _dicConnections.Add(tenantUniqueId, tenant);
             }
+            else
+            {
+                tenant =  _dicConnections[tenantUniqueId];
+            }
+
+            if (tenant == null)
+                throw new InvalidDataException($"Tenant with UniqueId:{tenantUniqueId} not found");
+
+            var tenantData = tenant.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.ConnString) ?? throw new InvalidOperationException();
+            var dbCtxOptions = SetupDbContextBuilder(tenant, tenantData.Value);
+
+            var dbcontext = new TenantDbContext(dbCtxOptions.Options);
+
+            return dbcontext;
 
         }
 
@@ -96,19 +86,19 @@ namespace PhishingPortal.Services.Notification.Helper
 
         public void Dispose()
         {
-            if (_dicConnections != null)
-            {
-                _logger.LogInformation("Disposing all tenant db connections");
-                foreach (var conn in _dicConnections.Values)
-                {
-                    _logger.LogDebug($"{conn}");
-                    conn.Dispose();
-                }
+            //if (_dicConnections != null)
+            //{
+            //    _logger.LogInformation("Disposing all tenant db connections");
+            //    foreach (var conn in _dicConnections.Values)
+            //    {
+            //        _logger.LogDebug($"{conn}");
+            //        conn.Dispose();
+            //    }
 
-                _logger.LogInformation("Disposing all tenant db connections - done");
-            }
+            //    _logger.LogInformation("Disposing all tenant db connections - done");
+            //}
 
-            _dicConnections?.Clear();
+            //_dicConnections?.Clear();
         }
     }
 }

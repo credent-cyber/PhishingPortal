@@ -1,0 +1,60 @@
+﻿@page "/training/my-trainings"
+
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Pages.GridButtons
+
+@inject AuthState authState;
+@inject TenantClient tenantClient
+@inject HttpClient HttpClient
+
+<div>
+    <div class="">
+        <GridComponent T="MyTraining" Grid="@_grid"></GridComponent>
+    </div>
+</div>
+
+@code {
+
+
+    private List<MyTraining> myTrainings = new();
+    private CGrid<MyTraining> _grid = null;
+    private Task _task = null;
+
+    Action<IGridColumnCollection<MyTraining>> columns = c =>
+    {
+        c.Add(o => o.Training.TrainingName).Titled("TrainingName").Css("table-bordered");
+        c.Add(o => o.TrainingLog.SentOn).Titled("Assigned On").SetWidth("50px").Css("table-bordered");
+        c.Add(o => o.TrainingLog.PercentCompleted).Titled("% Completed").SetWidth("50px").Css("table-bordered").Format("{0:0.0}");
+        c.Add(o => o.TrainingLog.Status).Titled("Status").Css("table-bordered").SetWidth("50px");
+        c.Add().Encoded(false)
+            .Sanitized(false)
+            .RenderComponentAs<LaunchTrainingButton>().SetWidth("50px").Titled("Lauch");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string url = $"odata/MyTraining?t={authState.TenantIdentifier}";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<MyTraining>(HttpClient, url, query, false, "trainingGrid", columns, 20)
+            .Filterable(true)
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .ChangePageSize(true)
+            .EmptyText("No training assigned to you yet")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+    
+
+}

@@ -1,6 +1,6 @@
 ﻿
 
-<nav class="navbar navbar-expand-lg navbar-dark " style=" background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">
+<nav class="navbar navbar-expand-lg navbar-dark " style="background: linear-gradient(300deg, rgba(56,55,67,0.9981034650188201) 0%, rgba(49,149,186,0.9728933809852066) 45%, rgba(0,212,255,1) 100%);">
 
     <a href="/" class="b-brand" style="margin-left:-50px">
         <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-responsive"
@@ -28,9 +28,7 @@
             <li class="nav-item custom">
                 <a href="tenant-templates" class="nav-link "> <i class="fa fa-envelope-square"></i> Templates </a>
             </li>
-            <li class="nav-item custom">
-                <a href="tenant-settings" class="nav-link "> <i class="fa fa-gears"></i> Settings </a>
-            </li>
+           
             @* <li class="nav-item custom">
             <a href="gridsample" class="nav-link "> <i class="fa fa-link"></i> test </a>
             </li>*@
@@ -51,13 +49,20 @@
                     <a class="dropdown-item" href="training-Quizzes">Training Quiz</a>
                 </div>
             </li>
+            <li class="nav-item custom">
+                <a href="training/my-trainings" class="nav-link "> <i class="fa fa-book"></i>My Trainings</a>
+            </li>
+
+            <li class="nav-item custom">               
+                <a href="tenant-settings" class="nav-link "> <i class="fa fa-gears"></i> Settings </a>
+            </li>
         </ul>
 
         <div class="form-inline my-2 my-lg-0">
             <LoginDisplay />
         </div>
         <div class="nav-item custom m-0">
-            <a href="#!" class="nav-link full-screen" onclick="javascript:toggleFullScreen()">
+            <a class="nav-link full-screen" onclick="javascript:toggleFullScreen()">
                 <i class="feather icon-maximize" style="color:black !important; font-weight: bolder !important;"></i>
             </a>
         </div>

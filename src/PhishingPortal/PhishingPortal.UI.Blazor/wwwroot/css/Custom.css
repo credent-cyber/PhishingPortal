@@ -113,6 +113,8 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
 
 .table thead th {
     background: #bec7ea;
+    text-transform: initial;
+    font-size: 15px !important;
 }
 
 .table-bordered td, .table-bordered th {
@@ -123,9 +125,7 @@ table.grid-table .grid-header > .grid-header-group > .grid-header-title > button
     font-weight: 500 !important;
     font-size: 16px !important;
 }
-/*.dropdown-menu {
-            left:270px;
-        }*/
+
 .dropdown-menu[data-bs-popper] {
     top: 145% !important;
 }
@@ -148,6 +148,11 @@ table.striped > tbody > tr.grid-row:nth-of-type(odd) {
     color: red;
 }
 
+.dialog {
+    background-color: transparent;
+    box-shadow: none;
+}
+
 .dialog-container {
     position: fixed;
     top: 0;
@@ -156,6 +161,7 @@ table.striped > tbody > tr.grid-row:nth-of-type(odd) {
 
 .note-editable {
     background: #ffffff !important;
+    min-height:100px !important;
 }
 
 .bold-font {
@@ -423,3 +429,78 @@ imgs {
     max-width: 100%;
     max-height: 180px !important;
 }
+/*Havit multiSelect css*/
+
+/*loading spinner*/
+.lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    width: 70px;
+    height: 26px;
+}
+
+    .lds-ellipsis div {
+        position: absolute;
+        top: 33px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #dc105a;
+        animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+
+        .lds-ellipsis div:nth-child(1) {
+            left: 8px;
+            top: 8px;
+            animation: lds-ellipsis1 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(2) {
+            left: 8px;
+            top: 8px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(3) {
+            left: 32px;
+            top: 8px;
+            animation: lds-ellipsis2 0.6s infinite;
+        }
+
+        .lds-ellipsis div:nth-child(4) {
+            left: 56px;
+            top: 8px;
+            animation: lds-ellipsis3 0.6s infinite;
+        }
+
+@keyframes lds-ellipsis1 {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes lds-ellipsis3 {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0);
+    }
+}
+
+@keyframes lds-ellipsis2 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(24px, 0);
+    }
+}
+/**/
+

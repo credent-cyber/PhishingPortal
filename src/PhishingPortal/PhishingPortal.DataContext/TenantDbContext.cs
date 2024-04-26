@@ -25,22 +25,28 @@ namespace PhishingPortal.DataContext
         public DbSet<Metadata> MetaContents { get; set; }
 
         public DbSet<Recipient> Recipients { get; set; }
+        public DbSet<OnPremiseADUsers> OnPremiseADUsers { get; set; }
         public DbSet<RecipientGroup> RecipientGroups { get; set; }
         public DbSet<RecipientGroupMapping> RecipientGroupMappings { get; set; }
         public DbSet<TenantSetting> Settings { get; set; }
         public DbSet<Training> Training { get; set; }
         public DbSet<TrainingLog> TrainingLog { get; set; }
         public DbSet<TrainingRecipients> TrainingRecipient { get; set; }
-        public DbSet<TrainingCompaignMapping> TrainingCampaignMapping { get; set; }
+        public DbSet<TrainingCampaignMapping> TrainingCampaignMapping { get; set; }
         public DbSet<TrainingVideo> TrainingVideoPath { get; set; }
         public DbSet<TrainingQuiz> TrainingQuiz { get; set; }
+        public DbSet<TrainingQuizQuestion> TrainingQuizQuestion { get; set; }
         public DbSet<TrainingQuizAnswer> TrainingQuizAnswer { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<RecipientGroupMapping>().HasKey(o => new { o.GroupId, o.RecipientId });
+            modelBuilder.Entity<TrainingLog>().Ignore(o => o.TrainingName);
+            modelBuilder.Entity<TrainingLog>().Ignore(o => o.RecipientName);
+
+            base.OnModelCreating(modelBuilder);
+
 
         }
 

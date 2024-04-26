@@ -11,6 +11,8 @@ using PhishingPortal.Common;
 using PhishingPortal.Services.Notification.Monitoring;
 using PhishingPortal.Services.Notification.Helper;
 using PhishingPortal.Dto.Extensions;
+using Humanizer;
+using Serilog.Core;
 
 namespace PhishingPortal.Services.Notification.Email
 {
@@ -45,20 +47,23 @@ namespace PhishingPortal.Services.Notification.Email
 
                 try
                 {
-
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
-                    dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
-
-                    var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => o.State == CampaignStateEnum.Published && o.IsActive
+                    var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
+                                            .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
                                                 && o.Detail.Type == CampaignType.Email).ToList();
 
-                    campaigns = campaigns.Where(o => o.Schedule.IsScheduledNow()).ToList();
+                    MarkExpiredOrCompleted(ConnManager.GetContext(Tenant.UniqueId), allActiveCampaigns);
 
-                    foreach (var campaign in campaigns)
+
+                    allActiveCampaigns = allActiveCampaigns.Where(o =>
+                                o.Schedule.IsScheduledNow() &&
+                                o.State == CampaignStateEnum.Published).ToList();
+
+                    foreach (var campaign in allActiveCampaigns)
                     {
                         campaign.State = CampaignStateEnum.InProgress;
+                        dbContext.Update(campaign);
                         dbContext.SaveChanges();
 
                         await Send(campaign, dbContext, Tenant.UniqueId);
@@ -88,9 +93,6 @@ namespace PhishingPortal.Services.Notification.Email
 
                 if (template == null)
                     throw new Exception("Template not found");
-
-              
-                  
 
                 var recipients = dbContext.CampaignRecipients.Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
 
@@ -129,7 +131,7 @@ namespace PhishingPortal.Services.Notification.Email
                                 CampignType = campaign.Detail.Type.ToString(),
                                 SentBy = "system",
                                 SentOn = timestamp,
-                                Status = CampaignLogStatus.Sent.ToString()
+                                Status = CampaignLogStatus.Queued.ToString()
                             }
                         };
 
@@ -137,10 +139,10 @@ namespace PhishingPortal.Services.Notification.Email
                     }
                 };
 
-                var c = dbContext.Campaigns.Find(campaign.Id);
-                c.State = CampaignStateEnum.Completed;
-                dbContext.Update(c);
-                dbContext.SaveChanges();
+                //var c = dbContext.Campaigns.Find(campaign.Id);
+                //c.State = CampaignStateEnum.Completed;
+                //dbContext.Update(c);
+                //dbContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -163,6 +165,66 @@ namespace PhishingPortal.Services.Notification.Email
             }
             return new Unsubscriber<EmailCampaignInfo>(observers, observer);
         }
+
+
+        private void MarkExpiredOrCompleted(TenantDbContext dbContext, List<Campaign> allActiveCampaigns)
+        {
+            try
+            {
+                var allCampaignScheduleExpired = allActiveCampaigns.Where(o => (!o.Schedule.IsScheduledNow() || o.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule)
+                       && o.State == CampaignStateEnum.InProgress);
+
+                foreach (var c in allCampaignScheduleExpired)
+                {
+                    var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
+                    var allLogs = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id);
+                    var allSentOrCompleted = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString() || o.Status == CampaignLogStatus.Completed.ToString());
+
+                    if (allCount > 0)
+                    {
+                        var percentSent = (allSentOrCompleted / allCount) * 100;
+
+                        if (percentSent >= 95)
+                        {
+                            c.State = CampaignStateEnum.Completed;
+                        }
+
+                        if (c.Schedule.ScheduleType == ScheduleTypeEnum.NoSchedule &&
+                            c.State == CampaignStateEnum.InProgress)
+                        {
+                            var lastLogTime = dbContext.CampaignLogs.Where(o => o.CampaignId == c.Id)?.OrderByDescending(o => o.SentOn)
+                                .Select(o => o.SentOn).FirstOrDefault();
+
+                            if (lastLogTime.HasValue && (DateTime.Now - lastLogTime.Value).TotalMinutes > 15)
+                            {
+                                c.State = CampaignStateEnum.InComplete;
+                            }
+
+                        }
+                        else if (c.Schedule.ScheduleType != ScheduleTypeEnum.NoSchedule && c.State == CampaignStateEnum.InProgress
+                            && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
+                        {
+                            c.State = CampaignStateEnum.InComplete;
+                        }
+
+                        dbContext.Update(c);
+                        dbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        c.State = CampaignStateEnum.Completed;
+                        dbContext.Update(c);
+                        dbContext.SaveChanges();
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, $"Error while marking campaigns completed");
+            }
+        }
+
 
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
         public ILogger<EmailCampaignProvider> Logger { get; }

@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace PhishingPortal.Dto
 {
@@ -17,14 +21,9 @@ namespace PhishingPortal.Dto
         public string SecurityStamp { get; set; }
         public string Url { get; set; }
         public DateTime SentOn { get; set; }
-
-    }
-    public enum TrainingStatus
-    {
-        Assigned,
-        InProgress,
-        Sent,
-        Completed,
-
+        public string UniqueID { get; set; }
+        public int? CampaignLogID { get; set; }
+        public string RecipientName { get; set; }
+        public string TrainingName { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PhishingPortal.Server;
 using PhishingPortal.Repositories;
 using PhishingPortal.Core;
 using PhishingPortal.Server.Services;
@@ -11,16 +10,11 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using PhishingPortal.Server.Services.Interfaces;
 using PhishingPortal.Server.Intrastructure;
-using Microsoft.OpenApi.Models;
-using Microsoft.Owin;
-using Owin;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OpenIdConnect;
-using Microsoft.Owin.Security.Notifications;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Build.Framework;
+using Microsoft.Extensions.FileProviders;
+using PhishingPortal.Server;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using System.Security.Claims;
+using PhishingPortal.Server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,13 +31,24 @@ var aadClientSecret = config.GetValue<string>("AzureAD:ClientSecret");
 var aadTenant = config.GetValue<string>("AzureAD:Tenant");
 var aadRedirectUri = config.GetValue<string>("AzureAD:RedirectUri");
 var authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, config.GetValue<string>("AzureAD:Authority"));
+var useWindowsAuthentication = config.GetValue<bool>("UseWindowsAuthentication");
+var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
+var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
+var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
 
+if (!useSqlLite)
+{
+    conString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
 
 builder.Services.AddLogging((builder) =>
 {
     Serilog.Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
+    .WriteTo.DbSink(conString, useSqlLite)
     .CreateLogger();
+
+
     builder.AddSerilog();
 });
 
@@ -59,10 +64,6 @@ builder.Services.AddControllers()
 //});
 
 
-var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
-var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
-var sqlProvider = builder.Configuration.GetValue<string>("SqlProvider");
-
 if (useSqlLite)
 {
     builder.Services.AddDbContext<PhishingPortalDbContext2>(options =>
@@ -76,7 +77,6 @@ else
         sqlProvider = "mysql";
     }
 
-    conString = builder.Configuration.GetConnectionString("DefaultConnection");
     switch (sqlProvider)
     {
         case "mysql":
@@ -116,36 +116,41 @@ else
 }
 
 builder.Services.AddIdentityCore<PhishingPortalUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
-
-//builder.Services.AddIdentity<PhishingPortalUser, IdentityRole>()
-//    .AddEntityFrameworkStores<PhishingPortalDbContext2>()
-//    .AddTokenProvider<DataProtectorTokenProvider<PhishingPortalUser>>(TokenOptions.DefaultProvider);
-
-//builder.Services.ConfigureApplicationCookie(options =>
-//{
-//    options.Cookie.HttpOnly = false;
-//    options.Events.OnRedirectToLogin = context =>
-//    {
-//        context.Response.StatusCode = 401;
-//        return Task.CompletedTask;
-//    };
-//});
+   .AddRoles<IdentityRole>()
+   .AddEntityFrameworkStores<PhishingPortalDbContext2>()
+   .AddSignInManager()
+   .AddDefaultTokenProviders();
 
 
-builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-    .AddMicrosoftAccount(options =>
+if (!useWindowsAuthentication)
+{
+
+   
+    builder.Services
+        .AddAuthentication(IdentityConstants.ApplicationScheme)
+        .AddMicrosoftAccount(options =>
+        {
+            options.SignInScheme = IdentityConstants.ExternalScheme;
+            options.ClientId = aadClientId;
+            options.ClientSecret = aadClientSecret;
+            options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
+            options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
+        })
+        .AddIdentityCookies();
+}
+else
+{
+
+    builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+          .AddNegotiate();
+
+    builder.Services.AddAuthorization(options =>
     {
-        options.SignInScheme = IdentityConstants.ExternalScheme;
-        options.ClientId = aadClientId;
-        options.ClientSecret = aadClientSecret;
-        options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
-        options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
-    })
-    .AddIdentityCookies();
+        // By default, all incoming requests will be authorized according to the default policy.
+        options.FallbackPolicy = options.DefaultPolicy;
+    });
+}
+
 
 //.AddOpenIdConnect("oidc", options =>
 //{
@@ -193,7 +198,6 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 // check if picked the correct configurations
 logger.LogInformation($"UseSqlLite: {useSqlLite}");
 logger.LogInformation($"SqlProvider: {sqlProvider}");
-
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
 {
@@ -221,10 +225,30 @@ else
 //app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+    FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), @"App_Data", "trainingvideo")),
+
+    RequestPath = new PathString("/trainingvideo")
+});
+
 app.UseRouting();
 
-app.UseAuthentication();
+if(!useWindowsAuthentication) 
+    app.UseAuthentication();
+else
+    app.UseAdAuthentication();
+
 app.UseAuthorization();
+
+app.Use((context, next) => {
+
+    var cookie = context.Request.Cookies;
+    return next(context);
+
+});
 
 app.UseEndpoints(endpoints =>
 {

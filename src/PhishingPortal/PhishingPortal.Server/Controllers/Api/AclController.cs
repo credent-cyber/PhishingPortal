@@ -1,19 +1,19 @@
-﻿using DocumentFormat.OpenXml.Office2010.Drawing;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using NPOI.SS.Formula.Functions;
+using Microsoft.EntityFrameworkCore;
+using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto.Auth;
 using PhishingPortal.Server.Controllers.Api.Abstraction;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 
 namespace PhishingPortal.Server.Controllers.Api
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class AclController : BaseApiController
@@ -21,13 +21,17 @@ namespace PhishingPortal.Server.Controllers.Api
         private readonly UserManager<PhishingPortalUser> _userManager;
         private readonly SignInManager<PhishingPortalUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly PhishingPortalDbContext2 _dbContext;
+        private readonly bool _isWindowsAuthentication;
 
         public AclController(UserManager<PhishingPortalUser> userManager, SignInManager<PhishingPortalUser> signInManager,
-            IEmailSender emailSender, ILogger<AclController> logger) : base(logger)
+            IEmailSender emailSender, ILogger<AclController> logger, PhishingPortalDbContext2 dbContext, IConfiguration appsettings) : base(logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _dbContext = dbContext;
+            _isWindowsAuthentication = appsettings.GetValue<bool>("UseWindowsAuthentication");
         }
 
         [HttpPost]
@@ -47,28 +51,48 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
+
             await _signInManager.SignOutAsync();
+
             return Ok();
         }
 
         [HttpGet]
         [Route("currentUserInfo")]
-        public CurrentUser CurrentUserInfo()
+        public async Task<CurrentUser> CurrentUserInfo()
         {
-            var user = new CurrentUser
+            var userName = User?.Identity?.Name;
+
+            CurrentUser currentUser = new()
             {
                 IsAuthenticated = User?.Identity?.IsAuthenticated ?? false,
-                UserName = User?.Identity?.Name ?? "guest",
-                Claims = User?.Claims?
-                              .ToDictionary(c => c.Type, c => c.Value)
+                UserName = User?.Identity?.Name ?? "guest"
             };
 
-            if (!User.Claims.Any(o => o.Type == "role"))
+            try
             {
-                user.Claims.Add(ClaimTypes.Role, "tenantuser");
+                if (currentUser.IsAuthenticated)
+                {
+                    var claims = new Dictionary<string, string>();
+                    foreach (var c in User.Claims)
+                    {
+                        if (!claims.ContainsKey(c.Type))
+                        {
+                            claims.Add(c.Type, c.Value);
+                        }
+                    }
+
+                    currentUser.Claims = claims; 
+                }
+
+            }
+            catch (Exception)
+            {
+                Logger.LogCritical("Issue getting user claims");
+                throw;
             }
 
-            return user;
+            return currentUser;
         }
 
         [Route("forgetpassword")]

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhishingPortal.Dto
@@ -21,7 +22,7 @@ namespace PhishingPortal.Dto
         public string LastWorkingDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsADUser { get; set; } = false;
-
+        public bool IsOnPremiseADUser { get; set; }
 
     }
 
@@ -51,7 +52,7 @@ namespace PhishingPortal.Dto
             DateOfBirth = o.DateOfBirth;
         }
 
-        public void Validate()
+        public void Validate(IEnumerable<TenantDomain> tenantDomains = null)
         {
             ValidationErrMsg = null;
 
@@ -63,6 +64,19 @@ namespace PhishingPortal.Dto
 
             if (!isEmail)
                 ValidationErrMsg = "Invalid Email Id specified";
+
+            if(tenantDomains != null)
+            {
+                try
+                {
+                    var domain = Email.Split("@")[1];
+                    if (!tenantDomains.Any(o => o.Domain == domain && o.IsDomainVerified))
+                    {
+                        ValidationErrMsg = $"Campaign can not be sent to [{domain}] domain";
+                    }
+                }
+                catch { }
+            }
 
             if (Mobile.Length < 10)
                 ValidationErrMsg = "Invalid Mobile number specified";
@@ -83,6 +97,7 @@ namespace PhishingPortal.Dto
         None = 0,
         Csv = 1,
         AzureActiveDirectory = 2,
-        Imported = 3
+        OnPremiseAD = 3,
+        Imported = 4
     }
 }

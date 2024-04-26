@@ -1,4 +1,5 @@
-﻿using PhishingPortal.Services.Notification.Helper;
+﻿using PhishingPortal.Dto;
+using PhishingPortal.Services.Notification.Helper;
 using System.Collections.Concurrent;
 
 namespace PhishingPortal.Services.Notification.Sms
@@ -93,14 +94,15 @@ namespace PhishingPortal.Services.Notification.Sms
                                 var db = TenantDbConnMgr.GetContext(smsInfo.Tenantdentifier);
 
                                 // TODO: short urls
-                                var outcome = await SmsClient.Send(smsInfo.SmsRecipient, smsInfo.From, smsInfo.SmsContent);
+                                var outcome = await SmsClient.Send(smsInfo.SmsRecipient, smsInfo.From, smsInfo.SmsContent, smsInfo.TemplateId);
 
-                                if (outcome)
+                                if (outcome.Item1)
                                 {
                                     Logger.LogInformation($"Sms sent");
 
                                     smsInfo.LogEntry.SentOn = DateTime.Now;
-
+                                    smsInfo.LogEntry.Status = CampaignLogStatus.Sent.ToString();
+                                    smsInfo.LogEntry.MessageId = outcome.Item2; //save MessageId to check msg delivery status later
                                     db.Add(smsInfo.LogEntry);
                                     db.SaveChanges();
 
