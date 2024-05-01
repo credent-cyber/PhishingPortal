@@ -13,23 +13,50 @@
                 <text>...</text>
             </Authorizing>
             <Authorized>
-                <div class="dropdown">
-                    <img height="24px" width="24px" src="img/user.png" />
-                    <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" style="line-height:22px !important;"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        @context.User.Identity.Name.Split('@')[0].ToUpper()
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        @* <li><a class="dropdown-item" href="authentication/profile">Profile</a></li>*@
-                        <li><a @onclick="BeginSignOut" class="dropdown-item">Logout</a></li>
-                    </ul>
+
+                <div class="dropdown drp-user">
+                    <a class="dropdown-toggle" data-toggle="dropdown">
+                       @*  <img src="assets/images/user/avatar-1.jpg" class="img-radius wid-40"
+                             alt="User-Profile-Image"> *@
+                        <div style="cursor:pointer" class="profile-image-circle">@context.User.Identity.Name.Split('@')[0].ToUpper().Substring(0, 1)</div>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right profile-notification">
+                        <div class="pro-head">
+                            <img src="/assets/images/auth/no-profile.png" class="img-radius" alt="User-Profile-Image">
+                            <span>@context.User.Identity.Name.Split('@')[0].ToUpper()</span>
+                            <a @onclick="BeginSignOut" class="dud-logout" title="Logout" style="cursor:pointer">
+                                <i class="feather icon-log-out"></i>
+                            </a>
+                        </div>
+                        <ul class="pro-body">
+                            <li>
+                                <a href="authentication/profile" class="dropdown-item" style="cursor:pointer">
+                                    <i class="feather icon-user"></i>
+                                    Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a href="training/my-trainings" class="dropdown-item" style="cursor:pointer">
+                                    <i class="feather icon-book"></i>
+                                    My Trainings
+                                </a>
+                            </li>
+                            <li>
+                                <a @onclick="BeginSignOut" class="dropdown-item" style="cursor:pointer">
+                                    <i class="feather icon-lock"></i>
+                                    Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
+
             </Authorized>
             <NotAuthorized>
                 <header class="d-flex align-items-center justify-content-between mt-3" style="height: 40px;">
                     <div id="logo" class="mr-3">
-                        <a href="#!" class="b-brand" style="margin-left:-40px">
-                            <img src="/custom/assets/images/ps.png" alt="Credent Infotech" class="img-fluid" style="height:42px"
+                        <a class="b-brand" style="margin-left:-40px">
+                            <img src="/assets/images/ps.png" alt="Credent Infotech" class="img-fluid" style="height:42px"
                                  width="200" height="40">
                         </a>
                     </div>
