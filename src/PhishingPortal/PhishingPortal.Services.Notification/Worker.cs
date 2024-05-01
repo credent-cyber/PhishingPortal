@@ -13,6 +13,8 @@ namespace PhishingPortal.Services.Notification
     using PhishingPortal.Services.Notification.EmailTemplate;
     using PhishingPortal.Services.Notification.Email.AppNotifications;
     using PhishingPortal.Services.Notification.UrlShortner;
+    using PhishingPortal.Services.Notification.WeeklySummaryReport;
+    using PhishingPortal.Dto;
 
     public partial class Worker : BackgroundService
     {
@@ -34,6 +36,7 @@ namespace PhishingPortal.Services.Notification
             IEmailTemplateProvider emailTemplateProvider,
             IAppEventNotifier appEventNotifier,
             IUrlShortner urlShortner,
+            IWeeklyReportExecutor weeklyReportExecutor,
             ApplicationSettings applicationSettings
             )
 
@@ -60,11 +63,15 @@ namespace PhishingPortal.Services.Notification
             this._appEventNotifier = appEventNotifier;
             this.applicationSettings = applicationSettings;
             this.urlShortner = urlShortner;
+            this._weeklyReportExecutor = weeklyReportExecutor;
         }
 
         readonly ILogger<Worker> _logger;
         private readonly ILogger<EmailCampaignProvider> providerLogger;
+        private readonly ILogger<SmsCampaignProvider> smsProviderLogger;
+        private readonly ILogger<WhatsappCampaignProvider> whatsappProviderLogger;
         private readonly ILogger<TrainingProvider> TrainingProviderLogger;
+        private readonly ILogger<WeeklyReportProvider> WeeklyReportLogger;
         readonly ApplicationSettings _settings;
         readonly IEmailClient _emailClient;
         readonly IConfiguration _configuration;
@@ -72,6 +79,7 @@ namespace PhishingPortal.Services.Notification
         private readonly IEmailCampaignExecutor _campaignExecutor;
         private readonly ISmsCampaignExecutor _smsExecutor;
         private readonly IWhatsappCampaignExecutor _whatsappCampaignExecutor;
+        private readonly IWeeklyReportExecutor _weeklyReportExecutor;
         bool _isprocessing = false;
         private readonly IDemoRequestHandler _demoRequestHandler;
         private readonly ITrainingExecutor _trainingExecutor;
@@ -102,6 +110,9 @@ namespace PhishingPortal.Services.Notification
             if (_settings.EnableTrainingProvider)
                 _trainingExecutor.Start();
 
+            if (_settings.EnableWeeklyReport)
+                _weeklyReportExecutor.Start();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
@@ -114,6 +125,7 @@ namespace PhishingPortal.Services.Notification
 
                     var tenants = _centralDbContext.Tenants.Include(o => o.Settings).Include(o => o.TenantDomains)
                                .Where(o => o.IsActive);
+
 
                     if (tenants == null || tenants.Count() == 0)
                     {
@@ -129,71 +141,89 @@ namespace PhishingPortal.Services.Notification
                         foreach (var tenant in tenants)
                         {
                             //var task = await Task.Factory.StartNew(async () =>
-                            var task = Task.Run(async () => 
+                            var task = Task.Run(async () =>
+                            {
+                                try
                                 {
-                                    try
+                                    var currentDayOfWeek = DateTime.Today.DayOfWeek;
+                                    // run email campaing for each tenant
+                                    if (_settings.EnableEmailCampaign)
                                     {
-                                        // run email campaing for each tenant
-                                        if (_settings.EnableEmailCampaign)
-                                        {
-                                            var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
-                                            provider.Subscribe(_campaignExecutor);
-                                            await provider.CheckAndPublish(stoppingToken);
+                                        var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                        provider.Subscribe(_campaignExecutor);
+                                        await provider.CheckAndPublish(stoppingToken);
 
+                                    }
+
+                                    //// sms campaign executor
+                                    if (_settings.EnableSmsCampaign)
+                                    {
+                                        var _smsProvider = new SmsCampaignProvider(smsProviderLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                        _smsProvider.Subscribe(_smsExecutor);
+                                        await _smsProvider.CheckAndPublish(stoppingToken);
+                                    }
+
+                                    // whatsapp provider 
+                                    if (_settings.EnableWhatsappCampaign)
+                                    {
+                                        var _waProvider = new WhatsappCampaignProvider(whatsappProviderLogger, WaClient, _configuration, tenant, TenantDbConnManager, urlShortner);
+                                        _waProvider.Subscribe(_whatsappCampaignExecutor);
+                                        await _waProvider.CheckAndPublish(stoppingToken);
+                                    }
+
+                                    //training provider
+                                    if (_settings.EnableTrainingProvider)
+                                    {
+                                        var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
+                                        trainingProvider.Subscribe(_trainingExecutor);
+                                        await trainingProvider.CheckAndPublish(stoppingToken);
+                                    }
+
+                                    // monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
+                                    if (_settings.EnableReportingMonitor)
+                                    {
+                                        var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
+                                        await _reportMonitor.ProcessAsync();
+                                    }
+
+                                    //Weekly Summary Report provider
+                                    if (_settings.EnableWeeklyReport && currentDayOfWeek == DayOfWeek.Saturday)
+                                        if (_settings.EnableWeeklyReport)
+                                        {
+                                            var dbContext = TenantDbConnManager.GetContext(tenant.UniqueId);
+                                            var settings = dbContext.Settings.ToList();
+                                            var status = dbContext.WeeklyReport.Any(d => d.CreatedOn == DateTime.Now.Date);
+
+                                            var isWeeklyReportEnable = settings.FirstOrDefault(x => x.Key == Constants.Keys.WeeklyReport_IsEnabled)?.Value;
+                                            if (bool.TryParse(isWeeklyReportEnable, out bool isWeeklyReportEnabled) && isWeeklyReportEnabled && !status)
+                                            {
+                                                // Execute the weekly report provider logic
+                                                var provider = new WeeklyReportProvider(WeeklyReportLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                                provider.Subscribe(_weeklyReportExecutor);
+                                                await provider.CheckAndPublish(stoppingToken);
+                                            }
                                         }
 
-                                        //// sms campaign executor
-                                        if (_settings.EnableSmsCampaign)
-                                        {
-                                            var _smsProvider = new SmsCampaignProvider(providerLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
-                                            _smsProvider.Subscribe(_smsExecutor);
-                                            await _smsProvider.CheckAndPublish(stoppingToken);
-                                        }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
+                                }
 
-                                        // whatsapp provider 
-                                        if (_settings.EnableWhatsappCampaign)
-                                        {
-                                            var _waProvider = new WhatsappCampaignProvider(providerLogger, WaClient, _configuration, tenant, TenantDbConnManager, urlShortner);
-                                            _waProvider.Subscribe(_whatsappCampaignExecutor);
-                                            await _waProvider.CheckAndPublish(stoppingToken);
-                                        }
-
-                                        //training provider
-                                        if (_settings.EnableTrainingProvider)
-                                        {
-                                            var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
-                                            trainingProvider.Subscribe(_trainingExecutor);
-                                            await trainingProvider.CheckAndPublish(stoppingToken);
-                                        }
-
-                                        //// monitor all incoming reports on the designated mail box and update the monitoring report for each campaign log
-                                        if (_settings.EnableReportingMonitor)
-                                        {
-                                            var _reportMonitor = new EmailPhishingReportMonitor(providerLogger, _configuration, tenant, TenantDbConnManager);
-                                            await _reportMonitor.ProcessAsync();
-                                        }
-
-
-                                 }
-                                 catch (Exception ex)
-                                 {
-                                     _logger.LogCritical(ex, $"Error while executing campaign for tenant [{tenant.UniqueId}], Error: {ex.Message}, StackTrace: {ex.StackTrace}");
-                                 }
-
-                                });
+                            });
 
                             allTasks.Add(task);
 
                         }
                     }
-                
+
                     if (allTasks.Count > 0)
                     {
                         await Task.WhenAll(allTasks);
 
                     }
                     _logger.LogInformation($"Worker reset _isProcessing=false, for the next cycle");
-                    _isprocessing = false; 
+                    _isprocessing = false;
                     _demoRequestHandler.Execute();
 
                     await Task.Delay(_settings.WaitIntervalInMinutes * 1000 * 60, stoppingToken);
@@ -206,6 +236,7 @@ namespace PhishingPortal.Services.Notification
 
             _campaignExecutor.Stop();
             _trainingExecutor.Stop();
+            _weeklyReportExecutor.Stop();
         }
 
     }

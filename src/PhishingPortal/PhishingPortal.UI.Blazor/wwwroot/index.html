@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="scrollbar-width: none !important;">
 
 <head>
     <meta charset="utf-8" />
@@ -10,9 +10,9 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <!--<link href="PhishingPortal.UI.Blazor.styles.css" rel="stylesheet" />-->
-    <link rel="icon" href="/custom/assets/images/favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="custom/assets/css/style.css">
-    <link rel="stylesheet" href="/custom/assets/font-awesome/css/font-awesome.min.css">
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
 
     <!--UI Template-->
     <script type="text/javascript" src="scripts/my-chart-js.js"></script>
@@ -30,11 +30,15 @@
                 display: none !important;
             }
         }
+
+        @media only screen and (max-width: 991px){
+            
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="scripts/printPdf.js"></script>
-    <link rel="stylesheet" href="/css/settingPage.css" />
-    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <!-- <link rel="stylesheet" href="/css/settingPage.css" /> -->
+    <!-- <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'> -->
 </head>
 
 <body>
@@ -58,17 +62,21 @@
 
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
-
-    <!--UI Template-->
-    <script src="custom/assets/js/responsive-all.min.js"></script>
-    <script src="custom/assets/js/plugins/bootstrap.min.js"></script>
-    <script src="custom/assets/js/pcoded.min.js"></script>
-    <!--<script src="custom/assets/js/menu-setting.min.js"></script>-->
     <!-- Summernote Editor -->
     <script src="./_content/BlazingComponents.Summernote/summernote/jquery-3.4.1.slim.min.js"></script>
     <script src="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.js"></script>
-    <script src="scripts/settingPage.js"></script>
+
+    <!--UI Template-->
+    <script src="assets/js/vendor-all.min.js"></script>
+    <script src="assets/js/plugins/bootstrap.min.js"></script>
+    <script src="assets/js/pcoded.min.js"></script>
+    <script src="assets/js/menu-setting.min.js"></script>
+    <script src="scripts/theme.js"></script>
+
   
+
+    <!-- <script src="scripts/settingPage.js"></script> -->
+
 </body>
 
 </html>

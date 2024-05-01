@@ -237,3 +237,22 @@ a, .btn-link {
     overflow-y: scroll;
 }
 /**/
+.non-selectable {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* Standard syntax */
+}
+
+.profile-image-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0; /* Choose your desired background color */
+    color: #333; /* Choose your desired text color */
+    font-weight: bold;
+}
+

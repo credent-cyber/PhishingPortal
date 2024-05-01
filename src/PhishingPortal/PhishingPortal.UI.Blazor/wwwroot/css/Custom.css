@@ -425,10 +425,10 @@ imgs {
     max-height: var(--hx-multi-select-dropdown-menu-height);
 }
 
-.dropdown-menu.show {
+/*.dropdown-menu.show {
     max-width: 100%;
     max-height: 180px !important;
-}
+}*/
 /*Havit multiSelect css*/
 
 /*loading spinner*/
