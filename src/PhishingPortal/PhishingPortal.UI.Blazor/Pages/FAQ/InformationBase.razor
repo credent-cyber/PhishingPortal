@@ -1,0 +1,325 @@
+﻿@page "/information-base"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Pages.FAQ
+@using PhishingPortal.UI.Blazor.Models
+@inject IJSRuntime JSRuntime
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+@inject CustomStateProvider authStateProvider3w
+@attribute [Authorize]
+
+
+<style>
+    .hx-tree-view-item.selected[b-so2pyrqosf], .hx-tree-view-item.selected:hover[b-so2pyrqosf] {
+        background-color: rgba(var(--hx-tree-view-item-selected-background), var(--hx-tree-view-item-hover-background-opacity));
+        color: var(--hx-tree-view-item-selected-color);
+    }
+
+    .hx-tree-view-item-spacer[b-so2pyrqosf] {
+        flex: 0 0 var(--hx-tree-view-item-spacer-width);
+    }
+
+    .hx-tree-view-item-expander-container[b-so2pyrqosf] {
+        width: var(--hx-tree-view-expander-container-width);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hx-tree-view-item-expander collapsed {
+        transform: rotate(-90deg);
+    }
+
+    .hx-tree-view-item-expander {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.15s ease-in-out;
+        transform: rotate(0deg);
+    }
+
+    .hx-tree-view-item-title[b-so2pyrqosf] {
+        flex: 1;
+    }
+
+    .text-nowrap {
+        white-space: nowrap !important;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .hx-tree-view-item[b-so2pyrqosf] {
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+        gap: var(--hx-tree-view-item-gap);
+        padding: var(--hx-tree-view-item-padding);
+        margin: var(--hx-tree-view-item-margin);
+        font-size: var(--hx-tree-view-item-font-size);
+        border-radius: var(--hx-tree-view-item-border-radius);
+        background-color: #f6f7fb;
+        color: var(--hx-tree-view-item-color);
+        border-width: var(--hx-tree-view-item-border-width);
+        border-color: var(--hx-tree-view-item-border-color);
+        border-style: var(--hx-tree-view-item-border-style);
+       
+    }
+
+    .bi::before, [class^="bi-"]::before, [class*=" bi-"]::before {
+        display: inline-block;
+        font-family: bootstrap-icons !important;
+        font-style: normal;
+        font-weight: normal !important;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        vertical-align: -0.125em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+</style>
+
+<div class="row">
+    <div class="col-md-3" style="height: 400px; padding: 15px">
+        <HxTreeView TItem="Directory"
+                    @bind-SelectedItem="selectedDirectory"
+                    Items="@fileSystem"
+                    CssClass="border rounded row"
+                    ItemTitleSelector="@(p => p.Name)"
+                    ItemIconSelector="@(p => p.Icon)"
+                    ItemChildrenSelector="@(p => p.Subdirectories)" />
+    </div>
+    <div style="max-height:85vh;overflow-y:auto" class="col-md-9">
+        @if (selectedDirectory.Name == "Get Started")
+        {
+            @*<p>No directory selected.</p>*@
+            <GetStartedContent/>
+        }
+        else 
+        {
+            @*<p>Directory <b>@selectedDirectory.Name</b> selected.</p>*@
+            if(selectedDirectory.Name == "What is Phishisms?")
+            {
+                <GetStartedContent/>
+            }
+            else if (selectedDirectory.Name == "Quick Start Guide")
+            {
+                <QuickStartContent/>
+            }
+            else if (selectedDirectory.Name == "How we support you?")
+            {
+                <SupportContent/>
+            }
+            else if (selectedDirectory.Name == "How to create Campaign?")
+            {
+                <NewCampaignContent/>
+            }
+            else if (selectedDirectory.Name == "How to create Campaign Template?")
+            {
+                <TemplateContent/>
+            }
+            else if (selectedDirectory.Name == "Report Hub")
+            {
+                <ReportHubContent />
+            }
+            else if (selectedDirectory.Name == "How to create Quiz for Training?")
+            {
+                <QuizContent/>
+            }
+            else if (selectedDirectory.Name == "How to upload Video for Training?")
+            {
+                <TrainingVideoUpldContent/>
+            }
+            else if (selectedDirectory.Name == "How to create Training?")
+            {
+                <TrainingContent/>
+            }
+            else if (selectedDirectory.Name == "PhishSims Policy")
+            {
+                <PhishSimsPolicyContent/>
+            }
+            else if (selectedDirectory.Name == "Allow listing in Microsoft 365")
+            {
+                <ListingContent/>
+            }
+            else if (selectedDirectory.Name == "Syncing with Azure")
+            {
+                <AzureSyncContent/>
+            }
+            else if (selectedDirectory.Name == "Overview of Risk Score")
+            {
+                <RiskOverview/>
+            }
+            else if (selectedDirectory.Name == "How to check Risk Score?")
+            {
+                <RiskScoreContent/>
+            }
+            else if (selectedDirectory.Name == "How to view Campaign Report?")
+            {
+                <CampaignReport/>
+            }
+
+
+        }
+    </div>
+</div>
+
+@code {
+    private Directory selectedDirectory;
+    private Directory[] fileSystem;
+
+    protected override void OnInitialized()
+    {
+        fileSystem = new[]
+            {
+            new Directory("Get Started", BootstrapIcon.Flag)
+            {
+                Subdirectories = new[]
+                {
+                    new Directory("What is Phishisms?")
+                    {
+                        //Subdirectories = new[] { new Directory("Visual Studio 2022"), new Directory("Rider 2021.3"), new Directory("VS Code"), new Directory("Borland Pascal") }
+                    },
+                    new Directory("Quick Start Guide")
+                    {
+                       // Subdirectories = new[] { new Directory("Vladimir"), new Directory("Jhosav"), new Directory("Ben"), new Directory("Admin") }
+                    },
+                    new Directory("How we support you?")
+                    {
+                       // Subdirectories = new[] { new Directory("Open Office"), new Directory("Git", BootstrapIcon.Magic), new Directory("Autocad") }
+                    },
+                    new Directory("Allow listing in Microsoft 365")
+                    {
+                       // Subdirectories = new[] { new Directory("Open Office"), new Directory("Git", BootstrapIcon.Magic), new Directory("Autocad") }
+
+                    },
+                    new Directory("How to create Campaign?")
+                    {
+                       // Subdirectories = new[] { new Directory("Open Office"), new Directory("Git", BootstrapIcon.Magic), new Directory("Autocad") }
+                    },
+                    new Directory("How to create Campaign Template?")
+                    {
+                       // Subdirectories = new[] { new Directory("Open Office"), new Directory("Git", BootstrapIcon.Magic), new Directory("Autocad") }
+                    },
+
+                    new Directory("Syncing with Azure")
+                    {
+                       // Subdirectories = new[] { new Directory("Open Office"), new Directory("Git", BootstrapIcon.Magic), new Directory("Autocad") }
+                    }
+
+                }
+            },
+            new Directory("Report Hub", BootstrapIcon.Folder2)
+            {
+                Subdirectories = new[]
+                {
+                   new Directory("How to view Campaign Report?", BootstrapIcon.Play)
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    },
+                    new Directory("How to view Training Report?", BootstrapIcon.FileMusic)
+                    {
+                        //Subdirectories = new[] { new Directory("Queen") { Subdirectories = new[] { new Directory("Live Killers"), new Directory("Live Magic") }}, new Directory("Metallica"), new Directory("AC/DC") }
+                    },
+
+                }
+            },
+
+            new Directory("PhishSims Trainings", BootstrapIcon.Folder2)
+            {
+                Subdirectories = new[]
+                {
+                    new Directory("How to create Training?", BootstrapIcon.QuestionSquare)
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    },
+                    new Directory("How to create Quiz for Training?", BootstrapIcon.QuestionSquare)
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    },
+                     new Directory("How to upload Video for Training?", BootstrapIcon.Check2All)
+                    {
+                        //Subdirectories = new[] { new Directory("Queen") { Subdirectories = new[] { new Directory("Live Killers"), new Directory("Live Magic") }}, new Directory("Metallica"), new Directory("AC/DC") }
+                    }
+
+                   
+                }
+            },
+
+            new Directory("PhishSims Policy", BootstrapIcon.Folder2)
+            {
+               Subdirectories = new[]
+                {
+                    new Directory("")
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    }
+                    
+                }
+            },
+            new Directory("Risk Score", BootstrapIcon.Folder2)
+            {
+                Subdirectories = new[]
+                {
+                    new Directory("Overview of Risk Score", BootstrapIcon.Play)
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    },
+                    new Directory("How to check Risk Score?", BootstrapIcon.FileMusic)
+                    {
+                        //Subdirectories = new[] { new Directory("Queen") { Subdirectories = new[] { new Directory("Live Killers"), new Directory("Live Magic") }}, new Directory("Metallica"), new Directory("AC/DC") }
+                    },
+
+                }
+            },
+            new Directory("Account Setting", BootstrapIcon.Folder2)
+            {
+                Subdirectories = new[]
+                {
+                    new Directory("How to reset password?", BootstrapIcon.Play)
+                    {
+                      //  Subdirectories = new[] { new Directory("Cyberpunk 2077"), new Directory("The Witcher 3"), new Directory("Tetris"), new Directory("Little Big Adventure 2: Twinsen's Odyssey") }
+                    },
+                    new Directory("Subpage 4", BootstrapIcon.FileMusic)
+                    {
+                        //Subdirectories = new[] { new Directory("Queen") { Subdirectories = new[] { new Directory("Live Killers"), new Directory("Live Magic") }}, new Directory("Metallica"), new Directory("AC/DC") }
+                    }
+
+                }
+            }
+    };
+
+        selectedDirectory = fileSystem.First();
+    }
+
+    public class Directory
+    {
+        public Directory(string name, IconBase icon = null, string message = null, ThemeColor? severity = null)
+        {
+            Name = name;
+            Icon = icon;
+            Message = message;
+            Severity = severity;
+        }
+
+        public string Name { get; }
+
+        public IconBase Icon { get; set; }
+
+        public string Message { get; set; }
+
+        public ThemeColor? Severity { get; set; }
+
+        public Directory[] Subdirectories { get; set; }
+    }
+
+}

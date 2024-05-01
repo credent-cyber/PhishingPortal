@@ -1,0 +1,70 @@
+﻿@page "/risk-overview"
+
+
+    <style>
+       
+
+        h1, h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        ol {
+            list-style-type: decimal;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        code {
+            background-color: #f6f7fb;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+    </style>
+
+    <div>
+        <h1>Risk Score Calculation in Phishsims</h1>
+
+        <h2>Introduction</h2>
+        <p>Phishsims is an advanced application designed to simulate phishing attacks and enhance cybersecurity awareness among organizations. One crucial metric within Phishsims is the Risk Score, which quantifies the overall risk level for a tenant based on the number of recipients who clicked on phishing emails, SMS messages, and WhatsApp messages throughout the calendar year.</p>
+
+        <h2>Understanding Risk Score</h2>
+        <p>The Risk Score in Phishsims is calculated as a total risk percentage, taking into account the following factors:</p>
+        <ul>
+            <li><strong>Phished Email Clicks:</strong> The number of recipients who clicked on phishing links in emails.</li>
+            <li><strong>Phished SMS Clicks:</strong> The number of recipients who interacted with phishing links in SMS messages.</li>
+            <li><strong>Phished WhatsApp Clicks:</strong> The number of recipients who engaged with phishing messages on WhatsApp.</li>
+        </ul>
+
+        <h2>Risk Score Calculation</h2>
+        <p>The Risk Score calculation formula is as follows:</p>
+        <code>Risk Score = ((Phished Email Clicks + Phished SMS Clicks + Phished WhatsApp Clicks) / Total Recipients) * 100</code>
+
+        <h2>Benefits of Risk Score</h2>
+        <ol>
+            <li><strong>Risk Assessment:</strong> Provides a quantitative measure of the risk posed by phishing attacks within the organization.</li>
+            <li><strong>Benchmarking:</strong> Allows for benchmarking risk levels over time and across different tenants or departments.</li>
+            <li><strong>Prioritization:</strong> Helps prioritize cybersecurity measures and training efforts based on risk exposure.</li>
+            <li><strong>Reporting:</strong> Facilitates clear and concise reporting to stakeholders regarding the organization's cybersecurity posture.</li>
+        </ol>
+
+        <h2>Using Risk Score in Phishsims</h2>
+        <p>1. <strong>Dashboard Overview:</strong> The Risk Score is prominently displayed on the Phishsims dashboard, providing an instant snapshot of the organization's risk level.</p>
+        <p>2. <strong>Detailed Reports:</strong> Users can access detailed reports that break down the Risk Score by communication channel (email, SMS, WhatsApp) and time periods (monthly, quarterly, annually).</p>
+        <p>3. <strong>Risk Mitigation Strategies:</strong> Phishsims offers actionable insights and recommendations to mitigate risks based on the Risk Score analysis.</p>
+
+        <h2>Conclusion</h2>
+        <p>The Risk Score feature in Phishsims is a powerful tool that enables organizations to quantify and manage the risk associated with phishing attacks effectively. By leveraging the Risk Score, organizations can make informed decisions, implement targeted cybersecurity measures, and ultimately strengthen their overall security posture.</p>
+    </div>
+

@@ -1,0 +1,174 @@
+﻿@page "/new-campaign-content"
+
+
+
+<style>
+    /* Your existing CSS styles */
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .steps {
+        list-style-type: none;
+        counter-reset: step-counter;
+        padding-left: 0;
+    }
+
+        .steps li {
+            margin-bottom: 30px;
+        }
+
+        .steps h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .steps p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .steps li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+    /* Animation styles */
+    img {
+        max-width: 100%;
+        height: auto;
+        /*opacity: 0;
+        transform: scale(0.9);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;*/
+    }
+
+    .steps li:hover img {
+        opacity: 1;
+    }
+</style>
+
+
+    <div>
+        <h1>Create New Campaign in Phishsims</h1>
+
+        <ol class="steps">
+            <li>
+                <h2>Accessing the Campaign Creation Page</h2>
+                <p>Log in to your Phishsims account.</p>
+                <p>Navigate to the main menu on dashboard where Campaign options are available.</p>
+                <p>Look for a button labeled "New Campaign" and click on it</p>         
+                <img src="/img/Campaign1.png" alt="Screenshot of accessing campaign creation page">
+                
+            </li>
+            <li>
+                <h2>Entering Campaign Details</h2>
+            <h4>STEP-1</h4>
+                <p>Click on the "New Campaign" button to access the campaign creation page.</p>
+            <img src="/img/Campaign2.png" alt="Screenshot of accessing campaign creation page">
+            <h4>STEP-2</h4>
+                <p>Provide a unique and descriptive name for your campaign in the designated field.</p>
+            <img src="/img/Campaign3.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-3</h4>
+            <p>Select the template category of the campaign from the available options(e.g., Email, SMS,and WhatsApp)..</p>
+                <img src="/img/Campaign5.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-4</h4>
+            <p>Then select the Template of the campaign from the available options.</p>
+            <p>For more information about How to create Template, <a href="/template-content" target="_blank">click here</a>.</p>
+            <img src="/img/Campaign6.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-5</h4>
+            <p>After that select the return page of the campaign from the available options.</p>
+            <img src="/img/Campaign7.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-6</h4>
+            <p>Then write a senders mail id, subject and description for the campaign</p>
+            <img src="/img/Campaign8.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-7</h4>
+            <p>After writing tha above fields, Select the Category of the campaign from the available options.</p>
+            <img src="/img/Campaign8.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-8</h4>
+            <p>Now Schedule a date and time to run the campaign also can select for now to run it.</p>
+            <img src="/img/Campaign9.png" alt="Screenshot of entering campaign details">
+            </li>
+
+            <li>
+            <h2>Defining Target Audience</h2>
+            <h4>STEP-1</h4>
+            <p>To import users you can select multiple options to import the users(CSV, Azure Active Directory and OnPrimiseAD)</p>
+            <img src="/img/Campaign10.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-2</h4>
+            <p>After selecting, click on ChooseFile Button</p>
+            <img src="/img/Campaign11.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-3</h4>
+            <p>Choose your file from your PC if you selected CSV and click on open.</p>
+            <img src="/img/Campaign12.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-4</h4>
+            <p>After choosing, all the imported users will be visible onthe screen.</p>
+            <img src="/img/Campaign13.png" alt="Screenshot of entering campaign details">
+            </li>
+
+        <li>
+            <h2>Defining Training to the Users</h2>
+            <h4>STEP-1</h4>
+            <p>To provide trainig to the phished users, you can select the Add Training option.</p>
+            <img src="/img/Campaign14.png" alt="Screenshot of entering campaign details">
+            <h4>STEP-2</h4>
+            <p>After selecting, click on the trainings shown which you want to provide to the users</p>
+            <p>For more information about How to create Training, <a href="https://example.com/campaign-types" target="_blank">click here</a>.</p>
+            <img src="/img/Campaign15.png" alt="Screenshot of entering campaign details">
+        </li>
+
+        <li>
+            <h2>Saving the Campaign</h2>
+            <p>After completing all the above steps, click on SAVE button.</p>
+            <p>After Clicking, you will get the popup message for capmpaign creation success.</p>
+            <img src="/img/Campaign16.png" alt="Screenshot of entering campaign details">
+        </li>
+
+
+        <h2>Editing Campaign</h2>
+        <ol>
+            <li>Access Campaign: Log in and navigate to the "Campaigns" section, open drop down and click on "All Campaigns" button.</li>
+            <img src="/img/Campaign17.png" alt="Screenshot of accessing campaign creation page">
+            <li>Find Campaign: Locate the Campaign you wish to edit from the list.</li>
+            <img src="/img/Campaign18.png" alt="Screenshot of accessing campaign creation page">
+            <li>Edit Option: Click on the edit option next to the Campaign name.</li>
+            <img src="/img/Campaign19.png" alt="Screenshot of accessing campaign creation page">
+            <li>Modify Content: Use the editor to make changes to the Campaign content.</li>
+            
+            <li>Save Changes: After editing, save the changes to update the template.</li>
+           
+        </ol>
+
+            <!-- Include other steps here -->
+        </ol>
+    </div>
+
