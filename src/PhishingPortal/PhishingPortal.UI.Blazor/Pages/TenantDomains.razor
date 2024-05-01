@@ -10,9 +10,25 @@
 @inject AuthState authState;
 @attribute [Authorize]
 
-
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">Domain Configuration</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Settings</a></li>
+                    <li class="breadcrumb-item"><a>Domain-Configuration</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row m-1">
-
     <EditForm Model="_model" OnValidSubmit="@Upsert">
         <div class="form-row align-items-center">
             <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;margin-top: -10px;">Add Domain</label>

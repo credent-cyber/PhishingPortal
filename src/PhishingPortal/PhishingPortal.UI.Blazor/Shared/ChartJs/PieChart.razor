@@ -35,6 +35,9 @@
     public bool Responsive { get; set; } = true;
 
     [Parameter]
+    public bool AspectRatio { get; set; } = true;
+
+    [Parameter]
     public bool IsStacked { get; set; }
 
     [Parameter]
@@ -60,7 +63,8 @@
             Type = Type.ToString(),
             Options = new
             {
-                Responsive = Responsive
+                Responsive = Responsive,
+                maintainAspectRatio = AspectRatio,
             },
 
             Data = new

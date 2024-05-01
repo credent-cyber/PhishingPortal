@@ -29,19 +29,40 @@
 @inject NavigationManager NavigationManager;
 @inject AuthState authState;
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Campaigns Report
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Report</a></li>
+                    <li class="breadcrumb-item"><a>Campaigns-Report</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="myContent">
     <div class="pcoded-content" style="padding: 0 0px !important;">
         <div>
-            <div class="row row-cols-1 row-cols-md-5 row-cols-lg-5 row-cols-xxl-5">
+            <div class="row row-cols-1 row-cols-md-4">
+                <!-- Select menu -->
                 <div class="col p-1">
-                    <select onchange="@ChangeYear" class="form-select" id="selectYear" aria-label="Default select example" style="height:45px;background:brown; color:white">
-                        @if (Years != null)
+                    <select onchange="@ChangeYear" class="form-select" id="selectYear" aria-label="Default select example" style="height:33px;background:brown; color:white">
+                        @if (Years != null && Years.Any())
                         {
                             foreach (var year in Years.OrderByDescending(y => y))
                             {
                                 if (year == Year)
                                 {
-                                    <option value="@year" selected> ▼ Data from @year </option>
+                                    <option value="@year" selected>▼ Data from @year</option>
                                 }
                                 else
                                 {
@@ -49,25 +70,37 @@
                                 }
                             }
                         }
+                        else
+                        {
+                            <option value="" disabled selected>
+                                <div class="spinner-border text-danger" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </option>
+                        }
                     </select>
                 </div>
+
+
+                <!-- Total card -->
                 <div class="col p-1">
                     <div class="card bg-facebook order-card mb-1">
                         <div class="card-body" style="padding:5px 25px !important">
                             <a>
                                 <div class="row align-items-center m-b-0">
                                     <div class="col">
-                                        <h6 class="text-white mb-0">Total </h6>
+                                        <h6 class="text-white mb-0">Total</h6>
                                     </div>
                                     <div class="col-auto">
-                                        <h3 style="color:black; margin-bottom: 0;">@total</h3>
+                                        <h3 style="color:black; margin-bottom: 0; font-size:19px">@total</h3>
                                     </div>
                                 </div>
                             </a>
                         </div>
-
                     </div>
                 </div>
+
+                <!-- Clicks card -->
                 <div class="col p-1">
                     <div class="card bg-danger order-card mb-1">
                         <div class="card-body" style="padding:5px 25px !important">
@@ -77,13 +110,15 @@
                                         <h6 class="text-white mb-0">Clicks</h6>
                                     </div>
                                     <div class="col-auto">
-                                        <h3 style="color:black; margin-bottom: 0;">@hits</h3>
+                                        <h3 style="color:black; margin-bottom: 0; font-size:19px">@hits</h3>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
+
+                <!-- Reported card -->
                 <div class="col p-1">
                     <div class="card bg-c-green order-card mb-1">
                         <div class="card-body" style="padding:5px 25px !important">
@@ -93,45 +128,56 @@
                                         <h6 class="text-white mb-0">Reported</h6>
                                     </div>
                                     <div class="col-auto">
-                                        <h3 style="color:black; margin-bottom: 0;">@reported</h3>
+                                        <h3 style="color:black; margin-bottom: 0; font-size:19px">@reported</h3>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
+
+                <!-- Prone card -->
                 <div class="col p-1">
                     <div class="card bg-c-purple order-card mb-1">
                         <div class="card-body" style="padding:5px 25px !important">
                             <a>
                                 <div class="row align-items-center m-b-0">
                                     <div class="col">
-                                        <h6 class="text-white mb-0">Prone %</h6>
+                                        <h6 class="text-white mb-0">Prone</h6>
                                     </div>
                                     <div class="col-auto">
-                                        <h3 style="color:black; margin-bottom: 0;">@pronePercent %</h3>
+                                        <h3 style="color:black; margin-bottom: 0; font-size:19px">@pronePercent %</h3>
                                     </div>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
-
             </div>
+
         </div>
         <div class="row">
             <div class="col-xl-12 col-md-12 p-1">
                 <div class="card">
-                    <div class="card-header p-2">
+                    <div class="card-header text-center p-2">
                         <h5>Statistics</h5>
                     </div>
                     <div class="card-body">
-                        <div style="width: 100%; height: 210px;
-}">
-                            <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
-                                   Labels="@BarChart1Labels" IsStacked="false" IsClickable="false" AspectRatio=false>
-                            </Chart>
-
+                        <div style="width: 100%; height: 210px;">
+                            @if (_task.IsCompleted)
+                            {
+                                <Chart Id="bar1" Type="@ChartType.bar" Datasets="@BarChart1Data"
+                                       Labels="@BarChart1Labels" IsStacked="false" IsClickable="false" AspectRatio=false>
+                                </Chart>
+                            }
+                            else
+                            {
+                                <div class="col-sm-12">
+                                    <div class="card-header">
+                                        <div class="loading-bar"></div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -334,9 +380,9 @@
             {
                 Label = "Total",
                 Data = Id > 0
-                            ? new[] { CountData.Count().ToString() }
-                                    : (data != null ? logData.Select(o => o.Logs.Sum(log=>log.Total).ToString()).ToArray()
-                                    : campaignLogData.Select(o => o.Logs.Count().ToString()).ToArray()),
+                                ? new[] { CountData.Count().ToString() }
+                                        : (data != null ? logData.Select(o => o.Logs.Sum(log => log.Total).ToString()).ToArray()
+                                        : campaignLogData.Select(o => o.Logs.Count().ToString()).ToArray()),
                 BackgroundColor = ColorHelper.GetBackgroundColors(Color.MediumBlue, campaignLogData.Select(o => o.CampaignId).Count())
             });
 
@@ -345,10 +391,10 @@
             {
                 Label = "Hits",
                 Data = Id > 0
-                    ? new[] { CountData.Count(o => o.IsHit).ToString() }
-                    : (data != null
-                            ? logData.Select(o => o.Logs.Sum(log => log.Hits).ToString()).ToArray()
-                        : campaignLogData.Select(o => o.Logs.Count(log => log.IsHit).ToString()).ToArray()),
+                        ? new[] { CountData.Count(o => o.IsHit).ToString() }
+                        : (data != null
+                                ? logData.Select(o => o.Logs.Sum(log => log.Hits).ToString()).ToArray()
+                            : campaignLogData.Select(o => o.Logs.Count(log => log.IsHit).ToString()).ToArray()),
                 BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightPink, campaignLogData.Select(o => o.CampaignId).Count()),
             });
 
@@ -356,10 +402,10 @@
         BarChart1Data.Add(new ChartJsDataset
             {
                 Label = "Reported",
-                Data = Id > 0 
-                          ? new[] { CountData.Count(o => o.IsReported).ToString() }
-                                    : (data != null ? logData?.Select(o => o.Logs.Sum(o => o.Reported).ToString()).ToArray()
-                                : campaignLogData.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray()),
+                Data = Id > 0
+                              ? new[] { CountData.Count(o => o.IsReported).ToString() }
+                                        : (data != null ? logData?.Select(o => o.Logs.Sum(o => o.Reported).ToString()).ToArray()
+                                    : campaignLogData.Select(o => o.Logs.Count(o => o.IsReported).ToString().ToString()).ToArray()),
                 BackgroundColor = ColorHelper.GetBackgroundColors(Color.LightGreen, campaignLogData.Select(o => o.CampaignId).Count()),
             });
         StateHasChanged();

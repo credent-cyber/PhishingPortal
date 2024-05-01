@@ -6,8 +6,25 @@
 @inject TenantClient client
 @inject ILogger<TenantCampaigns> logger
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">Azure App Configuration</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Settings</a></li>
+                    <li class="breadcrumb-item"><a>Azure-Configuration</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row m-1">
-
     @* <UiAlerts Model="alert"></UiAlerts> *@
     <EditForm Model="model" OnValidSubmit="OnSave">
         <DataAnnotationsValidator />
@@ -32,7 +49,7 @@
                 <ValidationMessage For="() => model.TenantID" />
             </div>
         </div>
-        <hr/>
+        <hr />
         <div class="mt-4" style="text-align:left;">
             <button type="submit" class="btn btn-primary col-md-1">Save</button>
         </div>
