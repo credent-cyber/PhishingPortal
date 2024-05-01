@@ -28,7 +28,7 @@ namespace PhishingPortal.Server.Controllers.Api
 
         [HttpPost]
         [Route("upsert_demorequestor")]
-        public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
+        public async Task<string> UpsertDemoRequestor(DemoRequestor demoRequestor)
         {
             demoRequestor.CreatedOn = DateTime.Now;
             var demo = await tenatAdminRepo.UpsertDemoRequestor(demoRequestor);

@@ -63,8 +63,8 @@ public class CustomStateProvider : AuthenticationStateProvider
     public async Task<(bool, string)> ForgetPassword(ForgetPasswordRequest request)
     {
         var success = await api.ForgetPassword(request);
-        var message = success ? "We have sent a password reset link to you respective email address, please check and follow the instructions" : "There was a problem accepting your request, please try again";
-        return await Task.FromResult((success, message));
+        var message = success.Item1 ? "We have sent a password reset link to you respective email address, please check and follow the instructions" : success.Item2;
+        return await Task.FromResult((success.Item1, message));
     }
 
     public async Task<(bool, string)> ResetPassword(ResetPasswordRequest request)
