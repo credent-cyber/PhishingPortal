@@ -1,0 +1,9 @@
+﻿
+
+
+CREATE TABLE UserProfilePic (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    User VARCHAR(255) NOT NULL,
+    ProfileUrl VARCHAR(255) NOT NULL,
+    BackgroundUrl VARCHAR(255) NOT NULL
+);
