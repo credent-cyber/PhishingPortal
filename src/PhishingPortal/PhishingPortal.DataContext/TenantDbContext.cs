@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PhishingPortal.Dto;
+using PhishingPortal.Dto.Auth;
 
 namespace PhishingPortal.DataContext
 {
@@ -38,6 +39,7 @@ namespace PhishingPortal.DataContext
         public DbSet<TrainingQuizQuestion> TrainingQuizQuestion { get; set; }
         public DbSet<TrainingQuizAnswer> TrainingQuizAnswer { get; set; }
         public DbSet<WeeklyReport> WeeklyReport { get; set; }
+        public DbSet<UserProfilePic> UserProfilePic { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

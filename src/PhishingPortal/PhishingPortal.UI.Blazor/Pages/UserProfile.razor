@@ -2,11 +2,16 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.Common;
 @using PhishingPortal.Dto.Auth
 @using System.ComponentModel.DataAnnotations
 @using PhishingPortal.UI.Blazor.Models
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using PhishingPortal.UI.Blazor.Client
+@inject TenantClient client
 
 <div class="page-header mb-0 breadcumb-sticky">
     <div class="page-block">
@@ -45,7 +50,8 @@
                             <div class="user-profile user-card mb-4">
                                 <div class="card-header border-0 p-0 pb-0">
                                     <div class="cover-img-block">
-                                        <img src="assets/images/profile/cover.jpg" alt="" class="img-fluid">
+                                     
+                                        <img src="@Bg" alt="" class="img-fluid">
                                         <div class="overlay"></div>
                                         <div class="change-cover">
                                             <div class="dropdown">
@@ -53,6 +59,7 @@
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
                                                     <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                    <InputFile id="ProfilePicfile" OnChange="@LoademployeeBackgroungPhoto" class="form-control" accept="image/jpeg, image/jpg,image/png" />
                                                 </div>
                                             </div>
                                         </div>
@@ -67,7 +74,7 @@
                                                         <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <div class="profile-dp">
                                                                 <div class="position-relative d-inline-block">
-                                                                    <img class="img-radius img-fluid wid-100" src="/assets/images/auth/no-profile.png" alt="User image">
+                                                                    <img src="@Pp" alt="User image" class="img-radius img-fluid wid-100">
                                                                 </div>
                                                                 <div class="overlay">
                                                                     <span>change</span>
@@ -78,9 +85,10 @@
                                                                 <i class="fas fa-check front-icon text-white"></i>
                                                             </div>
                                                         </a>
-                                                        <div class="dropdown-menu">
+                                                        <div  class="dropdown-menu">
                                                             <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
                                                             <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                            <InputFile id="ProfilePicfile" OnChange="@LoademployeeProfilePhoto" class="form-control" accept="image /jpeg, image /jpg,image/png" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -146,6 +154,9 @@
 </div>
 
 @code {
+    private IBrowserFile ProfilePhoto;
+    private IBrowserFile BackgroundPhoto;
+    private ProfileImageFile file = new ProfileImageFile();
 
     [CascadingParameter]
     private AlertModel alerts { get; set; } = new();
@@ -158,12 +169,158 @@
     private string message = string.Empty;
     private bool show = false;
     private bool submit = false;
+    private string Pp = "/assets/images/auth/no-profile.png";
+    private string Bg = "/assets/images/3d-logo-icon.png";
 
-    private ChangePassword Model { get; set; } = new ChangePassword();
+    ChangePassword Model { get; set; } = new ChangePassword();
 
     protected override async Task OnInitializedAsync()
     {
+        var user = await client.FetchUserProfilePic();
+        if (user != null)
+        {
+            var profileName = user.ProfileUrl;
+            var Background = user.BackgroundUrl;
+            var combinedPath = Path.Combine("/pbimg/", profileName);
+            var combinedBgPath = Path.Combine("/pbimg/", Background);
+            Pp = profileName != "" ? combinedPath : "/assets/images/auth/no-profile.png";
+            Bg = Background != "" ? combinedBgPath : "/assets/images/3d-logo-icon.png";
+           
+        }
+
         alerts ??= new AlertModel();
+
+    }
+
+
+    private async Task LoademployeeProfilePhoto(InputFileChangeEventArgs e)
+    {
+        ProfilePhoto = e.File;
+
+        if (ProfilePhoto != null)
+        {
+            var resizedFile = await ProfilePhoto.RequestImageFileAsync(ProfilePhoto.ContentType, 640, 480);
+
+            if (resizedFile != null)
+            {
+                var buf = new byte[resizedFile.Size];
+                using (var stream = resizedFile.OpenReadStream())
+                {
+                    await stream.ReadAsync(buf);
+                }
+
+                try
+                {
+                    file.base64data = Convert.ToBase64String(buf);
+                    file.contentType = ProfilePhoto.ContentType;
+                    file.fileName = ProfilePhoto.Name;
+                    file.IsProfilePic = true;
+
+                    var response = await Http.PostAsJsonAsync("api/Upload/upload", file);
+                    file = await response.Content.ReadFromJsonAsync<ProfileImageFile>();
+                    if (response.IsSuccessStatusCode)
+                    {
+                         //var result = await response.Content.ReadAsStringAsync();
+
+                        // Ensure state is updated after modifying Pp
+                        // Handle the successful upload response
+                        //if (updateResponse.IsSuccess)
+                        //{
+                        //    string baseUrl = @"C:\Users\MohammadUsaid\source\repos\PhishingPortal\src\PhishingPortal\PhishingPortal.UI.Blazor\wwwroot\pbimg\";
+                        //    Pp = baseUrl+updateResponse.Result.ProfileUrl;
+                        //}
+                        // Handle the updateResponse as needed
+                    }
+                    else
+                    {
+                        message = "Failed to upload file";
+                    }
+                    UserProfilePic userProfilePic = new UserProfilePic
+                        {
+                            ProfileUrl = file.fileName // Adjust according to your UserProfilePic model
+
+                        };
+
+                    // Call your client method to update the user profile picture
+                    var result = await response.Content.ReadAsStringAsync();
+                    var updateResponse = await client.UpsertUserProfile(userProfilePic);
+                    if (updateResponse.Result.ProfileUrl != null)
+                    {
+                        var trimmedUrl = updateResponse.Result.ProfileUrl.Trim();
+                        var combinedPath = Path.Combine("/pbimg/", trimmedUrl);
+                        Pp = combinedPath;
+                        StateHasChanged();// await InvokeAsync(StateHasChanged);// Update component state
+                    }
+                }
+                catch (Exception ex)
+                {
+                    message = $"Error: {ex.Message}";
+                }
+            }
+        }
+        else
+        {
+            message = "No file selected";
+            file = new ProfileImageFile(); // Reset the filesBase64 object
+        }
+    }
+
+
+
+    private async Task LoademployeeBackgroungPhoto(InputFileChangeEventArgs e)
+    {
+        BackgroundPhoto = e.File;
+
+        if (BackgroundPhoto != null)
+        {
+            var resizedFile = await BackgroundPhoto.RequestImageFileAsync(BackgroundPhoto.ContentType, 640, 480);
+
+            if (resizedFile != null)
+            {
+                var buf = new byte[resizedFile.Size];
+                using (var stream = resizedFile.OpenReadStream())
+                {
+                    await stream.ReadAsync(buf);
+                }
+
+                try
+                {
+                    file.base64data = Convert.ToBase64String(buf);
+                    file.contentType = BackgroundPhoto.ContentType;
+                    file.fileName = BackgroundPhoto.Name;
+                    file.IsProfilePic = false;
+
+                    var response = await Http.PostAsJsonAsync("api/Upload/upload", file);
+                    file = await response.Content.ReadFromJsonAsync<ProfileImageFile>();
+                   
+                    UserProfilePic userProfilePic = new UserProfilePic
+                        {
+                            BackgroundUrl = file.fileName // Adjust according to your UserProfilePic model
+
+                        };
+
+                    // Call your client method to update the user profile picture
+                    var result = await response.Content.ReadAsStringAsync();
+                    var updateResponse = await client.UpsertUserProfile(userProfilePic);
+                    if (updateResponse.Result.BackgroundUrl != null)
+                    {
+                        var trimmedUrl = updateResponse.Result.BackgroundUrl.Trim();
+                        var combinedPath = Path.Combine("/pbimg/", trimmedUrl);
+                        Bg = combinedPath;
+                        StateHasChanged(); // Update component state
+                    }
+                }
+                catch (Exception ex)
+                {
+                    message = $"Error: {ex.Message}";
+                }
+            }
+        }
+        else
+        {
+            message = "No file selected";
+            file = new ProfileImageFile(); // Reset the filesBase64 object
+        }
     }
 
     private async Task OnSubmit()

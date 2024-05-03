@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
+using PhishingPortal.Dto.Auth;
 using PhishingPortal.Dto.Dashboard;
 using PhishingPortal.UI.Blazor.Pages;
 using System;
@@ -1059,5 +1060,41 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         #endregion
+
+        public async Task<ApiResponse<UserProfilePic>> UpsertUserProfile(UserProfilePic data)
+        {
+            ApiResponse<UserProfilePic> result = new();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertUserProfile", data);
+                res.EnsureSuccessStatusCode();
+                result = await res.Content.ReadFromJsonAsync< ApiResponse<UserProfilePic>>();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+        public async Task<UserProfilePic> FetchUserProfilePic()
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/FetchUserProfilePic");
+
+                res.EnsureSuccessStatusCode();
+
+                return await res.Content.ReadFromJsonAsync<UserProfilePic>();
+
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

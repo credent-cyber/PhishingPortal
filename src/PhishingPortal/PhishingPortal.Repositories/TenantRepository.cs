@@ -7,6 +7,9 @@ using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
 using Humanizer;
 using Org.BouncyCastle.Asn1.Mozilla;
+using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Asn1.Ocsp;
+using PhishingPortal.Dto.Auth;
 
 namespace PhishingPortal.Repositories
 {
@@ -93,12 +96,12 @@ namespace PhishingPortal.Repositories
                 campaign.Detail.CreatedOn = now;
                 TenantDbCtx.Campaigns.Add(campaign);
             }
-            try { TenantDbCtx.SaveChanges(); } 
-            catch(Exception e) 
+            try { TenantDbCtx.SaveChanges(); }
+            catch (Exception e)
             {
 
             }
-           
+
             return campaign;
         }
 
@@ -480,8 +483,8 @@ namespace PhishingPortal.Repositories
                 var filterSmsData = totatPhishingTests.Where(o => o.CampaignId == sId1 || o.CampaignId == sId2 || o.CampaignId == sId3 || o.CampaignId == sId4 || o.CampaignId == sId5);
 
                 var smsPhishtestWithRecipients = from log in filterSmsData
-                                                      join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
-                                                      select new { logEntry = log, Department = crec.Recipient.Department };
+                                                 join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
+                                                 select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Sms camp**************************************************
 
                 var SmsDepatwiseCount = smsPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Sms.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
@@ -606,7 +609,7 @@ namespace PhishingPortal.Repositories
 
                 var whatsappPhishtestWithRecipients = from log in filterWhatsappData
                                                       join crec in TenantDbCtx.CampaignRecipients.Include(o => o.Recipient) on log.RecipientId equals crec.RecipientId
-                                              select new { logEntry = log, Department = crec.Recipient.Department };
+                                                      select new { logEntry = log, Department = crec.Recipient.Department };
                 //**************************Department for Whatsapp camp**************************************************
                 var WhatsappDepatwiseCount = whatsappPhishtestWithRecipients.Where(a => a.logEntry.CampignType == CampaignType.Whatsapp.ToString()).ToList().GroupBy(i => i.Department, (key, entries) => new
                 {
@@ -1319,7 +1322,7 @@ namespace PhishingPortal.Repositories
                 TenantDbCtx.Add(newMapping);
                 await TenantDbCtx.SaveChangesAsync();
             }
-            
+
             var UpdateNewTrainingData = TenantDbCtx.Training.Where(o => o.Id == trainingId).FirstOrDefault();
             if (UpdateNewTrainingData != null)
             {
@@ -1601,10 +1604,12 @@ namespace PhishingPortal.Repositories
 
         #region Report
         public async Task<IEnumerable<CampaignLog>> BarChartDrillDownReportCount(int campId)
-        { 
-             var data = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == campId);
-             return data;
+        {
+            var data = TenantDbCtx.CampaignLogs.Where(o => o.CampaignId == campId);
+            return data;
         }
+
+        
 
         public async Task<IQueryable<ReportDataCounts>> PieChartDrillDownReportCount(DrillDownReportCountParameter parameters)
         {
@@ -1646,7 +1651,76 @@ namespace PhishingPortal.Repositories
             return filterData.AsQueryable();
         }
 
+        //    public async Task<IEnumerable<CampaignLog>> saveProfileUrl(UserProfilePic request)
+        //    {
+
+        //        try
+        //        {
+        //            var userProfilePicture = new UserProfilePic
+        //            {
+        //                User = request.User,
+        //                ProfileUrl = request.ProfileUrl
+        //            };
+        //            TenantDbCtx.AddAsync(userProfilePicture);
+        //            await TenantDbCtx.SaveChangesAsync();
+
+        //        }
+        //       catch ()
+        //       {
+
+        //       }
+
+        //}
+
 
         #endregion
+
+
+        public async Task<ApiResponse<UserProfilePic>> UpsertUserProfile(UserProfilePic data)
+        {
+            var result = new ApiResponse<UserProfilePic>();
+
+            try
+            {
+                var user = TenantDbCtx.UserProfilePic.FirstOrDefault(o => o.User == data.User);
+
+                if (user == null)
+                {
+                    // If the user doesn't exist, add the new profile pic
+                    TenantDbCtx.UserProfilePic.Add(data);
+                    result.IsSuccess = true;
+                    result.Result = data;
+                    result.Message = "Successfully added";
+                }
+                else
+                {
+                    // Update the existing user's profile pic
+                    if (data.BackgroundUrl != "") { user.BackgroundUrl = data.BackgroundUrl; }
+                    if (data.ProfileUrl != "") { user.ProfileUrl = data.ProfileUrl; } 
+                    TenantDbCtx.UserProfilePic.Update(user);
+                    result.IsSuccess = true;
+                    result.Result = data;
+                    result.Message = "Successfully updated";
+                }
+
+                await TenantDbCtx.SaveChangesAsync(); // Use await to asynchronously save changes
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions and set the appropriate response
+                result.IsSuccess = false;
+                result.Message = $"Error: {ex.Message}";
+            }
+
+            return result;
+        }
+
+
+        public async Task<UserProfilePic> FetchUserProfilePic(string user)
+        {
+            var data = TenantDbCtx.UserProfilePic.Where(o => o.User == user).FirstOrDefault();
+            return data;
+        }
+
     }
 }

@@ -12,8 +12,10 @@ using Microsoft.Graph;
 namespace PhishingPortal.Server.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
+    using PhishingPortal.Dto.Auth;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -859,5 +861,27 @@ namespace PhishingPortal.Server.Controllers.Api
                 return await _tenantRepository.PieChartDrillDownReportCount(parameters);        
         }
         #endregion
+
+        [HttpPost]
+        [Route("UpsertUserProfile")]
+        public async Task<ApiResponse<UserProfilePic>> UpsertUserProfile(UserProfilePic data)
+        {
+            var result = new ApiResponse<UserProfilePic>();
+            data.User = User.Identity.Name;
+            return await _tenantRepository.UpsertUserProfile(data);
+
+        }
+        [HttpGet]
+        [Route("FetchUserProfilePic")]
+        public async Task<UserProfilePic> FetchUserProfilePic()
+        {
+            string user = User.Identity.Name;
+            return await _tenantRepository.FetchUserProfilePic(user);
+        }
+
+
     }
+
 }
+
+

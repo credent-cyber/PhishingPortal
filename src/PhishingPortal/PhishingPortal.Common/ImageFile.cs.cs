@@ -12,4 +12,14 @@ namespace PhishingPortal.Common
         public string contentType { get; set; }
         public string fileName { get; set; }
     }
+
+
+    public class ProfileImageFile
+    {
+        public string base64data { get; set; }
+        public string contentType { get; set; }
+        public string fileName { get; set; }
+        public bool IsProfilePic { get; set; }
+
+    }
 }
