@@ -10,6 +10,12 @@
     </Authorized>
 </AuthorizeView>
 
+<AuthorizeView Roles="tenantuser">
+    <Authorized>
+        <UserDashboard/>
+    </Authorized>
+</AuthorizeView>
+
 <AuthorizeView Roles="superadmin">
     <Authorized>
         <AdminDashboard />

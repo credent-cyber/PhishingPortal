@@ -16,13 +16,15 @@
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantuser">
-            <UserPage IsTrainingLanding="true"></UserPage>
+            @*<UserPage IsTrainingLanding="true"></UserPage>*@
+
+            <UserPage IsCollapsedChanged="HandleIsCollapsedChanged" IsTrainingLanding="true" />
         </AuthorizeView>
 
         <AuthorizeView>
             <NotAuthorized>
                 @* <LoginDisplay /> *@
-                <LoginHome/>
+                <LoginHome />
                 <SlideShow />
             </NotAuthorized>
 
