@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Repositories;
+using PhishingPortal.Server.Intrastructure.ActionFilters;
 using PhishingPortal.Server.Services.Interfaces;
 
 namespace PhishingPortal.Server.Controllers.Api
@@ -24,6 +25,7 @@ namespace PhishingPortal.Server.Controllers.Api
         }
 
         [EnableQuery]
+        [ODataAuthorize]
         public IQueryable<Campaign> Get()
         {
             return DbContext.Campaigns.AsQueryable();
