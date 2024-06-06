@@ -9,7 +9,7 @@
 
 
 <!-- Header Start -->
-<header class="sticky-header">
+<header class="sticky-header @(toggleCss ? "showMenu":"")">
     <nav class="homenav">
         <h2 class="homenav_logo">
             <a href="/">
@@ -18,13 +18,13 @@
             </a>
         </h2>
 
-        <ul class="homemenu_items" onclick="toggleMobileMenu()">
-            <img src="/img/times.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()"  />
+        <ul class="homemenu_items" @onclick="ToggleMenu">
+            <img src="/img/times.svg" alt="timesicon" id="menu_toggle"  />
             <li><a href="/" class="nav_link">Home</a></li>
             <li><a href="#" class="nav_link">About</a></li>
             <li><a href="login?ReturnUrl=@(Navigation.Uri)" class="nav_link">Login</a></li>
         </ul>
-        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()" />
+        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" @onclick="ToggleMenu" />
     </nav>
 </header>
 <!-- Header End -->
@@ -83,9 +83,15 @@
 </section>
 
 @code {
-
+    bool toggleCss = false;
     protected override async Task OnInitializedAsync()
     {
         await jsRuntime.InvokeVoidAsync("import", "/scripts/LoginHome.js");
+    }
+
+
+    public void ToggleMenu()
+    {
+        toggleCss = !toggleCss;
     }
 }
