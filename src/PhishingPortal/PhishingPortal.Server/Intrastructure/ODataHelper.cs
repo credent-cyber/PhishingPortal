@@ -2,11 +2,14 @@
 {
 
     using Microsoft.AspNetCore.OData;
+    using Microsoft.AspNetCore.OData.Routing.Attributes;
     using Microsoft.OData.Edm;
     using Microsoft.OData.ModelBuilder;
     using PhishingPortal.Dto;
-
-
+    using PhishingPortal.Server.Intrastructure.ActionFilters;
+    using System.Web.Http;
+    [Authorize]
+    [ODataAuthorize]
     public static class ODataHelper
     {
 
@@ -24,7 +27,7 @@
                 option.AddRouteComponents("Odata", GetModel());
             });
         }
-
+        
         private static IEdmModel GetModel()
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();

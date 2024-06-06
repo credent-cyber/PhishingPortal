@@ -30,15 +30,15 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0 badge-light-success" style="border-radius:50%"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.Total</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.Total</span></h6>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0 badge-light-success" style="border-radius:50%"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.Total</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.Total</span></h6>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0 badge-light-success" style="border-radius:50%"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.Total</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.Total</span></h6>
                                 }
                             </div>
                         </div>
@@ -61,15 +61,15 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0 badge-light-danger" style="border-radius:50%"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.TotalHits</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.TotalHits</span></h6>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0 badge-light-danger" style="border-radius:50%"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.TotalHits</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.TotalHits</span></h6>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0 badge-light-danger" style="border-radius:50%"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.TotalHits</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.TotalHits</span></h6>
                                 }
                             </div>
                         </div>
@@ -94,15 +94,15 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0 badge-light-warning" style="border-radius:50%"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Email.Total - stats.Email.TotalHits)</span> </h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Email.Total - stats.Email.TotalHits)</span> </h6>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0 badge-light-warning" style="border-radius:50%"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Sms.Total - stats.Sms.TotalHits)</span> </h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Sms.Total - stats.Sms.TotalHits)</span> </h6>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0 badge-light-warning" style="border-radius:50%"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</span></h6>
                                 }
                             </div>
                         </div>
@@ -127,15 +127,15 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0 badge-light-info" style="border-radius:50%"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Email.PronePercent %</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Email.PronePercent %</span></h6>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0 badge-light-info" style="border-radius:50%"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Sms.PronePercent %</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Sms.PronePercent %</span></h6>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0 badge-light-info" style="border-radius:50%"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Whatsapp.PronePercent %</span></h6>
+                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Whatsapp.PronePercent %</span></h6>
                                 }
                             </div>
                         </div>
