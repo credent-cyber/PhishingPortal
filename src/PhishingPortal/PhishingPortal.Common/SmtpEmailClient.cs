@@ -89,9 +89,9 @@
             msg.BodyEncoding = System.Text.Encoding.UTF8;
 
             if(!_smtpConfig.IsSendingEnabled)
-               Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
-            else 
                 await SendEmailAsync(msg);
+            else 
+               Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
 
             await Task.CompletedTask;
         }

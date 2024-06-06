@@ -1565,7 +1565,7 @@ namespace PhishingPortal.Repositories
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
                 .FirstOrDefault(o => o.SecurityStamp == key
-                                    && o.IsReported == false && o.Status == status);
+                                    && o.IsReported == false);
 
             if (campaignLog == null)
             {
