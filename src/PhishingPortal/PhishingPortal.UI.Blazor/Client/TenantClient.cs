@@ -984,6 +984,24 @@ namespace PhishingPortal.UI.Blazor.Client
             }
         }
 
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            var result = new ApiResponse<TrainingQuizQuestion>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteTrainingQuizQuestion/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingQuizQuestion>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #region #OnPremise AD
         public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAllOnPremiseADGroups()
         {

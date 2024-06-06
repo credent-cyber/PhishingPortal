@@ -1559,6 +1559,34 @@ namespace PhishingPortal.Repositories
             return result;
         }
 
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            var result = new ApiResponse<TrainingQuizQuestion>();
+            try
+            {
+                var existing = TenantDbCtx.TrainingQuizQuestion.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Produc tList not found!";
+                    return result;
+                }
+
+                TenantDbCtx.TrainingQuizQuestion.Remove(existing);
+                await TenantDbCtx.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         public async Task<ApiResponse<string>> CampaignSpamReport(string key)
         {
             var result = new ApiResponse<string>();
