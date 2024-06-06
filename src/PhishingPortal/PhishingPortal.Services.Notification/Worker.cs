@@ -187,7 +187,7 @@ namespace PhishingPortal.Services.Notification
                                     }
 
                                     //Weekly Summary Report provider
-                                    if (_settings.EnableWeeklyReport && currentDayOfWeek == DayOfWeek.Saturday)
+                                    if (_settings.EnableWeeklyReport && currentDayOfWeek == DayOfWeek.Thursday)
                                         if (_settings.EnableWeeklyReport)
                                         {
                                             var dbContext = TenantDbConnManager.GetContext(tenant.UniqueId);

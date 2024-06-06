@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Org.BouncyCastle.Math.EC.ECCurve;
+using Microsoft.Extensions.Configuration;
 
 namespace PhishingPortal.Services.Notification.WeeklySummaryReport
 {
@@ -308,11 +309,10 @@ namespace PhishingPortal.Services.Notification.WeeklySummaryReport
                 parameter.Add("###TrainingDepartmentLabel###", $"[]");
                 parameter.Add("###TrainingReportData###", $"[]");
 
-                _weeklyReportTemplatePath = @"C:\Users\ChhaganSinha\Downloads\apex\WeeklyReportTemplate - Copy.html";
-
-                //var templateDirectory = Path.GetDirectoryName(_weeklyReportTemplatePath);
-                //if (!Directory.Exists(templateDirectory))
-                //    throw new Exception("Template directory does not exist: " + templateDirectory);
+                //_weeklyReportTemplatePath = @"C:\Users\ChhaganSinha\Downloads\apex\WeeklyReportTemplate - Copy.html";
+                var templateDirectory = Path.GetDirectoryName(_weeklyReportTemplatePath);
+                if (!Directory.Exists(templateDirectory))
+                    throw new Exception("Template directory does not exist: " + templateDirectory);
 
                 if (!File.Exists(_weeklyReportTemplatePath))
                     throw new Exception("Template File doesn't exist");
