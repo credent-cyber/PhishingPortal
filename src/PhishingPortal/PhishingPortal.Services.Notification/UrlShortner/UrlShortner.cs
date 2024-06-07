@@ -39,6 +39,18 @@ namespace PhishingPortal.Services.Notification.UrlShortner
             }
 
         }
+
+        public async Task<string> GetTinyUrlAsync(string url)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromSeconds(5);
+                HttpResponseMessage response = await client.GetAsync("http://tinyurl.com/api-create.php?url=" + url);
+                response.EnsureSuccessStatusCode();
+                string responseData = await response.Content.ReadAsStringAsync();
+                return responseData;
+            }
+        }
     }
 
     public class ApiResponse

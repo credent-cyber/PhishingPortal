@@ -158,7 +158,7 @@ namespace PhishingPortal.Services.Notification
                                     //// sms campaign executor
                                     if (_settings.EnableSmsCampaign)
                                     {
-                                        var _smsProvider = new SmsCampaignProvider(smsProviderLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                        var _smsProvider = new SmsCampaignProvider(smsProviderLogger, SmsClient, _configuration, tenant, TenantDbConnManager, urlShortner);
                                         _smsProvider.Subscribe(_smsExecutor);
                                         await _smsProvider.CheckAndPublish(stoppingToken);
                                     }

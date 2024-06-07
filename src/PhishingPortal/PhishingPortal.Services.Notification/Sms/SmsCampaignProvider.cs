@@ -4,6 +4,7 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Extensions;
 using PhishingPortal.Services.Notification.Helper;
+using PhishingPortal.Services.Notification.UrlShortner;
 
 namespace PhishingPortal.Services.Notification.Sms
 {
@@ -12,14 +13,16 @@ namespace PhishingPortal.Services.Notification.Sms
         private readonly List<IObserver<SmsCampaignInfo>> observers;
         private string BaseUrl = "http://localhost:7081/cmp";
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
+        public IUrlShortner urlShortner { get; }
         public SmsCampaignProvider(ILogger logger,
-            ISmsGatewayClient smsSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+            ISmsGatewayClient smsSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner)
         {
             Logger = logger;
             SmsSender = smsSender;
             Config = config;
             Tenant = tenant;
             ConnManager = connManager;
+            urlShortner = UrlShortner;
 
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
@@ -112,7 +115,8 @@ namespace PhishingPortal.Services.Notification.Sms
                         var timestamp = DateTime.Now;
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
-                        var content = template.Content.Replace("###RETURN_URL###", returnUrl);
+                        string shortReturnUrl = await urlShortner.GetTinyUrlAsync(returnUrl);
+                        var content = template.Content.Replace("https://tinyurl.com/{#var#}", shortReturnUrl);
 
                         // TODO: calculate short urls
                         var smsInfo = new SmsCampaignInfo()

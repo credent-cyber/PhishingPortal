@@ -1,5 +1,5 @@
 ﻿using SmsTestConsole;
 
 DndSMS dndSMS = new DndSMS();
-//dndSMS.SendSMS();
-dndSMS.CheckDeliveryStatus();
+dndSMS.SendSMS();
+//dndSMS.CheckDeliveryStatus();
