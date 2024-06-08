@@ -111,7 +111,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
                         var key = $"{campaign.Id}-{r.Recipient.Email}-{timestamp}".ComputeMd5Hash().ToLower();
                         var returnUrl = $"{BaseUrl}/{tenantIdentifier}/{key}";
 
-                        string shortReturnUrl = await urlShortner.CallApiAsync(returnUrl);
+                        string shortReturnUrl = await urlShortner.GetTinyUrlAsync(returnUrl);
 
                         var content = template.Content.Replace("###RETURN_URL###", shortReturnUrl);
 
