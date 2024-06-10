@@ -27,7 +27,25 @@ namespace PhishingPortal.Server.Controllers.Api.OData
         [ODataAuthorize]
         public IQueryable<CampaignLog> Get()
         {
-            return DbContext.CampaignLogs.AsQueryable();
+            var result = from tl in DbContext.CampaignLogs.AsQueryable()
+                         join r in DbContext.Recipients.AsQueryable() on tl.RecipientId equals r.Id
+                         join cm in DbContext.Campaigns.AsQueryable() on tl.CampaignId equals cm.Id
+                         select new CampaignLog
+                         {
+                             CampaignId = tl.CampaignId,
+                             Camp = cm,
+                             Id = tl.Id,
+                             CampignType = tl.CampignType,
+                             RecipantEmail = r.Email,
+                             RecipantMobile = r.Mobile,
+                             RecipantDepartment = r.Department,
+                             IsHit = tl.IsHit,
+                             IsReported  = tl.IsReported,
+                             CreatedOn = tl.CreatedOn,
+                         };
+
+            return result.AsQueryable();
+            //return DbContext.CampaignLogs.AsQueryable();
         }
 
     }
