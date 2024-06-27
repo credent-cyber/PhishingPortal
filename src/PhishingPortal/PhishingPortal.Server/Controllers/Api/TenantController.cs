@@ -825,6 +825,59 @@ namespace PhishingPortal.Server.Controllers.Api
             }
         }
 
+        #region UserDashBoard
+        [HttpGet]
+        [Route("get-usertraining-statistics")]
+        public async Task<ApiResponse<TrainingStatics>> GetUserDashBoardStats()
+        {
+            var result = new ApiResponse<TrainingStatics>();
+
+            try
+            {
+                var user = User.Identity.Name;
+                var data = await _tenantRepository.GetUserDashBoardStats(user);
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        [Route("monthwise-usertraining-data/{year}")]
+        public async Task<ApiResponse<MonthlyTrainingBarChart>> GetMonthwiseUserTrainingData(int year)
+        {
+            var user = User.Identity.Name;
+            var result = new ApiResponse<MonthlyTrainingBarChart>();
+            try
+            {
+                var data = await _tenantRepository.GetMonthwiseUserTrainingData(user, year);
+                result.Result = data;
+                result.IsSuccess = true;
+                result.Message = String.Empty;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
+        #endregion
+
         #region OnPromiseAD
         [HttpGet]
         [Route("GetOnPremiseADGroups")]

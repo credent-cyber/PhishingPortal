@@ -1002,6 +1002,59 @@ namespace PhishingPortal.UI.Blazor.Client
             }
         }
 
+        #region UserDashBoard
+        public async Task<TrainingStatics> GetUserDashBoardStats()
+        {
+            var result = new TrainingStatics();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/get-usertraining-statistics");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return result;
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingStatics>>();
+
+                if (json != null)
+                    result = json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+        public async Task<MonthlyTrainingBarChart?> GetMonthwiseUserTrainingData(int year)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/monthwise-usertraining-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
+                res.EnsureSuccessStatusCode();
+
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyTrainingBarChart>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
+        }
+        #endregion
+
+
         #region #OnPremise AD
         public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAllOnPremiseADGroups()
         {

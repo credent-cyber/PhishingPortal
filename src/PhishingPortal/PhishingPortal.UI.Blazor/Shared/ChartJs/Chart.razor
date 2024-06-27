@@ -118,6 +118,11 @@
         {
             NavManager.NavigateTo($"/tenant-training-report/{Id}/{label}");
         }
+        else if (ChartId.Contains("User"))
+        {
+            NavManager.NavigateTo($"/training/my-trainings/{Id}/{label}");
+        }
+
         else
         {
             NavManager.NavigateTo($"/report/{Id}/{label}");
