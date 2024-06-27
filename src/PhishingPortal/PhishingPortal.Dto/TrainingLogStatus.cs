@@ -6,6 +6,7 @@
         InProgress,
         Sent,
         Completed,
+        Pending,
 
     }
 }

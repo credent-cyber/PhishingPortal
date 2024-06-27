@@ -1755,7 +1755,7 @@ namespace PhishingPortal.Repositories
                     Month = (Months)key,
                     TotalTraining = entries.Count(),
                     Completed = entries.Count(i => i.Status == (TrainingLogStatus.Completed).ToString()),
-                    Inprogress = entries.Count(i => i.Status == (TrainingLogStatus.InProgress).ToString()),
+                    Inprogress = entries.Count(i => i.Status == (TrainingLogStatus.Pending).ToString()),
 
                 });
 

@@ -76,10 +76,10 @@
             else if (Label == "Completed")
                 status = "Completed";
             else if (Label == "InProgress")
-                status = "InProgress";
+                status = "Pending";
 
 
-            
+
 
             #region filterValue
             // filterType: string for the selected filter type. It can be one of these characters:
@@ -92,12 +92,13 @@
             // 7: GreaterThanOrEquals
             // 8: LessThanOrEquals
             #endregion
-            
-            
-                var values = new string[] {$"TrainingLog.Status__1__{status}" };
+
+            if (Label != "Training Assign")
+            {
+                var values = new string[] { $"TrainingLog.Status__1__{status}" };
                 query.Add("grid-filter", new StringValues(values));
-            
-            
+            }
+
         }
        
 
