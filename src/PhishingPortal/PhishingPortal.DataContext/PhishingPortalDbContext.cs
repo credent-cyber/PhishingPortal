@@ -9,8 +9,8 @@ namespace PhishingPortal.DataContext
     using Microsoft.Extensions.Options;
     using PhishingPortal.Domain;
     using PhishingPortal.Dto;
+    using PhishingPortal.Dto.Dashboard;
 
-   
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {
         static bool _recreateDb = false;
@@ -57,6 +57,7 @@ namespace PhishingPortal.DataContext
         public DbSet<TenantDomain> TenantDomain { get; set; }
         public DbSet<DemoRequestor> DemoRequestor { get; set; }
         public DbSet<AppLog> AppLog { get; set; }
+       
       
        
     }

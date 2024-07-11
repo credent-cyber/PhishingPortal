@@ -1,4 +1,5 @@
 ﻿using PhishingPortal.Dto;
+using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.Repositories
 {
@@ -20,6 +21,7 @@ namespace PhishingPortal.Repositories
         Task<Tenant> ConfirmRegistrationAsync(string uniqueId, string hash, string link);
 
         Task<Tenant> ConfirmDomainAsync(DomainVerificationRequest domain);
+        Task<AdminDashboardDto> GetAdminDashBoardStats();
 
         Task<string> UpsertDemoRequestor(DemoRequestor demoRequestor);
         Task<TenantDomain> UpsertTenantDomain(TenantDomain domain);

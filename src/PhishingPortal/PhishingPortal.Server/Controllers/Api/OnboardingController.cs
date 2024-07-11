@@ -13,6 +13,7 @@ using PhishingPortal.Repositories;
 namespace PhishingPortal.Server.Controllers
 {
     using Microsoft.AspNetCore.Identity.UI.Services;
+    using PhishingPortal.Dto.Dashboard;
     using PhishingPortal.Server.Controllers.Api.Abstraction;
 
     [Route("api/[controller]")]
@@ -292,6 +293,32 @@ namespace PhishingPortal.Server.Controllers
             await EmailSender.SendEmailAsync(to, subject, mailContent);
         }
 
-       
+
+        [HttpGet]
+        [Route("get-admin-statistics")]
+        public async Task<ApiResponse<AdminDashboardDto>> GetUserDashBoardStats()
+        {
+            var result = new ApiResponse<AdminDashboardDto>();
+
+            try
+            {
+                var user = User.Identity.Name;
+                var data = await tenatAdminRepo.GetAdminDashBoardStats();
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+
+
     }
 }
