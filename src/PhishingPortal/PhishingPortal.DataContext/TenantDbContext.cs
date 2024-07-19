@@ -38,6 +38,7 @@ namespace PhishingPortal.DataContext
         public DbSet<TrainingQuizQuestion> TrainingQuizQuestion { get; set; }
         public DbSet<TrainingQuizAnswer> TrainingQuizAnswer { get; set; }
         public DbSet<WeeklyReport> WeeklyReport { get; set; }
+        public DbSet<UserProfilePicUpld> UserProfilePicUpld { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

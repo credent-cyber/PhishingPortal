@@ -7,6 +7,8 @@ using Org.BouncyCastle.Asn1.X509;
 using System.Linq;
 using Humanizer;
 using Org.BouncyCastle.Asn1.Mozilla;
+using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace PhishingPortal.Repositories
 {
@@ -1797,8 +1799,117 @@ namespace PhishingPortal.Repositories
             return await Task.FromResult(data);
         }
 
+
         #endregion
 
         #endregion
+
+
+        #region Update User Profile Images
+        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePic(UserProfilePicUpld data)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+            
+
+           
+            try
+            {
+                var profilepicList = await TenantDbCtx.UserProfilePicUpld.Where(o => o.Email == data.Email).FirstOrDefaultAsync();
+               
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid ProfilePic data!";
+                    return result;
+                }
+
+                if (profilepicList != null )
+                {
+                    if(data.ProfileImage != null && data.ProfileImage.Length > 0)
+                    {
+                    profilepicList.ProfileImage = data.ProfileImage;
+
+                    }
+
+                    if (data.BackgroundImage != null && data.BackgroundImage.Length > 0)
+                    {
+                        profilepicList.BackgroundImage = data.BackgroundImage;
+
+                    }
+
+                    TenantDbCtx.Update(profilepicList);
+                    result.Message = "ProfilePic Successfully Updated.";
+                }
+                else
+                {
+
+                    TenantDbCtx.UserProfilePicUpld.Add(data);
+                    result.Message = "ProfilePic Successfully Inserted.";
+                }
+
+                TenantDbCtx.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<UserProfilePicUpld> GetProfilePicByEmail(string userEmail)
+        {
+            UserProfilePicUpld result = null;
+
+#pragma warning disable CS8600
+            result = TenantDbCtx.UserProfilePicUpld.FirstOrDefault(o => o.Email == userEmail);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld userProfilePicUpld)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+            try
+            {
+                var existing = TenantDbCtx.UserProfilePicUpld.First(x => x.Email == userProfilePicUpld.Email);
+                result.Result = existing;
+
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Product Category not found!";
+                    return result;
+                }
+                if (userProfilePicUpld.removePp == true)
+                {
+                    existing.ProfileImage = null;
+                    TenantDbCtx.Update(existing);
+                }
+                else
+                {
+                    existing.BackgroundImage = null;
+                    TenantDbCtx.Update(existing);
+                }
+
+                await TenantDbCtx.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
+
     }
 }

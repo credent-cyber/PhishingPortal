@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
@@ -704,7 +705,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
-         {
+        {
             List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
@@ -1111,7 +1112,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 return await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
 
-                
+
             }
             catch (Exception ex)
             {
@@ -1129,6 +1130,72 @@ namespace PhishingPortal.UI.Blazor.Client
             return data;
         }
 
+        #endregion
+
+
+        #region UserProfile Pic Upload
+        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePicAsync(UserProfilePicUpld data)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertProfilePic", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+
+
+        public async Task<UserProfilePicUpld> GetProfilePicByEmail()
+        {
+            UserProfilePicUpld data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetProfilePicByEmail");
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<UserProfilePicUpld>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+
+        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld profilePic)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteProfBgPic", profilePic);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
         #endregion
     }
 }
