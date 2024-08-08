@@ -43,6 +43,9 @@
             public const string WeeklyReport_IsEnabled = "weekly_report_enable";
             public const string WeeklyReport_Recipients = "weekly_report_recipients";
 
+            public const string GOOGLE_ClIENT_ID = "google_client_id";
+            public const string GOOGLE_CLIENT_SECRET = "google_client_secret";
+
             public static string MonitoredMailBoxFilters { get; set; }
         }
     }

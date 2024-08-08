@@ -33,26 +33,33 @@
                             </li>
                             <hr style="margin: 0;" />
                             <li class="@((block == 2) ? "active" : "")">
+                                <a @onclick='()=> { block = 2; heading = "Google App Configurations"; }'>
+                                    <img src="/img/icons/google.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Google App Configurations">
+                                    <span class="link_name">Google App Configurations</span>
+                                </a>
+                            </li>
+                            <hr style="margin: 0;" />
+                            <li class="@((block == 3) ? "active" : "")">
                                 <div class="iocn-link">
-                                    <a @onclick='()=> { block = 2; heading = "OnPremise AD Configurations"; }'>
+                                    <a @onclick='()=> { block = 3; heading = "OnPremise AD Configurations"; }'>
                                         <img src="/img/icons/AppCircles-AD.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="OnPremise AD Configurations">
                                         <span class="link_name">AD Configurations</span>
                                     </a>
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
-                            <li class="@((block == 3) ? "active" : "")">
+                            <li class="@((block == 4) ? "active" : "")">
                                 <div class="iocn-link">
-                                    <a @onclick='()=> { block = 3; heading = "Domain Configurations"; }'>
+                                    <a @onclick='()=> { block = 4; heading = "Domain Configurations"; }'>
                                         <img src="/img/icons/domain.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Domain Configurations">
                                         <span class="link_name">Domain Configurations</span>
                                     </a>
                                 </div>
                             </li>
                             <hr style="margin: 0;" />
-                            <li class="@((block == 4) ? "active" : "")">
+                            <li class="@((block == 5) ? "active" : "")">
                                 <div class="iocn-link">
-                                    <a @onclick='()=> { block = 4; heading = "Return Url Configurations"; }'>
+                                    <a @onclick='()=> { block = 5; heading = "Return Url Configurations"; }'>
                                         <img src="/img/icons/url.png" style="margin:5px 5px 5px 20px" height="30" alt="Icon" title="Return Url Configurations">
                                         <span class="link_name">Return Url Configurations</span>
                                     </a>
@@ -73,13 +80,17 @@
                             }
                             @if (block == 2)
                             {
-                                <OnPremiseADConfigurations />
+                                <GoogleAppConfigurations />
                             }
                             @if (block == 3)
                             {
-                                <TenantDomains />
+                                <OnPremiseADConfigurations />
                             }
                             @if (block == 4)
+                            {
+                                <TenantDomains />
+                            }
+                            @if (block == 5)
                             {
                                 <TenantRedirecUrls />
                             }

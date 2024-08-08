@@ -1,0 +1,164 @@
+﻿@page "/google-config"
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
+
+@inject TenantClient client
+@inject ILogger<TenantCampaigns> logger
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">Google App Configuration</h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Settings</a></li>
+                    <li class="breadcrumb-item"><a>Google-Configuration</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row m-1">
+    @* <UiAlerts Model="alert"></UiAlerts> *@
+    <EditForm Model="model" OnValidSubmit="OnSave">
+        <DataAnnotationsValidator />
+        <div class="form-group row mt-1">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Client ID</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.GoogleClientID" id="ClientID" class="form-control"></InputText>
+                <ValidationMessage For="() => model.GoogleClientID" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-form-label col-md-2 bold-font" style="padding-right: 0;">Client Secret</label>
+            <div class="col-md-10">
+                <InputText @bind-Value="@model.GoogleClientSecret" id="Clientkey" class="form-control"></InputText>
+                <ValidationMessage For="() => model.GoogleClientSecret" />
+            </div>
+        </div>
+
+        <hr />
+        <div class="mt-4" style="text-align:left;">
+            <button type="submit" class="btn btn-primary col-md-1">Save</button>
+        </div>
+    </EditForm>
+    <Dailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            @if (TaskCompleted)
+            {
+                <div style="text-align:center;">
+                    @MessageBody
+                </div>
+            }
+            else
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+        }
+
+    </Dailog>
+</div>
+
+
+@code {
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 1500;
+
+    bool IsError = false;
+    bool IsSuccess = false;
+    bool TaskCompleted = false;
+
+    private bool show = false;
+    string MessageBody = "Thank you!";
+
+    private GoogleRegistrationSettings model = new GoogleRegistrationSettings();
+
+
+    private string message = string.Empty;
+    private string secret = string.Empty;
+
+    private const string SecretMask = "*******************************************";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await client.GetSettings();
+        alert?.Clear();
+        if (settings.ContainsKey("google_client_id"))
+            model = new GoogleRegistrationSettings(settings);
+
+
+        secret = model.GoogleClientSecret;
+        model.GoogleClientSecret = SecretMask;
+    }
+
+    public async void OnSave()
+    {
+
+        if (model != null)
+        {
+            message = string.Empty;
+            MessageBody = "Thank you!";
+            IsError = false;
+            IsSuccess = false;
+            show = true;
+            TaskCompleted = false;
+
+            //alert?.Clear();
+            try
+            {
+                message = "Please wait";
+                if (model.GoogleClientSecret == SecretMask)
+                {
+                    model.GoogleClientSecret = secret;
+                }
+
+                var result = await client.UpsertSettings(model.ToSettingsDictionary());
+
+                model = new GoogleRegistrationSettings(result);
+
+                secret = model.GoogleClientSecret;
+                model.GoogleClientSecret = SecretMask;
+
+                //alert?.SetSuccess("saved!");
+                message = "Saved!";
+                TaskCompleted = true;
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                //alert?.SetError("Error while saving!");
+
+                logger.LogError(ex, ex.Message);
+                IsError = true;
+                message = "Error!";
+                MessageBody = ex.Message;
+                TaskCompleted = true;
+            }
+            // _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        }
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+    private void ResetForm()
+    {
+        show = false;
+    }
+}
