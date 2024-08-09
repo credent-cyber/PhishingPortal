@@ -45,7 +45,7 @@
             <a class="btn  btn-warning mb-2 col fa fa-windows" href="/oidc/challenge?returnUrl=@(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl)&provider=Microsoft"> Office 365 User</a>
 
             <!-- Google Login Button -->
-            <a class="btn  btn-danger mb-4 col fa fa-google" href="/oidc/challenge?returnUrl=@(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl)&provider=Google"> Login with Google</a>
+            <a class="btn  btn-danger mb-4 col fa fa-google" href="/googleoauth/challenge?returnUrl=@(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl)&provider=Google"> Login with Google</a>
 
 
 
