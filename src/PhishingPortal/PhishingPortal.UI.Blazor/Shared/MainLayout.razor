@@ -2,6 +2,7 @@
 @using PhishingPortal.UI.Blazor.Models
 @inherits LayoutComponentBase
 @using PhishingPortal.UI.Blazor.Pages
+@using PhishingPortal.UI.Blazor.Pages.Home
 
 
 <div class="">
@@ -23,9 +24,8 @@
 
         <AuthorizeView>
             <NotAuthorized>
-                @* <LoginDisplay /> *@
                 <LoginHome />
-                <SlideShow />
+                @* <SlideShow /> *@
             </NotAuthorized>
 
         </AuthorizeView>

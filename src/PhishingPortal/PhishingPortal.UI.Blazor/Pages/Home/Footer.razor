@@ -1,0 +1,222 @@
+﻿<style>
+
+    .footer {
+        background-color: #1d1d1d;
+        color: #fff;
+        padding: 30px 180px;
+    }
+
+    .footer-heading-1 {
+        display: flex;
+        align-items: center; /* Aligns items in the center vertically */
+        margin-bottom: 20px; /* Adds some space below the heading */
+        position: relative; /* Allows positioning of pseudo-element for the underline */
+    }
+
+        .footer-heading-1 img {
+            max-height: 45px;
+            padding: 5px 0;
+            border-radius: 10px;
+            margin-right: 15px; /* Adds space between the logo and the heading */
+        }
+
+        .footer-heading-1 h1 {
+            font-size: 40px;
+            margin: 0;
+            color: white;
+            position: relative;
+        }
+
+            .footer-heading-1 h1::after {
+                content: "";
+                display: block;
+                height: 2px;
+                background-color: #5ba7ff;
+                position: absolute;
+                left: 0;
+                bottom: -10px; /* Adjust the position if needed */
+                width: 100%;
+            }
+
+   /*  .footer-left-main h2 {
+        border-bottom: 2px solid #5ba7ff;
+        padding-bottom: 10px;
+        margin-top: 15px;
+        font-size: 35px;
+        color: white;
+    } */
+
+    .footer-right-main h2 {
+        border-bottom: 2px solid #5ba7ff;
+        padding-bottom: 10px;
+        margin-top: 15px;
+        font-size: 35px;
+        color: white;
+    }
+
+    .footer-2 {
+        background-color: #5ba7ff;
+        text-align: center;
+        padding: 10px 0;
+        color: #fff;
+        font-size: 12px;
+    }
+
+    .social-icon i {
+        font-size: 24px;
+        color: #5ba7ff;
+        margin: 10px;
+    }
+
+    .form-control {
+        background-color: #2c2c2c;
+        color: #ffffff;
+        border: 1px solid #333333;
+    }
+
+        .form-control:focus {
+            box-shadow: none;
+        }
+
+    .btn-primary {
+        background-color: #5ba7ff;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #1034A6;
+        }
+
+    @@media (max-width: 768px) {
+        .footer {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .footer-left-main, .footer-right-main {
+            width: 100%;
+            max-width: none;
+            padding: 0;
+        }
+
+        .footer-heading-1 h1 {
+            font-size: 24px;
+        }
+
+        .footer-right-main h2 {
+            font-size: 24px;
+        }
+    }
+
+    .footer-heading-1 {
+        display: flex;
+        border-bottom: 2px solid #5ba7ff;
+        padding-bottom: 10px;
+        top: 11px;
+    }
+</style>
+
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 footer-left-main">
+                <div class="footer-heading-1">
+                    <img src="/assets/images/logo.png" alt="Logo" class="bg-light">
+                    <h2 class="text-white m-0">PhishSims</h2>
+                </div>
+                <div class="footer-left-content-1">
+                    <div class="f-c-heading1">
+                        <p>CONNECT</p>
+                    </div>
+                    <div class="d-flex justify-content-between flex-wrap mb-4">
+                        <div>
+                            <p>NINJIO, LLC</p>
+                            <p>880 Hampshire Rd. Suite B</p>
+                            <p>Westlake Village, CA 91361</p>
+                        </div>
+                        <div>
+                            <p>+1 805 864 1999</p>
+                            <p>hello@ninjio.com</p>
+                            <p>www.ninjio.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-left-content-2">
+                    <div class="f-c-heading2">
+                        <p>NAVIGATE</p>
+                    </div>
+                    <div class="d-flex justify-content-between flex-wrap mb-4">
+                        <div>
+                            <p>CONTACT</p>
+                            <p>FREE TRIAL</p>
+                        </div>
+                        <div>
+                            <p>PRIVACY + COOKIES</p>
+                            <p>TERMS & CONDITIONS</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-left-content-3">
+                    <div class="f-c-heading3">
+                        <p>SOCIALIZE</p>
+                    </div>
+                    <div class="social-icon">
+                        <i class="fab fa-linkedin"></i>
+                        <i class="fab fa-facebook-f"></i>
+                        <i class="fab fa-twitter"></i>
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 footer-right-main">
+                <h2>SPEAK WITH AN EXPERT</h2>
+                <form>
+                    <div class="form-row mb-4">
+                        <div class="form-group col-md-6">
+                            <input type="text" class="form-control" name="first-name" placeholder="First Name*" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="text" class="form-control" name="last-name" placeholder="Last Name*" required>
+                        </div>
+                    </div>
+                    <div class="form-row mb-4">
+                        <div class="form-group col-md-6">
+                            <input type="email" class="form-control" name="business-email" placeholder="Business Email*" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="text" class="form-control" name="company-name" placeholder="Company Name*" required>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <p>How many users need training?*</p>
+                        <select class="form-control" name="users-training" required>
+                            <option value="" disabled selected>Please Select</option>
+                            <option value="1-10">1-10</option>
+                            <option value="11-50">11-50</option>
+                            <option value="51-100">51-100</option>
+                            <option value="100+">100+</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-4">
+                        <input type="text" class="form-control" name="hear-about" placeholder="How did you hear about PhishSims?*" required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <p>Best contact number to reach you*</p>
+                        <input type="tel" class="form-control" name="contact-number" placeholder="Best contact number to reach you" required>
+                    </div>
+                    <div class="form-group mb-4">
+                        <p>Please provide an accurate user count to ensure the correct NINJIO representative is assigned to you.</p>
+                        <div class="form-check">
+                            <input type="checkbox" style="top: -3px;" class="form-check-input" id="agree" name="agree" required>
+                            <label class="form-check-label" for="agree">I agree to the terms and conditions</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer-2">
+    <p>© @DateTime.Now.Year PhishSims, LLC. All Rights Reserved.</p>
+</div>

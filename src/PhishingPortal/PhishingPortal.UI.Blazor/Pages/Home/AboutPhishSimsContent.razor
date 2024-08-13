@@ -1,0 +1,284 @@
+﻿@page "/about-phishsims"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@layout NoLayout
+@inject IJSRuntime jsRuntime
+
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #5ba7ff;
+        }
+
+    .home-1 {
+        display: flex;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .home-left {
+        width: 35%;
+        color: #fff;
+    }
+
+        .home-left h1 {
+            margin: 30px 0;
+            font-size: 40px;
+        }
+
+        .home-left p {
+            line-height: 25px;
+        }
+
+        .home-left button {
+            margin-top: 25px;
+            padding: 20px 30px;
+            font-size: 19px;
+            border: none;
+            background-color: #0530ad;
+        }
+
+            .home-left button a {
+                color: #fff;
+                font-weight: bolder;
+                text-decoration: none;
+            }
+
+    .home-right {
+        /* border: 1px solid black; */
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        width: 50%;
+    }
+
+        .home-right img {
+            height: 80%;
+        }
+        /**************** section-2 ----------*************/
+        .sec-2{
+            display: flex;
+            padding: 0 0px;
+            margin-bottom: 80px;
+        }
+        .box-1{
+            /* border: 1px solid white; */
+            width: 33;
+            padding: 40px;
+            color: #fff;
+            background-color: #1034A6;
+        }
+        .box-1 h1{
+            border-bottom: 2px solid white;
+            line-height: 55px;
+            margin-bottom: 25px;
+        }
+        .box-1 p{
+            line-height: 23px;
+            text-align: justify;
+        }
+        /******************* section-3 -----------------*************/
+        .sec-3 h1{
+            font-size: 40px;
+            text-align: center;
+            color: #fff;
+            margin: 60px 0;
+        }
+        .sec-3-1{
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+        .container-1{
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .container-1 img{
+            height: 200px;
+        }
+        .container-1 h2{
+            color: #333;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+        /*************** section-4 ------------******************/
+        .sec-4{
+            margin-top: 80px;
+            padding: 30px 80px;
+            color: #fff;
+            border-top: 3px solid #1034A6;
+            border-bottom: 3px solid #1034A6;
+            border-radius: 0px;
+            background-color: #1034A6;
+        }
+        .sec-4 h1{
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 40px;
+        }
+        .sec-4 p{
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ffffff;
+            line-height: 23px;
+        }
+
+
+        .section-2{
+            padding-top: 70px;
+            margin: 0 00px;
+        }
+        .section-2-heading{
+            text-align: center;
+            margin-bottom: 100px;
+            color: #fff;
+            font-size: 45px;
+            padding: 20px 00px;
+            background-color: #1034A6;
+        }
+        .box-12{
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            margin-bottom: 50px;
+        }
+        .left{
+            /* border: 1px solid black; */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 500px;
+        }
+        .left h1{
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .left p{
+            color: #fff;
+            font-size: 18px;
+            line-height: 25px;
+        }
+        
+        .right img{
+            height: 300px;
+            width: 500px;
+        }
+        .box-22{
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            margin-bottom: 50px;
+        }
+    </style>
+
+    <Header/>
+
+    <div class="home-1">
+        <div class="home-left">
+            <h1>About PhishSims</h1>
+            <p>PhishSims is a cutting-edge phishing simulation platform designed to strengthen organizational cybersecurity defenses. Our mission is to empower business with the tools and knowledge necessary to combat evolving cyber threats effectively.</p>
+        <a class="btn btn-primary rounded-pill" @onclick="Readmore">Read More</a>
+        </div>
+        <div class="home-right">
+            <img src="img/back-removebg-preview.png">
+        </div>
+    </div>
+    <div class="sec-2" id="read-more">
+        <div class="box-1">
+            <h1>Our Mission</h1>
+            <p>At phishSims, our mission is to empower organizations in their cybersecurity efforts by providing cutting-edge phishing simulation and training solutions. We believe that the key to a secure digital environment lies in proactive education and preparedness. Our goal is to help organizations identify vulnerabilities and equip their employees with the knowledge and skills needed to thwart phishing attacks effectively.</p>
+        </div>
+        <div class="box-1">
+            <h1>Who We Are</h1>
+            <p>PhishSims is a powerful phishing simulation platform designed to simulate real-world phishing attacks. Our advanced AI technology generates realistic phishing scenarios that help organizations uncover potential weaknesses in their cybersecurity defenses. By exposing employees to these simulations, we ensure they are better prepared to recognize and respond to actual phishing threats.</p>
+        </div>
+        <div class="box-1">
+            <h1>Our Approach</h1>
+            <p>We adopt a holistic approach to cybersecurity training. Our platform not only simulates phishing attacks via email, SMS, and WhatsApp but also provides comprehensive training modules tailored to each user's needs. By integrating interactive quizzes and detailed performance reports, we ensure continuous learning and improvement.</p>
+        </div>
+    </div>
+    <div class="sec-3">
+        <h1>Why Choose PhishSims?</h1>
+        <div class="sec-3-1">
+            <div class="container-1">
+                <img src="img/About1.jpg">
+                <h2>Comprehensive Simulation</h2>
+            </div>
+            <div class="container-1">
+                <img src="img/About2.jpg">
+                <h2>Risk Assessment</h2>
+            </div>
+            <div class="container-1">
+                <img src="img/About3.svg">
+                <h2>Interactive Training</h2>
+            </div>
+        </div>
+        <div class="sec-3-1">
+            <div class="container-1">
+                <img src="img/About4.png">
+                <h2>Real-Time Monitoring</h2>
+            </div>
+            <div class="container-1">
+                <img src="img/About5.gif">
+                <h2>Policy Enforcement</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-2">
+        <h1 class="section-2-heading">Services Provided By PhishSims</h1>
+        <div class="box-12">
+            <div class="left">
+                <h1>Email Phishing Prevention</h1>
+                <p>Our Email Phishing Prevention module is designed to equip users with the knowledge and skills necessary to recognize and avoid phishing attacks via email. Phishing emails are one of the most common methods cybercriminals use to steal personal information, distribute malware, and compromise security. This module provides comprehensive training to help users stay vigilant and secure.</p>
+            </div>
+            <div class="right">
+                <img src="img/About5.gif">
+            </div>
+        </div>
+        <div class="box-22">
+            <div class="right">
+                <img src="img/Cyber-News-Rundown_PhishingEmail_800x4001.gif">
+            </div>
+            <div class="left">
+                <h1>SMS Phishing Prevention</h1>
+                <p>Our SMS Phishing Prevention module provides detailed training to help users recognize and avoid phishing attacks delivered via SMS (text messages). SMS phishing, also known as smishing, is a growing threat as more people rely on mobile devices for communication. This module teaches users how to identify suspicious messages and take preventive measures.</p>
+            </div>
+        </div>
+        <div class="box-12">
+            <div class="left">
+                <h1>WhatsApp Phishing Prevention</h1>
+                <p>Our WhatsApp Phishing Prevention module is designed to help users stay safe on WhatsApp by teaching them how to identify and avoid phishing attempts on this popular messaging platform. WhatsApp phishing, also known as vishing (voice phishing) when voice messages are involved, can lead to significant security breaches if not properly addressed. This module provides practical tips and best practices to protect users from falling victim.</p>
+            </div>
+            <div class="right">
+                <img src="img/Round6.gif">
+            </div>
+        </div>
+    </div>
+    <div class="sec-4">
+        <h1>Join Us in the Fight Against Phishing</h1>
+        <p>Join the growing number of organizations that trust phishSims to safeguard their digital assets. Together, we can build a more secure future by educating and empowering employees to recognize and combat phishing attacks.</p>
+        <p>For more information or to schedule a demo, contact us today. Let's work together to make your organization resilient against phishing threats.</p>
+    </div>
+    <Footer/>
+
+@code {
+
+    public async Task Readmore()
+    {
+        await jsRuntime.InvokeVoidAsync("scrollToContent");
+    }
+}

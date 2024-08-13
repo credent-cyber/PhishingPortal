@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@inject CustomStateProvider StateProvider
+@inject IJSRuntime jsRuntime
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <a class="navbar-brand" style="background:none;" href="/">
+        <img src="/assets/images/logo.png" alt="Logo" style="height: 35px;">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about-phishsims">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="login?ReturnUrl=@(Navigation.Uri)">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+<style>
+    .navbar-nav .nav-link {
+        font-size: 18px; /* Increase font size */
+        font-weight: 500; /* Make font slightly bolder */
+        position: relative; /* For the underline effect */
+        transition: color 0.3s ease; /* Smooth color transition */
+    }
+
+        .navbar-nav .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #fff; /* Underline color */
+            transition: width 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #f9f9f9; /* Change text color on hover */
+        }
+
+            .navbar-nav .nav-link:hover::after {
+                width: 100%; /* Full width underline on hover */
+            }
+</style>

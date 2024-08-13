@@ -6,8 +6,10 @@ function toggleMobileMenu() {
         toggler.addEventListener("click", () => header.classList.toggle("showMenu"));
       });
 }
-    function scrollToContent() {
-            const contentSection = document.querySelector("#content-section");
-    contentSection.scrollIntoView({behavior: "smooth" });
-        }
-              
+function scrollToContent() {
+    var element = document.getElementById("read-more");
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+

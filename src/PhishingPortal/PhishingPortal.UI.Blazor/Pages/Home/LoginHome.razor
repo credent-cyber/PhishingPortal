@@ -1,0 +1,588 @@
+﻿@page "/login-home"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@inject CustomStateProvider StateProvider
+@inject IJSRuntime jsRuntime
+
+<style>
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #5ba7ff;
+    }
+    /* -------------------------------------------------p-navbar style-------------------------------------------------------- */
+    .p-navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #5ba7ff;
+        z-index: 1000;
+        transition: background-color 0.3s ease;
+    }
+
+    .p-navbar-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 40px;
+    }
+
+    .p-nav-logo {
+        height: 35px;
+    }
+
+    .p-nav-links {
+        list-style: none;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+
+        .p-nav-links li {
+            margin-left: 20px;
+        }
+
+            .p-nav-links li a {
+                color: #fff;
+                text-decoration: none;
+                position: relative;
+                padding: 10px 0;
+            }
+
+        .p-nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background-color: #fff;
+            transition: width 0.7s ease, left 0.7s ease;
+        }
+
+        .p-nav-links a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+    .menu-toggle1 {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+    }
+
+        .menu-toggle1 span {
+            width: 23px;
+            height: 3px;
+            background: #111;
+            margin: 2px 0;
+        }
+
+    #menu-toggle {
+        display: none;
+    }
+
+    section {
+        background-color: #5ba7ff;
+    }
+
+    .home-main {
+        height: 100vh;
+        margin-top: 55px;
+    }
+
+    .home-1 {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .home-details {
+        /* border: 1px solid black; */
+        width: 38%;
+        margin-top: 10%;
+        margin-left: 50px;
+    }
+
+        .home-details h1 {
+            color: #fff;
+            margin: 20px 0;
+            font-size: 40px;
+        }
+
+        .home-details h2 {
+            font-size: 33px;
+        }
+
+        .home-details p {
+            color: #f9f9f9;
+            font-size: 16px;
+            line-height: 23px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+    .home-btn {
+        margin: 30px 0;
+    }
+
+    .home-btn-1 {
+        padding: 20px 30px;
+        border-radius: 30px;
+        border: #fff;
+    }
+
+        .home-btn-1 a {
+            color: #111;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+    .home-btn-2 {
+        padding: 20px 30px;
+        border-radius: 30px;
+        border: 3px solid #fff;
+        background-color: #5ba7ff;
+        margin-left: 20px;
+    }
+
+        .home-btn-2 a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+    .home-btn-1:hover {
+        background-color: transparent;
+        border: 3px solid #fff;
+    }
+
+    .home-btn-2:hover {
+        /* background-color: red;
+                color: #111; */
+        font-size: 17px;
+    }
+
+    .home-img {
+        /* border: 1px solid black; */
+        width: 50%;
+        margin-top: 50px;
+    }
+
+        .home-img img {
+            height: 500px;
+        }
+
+    .home-bottom {
+        margin-top: -20px;
+    }
+
+        .home-bottom img {
+            height: 100px;
+            width: 100%;
+        }
+
+    .section-2 {
+        margin-top: -50px;
+        /* border: 1px solid black; */
+    }
+
+    .section-2-heading {
+        text-align: center;
+        margin-bottom: 100px;
+        color: #fff;
+        font-size: 45px;
+        padding: 0 100px;
+    }
+
+    .box-1 {
+        display: flex;
+        justify-content: center;
+        gap: 100px;
+        margin-bottom: 50px;
+    }
+
+    .left {
+        /* border: 1px solid black; */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 500px;
+    }
+
+        .left h1 {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .left p {
+            color: #fff;
+            font-size: 18px;
+            line-height: 25px;
+        }
+
+    .right img {
+        height: 300px;
+        width: 500px;
+    }
+
+    .box-2 {
+        display: flex;
+        justify-content: center;
+        gap: 100px;
+        margin-bottom: 50px;
+    }
+
+    .section-3 {
+        display: flex;
+        margin-top: 120px;
+        margin-bottom: 50px;
+    }
+
+    .sec-detail {
+        display: flex;
+        border-top: 1px solid #1034A6;
+        border-bottom: 1px solid #1034A6;
+        margin: 0 100px;
+        width: 100%;
+        height: 150px;
+    }
+
+    .left-main, .right-main {
+        display: flex;
+    }
+
+    .left-detail, .right-detail {
+        display: flex;
+    }
+
+    .left-3 p {
+        border: 4px solid white;
+        border-radius: 50%;
+        padding: 0 7px;
+        color: white;
+        font-size: 26px;
+        font-weight: bolder;
+        margin: 40px 55px;
+    }
+
+    .right-3 {
+        width: 100px;
+        margin-top: 40px;
+    }
+
+        .right-3 p {
+            color: #fff;
+            font-size: 13px;
+            line-height: 1.23077em;
+            margin-bottom: 10px;
+        }
+    /*** ------------------------------------------section-4-------------------- ****/
+    .section-4 {
+        margin-top: 100px;
+    }
+
+    .sec-4-heading {
+        text-align: center;
+        margin: 70px 0;
+    }
+
+        .sec-4-heading p {
+            letter-spacing: .1rem;
+            color: #1034A6;
+            font-weight: bold;
+        }
+
+        .sec-4-heading h1 {
+            font-size: 55px;
+            font-weight: bolder;
+            color: #fff;
+        }
+
+    .sec-4-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin: 0 180px;
+    }
+
+    .p-container1 {
+        color: #fff;
+        border: 2px solid #1034A6;
+        box-shadow: 0 0 3px blue;
+        padding: 30px 25px;
+        border-radius: 1.5rem;
+        width: 25%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .p-container1:hover {
+            transform: scale(1.1); /* Adjust the scale factor as needed */
+            box-shadow: 0 0 10px blue; /* Optional: Adjust the box-shadow on hover */
+        }
+
+        .p-container1 h1 {
+            color: #1034A6;
+            margin-bottom: 20px;
+            letter-spacing: .1rem;
+            font-size: 30px;
+        }
+
+        .p-container1 p {
+            font-size: 16.5px;
+            line-height: 23px;
+        }
+
+    .p-container1-p2 {
+        margin-top: 47px;
+    }
+
+    .p-container1-p4 {
+        margin-top: 42px;
+    }
+    /****************** section-5 ----------------------*************************/
+    .section-5 {
+        display: flex;
+        margin-top: 100px;
+        padding: 0 170px;
+    }
+    /* .left-5{
+                border: 1px solid black;
+                width: 100%;
+            } */
+    .left-5 h1 {
+        color: #fff;
+        font-size: 50px;
+        margin-bottom: 30px;
+    }
+
+    .left-5 p {
+        font-size: clamp(15px, 1.25vw, 17px);
+        line-height: 25px;
+        margin-bottom: 20px;
+        color: #fff;
+    }
+
+    .left-5 h2 {
+        color: #1034A6;
+        padding: 5px 5px;
+        font-weight: bolder;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #1034A6;
+        width: auto;
+    }
+
+    .right-5 {
+        margin-left: 200px;
+    }
+
+    .service-1 {
+        border: 2px solid #1034A6;
+        box-shadow: 0 0 3px blue;
+        width: 100%;
+        padding: 30px 25px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+        .service-1 h1 {
+            color: #1034A6;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        .service-1 p {
+            color: #fff;
+            font-size: 17px;
+            line-height: 23px;
+        }
+</style>
+
+<Header />
+
+<section>
+    <div class="home-main">
+        <div class="home-1">
+            <div class="home-details">
+                <h1 style="font-family:cursive">Why <span style="color:brown">Phish</span><span style="color:black">sims</span>?</h1>
+                <h2 style="font-family: monospace; color: gainsboro;">Assessing human risk is crucial for safeguarding your business.</h2>
+                <p style="color: greenyellow;">Phishsims is a powerful phishing simulation platform designed to empower organisations in their cybersecurity efforts. By simulating real-world phishing attacks, Phishsims helps organisations identify vulnerabilities in their systems and educate employees on the importance of cybersecurity best practices.</p>
+                <div class="home-btn">
+                    <button class="btn btn-primary rounded-pill" @onclick="Readmore">Read More</button>
+                    <a href="/request_demo" class="btn btn-secondary rounded-pill">Request Demo</a>
+                </div>
+            </div>
+            <div class="home-img">
+                <img src="img/phishing.png" class="img-fluid" alt="Phishing Illustration">
+            </div>
+        </div>
+        <div class="home-bottom">
+            <img src="img/svg5.png" class="img-fluid" alt="Decorative Image">
+        </div>
+    </div>
+
+    <div class="section-2" id="read-more">
+        <h1 class="section-2-heading">Revolutionize Security Awareness: Human Risk Management as the Solution</h1>
+        <div class="box-1">
+            <div class="left">
+                <h1>Key Features of Cyber Awareness Training</h1>
+                <p>Discover and address the unique security knowledge gaps of each user by automaticaly implementing tailored training programs aimed at mitigating their specific risks.</p>
+            </div>
+            <div class="right">
+                <img src="img/About5.gif">
+            </div>
+        </div>
+        <div class="box-2">
+            <div class="right">
+                <img src="img/Cyber-News-Rundown_PhishingEmail_800x4001.gif">
+            </div>
+            <div class="left">
+                <h1>Effortless Deployment: Seamlessly Automate and Onboard</h1>
+                <p>Deploying PhishSims is effortless thanks to its fully cloud-based infrastructure , smooth integrations, and user-friendly onboarding process.</p>
+            </div>
+        </div>
+        <div class="box-1">
+            <div class="left">
+                <h1>Streamline Ongoing Learning with PhishSims</h1>
+                <p>Generic training that applies to everyone is ineffective. That's why PhishSims takes a personalized approach, identifying each user's specific risk areas.</p>
+            </div>
+            <div class="right">
+                <img src="img/Round6.gif">
+            </div>
+        </div>
+        <div class="box-2">
+            <div class="right">
+                <img src="img/website.gif">
+            </div>
+            <div class="left">
+                <h1>Instant Human Support When You Need it</h1>
+                <p>With PhishSims, you get real-time support that prioritizes fast resolutions over mere responses.</p>
+            </div>
+        </div>
+    </div>
+    <div class="section-3">
+        <div class="sec-detail">
+            <div class="left-main">
+                <div class="left-detail">
+                    <div class="left-3">
+                        <p>&#10003;</p>
+                    </div>
+                    <div class="right-3">
+                        <p>Gamification- Badges for completing modules and passing quizzes.</p>
+                    </div>
+                </div>
+                <div class="left-detail">
+                    <div class="left-3">
+                        <p>&#10003;</p>
+                    </div>
+                    <div class="right-3">
+                        <p>Periodic updates to training modules with the latest phishing tactics.</p>
+                    </div>
+                </div>
+                <div class="left-detail">
+                    <div class="left-3">
+                        <p>&#10003;</p>
+                    </div>
+                    <div class="right-3">
+                        <p>Access to articles, videos, and infographics on cybersecurity and phishing prevention.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="right-main">
+                <div class="right-detail">
+                    <div class="left-3">
+                        <p>&#10003;</p>
+                    </div>
+                    <div class="right-3">
+                        <p>A dedicated support section with frequently asked question</p>
+                    </div>
+                </div>
+                <div class="right-detail">
+                    <div class="left-3">
+                        <p>&#10003;</p>
+                    </div>
+                    <div class="right-3">
+                        <p>A personalized dashboard where users can track their progress, view reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section-4">
+        <div class="sec-4-heading">
+            <p>FEATURES</p>
+            <h1>Why you need it</h1>
+        </div>
+        <div class="sec-4-container">
+            <div class="p-container1">
+                <h1>AI-Generated Phishing Templates</h1>
+                <p>Our advanced AI creates realistic phishing scenarios to test and train you effectively.</p>
+            </div>
+            <div class="p-container1 ">
+                <h1>Personalized Training</h1>
+                <p class="p-container1-p2">Tailored training programs for users who get phished, ensuring they learn from their mistakes.</p>
+            </div>
+            <div class="p-container1">
+                <h1>Detailed Performance Reports</h1>
+                <p class="p-container1-p3">Track your progress with detailed reports and graphs.</p>
+            </div>
+            <div class="p-container1">
+                <h1>Interactive Quizzes</h1>
+                <p class="p-container1-p4">Test your knowledge with engaging quizzes and scenarios.</p>
+            </div>
+        </div>
+    </div>
+    <div class="section-5">
+        <div class="left-5">
+            <h1>What it is</h1>
+            <p>ESET Cybersecurity Awareness Training is specifically designed to educate your workforce—because employees who recognize phishing, avoid online scams and understand internet best practices add a vital layer of protection for your business.</p>
+            <p>Newly updated for 2023, this online security awareness training course takes under 90 minutes to complete. Employees enjoy an engaging learning experience through gamified quizzes, interactive sessions and role playing—all proven methods of improving adoption and retention.</p>
+            <h2>Quiz</h2>
+            <p>Test your knowledge with our interactive quiz. Answer a mix of multiple-choice and scenario-based questions to demonstrate your understanding.</p>
+            <p>Achieve a score of at least 70% to pass the quiz and receive your completion certificate.</p>
+            <p>Didn't pass? No worries. You can retake the quiz until you achieve the required score.</p>
+            <h2>Reports</h2>
+            <p>Track your progress with detailed reports. View your overall score, section-wise performance, and personalized feedback.
+            <p>Organizations can monitor employee progress with aggregate reports, helping to identify areas for improvement and ensure comprehensive training.</p>
+            </p>
+        </div>
+        <div class="right-5">
+            <div class="service-1">
+                <h1>Email Phishing Prevention</h1>
+                <p>Learn how to identify and avoid email phishing attacks with our interactive training module. Understand common tactics and best practices to stay safe.</p>
+            </div>
+            <div class="service-1">
+                <h1>SMS Phishing Prevention</h1>
+                <p>Protect yourself from SMS phishing with our detailed training module. Learn to recognize suspicious messages and take preventive measures.</p>
+            </div>
+            <div class="service-1">
+                <h1>WhatsApp Phishing Prevention</h1>
+                <p>Stay safe on WhatsApp by learning to identify phishing attempts. Our training module provides tips and best practices to avoid falling victim.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<Footer />
+@code {
+    bool toggleCss = false;
+    public async Task Readmore()
+    {
+        await jsRuntime.InvokeVoidAsync("scrollToContent");
+    }
+
+
+    public void ToggleMenu()
+    {
+        toggleCss = !toggleCss;
+    }
+}
