@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Graph;
+using Microsoft.Owin;
+using Microsoft.Owin.Host.SystemWeb;
 using PhishingPortal.Domain;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace PhishingPortal.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class GoogleOAuthController : Controller
     {
         private const string ClaimTypeName = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name";
@@ -26,8 +26,10 @@ namespace PhishingPortal.Server.Controllers
 
         [HttpGet]
         [Route("challenge")]
-        public IActionResult Challenge([FromQuery] string returnUrl, string provider)
+        public IActionResult Challenge()
         {
+            string returnUrl = Url.Action(nameof(Callback), "GoogleOAuth", null, Request.Scheme);
+            string provider = "Google";
             var redirectUrl = Url.Action(nameof(Callback), "GoogleOAuth", new { returnUrl });
 
             var authProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -39,6 +41,7 @@ namespace PhishingPortal.Server.Controllers
         [Route("callback")]
         public async Task<IActionResult> Callback(string returnUrl = "")
         {
+
             var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
             var info = await SignInManager.GetExternalLoginInfoAsync();
             if (info == null)
@@ -46,17 +49,8 @@ namespace PhishingPortal.Server.Controllers
                 return Redirect("/login");
             }
 
-            var claims = result.Principal.Claims;
-
-            // Log or inspect claims
-            foreach (var claim in claims)
-            {
-                // You can log the claims to see what is being provided
-                System.Diagnostics.Debug.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-            }
-
-            var name = claims.FirstOrDefault(o => o.Type == ClaimTypeName)?.Value;
-            var email = claims.FirstOrDefault(o => o.Type == ClaimTypeEmailAddress)?.Value;
+            var name = result?.Principal?.Claims?.FirstOrDefault(o => o.Type == ClaimTypeName)?.Value;
+            var email = result?.Principal?.Claims?.FirstOrDefault(o => o.Type == ClaimTypeEmailAddress)?.Value;
 
             var user = await UserManager.FindByEmailAsync(email);
             if (user == null)
@@ -85,6 +79,7 @@ namespace PhishingPortal.Server.Controllers
             {
                 // Add the role claim if it doesn't exist
                 var addRoleClaimResult = await UserManager.AddClaimAsync(user, roleClaim);
+                
             }
 
             var signInResult = await SignInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
@@ -103,7 +98,8 @@ namespace PhishingPortal.Server.Controllers
         {
             var providers = SignInManager.GetExternalAuthenticationSchemesAsync().Result;
 
-            return Ok(providers.Select(o => $"googleoauth/challenge?returnUrl={HttpContext.Request.Scheme}://{HttpContext.Request.Host}:{HttpContext.Request.Host.Port}&provider={o.Name}"));
+            return Ok(providers.Select(o => $"GoogleOAuth/challenge?returnUrl={HttpContext.Request.Scheme}://{HttpContext.Request.Host}:{HttpContext.Request.Host.Port}&provider={o.Name}"));
         }
+
     }
 }

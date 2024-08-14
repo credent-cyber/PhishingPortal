@@ -28,6 +28,7 @@ namespace PhishingPortal.Server.Controllers
         [Route("challenge")]
         public IActionResult Challenge([FromQuery] string returnUrl, string provider)
         {
+            string baseUrl = $"{Request.Scheme}://{Request.Host.Value}/";
             var redirectUrl = Url.Action(nameof(Callback), "Oidc", new { returnUrl });
 
             var authProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
