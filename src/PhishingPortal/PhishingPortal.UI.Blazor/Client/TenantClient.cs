@@ -9,6 +9,8 @@ using PhishingPortal.Dto.Dashboard;
 using PhishingPortal.UI.Blazor.Pages;
 using System;
 using System.Net.Http.Json;
+using System.Text.Json;
+
 
 namespace PhishingPortal.UI.Blazor.Client
 {
@@ -1164,8 +1166,12 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 var res = await HttpClient.GetAsync($"api/tenant/GetProfilePicByEmail");
                 res.EnsureSuccessStatusCode();
-
-                data = await res.Content.ReadFromJsonAsync<UserProfilePicUpld>();
+                var responseContent = await res.Content.ReadAsStringAsync();
+                if (!string.IsNullOrWhiteSpace(responseContent))
+                {
+                    // Deserialize the response content to UserProfilePicUpld object
+                    data = JsonSerializer.Deserialize<UserProfilePicUpld>(responseContent);
+                }
 
             }
             catch (Exception ex)

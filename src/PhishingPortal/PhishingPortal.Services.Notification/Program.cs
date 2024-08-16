@@ -17,6 +17,7 @@ using PhishingPortal.Services.Notification.Sms.DndSms;
 using PhishingPortal.Services.Notification.Email.AppNotifications;
 using PhishingPortal.Services.Notification.UrlShortner;
 using PhishingPortal.Services.Notification.WeeklySummaryReport;
+using PhishingPortal.Services.Notification.TrainingReminder;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureHostConfiguration(hostBuilder =>
@@ -110,6 +111,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IAppEventNotifier, AppEventNotifier>();
         services.AddSingleton<IUrlShortner, UrlShortner>();
         services.AddSingleton<IWeeklyReportExecutor, WeeklyReportExecutor>();
+        services.AddSingleton<ITrainingRemindExecutor, TrainingRemindExecutor>();
 
         services.AddHostedService<Worker>();
 
