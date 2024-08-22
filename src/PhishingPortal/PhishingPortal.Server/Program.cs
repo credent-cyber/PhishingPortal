@@ -145,7 +145,9 @@ if (!useWindowsAuthentication)
             googleOptions.ClientId = googleClientId;
             googleOptions.ClientSecret = googleClientSecret;
             googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
-            googleOptions.CallbackPath = new PathString("/signin-google");
+            //googleOptions.CallbackPath = new PathString("/signin-google");// This should match with the Google redirect URI
+
+
         })
         .AddIdentityCookies();
 }

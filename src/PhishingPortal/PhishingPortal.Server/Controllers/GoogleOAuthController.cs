@@ -28,9 +28,11 @@ namespace PhishingPortal.Server.Controllers
         [Route("challenge")]
         public IActionResult Challenge()
         {
+            string baseUrl = $"{Request.Scheme}://{Request.Host.Value}/";
             string returnUrl = Url.Action(nameof(Callback), "GoogleOAuth", null, Request.Scheme);
             string provider = "Google";
-            var redirectUrl = Url.Action(nameof(Callback), "GoogleOAuth", new { returnUrl });
+            var redirectUrl = Url.Action(nameof(Callback), "GoogleOAuth", new { baseUrl }); //https://localhost:7018/GoogleOAuth/callback
+
 
             var authProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 
@@ -39,7 +41,7 @@ namespace PhishingPortal.Server.Controllers
 
         [HttpGet]
         [Route("callback")]
-        public async Task<IActionResult> Callback(string returnUrl = "")
+        public async Task<IActionResult> Callback(string returnUrl = "/")
         {
 
             var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
