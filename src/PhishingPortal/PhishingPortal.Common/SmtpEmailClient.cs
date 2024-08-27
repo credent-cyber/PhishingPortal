@@ -112,8 +112,8 @@
                 //_smtpConfig.IsSendingEnabled = true;
 #endif
 
-                if (_smtpConfig.IsSendingEnabled)
-                    await SmtpClient.SendMailAsync(message);
+                if (_smtpConfig.IsSendingEnabled) ;
+                // await SmtpClient.SendMailAsync(message);
                 else
                 {
                     Logger.LogWarning($"Sending emails is disabled at moment");
