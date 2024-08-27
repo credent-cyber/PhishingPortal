@@ -87,7 +87,7 @@ namespace PhishingPortal.Common
 
                 SmtpClient oSmtp = new SmtpClient();
 
-                if (_config.IsSendingEnabled)
+                if (!_config.IsSendingEnabled)
                     Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
                 else
                     oSmtp.SendMail(oServer, oMail);

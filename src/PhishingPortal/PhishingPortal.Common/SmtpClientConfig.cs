@@ -7,7 +7,7 @@ namespace PhishingPortal.Common
     public class SmtpClientConfig
     {
 
-        public bool IsSendingEnabled { get; set; } = false;
+        public bool IsSendingEnabled { get; set; } = true;
         public string Server { get; set; } = "smtp.gmail.com";
         public int Port { get; set; } = 587;
         public string From { get; set; } = "admin@phish.credentinfotech.com";
