@@ -1,14 +1,11 @@
 ﻿namespace PhishingPortal.Server.Intrastructure
 {
-
     using Microsoft.AspNetCore.OData;
-    using Microsoft.AspNetCore.OData.Routing.Attributes;
     using Microsoft.OData.Edm;
     using Microsoft.OData.ModelBuilder;
     using PhishingPortal.Dto;
     using PhishingPortal.Server.Intrastructure.ActionFilters;
-    using System.Web.Http;
-    [Authorize]
+
     [ODataAuthorize]
     public static class ODataHelper
     {
