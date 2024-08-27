@@ -26,13 +26,10 @@ namespace PhishingPortal.Server.Controllers
 
         [HttpGet]
         [Route("challenge")]
-        public IActionResult Challenge()
+        public IActionResult Challenge([FromQuery] string returnUrl, string provider)
         {
             string baseUrl = $"{Request.Scheme}://{Request.Host.Value}/";
-            string returnUrl = Url.Action(nameof(Callback), "GoogleOAuth", null, Request.Scheme);
-            string provider = "Google";
-            var redirectUrl = Url.Action(nameof(Callback), "GoogleOAuth", new { baseUrl }); //https://localhost:7018/GoogleOAuth/callback
-
+            var redirectUrl = Url.Action(nameof(Callback), "GoogleOAuth", new { returnUrl }); //https://localhost:7018/GoogleOAuth/callback
 
             var authProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 
