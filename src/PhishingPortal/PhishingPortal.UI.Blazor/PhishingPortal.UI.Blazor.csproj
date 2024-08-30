@@ -35,10 +35,15 @@
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.chartjs\6.0.8\contentFiles\any\net6.0\wwwroot\lib\Chart.js\helpers.esm.js" />
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.chartjs\6.0.8\contentFiles\any\net6.0\wwwroot\lib\Chart.js\helpers.esm.min.js" />
 	  <Content Remove="C:\Users\ChhaganSinha\.nuget\packages\psc.blazor.components.codesnippet\1.0.3\contentFiles\any\net6.0\wwwroot\codesnippet.js" />
+	  <Content Remove="wwwroot\scripts\TrackUser.js" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="App.razor~RFd000aa3.TMP" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="wwwroot\scripts\TrackUser.js" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -1447,6 +1452,7 @@
 	  <None Include="wwwroot\assets\font-awesome\webfonts\fa-regular-400.woff2" />
 	  <None Include="wwwroot\assets\font-awesome\webfonts\fa-solid-900.svg" />
 	  <None Include="wwwroot\assets\font-awesome\webfonts\fa-solid-900.woff2" />
+	  <None Include="wwwroot\scripts\TrackUser.js" />
 	  <None Include="wwwroot\summernote\font\summernote.woff2" />
 	  <None Include="wwwroot\summernote\jquery-3.4.1.slim.min.js" />
 	  <None Include="wwwroot\summernote\plugin\databasic\summernote-ext-databasic.js" />

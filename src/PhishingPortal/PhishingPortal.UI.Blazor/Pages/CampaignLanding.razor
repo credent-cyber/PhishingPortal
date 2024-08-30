@@ -1,16 +1,18 @@
 ﻿@page "/cmpgn/{TenantId}/{Key}/{Url?}"
 @page "/cmp/{TenantId}/{Key}/{Url?}"
 
-@*<h3>@Title</h3>*@
-@attribute [AllowAnonymous]
+@* @page "/track" *@
+
 @using PhishingPortal.Dto
 @using PhishingPortal.UI.Blazor.Client
 
 @inject TenantClient client
-@inject HttpClient httpClient;
+@inject HttpClient httpClient
 @inject ILogger<TenantCampaigns> logger
 @inject NavigationManager navigation
+@inject IJSRuntime JSRuntime
 @layout NoLayout
+@attribute [AllowAnonymous]
 
 <div class="auth-wrapper" style="background:skyblue !important;">
     <div style="width:600px;">
@@ -24,8 +26,8 @@
     </div>
 </div>
 
-@code {
 
+@code {
     public string Title { get; set; } = "Wait ....";
 
     [Parameter]
@@ -37,16 +39,39 @@
     [Parameter]
     public string Url { get; set; } = string.Empty;
 
+    // Client details
+    public string Ip { get; set; }
+    public string Latitude { get; set; }
+    public string Longitude { get; set; }
+    public string City { get; set; }
+    public string Region { get; set; }
+    public string Country { get; set; }
+    public string Browser { get; set; }
+    public string OS { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        // load campaign data
-        // validate campaign
-        // update campaign hit if valid
+        // Get client details
+        await GetClientDetails();
 
         try
         {
-            var payload = new GenericApiRequest<string>() { Param = Key };
-            var result = await httpClient.PostAsJsonAsync<GenericApiRequest<string>>($"api/tenant/campaign-hit?t={TenantId}", payload);
+            var payload = new CampaignHitRequest
+                {
+                    Key = Key,
+                    ClientDetails = new ClientDetails
+                    {
+                        Ip = Ip,
+                        Latitude = Latitude,
+                        Longitude = Longitude,
+                        City = City,
+                        Region = Region,
+                        Country = Country,
+                        Browser = Browser,
+                        OS = OS
+                    }
+                };
+            var result = await httpClient.PostAsJsonAsync($"api/tenant/campaign-hit?t={TenantId}", payload);
             result.EnsureSuccessStatusCode();
 
             if (result.IsSuccessStatusCode)
@@ -56,22 +81,48 @@
                 if (content != null)
                     Url = content.Result;
 
-                //System.Threading.Thread.Sleep(5000);
-                //Redirect();
+                // Redirect
+                Redirect();
             }
             else
             {
                 navigation.NavigateTo("/error");
             }
-
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, ex.Message);
             navigation.NavigateTo("/error");
         }
+    }
 
-        await Task.CompletedTask;
+    private async Task GetClientDetails()
+    {
+        try
+        {
+            // Call JavaScript function to get client details
+            var dotNetObject = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("getClientDetails", dotNetObject);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to retrieve client details: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public void ReceiveClientDetails(ClientDetails details)
+    {
+        Ip = details.Ip;
+        Latitude = details.Latitude;
+        Longitude = details.Longitude;
+        City = details.City;
+        Region = details.Region;
+        Country = details.Country;
+        Browser = details.Browser;
+        OS = details.OS;
+
+       // logger.LogInformation($"Client Details: IP: {Ip}, Latitude: {Latitude}, Longitude: {Longitude}, City: {City}, Region: {Region}, Country: {Country}, Browser: {Browser}, OS: {OS}");
     }
 
     private void Redirect()
@@ -95,11 +146,12 @@
 
     protected override void OnAfterRender(bool firstRender)
     {
-        @if (!firstRender)
+        if (firstRender)
         {
-            System.Threading.Thread.Sleep(5000);
+            System.Threading.Thread.Sleep(2000);
             Redirect();
         }
     }
 
 }
+

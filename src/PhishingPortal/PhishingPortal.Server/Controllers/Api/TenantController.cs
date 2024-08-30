@@ -198,12 +198,12 @@ namespace PhishingPortal.Server.Controllers.Api
         [HttpPost]
         [Route("campaign-hit")]
         [AllowAnonymous]
-        public async Task<ApiResponse<string>> CampignLinkHit(GenericApiRequest<string> request)
+        public async Task<ApiResponse<string>> CampignLinkHit(CampaignHitRequest request)
         {
             var result = new ApiResponse<string>();
             try
             {
-                var outcome = await _tenantRepository.CampaignHit(request.Param);
+                var outcome = await _tenantRepository.CampaignHit(request);
                 result.IsSuccess = outcome.Item1;
                 result.Message = "Successful";
                 result.Result = outcome.Item2;

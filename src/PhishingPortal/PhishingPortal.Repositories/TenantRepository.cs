@@ -233,11 +233,11 @@ namespace PhishingPortal.Repositories
             return template;
         }
 
-        public async Task<Tuple<bool, string>> CampaignHit(string key)
+        public async Task<Tuple<bool, string>> CampaignHit(CampaignHitRequest request)
         {
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
-                .FirstOrDefault(o => o.SecurityStamp == key
+                .FirstOrDefault(o => o.SecurityStamp == request.Key
                                     && o.IsHit == false && o.Status == status);
 
             if (campaignLog == null)
@@ -251,6 +251,15 @@ namespace PhishingPortal.Repositories
             campaignLog.IsHit = true;
             campaignLog.ModifiedOn = DateTime.Now;
             campaignLog.ModifiedBy = nameof(CampaignHit);
+
+            campaignLog.Ip = request.ClientDetails.Ip;
+            campaignLog.Latitude = request.ClientDetails.Latitude; 
+            campaignLog.Longitude = request.ClientDetails.Longitude;
+            campaignLog.City = request.ClientDetails.City;
+            campaignLog.Region = request.ClientDetails.Region;
+            campaignLog.Country = request.ClientDetails.Country;
+            campaignLog.Browser = request.ClientDetails.Browser;
+            campaignLog.OS = request.ClientDetails.OS;
 
             TenantDbCtx.Update(campaignLog);
             TenantDbCtx.SaveChanges();

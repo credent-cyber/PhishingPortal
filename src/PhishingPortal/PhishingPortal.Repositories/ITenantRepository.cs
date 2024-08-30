@@ -1,11 +1,12 @@
-﻿using PhishingPortal.Dto;
+﻿using Org.BouncyCastle.Asn1.Ocsp;
+using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.Repositories
 {
     public interface ITenantRepository
     {
-        Task<Tuple<bool, string>> CampaignHit(string key);
+        Task<Tuple<bool, string>> CampaignHit(CampaignHitRequest request);
         Task<IEnumerable<Campaign>> GetAllCampaigns(int pageIndex, int pageSize);
         Task<IEnumerable<CampaignTemplate>> GetAllTemplates(int pageIndex = 0, int pageSize = 10);
         Task<List<CampaignTemplate>> GetAllTemplates(CampaignType? type);

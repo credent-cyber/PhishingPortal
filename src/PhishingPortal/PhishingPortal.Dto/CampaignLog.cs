@@ -27,12 +27,21 @@ namespace PhishingPortal.Dto
         public string ReturnUrl { get; set; }
         public bool IsHit { get; set; }
         public bool IsDataEntered { get; set; }
-        public bool IsAttachmentOpen { get; set; }
+        public bool IsAttachmentOpen { get; set; 
         public bool IsMacroEnabled { get; set; }
 
         public string RecipantEmail {  get; set; }
         public string RecipantMobile {  get; set; }
         public string RecipantDepartment {  get; set; }
+
+        public string Ip { get; set; }
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
+        public string City { get; set; }
+        public string Region { get; set; }
+        public string Country { get; set; }
+        public string Browser { get; set; }
+        public string OS { get; set; }
 
 
 
