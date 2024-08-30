@@ -27,7 +27,7 @@ header {
     padding: 15px 0;
     width: 50px;
     position: relative;
-    margin-left: -100px;
+    margin-left: -40px;
 }
 
 .homemenu_items {
@@ -45,7 +45,7 @@ header {
 
 .nav_link {
     text-decoration: none;
-    color: #fff;
+    color: black;
     transition: color 0.3s;
     font-size: large;
 }

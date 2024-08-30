@@ -31,6 +31,10 @@ var aadClientSecret = config.GetValue<string>("AzureAD:ClientSecret");
 var aadTenant = config.GetValue<string>("AzureAD:Tenant");
 var aadRedirectUri = config.GetValue<string>("AzureAD:RedirectUri");
 var authority = string.Format(System.Globalization.CultureInfo.InvariantCulture, config.GetValue<string>("AzureAD:Authority"));
+
+var googleClientId = config.GetValue<string>("Google:ClientId");
+var googleClientSecret = config.GetValue<string>("Google:ClientSecret");
+
 var useWindowsAuthentication = config.GetValue<bool>("UseWindowsAuthentication");
 var conString = builder.Configuration.GetValue<string>("SqlLiteConnectionString");
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
@@ -135,6 +139,15 @@ if (!useWindowsAuthentication)
             options.ClientSecret = aadClientSecret;
             options.AuthorizationEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/authorize";
             options.TokenEndpoint = $"https://login.microsoftonline.com/{aadTenant}/oauth2/v2.0/token";
+        })
+        .AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = googleClientId;
+            googleOptions.ClientSecret = googleClientSecret;
+            googleOptions.SignInScheme = IdentityConstants.ExternalScheme;
+            //googleOptions.CallbackPath = new PathString("/signin-google");// This should match with the Google redirect URI
+
+
         })
         .AddIdentityCookies();
 }

@@ -750,6 +750,14 @@ namespace PhishingPortal.Server.Controllers.Api
             return await _tenantRepository.GetAllTrainingQuiz();
         }
 
+        [HttpPost]
+        [Route("DeleteTrainingQuizQuestion/{id}")]
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            return await _tenantRepository.DeleteTrainingQuizQuestion(id);
+        }
+
+
         [HttpGet]
         [Route("GetAllDomains")]
         public async Task<IEnumerable<TenantDomain>> GetAllDomains()

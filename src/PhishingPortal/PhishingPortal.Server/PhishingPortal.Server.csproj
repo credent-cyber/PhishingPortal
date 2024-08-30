@@ -28,6 +28,7 @@
 		<PackageReference Include="Azure.Identity" Version="1.10.4" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
 		<PackageReference Include="Microsoft.AspNet.OData" Version="7.5.17" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.32" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.13" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="6.0.26" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
@@ -82,6 +83,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="Extensions\" />

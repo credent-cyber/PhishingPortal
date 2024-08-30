@@ -203,7 +203,7 @@ else
                         </div> *@
 
 
-                            @if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+                            @if (model.Type == CampaignType.Email)
                             {
                                 <div style="max-width:100%; overflow-x:auto;" class="col-md-12">
                                     <UnlayerEditor Design="@model.Design" />
@@ -214,7 +214,10 @@ else
                                 <textarea class="col-sm-12" style="background-color:lavender; height:200px;margin-left: 17px; max-width: 96% !important;" @bind="text" @bind:event="oninput" maxlength="@MAX_TEXT_COUNT" />
                                 <label>Chars left: @(MAX_TEXT_COUNT - text.Count())</label>
                             }
-
+                            @if (model.Type == CampaignType.Whatsapp)
+                            {
+                                <BlazingComponents.Summernote.Editor />
+                            }
                             <div style="text-align:center; margin-top:5px; margin-left: 14px; width: 98.2%; padding: 6px;">
                                 <button type="submit" class="btn btn-primary">Save</button>
                                 <button type="button" class="btn btn-danger" @onclick="onClose">Close</button>
@@ -356,13 +359,17 @@ else
         TaskCompleted = false;
         show = true;
         message = "Please wait";
-        if (model.Type == CampaignType.Email || model.Type == CampaignType.Whatsapp)
+        if (model.Type == CampaignType.Email)
         {
             //model.Content = contents = await GetSummerNoteContent();
 
             //fetching data from Unlayer editor
             model.Content = await JSRuntime.InvokeAsync<string>("exportHtml");
             model.Design = await JSRuntime.InvokeAsync<string>("exportDesign");
+        }
+        if (model.Type == CampaignType.Whatsapp)
+        {
+            model.Content = contents = await GetSummerNoteContent();
         }
 
         if (model.Type == CampaignType.Sms) { model.Content = text; }

@@ -30,6 +30,12 @@ namespace PhishingPortal.Dto
         public bool IsAttachmentOpen { get; set; }
         public bool IsMacroEnabled { get; set; }
 
+        public string RecipantEmail {  get; set; }
+        public string RecipantMobile {  get; set; }
+        public string RecipantDepartment {  get; set; }
+
+
+
         [Obsolete]
         public bool IsReplied { get; set; }
 

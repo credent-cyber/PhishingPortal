@@ -1,0 +1,91 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Shared
+@inject TenantClient client
+@implements ICustomGridComponent<TrainingQuizQuestion>
+@inject NavigationManager NavigationManager
+<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
+<SimpleDialog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (!TaskCompleted && !process)
+        {
+            <div style="text-align:center;">
+                <h6 class="pb-2">Are you sure want to Delete?</h6>
+
+                <button class="btn btn-danger" @onclick="Delete">Yes</button>
+                <button class="btn btn-primary" @onclick="ResetForm">No</button>
+            </div>
+        }
+        else if (TaskCompleted && process)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+            <br />
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+        <br />
+    }
+</SimpleDialog>
+
+@code {
+    [Parameter]
+    public TrainingQuizQuestion Item { get; set; }
+
+    [Parameter]
+    public CGrid<TrainingQuizQuestion> Grid { get; set; }
+
+    [Parameter]
+    public IList<Action<object>> Actions { get; set; }
+
+    bool show = false;
+    bool process = false;
+    bool TaskCompleted = false;
+    string MessageBody = string.Empty;
+    string Title = "Delete TrainingQuizQuestion";
+
+    private async void Delete()
+    {
+        process = true;
+        var responce = await client.DeleteTrainingQuizQuestion(Item.Id);
+        if (responce.IsSuccess == true)
+        {
+            MessageBody = responce.Message;
+        }
+        else
+        {
+            MessageBody = responce.Message;
+        }
+
+        TaskCompleted = true;
+        Actions[0]?.Invoke(Item);
+    }
+
+    private void MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        MessageBody = string.Empty;
+        TaskCompleted = false;
+    }
+
+    public void ResetForm()
+    {
+
+        show = false;
+        TaskCompleted = false;
+        process = false;
+        MessageBody = string.Empty;
+        StateHasChanged();
+    }
+
+}

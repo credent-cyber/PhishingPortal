@@ -37,6 +37,7 @@ namespace PhishingPortal.DataContext
         public DbSet<TrainingQuiz> TrainingQuiz { get; set; }
         public DbSet<TrainingQuizQuestion> TrainingQuizQuestion { get; set; }
         public DbSet<TrainingQuizAnswer> TrainingQuizAnswer { get; set; }
+        public DbSet<WeeklyReport> WeeklyReport { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +45,9 @@ namespace PhishingPortal.DataContext
             modelBuilder.Entity<RecipientGroupMapping>().HasKey(o => new { o.GroupId, o.RecipientId });
             modelBuilder.Entity<TrainingLog>().Ignore(o => o.TrainingName);
             modelBuilder.Entity<TrainingLog>().Ignore(o => o.RecipientName);
+            modelBuilder.Entity<CampaignLog>().Ignore(o => o.RecipantEmail);
+            modelBuilder.Entity<CampaignLog>().Ignore(o => o.RecipantMobile);
+            modelBuilder.Entity<CampaignLog>().Ignore(o => o.RecipantDepartment);
 
             base.OnModelCreating(modelBuilder);
 

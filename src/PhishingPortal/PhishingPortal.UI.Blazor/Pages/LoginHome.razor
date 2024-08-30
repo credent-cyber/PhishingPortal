@@ -1,4 +1,5 @@
 ﻿@page "/login-home"
+@page "/signin-google"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using PhishingPortal.UI.Blazor.Services
@@ -9,7 +10,7 @@
 
 
 <!-- Header Start -->
-<header class="sticky-header">
+<header class="sticky-header @(toggleCss ? "showMenu":"")">
     <nav class="homenav">
         <h2 class="homenav_logo">
             <a href="/">
@@ -18,13 +19,13 @@
             </a>
         </h2>
 
-        <ul class="homemenu_items" onclick="toggleMobileMenu()">
-            <img src="/img/times.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()"  />
+        <ul class="homemenu_items" @onclick="ToggleMenu">
+            <img src="/img/times.svg" alt="timesicon" id="menu_toggle"  />
             <li><a href="/" class="nav_link">Home</a></li>
-            <li><a href="#" class="nav_link">About</a></li>
+            <li><a href="/about-phishsims" class="nav_link">About</a></li>
             <li><a href="login?ReturnUrl=@(Navigation.Uri)" class="nav_link">Login</a></li>
         </ul>
-        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()" />
+        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" @onclick="ToggleMenu" />
     </nav>
 </header>
 <!-- Header End -->
@@ -33,7 +34,7 @@
     <div class="row container" style="padding:20px;">
         <div class="column">
             <h2>Why Phishsims?</h2>
-            <h3 style="color:"darkblue">Assessing human risk is crucial for safeguarding your business.</h3>
+            <h3 style="color:" darkblue">Assessing human risk is crucial for safeguarding your business.</h3>
             <p>PhishSims is a powerful phishing simulation platform designed to empower organizations in their cybersecurity efforts. By simulating real-world phishing attacks, PhishSims helps organizations identify vulnerabilities in their systems and educate employees on the importance of cybersecurity best practices.</p>
             <div class="Lgnbuttons">
                 <button class="Lgnbtn" onclick="scrollToContent()">Read More</button>
@@ -49,7 +50,7 @@
 <!-- Hero End-->
 
 <section id="content-section" class="content-section">
-    <div >
+    <div>
         <h1 class="content-heading">Revolutionize Security Awareness: Human Risk Management as the Solution</h1>
         <div class="content-wrapper left">
             <img src="/img/tenor.gif" alt="Image 1" class="content-image">
@@ -83,9 +84,15 @@
 </section>
 
 @code {
-
+    bool toggleCss = false;
     protected override async Task OnInitializedAsync()
     {
         await jsRuntime.InvokeVoidAsync("import", "/scripts/LoginHome.js");
+    }
+
+
+    public void ToggleMenu()
+    {
+        toggleCss = !toggleCss;
     }
 }

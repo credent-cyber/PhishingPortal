@@ -131,14 +131,15 @@ namespace PhishingPortal.OutlookAddInVSTO
             //var BaseUrl = "https://localhost:7018";
 
             string input = WebLink;
-            //string input = "https://localhost:7018/cmpgn/T-20220619003439/daafd66f6327d2569151231ba79be8d9";
+            //string input = "https://localhost:7018/cmpgn/PhishSim-T-20240223143134/cd2209ee10d6535cd21665cf34e7bc2a";
+
             if (input == null || input.Contains("/training/details"))
             {
                 EmailForward = true;
                 return true;
             }
 
-            string[] parts = input.Split(new string[] { "https://phishsims.com/cmpgn/" }, StringSplitOptions.None);
+             string[] parts = input.Split(new string[] { "https://phishsims.com/cmpgn/" }, StringSplitOptions.None);
             //string[] parts = input.Split(new string[] { "https://localhost:7018/cmpgn/" }, StringSplitOptions.None);
 
             if (parts.Length > 1)

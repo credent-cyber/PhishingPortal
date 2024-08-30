@@ -5,6 +5,7 @@ using Microsoft.Graph;
 using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using PhishingPortal.Domain;
+using System.Security.Claims;
 
 namespace PhishingPortal.Server.Controllers
 {
@@ -27,6 +28,7 @@ namespace PhishingPortal.Server.Controllers
         [Route("challenge")]
         public IActionResult Challenge([FromQuery] string returnUrl, string provider)
         {
+            string baseUrl = $"{Request.Scheme}://{Request.Host.Value}/";
             var redirectUrl = Url.Action(nameof(Callback), "Oidc", new { returnUrl });
 
             var authProperties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -68,6 +70,15 @@ namespace PhishingPortal.Server.Controllers
             else
             {
                 var r = await UserManager.AddLoginAsync(user, new UserLoginInfo(info.LoginProvider, info.ProviderKey, info.ProviderDisplayName));
+            }
+
+            var roleClaim = new Claim("role", "tenantuser");
+            var userHasRoleClaim = await UserManager.GetClaimsAsync(user);
+            if (!userHasRoleClaim.Any(c => c.Type == roleClaim.Type && c.Value == roleClaim.Value))
+            {
+                // Add the role claim if it doesn't exist
+                var addRoleClaimResult = await UserManager.AddClaimAsync(user, roleClaim);
+                
             }
 
             var signInResult = await SignInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);

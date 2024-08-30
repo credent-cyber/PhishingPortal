@@ -71,6 +71,7 @@
                             <li><a href="tenant-training-config">New Training</a></li>
                             <li><a href="training-video-upload">Training Video</a></li>
                             <li><a href="training-Quizzes">Training Quiz</a></li>
+                            <li><a href="training-quiz">New Training Quiz</a></li>
 
                         </ul>
                     </li>
@@ -108,6 +109,7 @@
                         </a>
                         <ul class="pcoded-submenu @(IsSettingExpanded ? "d-block" : "d-none")">
                             <li><a href="az-config">Azure App Configurations</a></li>
+                            <li><a href="google-config">Google App Configurations</a></li>
                             <li><a href="onprem-ad-config">AD Configurations</a></li>
                             <li><a href="tenant-domains">Domain Configurations</a></li>
                             <li><a href="redirect-urls">Return Url Configurations</a></li>
@@ -250,69 +252,7 @@
                 </a>
             </li>
         </ul>
-        <div class="tab-content" id="chatTabContent" style="overflow: auto; scrollbar-width: none;">
-            <div class="tab-pane fade show active" id="setting" role="tabpanel" aria-labelledby="setting-tab">
-                <div class="p-4 main-friend-cont scroll-div">
-                    <h6 class="mt-2"><i class="feather icon-monitor mr-2"></i>Desktop settings</h6>
-                    <hr>
-                    <div class="form-group mb-0">
-                        <div class="switch switch-primary d-inline m-r-10">
-                            <input type="checkbox" id="cn-p-1" checked>
-                            <label for="cn-p-1" class="cr"></label>
-                        </div>
-                        <label class="f-w-600">Allow desktop notification</label>
-                    </div>
-                    <p class="text-muted ml-5">you get lettest content at a time when data will updated</p>
-                    <div class="form-group mb-0">
-                        <div class="switch switch-primary d-inline m-r-10">
-                            <input type="checkbox" id="cn-p-5">
-                            <label for="cn-p-5" class="cr"></label>
-                        </div>
-                        <label class="f-w-600">Store Cookie</label>
-                    </div>
-                    <h6 class="mb-0 mt-5"><i class="feather icon-layout mr-2"></i>Application settings</h6>
-                    <hr>
-                    <div class="form-group mb-0">
-                        <div class="switch switch-primary d-inline m-r-10">
-                            <input type="checkbox" id="cn-p-3" checked>
-                            <label for="cn-p-3" class="cr"></label>
-                        </div>
-                        <label class="f-w-600">Backup Storage</label>
-                    </div>
-                    <p class="text-muted mb-0 ml-5">Automaticaly take backup as par schedule</p>
-                    <div class="form-group mb-4">
-                        <div class="switch switch-primary d-inline m-r-10">
-                            <input type="checkbox" id="cn-p-4" checked>
-                            <label for="cn-p-4" class="cr"></label>
-                        </div>
-                        <label class="f-w-600">Allow guest to print file</label>
-                    </div>
-                    <h6 class="mb-0 mt-5"><i class="feather icon-globe mr-2"></i>System settings</h6>
-                    <hr>
-                    <div class="form-group mb-0">
-                        <div class="switch switch-primary d-inline m-r-10">
-                            <input type="checkbox" id="cn-p-2">
-                            <label for="cn-p-2" class="cr"></label>
-                        </div>
-                        <label class="f-w-600">View other user chat</label>
-                    </div>
-                    <p class="text-muted ml-5">Allow to show public user message</p>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat-tab">
-                <div class="h-list-header">
-                    <span><i class="fas fa-assistive-listening-systems pr-1"></i> Chat Support</span>
-                </div>
-                <div class="h-list-body">
-                    <div class="p-4 main-friend-cont scroll-div">
-                        <div>
-                            <span class="main-friend-cont">This feature is currently unavailable!</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <PhishingPortal.UI.Blazor.Pages.TenantSetting/>
     </section>
 </div>
 

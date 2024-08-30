@@ -1,0 +1,130 @@
+﻿@using PhishingPortal.Dto
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Models
+@inject TenantClient client
+
+<div class="tab-content" id="chatTabContent" style="overflow: auto; scrollbar-width: none;">
+    <div class="tab-pane fade show active" id="setting" role="tabpanel" aria-labelledby="setting-tab">
+        <div class="p-4 main-friend-cont scroll-div">
+            <EditForm Model="model" OnValidSubmit="@OnSubmit">
+                <DataAnnotationsValidator />
+                <h6 class="mt-2"><i class="feather icon-monitor mr-2"></i>Allow listing</h6>
+                <hr>
+                <div class="form-group mb-0">
+                    <i class="fas fa-hand-point-right text-c-blue"></i> <b>To ensure you receive <span style="margin-left:20px">campaigns email :</span></b>
+                </div>
+                <p class="text-muted ml-5">
+
+                    1. White list this IP in your Email environment:
+
+                    <mark>103.166.62.86</mark>
+
+                    <mark> https://phishsims.com</mark>
+                </p>
+
+                <h6 class="mb-0 mt-5"><i class="feather icon-layout mr-2"></i>Application settings</h6>
+                <hr>
+           @*      <div class="form-group mb-0">
+                    <div class="switch switch-primary d-inline m-r-10">
+                        <input type="checkbox" id="cn-p-3" @bind="@model.IsTrainingReminderEnabled">
+                        <label for="cn-p-3" class="cr"></label>
+                    </div>
+                    <label class="f-w-600">Training Reminder</label>
+                </div> *@
+                @* <p class="text-muted mb-0 ml-5">Remind recipients via email to complete their training until they have finished.</p> *@
+                <div class="form-group mb-4">
+                    <div class="switch switch-primary d-inline m-r-10">
+                        <input type="checkbox" id="cn-p-4" @bind="@model.IsWeeklyReportEnabled">
+                        <label for="cn-p-4" class="cr"></label>
+                    </div>
+                    <label class="f-w-600">Enable Weekly Report</label>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="f-w-600">Report Recipient Emails</label>
+                    <div>
+                        <InputText @bind-Value="@model.WeeklyReportRecipients" class="form-control col-12" ></InputText>
+                        <i style="font-size:10px;">For multiple emails, should be separated with ";"</i>
+                    </div>
+                </div>
+                <UiAlerts Model="alert"></UiAlerts>
+                <hr>
+                <button class="btn btn-outline-primary btn-sm col-12 mb-4" type="submit">
+                    @if (loading)
+                    {
+                        <div class="spinner-border spinner-border-sm" role="status">
+                            <span class="sr-only">...</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <b>Save</b>
+                    }
+                </button>
+            </EditForm>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat-tab">
+        <div class="h-list-header">
+            <span><i class="fas fa-assistive-listening-systems pr-1"></i> Chat Support</span>
+        </div>
+        <div class="h-list-body">
+            <div class="p-4 main-friend-cont scroll-div">
+                <div>
+                    <span class="main-friend-cont">This feature is currently unavailable!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ApplicationSettings model = new();
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 3000;
+    bool loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert ??= new AlertModel();
+        var settings = await client.GetSettings();
+
+        if (settings.ContainsKey("weekly_report_recipients"))
+            model = new ApplicationSettings(settings);
+    }
+
+    public async Task OnSubmit()
+    {
+        alert?.Clear();
+        if (model != null)
+        {
+            loading = true;
+            try
+            {
+                var result = await client.UpsertSettings(model.ToSettingsDictionary());
+
+                model = new ApplicationSettings(result);
+
+                alert?.SetSuccess("Successfully Saved!");
+                loading = false;
+            }
+            catch (Exception ex)
+            {
+                loading = false;
+                alert?.SetError(ex.Message);
+            }
+        }
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+}
