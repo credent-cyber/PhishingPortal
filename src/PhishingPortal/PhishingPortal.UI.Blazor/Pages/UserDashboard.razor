@@ -1,4 +1,171 @@
-﻿<div class="container m-10">
-    <h3 class="m-0 text-info">Cyber Security Trainings</h3>
-    <p class="m-0 text-secondary">You can do some trainings</p>
+﻿@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Helpers
+@using PhishingPortal.UI.Blazor.Pages.GridComponent
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
+@using PhishingPortal.Dto;
+
+@using PhishingPortal.UI.Blazor.Client;
+@using System.Drawing
+@inject TenantClient client;
+@inject ILogger<UserDashboard> logger;
+@inject IJSRuntime JSRuntime;
+@attribute [Authorize]
+
+<div class="row">
+<div class="col-md-6 col-xl-3">
+    <div class="card bg-facebook order-card">
+        <div class="card-body">
+            <a href="#!">
+                <div class="row align-items-center m-b-0">
+                    <div class="col" style="padding: 0">
+                        <h6 class="m-b-5 text-white">Total Assigned Training </h6>
+                    </div>
+                    <div class="col-auto">
+                        <h3 style="color:black">@trainingStats.TotalTrainingAssign</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
+<div class="col-md-6 col-xl-3">
+    <div class="card bg-c-green order-card">
+        <div class="card-body">
+            <a href="#!">
+                <div class="row align-items-center m-b-0">
+                    <div class="col" style="padding: 0">
+                        <h6 class="m-b-5 text-white">Training Completed</h6>
+                    </div>
+                    <div class="col-auto">
+                         <h3 style="color:black">@trainingStats.TrainingCompleted</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-xl-3">
+    <div class="card bg-danger order-card">
+        <div class="card-body">
+            <a href="#!">
+                <div class="row align-items-center m-b-0">
+                    <div class="col" style="padding: 0">
+                        <h6 class="m-b-5 text-white">Training Incomplete</h6>
+                    </div>
+                    <div class="col-auto">
+                        <h3 style="color:black">@trainingStats.TrainingNotAttampt</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="col-md-6 col-xl-3">
+    <div class="card bg-c-purple order-card">
+        <div class="card-body">
+            <a href="#!">
+                <div class="row align-items-center m-b-0">
+                    <div class="col" style="padding: 0">
+                        <h6 class="m-b-5 text-white">Complition Percentage %</h6>
+                    </div>
+                    <div class="col-auto">
+                        <h3 style="color:black">@trainingStats.TrainingCompromised</h3>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <p class="mb-0">
+        <div class="row">
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h5>Month wise Training Report</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%;">
+
+
+                             <Chart Id="UserBarChart" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
+                            Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                            </Chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h5>Training Completion Percentage</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%;">
+
+                            <Chart Id="UserLineChart" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
+                            Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                            </Chart>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p>
+</div>
+
+
+@code {
+
+    public List<ChartJsDataset> TrainingBarChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] TrainingBarChartLabels { get; set; }
+    public int[] TrainingBarChartIds { get; set; }
+
+    public List<ChartJsDataset> TrainingLineChartData { get; set; } = new List<ChartJsDataset>();
+    public string[] TrainingLineChartLabels { get; set; }
+
+    TrainingStatics trainingStats = new TrainingStatics();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        trainingStats = await client.GetUserDashBoardStats();
+        var TrainingData = await client.GetMonthwiseUserTrainingData(DateTime.Now.Year);
+       
+        StateHasChanged();
+
+
+
+        TrainingBarChartIds = TrainingData.MonthwiseTrainingEntry.Select(o => (int)o.Month).ToArray();
+        TrainingBarChartLabels = TrainingData.MonthwiseTrainingEntry.Select(o => o.Month.ToString()).ToArray(); //Recent Training Report
+        TrainingBarChartData.Add(new ChartJsDataset
+            {
+                Label = "Training Assign",
+                Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.TotalTraining.ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.DarkBlue, TrainingData.MonthwiseTrainingEntry.Count()),
+            });
+
+        TrainingBarChartData.Add(new ChartJsDataset
+            {
+                Label = "Completed",
+                Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.Completed.ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Cyan, TrainingData.MonthwiseTrainingEntry.Count()),
+            });
+
+        TrainingBarChartData.Add(new ChartJsDataset
+            {
+                Label = "InProgress",
+                Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.Inprogress.ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Yellow, TrainingData.MonthwiseTrainingEntry.Count()),
+            });
+       // TrainingLineChartLabels = data2.Entries.Select(o => o.Campaign.Name).ToArray();
+        TrainingLineChartData.Add(new ChartJsDataset
+            {
+                Label = "Training Completion%",
+                Data = TrainingData.MonthwiseTrainingEntry.Select(o => o.CompletionPercent.ToString()).ToArray(),
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, TrainingData.MonthwiseTrainingEntry.Count()), //Trend of Training Completion Percentege
+            });
+    }
+
+
+}
