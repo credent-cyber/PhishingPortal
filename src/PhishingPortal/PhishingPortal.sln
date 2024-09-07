@@ -51,6 +51,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OutlookAddin", "OutlookAddi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.OutlookAddInVSTO", "PhishingPortal.OutlookAddInVSTO\PhishingPortal.OutlookAddInVSTO.csproj", "{CF84B31C-8C29-4F4E-A300-EB9D87553924}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MailTracking", "MailTracking", "{456E5846-6CDC-4A4C-B980-2DF5086138C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.Tracking", "PhishingPortal.Tracking\PhishingPortal.Tracking.csproj", "{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,6 +129,10 @@ Global
 		{CF84B31C-8C29-4F4E-A300-EB9D87553924}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF84B31C-8C29-4F4E-A300-EB9D87553924}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF84B31C-8C29-4F4E-A300-EB9D87553924}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +155,7 @@ Global
 		{F66DB7ED-BAB7-4698-8731-1CEC8537F85F} = {363AB036-0661-460E-B9EF-86B5CB5F444A}
 		{DF72F6DB-9B00-423A-83C2-F565410670FC} = {8F04C3DA-E1DD-483D-A463-0CAB14B85827}
 		{CF84B31C-8C29-4F4E-A300-EB9D87553924} = {F54586DA-6CED-4036-A572-741665C950B9}
+		{96D5D2A7-E09F-4BAA-9EC4-6A6D112A02A1} = {456E5846-6CDC-4A4C-B980-2DF5086138C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3B8205F-FBA7-4A7D-BFCB-4EDF19CE3CD8}
