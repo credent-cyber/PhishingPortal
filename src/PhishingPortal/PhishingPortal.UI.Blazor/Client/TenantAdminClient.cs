@@ -1,6 +1,10 @@
 ﻿using PhishingPortal.Dto;
 using System.Text.Json;
 using System.Net.Http.Json;
+using PhishingPortal.Dto.Subscription;
+using PhishingPortal.Licensing;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace PhishingPortal.UI.Blazor.Client
 {
@@ -33,6 +37,33 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         /// <summary>
+        /// CreateLicenseAsyncs
+        /// </summary>
+        /// <param name="subscription"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<LicenseInfo>> CreateLicense(SubscriptionInfo subscription)
+        {
+            ApiResponse<LicenseInfo> content;
+
+            var res = await HttpClient.PostAsJsonAsync("api/Onboarding/CreateLicense", subscription);
+
+            res.EnsureSuccessStatusCode();
+            content = await res.Content.ReadFromJsonAsync<ApiResponse<LicenseInfo>>();
+            return content;
+
+        }
+
+        public async Task<ApiResponse<SubscriptionInfo>> GetCurrentSubscription(string tenantIdentifier)
+        {
+            var res = await HttpClient.GetAsync($"api/onboarding/GetCurrentSubscription?tenantIdentifier={tenantIdentifier}");
+
+            res.EnsureSuccessStatusCode();
+
+            return await res.Content.ReadFromJsonAsync<ApiResponse<SubscriptionInfo>>();
+        }
+    
+
+        /// <summary>
         /// GetAllAsync
         /// </summary>
         /// <param name="pageIndex"></param>
@@ -61,9 +92,16 @@ namespace PhishingPortal.UI.Blazor.Client
         public async Task<Tenant> GetTenantByUniqueId(string uniqueId)
         {
             var res = await HttpClient.GetAsync($"api/onboarding/TenantByUniqueId?uniqueId={uniqueId}");
-            res.EnsureSuccessStatusCode();
-            var val = await res.Content.ReadFromJsonAsync<Tenant>();
-            return val;
+            try
+            {
+                res.EnsureSuccessStatusCode();
+                var val = await res.Content.ReadFromJsonAsync<Tenant>();
+                return val;
+            }
+            catch (Exception)
+            {
+                return await Task.FromResult<Tenant>(default);
+            }
         }
         public async Task<(bool, string)> DeleteTenantByUniqueId(string uniqueId)
         {

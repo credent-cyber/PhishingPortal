@@ -7,12 +7,6 @@ using System.Threading.Tasks;
 
 namespace PhishingPortal.Dto.Subscription
 {
-    public enum SubscriptionTypes
-    {
-        Trial,
-        Limited,
-        Enterprise
-    }
 
     public enum AppModules
     {
@@ -24,15 +18,15 @@ namespace PhishingPortal.Dto.Subscription
 
     public class SubscriptionInfo
     {
-        public SubscriptionTypes SubscriptionType { get; set; } = SubscriptionTypes.Trial;
+        public LicenseTypes SubscriptionType { get; set; }
 
         public List<AppModules> Modules { get; set; } = new List<AppModules>();
 
         [Range(0, int.MaxValue)]
-        public int TransactionCount { get; set; }
+        public int TransactionCount { get; set; } = 1;
 
         [Range(0, int.MaxValue)]
-        public int AllowedUserCount { get; set; }
+        public int AllowedUserCount { get; set; } = 50;
 
         [Required]
         public DateTime ExpiryInUTC { get; set; } = DateTime.UtcNow.AddDays(30);

@@ -26,5 +26,7 @@ namespace PhishingPortal.Repositories
         Task<IEnumerable<TenantDomain>> GetDomains(int tenantId);
         Task<TenantDomain> VerifyDomain(TenantDomain domain);
         Task<bool> DeleteDomain(int id);
+        Task<TenantData> UpsertTenantData(TenantData tenantData, string adminUser);
+        Task<IQueryable<TenantData>> GetTenantData(string tenantIdentifier);
     }
 }

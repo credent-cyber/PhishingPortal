@@ -12,8 +12,15 @@ using PhishingPortal.Repositories;
 
 namespace PhishingPortal.Server.Controllers
 {
+    using DocumentFormat.OpenXml.Office2010.Drawing;
     using Microsoft.AspNetCore.Identity.UI.Services;
+    using Newtonsoft.Json;
+    using PhishingPortal.Dto.Subscription;
+    using PhishingPortal.Licensing;
     using PhishingPortal.Server.Controllers.Api.Abstraction;
+    using PhishingPortal.Server.Services;
+    using PhishingPortal.Server.Services.Interfaces;
+    using System.Security.Claims;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -27,14 +34,15 @@ namespace PhishingPortal.Server.Controllers
             public string EmailContent { get; set; } = "Confirmation Email Content ###CONFIRM_LINK###";
 
         }
-        
 
-        public OnboardingController(ILogger<OnboardingController> logger, IConfiguration config, ITenantAdminRepository tenantAdminRepo, INsLookupHelper nsLookup,
+
+        public OnboardingController(ILogger<OnboardingController> logger, IConfiguration config, ITenantAdminRepository tenantAdminRepo, INsLookupHelper nsLookup, ILicenseProvider licenseProvider,
             IEmailSender emailSender,
             UserManager<PhishingPortalUser> userManager) : base(logger)
         {
-            tenatAdminRepo = tenantAdminRepo;
+            this.tenantAdminRepo = tenantAdminRepo;
             NsLookup = nsLookup;
+            LicenseProvider = licenseProvider;
             EmailSender = emailSender;
             UserManager = userManager;
             _config = new OnboardingConfig();
@@ -42,9 +50,10 @@ namespace PhishingPortal.Server.Controllers
         }
 
         OnboardingConfig _config;
-        
-        public ITenantAdminRepository tenatAdminRepo { get; }
+
+        public ITenantAdminRepository tenantAdminRepo { get; }
         public INsLookupHelper NsLookup { get; }
+        public ILicenseProvider LicenseProvider { get; }
         public IEmailSender EmailSender { get; }
         public UserManager<PhishingPortalUser> UserManager { get; }
 
@@ -62,25 +71,123 @@ namespace PhishingPortal.Server.Controllers
 
             try
             {
-                response = await tenatAdminRepo.CreateTenantAsync(tenant);
+                response = await tenantAdminRepo.CreateTenantAsync(tenant);
 
-                if(tenant.RequireDomainVerification)
+                if (tenant.RequireDomainVerification)
                     await SendConfirmationEmail(tenant);
 
             }
             catch (Exception ex)
             {
                 Logger.LogCritical(ex, ex.Message);
-                return new ApiResponse<Tenant>() { IsSuccess=false, Message = ex.Message };
+                return new ApiResponse<Tenant>() { IsSuccess = false, Message = ex.Message };
             }
             return response;
+        }
+
+
+        [Authorize]
+        [HttpGet]
+        [Route("GetCurrentSubscription")]
+        public async Task<ApiResponse<SubscriptionInfo>> GetCurrentSubscription(string tenantIdentifier)
+        {
+            var tenant = await tenantAdminRepo.GetByUniqueId(tenantIdentifier);
+            var tenantDbContext = TenantDbResolver.CreateTenantDbContext(tenant);
+
+            var setting = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+
+            if (setting == null || string.IsNullOrEmpty(setting.Value))
+            {
+                return await Task.FromResult(new ApiResponse<SubscriptionInfo>() { IsSuccess = false });
+            }
+
+            var lic = JsonConvert.DeserializeObject<LicenseInfo>(setting.Value);
+
+            var subscriptionInfo = LicenseProvider.GetSubscriptionInfo(lic.Content, lic.PublicKey);
+
+            return await Task.FromResult(new ApiResponse<SubscriptionInfo>()
+            {
+                IsSuccess = true,
+                Result = subscriptionInfo
+            });
+        }
+
+        [Authorize]
+        [Route("CreateLicense")]
+        public async Task<ApiResponse<LicenseInfo>> CreateLicense(SubscriptionInfo subscriptionInfo)
+        {
+            try
+            {
+                var tenant = await tenantAdminRepo.GetByUniqueId(subscriptionInfo.TenantIdentifier);
+                var currentUser = User.Claims.FirstOrDefault(o => o.Type == ClaimTypes.Email);
+
+                if (currentUser == null)
+                    throw new InvalidOperationException("No authorized");
+
+                var lic = new ApiResponse<LicenseInfo>()
+                {
+                    IsSuccess = true,
+
+                    Result = LicenseProvider.Generate(subscriptionInfo.TenantIdentifier, subscriptionInfo)
+
+                };
+
+                var data = new
+                {
+                    License = lic.Result,
+                    Subscription = subscriptionInfo,
+                };
+
+                await tenantAdminRepo.UpsertTenantData(new TenantData
+                {
+                    Key = TenantData.Keys.License,
+                    Value = JsonConvert.SerializeObject(data),
+                    TenantId = tenant.Id,
+                }, currentUser.Value);
+
+                var tenantDbContext = TenantDbResolver.CreateTenantDbContext(tenant);
+
+
+                var tenantLic = new LicenseInfo(string.Empty, lic.Result.PublicKey, string.Empty, lic.Result.Content);
+                var tenantSetting = new TenantSetting
+                {
+                    Key = TenantData.Keys.License,
+                    Value = JsonConvert.SerializeObject(tenantLic)
+                };
+
+                var existingLicense = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+                if (existingLicense != null)
+                {
+                    existingLicense.ModifiedOn = DateTime.UtcNow;
+                    existingLicense.ModifiedBy = currentUser?.Value ?? "admin";
+                    existingLicense.Value = tenantSetting.Value;
+
+                    tenantDbContext.Settings.Update(existingLicense);
+                }
+                else
+                {
+                    tenantSetting.CreatedOn = DateTime.UtcNow;
+                    tenantSetting.CreatedBy = currentUser?.Value ?? "admin";
+
+                    tenantDbContext.Settings.Add(tenantSetting);
+                }
+
+                await tenantDbContext.SaveChangesAsync();
+
+                return await Task.FromResult(lic);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, $"Error while creating license for tenant - {subscriptionInfo.TenantIdentifier}");
+                throw;
+            }
         }
 
 
         [HttpGet]
         public async Task<List<Tenant>> GetAll(int pageIndex, int pageSize)
         {
-            return await tenatAdminRepo.GetAllAsync(pageIndex, pageSize);
+            return await tenantAdminRepo.GetAllAsync(pageIndex, pageSize);
         }
 
         [HttpGet]
@@ -88,7 +195,7 @@ namespace PhishingPortal.Server.Controllers
         public async Task<Tenant> GetByUniqueId(string uniqueId)
         {
 
-            return await tenatAdminRepo.GetByUniqueId(uniqueId);
+            return await tenantAdminRepo.GetByUniqueId(uniqueId);
         }
 
         [HttpDelete]
@@ -96,7 +203,7 @@ namespace PhishingPortal.Server.Controllers
         public async Task<(bool, string)> DeleteTenantByUniqueId(string uniqueId)
         {
 
-            return await tenatAdminRepo.DeleteTenantByUniqueId(uniqueId);
+            return await tenantAdminRepo.DeleteTenantByUniqueId(uniqueId);
         }
 
 
@@ -105,7 +212,7 @@ namespace PhishingPortal.Server.Controllers
         [Obsolete("This method is not used anymore")]
         public async Task Provision(ProvisionTenantRequest request)
         {
-            var result = await tenatAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);
+            var result = await tenantAdminRepo.ProvisionAsync(request.TenantId, request.ConnectionString);
 
             if (result == false)
                 NotFound("Tenant not registered yet");
@@ -126,7 +233,7 @@ namespace PhishingPortal.Server.Controllers
             try
             {
 
-                t = await tenatAdminRepo.ConfirmRegistrationAsync(request.UniqueId, request.RegisterationHash, request.Url);
+                t = await tenantAdminRepo.ConfirmRegistrationAsync(request.UniqueId, request.RegisterationHash, request.Url);
                 response.IsSuccess = true;
                 response.Message = "Registration confirmed, please proceed with domain registration";
                 response.Result = t;
@@ -154,7 +261,7 @@ namespace PhishingPortal.Server.Controllers
             Tenant confirmedTenant;
             try
             {
-                var tenant = await tenatAdminRepo.GetByUniqueId(domain.UniqueId);
+                var tenant = await tenantAdminRepo.GetByUniqueId(domain.UniqueId);
                 if (tenant == null)
                 {
                     Logger.LogError($"Tenant with uniqueid: [{domain.UniqueId}] not found");
@@ -162,9 +269,9 @@ namespace PhishingPortal.Server.Controllers
                     response.Message = "Sucessfully verified domain";
                     return response;
                 }
-                
+
                 var verficationResult = false;
-                if(tenant.RequireDomainVerification)
+                if (tenant.RequireDomainVerification)
                 {
                     verficationResult = NsLookup.VerifyDnsRecords("TXT", domain.Domain.Trim().ToLower(), domain.DomainVerificationCode);
                 }
@@ -176,7 +283,7 @@ namespace PhishingPortal.Server.Controllers
                 // do actual domain verification
                 if (verficationResult)
                 {
-                    confirmedTenant = await tenatAdminRepo.ConfirmDomainAsync(domain);
+                    confirmedTenant = await tenantAdminRepo.ConfirmDomainAsync(domain);
                     response.IsSuccess = true;
                     response.Message = "Sucessfully verified domain, Now create credential to log in the portal.";
                     response.Result = confirmedTenant;
@@ -212,7 +319,7 @@ namespace PhishingPortal.Server.Controllers
             try
             {
                 var domain = user.Email.Split("@")[1];
-                var tenant = await tenatAdminRepo.GetByDomain(domain);
+                var tenant = await tenantAdminRepo.GetByDomain(domain);
 
                 if (tenant.UniqueId != user.TenantUniqueId)
                     throw new Exception("Invalid request");
@@ -292,6 +399,6 @@ namespace PhishingPortal.Server.Controllers
             await EmailSender.SendEmailAsync(to, subject, mailContent);
         }
 
-       
+
     }
 }

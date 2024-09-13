@@ -4,6 +4,7 @@ using Standard.Licensing;
 using System.Runtime.Serialization;
 using Standard.Licensing.Validation;
 using Microsoft.Extensions.Logging;
+using PhishingPortal.Dto;
 
 namespace PhishingPortal.Licensing
 {
@@ -39,7 +40,7 @@ namespace PhishingPortal.Licensing
             }
 
             features.Add(AllowedUserCountFeature, subscriptionInfo.AllowedUserCount.ToString());
-            features.Add(nameof(SubscriptionTypes), subscriptionInfo.SubscriptionType.ToString());
+            features.Add(nameof(LicenseType), subscriptionInfo.SubscriptionType.ToString());
 
             var license = Standard.Licensing.License.New()
                             .WithUniqueIdentifier(Guid.NewGuid())
@@ -112,7 +113,7 @@ namespace PhishingPortal.Licensing
                 return new SubscriptionInfo
                 {
                     ExpiryInUTC = lic.Expiration,
-                    SubscriptionType = Enum.Parse<SubscriptionTypes>(features.Get(nameof(SubscriptionTypes))),
+                    SubscriptionType = Enum.Parse<LicenseTypes>(features.Get("LicenseType")),
                     AllowedUserCount = int.Parse(features.Get(AllowedUserCountFeature)),
                     TransactionCount = lic.Quantity,
                     Modules = modules,

@@ -16,7 +16,7 @@ var lic = licProvider.Generate("ABC", new PhishingPortal.Dto.Subscription.Subscr
     Modules = new List<PhishingPortal.Dto.Subscription.AppModules> { PhishingPortal.Dto.Subscription.AppModules.EmailCampaign },
     AllowedUserCount = 1000,
     ExpiryInUTC = DateTime.UtcNow.AddDays(30),
-    SubscriptionType = PhishingPortal.Dto.Subscription.SubscriptionTypes.Limited,
+    SubscriptionType = PhishingPortal.Dto.LicenseTypes.Limited,
     TenantEmail = "malaykp@gmail.com",
     TenantIdentifier = "12345678"
     

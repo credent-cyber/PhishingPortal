@@ -15,6 +15,7 @@ using PhishingPortal.Server;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.Security.Claims;
 using PhishingPortal.Server.Middleware;
+using PhishingPortal.Licensing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -203,7 +204,7 @@ builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
-
+builder.Services.AddScoped<ILicenseProvider, LicenseProvider>();
 
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();

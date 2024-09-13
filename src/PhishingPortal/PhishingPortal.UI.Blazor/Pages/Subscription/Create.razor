@@ -1,0 +1,191 @@
+﻿@page "/subscription/{TenantIdentifier}"
+
+@using PhishingPortal.Dto
+@using PhishingPortal.Dto.Subscription
+@using PhishingPortal.UI.Blazor.Client
+
+@inject TenantAdminClient TenantAdminClient
+@inject NavigationManager Navigation
+@inject ILogger<Create> Logger
+
+<h3>@(IsUpdate ? "Update" : "Create") Subscription</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <span class="alert-danger">@errorMessage</span>
+}
+
+<EditForm Model="model" OnValidSubmit="OnSubmit">
+
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+    <div class="m-1 p-1">
+
+
+        <div class="row form-group">
+            <label class="col-form-label col-md-2 bold-font" for="TenantIdentifier">@nameof(model.TenantIdentifier)</label>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="model.TenantIdentifier"></InputText>
+            </div>
+
+            <label class="col-form-label col-md-2 bold-font" for="TenantEmail">@nameof(model.TenantEmail)</label>
+            <div class="col-md-4">
+                <InputText class="form-control" @bind-Value="model.TenantEmail"></InputText>
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <label class="col-form-label col-md-2 bold-font" for="TransactionCount">@nameof(model.TransactionCount)</label>
+            <div class="col-md-4">
+                <InputNumber class="form-control" @bind-Value="model.TransactionCount"></InputNumber>
+            </div>
+
+            <label class="col-form-label col-md-2 bold-font" for="TenantEmail">@nameof(model.AllowedUserCount)</label>
+            <div class="col-md-4">
+                <InputNumber class="form-control" @bind-Value="model.AllowedUserCount"></InputNumber>
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <label class="col-form-label col-md-2 bold-font" for="Domain">@nameof(model.SubscriptionType)</label>
+            <div class="col-md-4">
+                <InputSelect @bind-Value="model.SubscriptionType" class="form-control">
+                    @foreach (var lic in Enum.GetValues(typeof(LicenseTypes)))
+                    {
+                        <option value="@lic">@lic</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <label class="col-form-label col-md-2 bold-font" for="LicenseExpiry">Expiry Date</label>
+            <div class="col-md-4">
+                <InputDate @bind-Value="model.ExpiryInUTC" id="ExpiryInUTC" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row m-2">
+
+            <div class="form-check">
+                <InputCheckbox class="form-check-input" @bind-Value="Email"></InputCheckbox>
+                <label class="form-check-label" for="Email">
+                    @nameof(Email)
+                </label>
+            </div>
+            <div class="form-check">
+                <InputCheckbox class="form-check-input" @bind-Value="Sms"></InputCheckbox>
+                <label class="form-check-label" for="Sms">
+                    @nameof(Sms)
+                </label>
+            </div>
+
+            <div class="form-check">
+                <InputCheckbox class="form-check-input" @bind-Value="WhatsApp"></InputCheckbox>
+                <label class="form-check-label" for="WhatsApp">
+                    @nameof(WhatsApp)
+                </label>
+            </div>
+
+            <div class="form-check">
+                <InputCheckbox class="form-check-input" @bind-Value="Training"></InputCheckbox>
+                <label class="form-check-label" for="Training">
+                    @nameof(Training)
+                </label>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <button class="btn btn-primary">Save</button>
+                <button class="btn btn-secondary" @onclick="@(() => Navigation.NavigateTo("provision"))">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+@code {
+
+    [Parameter]
+    public string TenantIdentifier { get; set; }
+
+    private SubscriptionInfo model = new SubscriptionInfo();
+    private string errorMessage = string.Empty;
+    private bool Email = false;
+    private bool WhatsApp = false;
+    private bool Sms = false;
+    private bool Training = false;
+    private bool IsUpdate = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // get tenant info
+        // get tenant licensing info if already has a license
+        // bind if already has a license
+        model.TenantIdentifier = TenantIdentifier;
+
+        var tenant = await TenantAdminClient.GetTenantByUniqueId(TenantIdentifier);
+
+        if(tenant == null)
+        {
+            errorMessage = "$Tenant not found!";
+            Logger.LogCritical(errorMessage);
+            Navigation.NavigateTo("provision");
+        }
+
+        var response = await TenantAdminClient.GetCurrentSubscription(TenantIdentifier);
+
+        model.TenantEmail = tenant.ContactEmail;
+
+        if (response.IsSuccess)
+        {
+            model = response.Result;
+            IsUpdate = true;
+            foreach (var m in model.Modules)
+            {
+                switch (m)
+                {
+                    case AppModules.EmailCampaign: Email = true; break;
+                    case AppModules.SmsCampaign: Sms = true; break;
+                    case AppModules.WhatsAppCampaign: WhatsApp = true; break;
+                    case AppModules.TrainingCampaign: Training = true; break;
+                }
+
+            }
+        }
+    }
+
+    protected async Task OnSubmit()
+    {
+        // create or update license
+        // update tenant setting (admin) with private key phassphrase and license
+        // update tenant db (license and public key)
+
+        AssignModule();
+
+        var result = await TenantAdminClient.CreateLicense(model);
+
+        if (result.IsSuccess)
+        {
+            Navigation.NavigateTo("provision");
+        }
+        else
+        {
+            errorMessage = result.Message;
+        }
+    }
+
+    private void AssignModule()
+    {
+        if (Email && !model.Modules.Any(o => o == AppModules.EmailCampaign))
+            model.Modules.Add(AppModules.EmailCampaign);
+
+        if (Sms && !model.Modules.Any(o => o == AppModules.SmsCampaign))
+            model.Modules.Add(AppModules.SmsCampaign);
+
+        if (Training && !model.Modules.Any(o => o == AppModules.TrainingCampaign))
+            model.Modules.Add(AppModules.TrainingCampaign);
+
+        if (WhatsApp && !model.Modules.Any(o => o == AppModules.WhatsAppCampaign))
+            model.Modules.Add(AppModules.WhatsAppCampaign);
+    }
+}
