@@ -94,27 +94,27 @@ namespace PhishingPortal.Server.Controllers
             var tenant = await tenantAdminRepo.GetByUniqueId(tenantIdentifier);
             var tenantDbContext = TenantDbResolver.CreateTenantDbContext(tenant);
 
-            var setting = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+            var license = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+            var publicKey = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.PublicKey);
 
-            if (setting == null || string.IsNullOrEmpty(setting.Value))
+            if (license == null || string.IsNullOrEmpty(license.Value)
+                || publicKey == null || string.IsNullOrEmpty(publicKey.Value))
             {
                 return await Task.FromResult(new ApiResponse<SubscriptionInfo>() { IsSuccess = false });
             }
 
-            var lic = JsonConvert.DeserializeObject<LicenseInfo>(setting.Value);
-
-            var subscriptionInfo = LicenseProvider.GetSubscriptionInfo(lic.Content, lic.PublicKey);
+            var subscriptionInfo = LicenseProvider.GetSubscriptionInfo(license.Value, publicKey.Value);
 
             return await Task.FromResult(new ApiResponse<SubscriptionInfo>()
             {
-                IsSuccess = true,
+                IsSuccess = subscriptionInfo != null,
                 Result = subscriptionInfo
             });
         }
 
         [Authorize]
         [Route("CreateLicense")]
-        public async Task<ApiResponse<LicenseInfo>> CreateLicense(SubscriptionInfo subscriptionInfo)
+        public async Task<ActionResult> CreateLicenseKey(SubscriptionInfo subscriptionInfo)
         {
             try
             {
@@ -124,57 +124,53 @@ namespace PhishingPortal.Server.Controllers
                 if (currentUser == null)
                     throw new InvalidOperationException("No authorized");
 
-                var lic = new ApiResponse<LicenseInfo>()
+                var license = LicenseProvider.Generate(subscriptionInfo.TenantIdentifier, subscriptionInfo);
+
+                var licenseData = new List<TenantData>
                 {
-                    IsSuccess = true,
-
-                    Result = LicenseProvider.Generate(subscriptionInfo.TenantIdentifier, subscriptionInfo)
-
+                    new TenantData
+                    {
+                        Key = TenantData.Keys.License,
+                        Value = license.Content,
+                        TenantId = tenant.Id
+                    },
+                    new TenantData
+                    {
+                        Key = TenantData.Keys.PublicKey,
+                        Value = license.PublicKey,
+                        TenantId = tenant.Id
+                    },
+                      new TenantData
+                    {
+                        Key = TenantData.Keys.PrivateKey,
+                        Value = license.PrivateKey,
+                        TenantId = tenant.Id
+                    }
                 };
 
-                var data = new
-                {
-                    License = lic.Result,
-                    Subscription = subscriptionInfo,
-                };
-
-                await tenantAdminRepo.UpsertTenantData(new TenantData
-                {
-                    Key = TenantData.Keys.License,
-                    Value = JsonConvert.SerializeObject(data),
-                    TenantId = tenant.Id,
-                }, currentUser.Value);
-
+                await tenantAdminRepo.UpsertLicenseInfo(licenseData, currentUser.Value ?? "admin");
                 var tenantDbContext = TenantDbResolver.CreateTenantDbContext(tenant);
-
-
-                var tenantLic = new LicenseInfo(string.Empty, lic.Result.PublicKey, string.Empty, lic.Result.Content);
-                var tenantSetting = new TenantSetting
+                var tenantSettings = new List<TenantSetting>()
                 {
-                    Key = TenantData.Keys.License,
-                    Value = JsonConvert.SerializeObject(tenantLic)
+                    new TenantSetting
+                    {
+                        Key = TenantData.Keys.License,
+                        Value = license.Content
+                    },
+
+                    new TenantSetting
+                    {
+                        Key = TenantData.Keys.PublicKey,
+                        Value = license.PublicKey
+                    }
+
                 };
 
-                var existingLicense = tenantDbContext.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
-                if (existingLicense != null)
-                {
-                    existingLicense.ModifiedOn = DateTime.UtcNow;
-                    existingLicense.ModifiedBy = currentUser?.Value ?? "admin";
-                    existingLicense.Value = tenantSetting.Value;
-
-                    tenantDbContext.Settings.Update(existingLicense);
-                }
-                else
-                {
-                    tenantSetting.CreatedOn = DateTime.UtcNow;
-                    tenantSetting.CreatedBy = currentUser?.Value ?? "admin";
-
-                    tenantDbContext.Settings.Add(tenantSetting);
-                }
+                await tenantAdminRepo.UpsertTenantDbLicenseInfo(tenantSettings, tenantDbContext, currentUser.Value ?? "admin");
 
                 await tenantDbContext.SaveChangesAsync();
 
-                return await Task.FromResult(lic);
+                return await Task.FromResult(new FileContentResult(license.Content.ToByteArray(), "text/plain"));
             }
             catch (Exception ex)
             {

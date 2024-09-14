@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using Standard.Licensing.Validation;
 using Microsoft.Extensions.Logging;
 using PhishingPortal.Dto;
+using PhishingPortal.Common;
 
 namespace PhishingPortal.Licensing
 {
@@ -20,12 +21,12 @@ namespace PhishingPortal.Licensing
         }
 
         /// <summary>
-        /// 
+        /// To generate a new license based on subscription
         /// </summary>
         /// <param name="passPhrase"></param>
         /// <param name="subscriptionInfo"></param>
         /// <returns></returns>
-        public LicenseInfo Generate(string passPhrase, SubscriptionInfo subscriptionInfo)
+        public (string PrivateKey, string PublicKey, string PassPhrase, string Content) Generate(string passPhrase, SubscriptionInfo subscriptionInfo)
         {
             var keyGenerator = Standard.Licensing.Security.Cryptography.KeyGenerator.Create();
             var keyPair = keyGenerator.GenerateKeyPair();
@@ -51,27 +52,25 @@ namespace PhishingPortal.Licensing
                             .LicensedTo(subscriptionInfo.TenantIdentifier, subscriptionInfo.TenantEmail)
                             .CreateAndSignWithPrivateKey(privateKey, passPhrase);
 
-            return new LicenseInfo(privateKey, publicKey, passPhrase, license.ToString());
+            return (privateKey, publicKey, passPhrase, license.ToString());
         }
 
         /// <summary>
-        /// 
+        /// Read subscription from a license
         /// </summary>
-        /// <param name="licString"></param>
+        /// <param name="licenseKey"></param>
         /// <param name="publicKey"></param>
         /// <returns></returns>
-        public SubscriptionInfo? GetSubscriptionInfo(string licString, string publicKey)
+        public SubscriptionInfo? GetSubscriptionInfo(string licenseKey, string publicKey)
         {
-            var result = Validate(licString, publicKey);
+            var result = Validate(licenseKey, publicKey);
 
             return result.SubscriptionInfo;
         }
 
-        public (bool Valid, SubscriptionInfo? SubscriptionInfo) Validate(string licString, string publicKey)
+        public (bool Valid, SubscriptionInfo? SubscriptionInfo) Validate(string licenseKey, string publicKey)
         {
-            var content = System.Text.Encoding.UTF8.GetBytes(licString);
-
-            using (MemoryStream ms = new MemoryStream(content))
+            using (MemoryStream ms = new MemoryStream(licenseKey.ToByteArray()))
             {
                 var lic = Standard.Licensing.License.Load(ms);
 

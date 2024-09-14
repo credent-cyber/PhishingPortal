@@ -5,6 +5,8 @@ using PhishingPortal.Dto.Subscription;
 using PhishingPortal.Licensing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Newtonsoft.Json;
+using PhishingPortal.Common;
 
 namespace PhishingPortal.UI.Blazor.Client
 {
@@ -41,16 +43,13 @@ namespace PhishingPortal.UI.Blazor.Client
         /// </summary>
         /// <param name="subscription"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<LicenseInfo>> CreateLicense(SubscriptionInfo subscription)
+        public async Task<string> CreateLicense(SubscriptionInfo subscription)
         {
-            ApiResponse<LicenseInfo> content;
-
             var res = await HttpClient.PostAsJsonAsync("api/Onboarding/CreateLicense", subscription);
 
             res.EnsureSuccessStatusCode();
-            content = await res.Content.ReadFromJsonAsync<ApiResponse<LicenseInfo>>();
-            return content;
-
+            var license = await res.Content.ReadAsStringAsync();
+            return license;
         }
 
         public async Task<ApiResponse<SubscriptionInfo>> GetCurrentSubscription(string tenantIdentifier)

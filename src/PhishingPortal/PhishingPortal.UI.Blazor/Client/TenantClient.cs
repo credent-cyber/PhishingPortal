@@ -340,6 +340,28 @@ namespace PhishingPortal.UI.Blazor.Client
             return null;
         }
 
+        public async Task<Dictionary<string, string>> GetSubscription()
+        {
+            var response = new Dictionary<string, string>();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/subscription");
+                res.EnsureSuccessStatusCode();
+
+                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                if (json != null)
+                    response = json;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
+                throw;
+            }
+
+            return response;
+        }
+
         #region Settings
         public async Task<Dictionary<string, string>> GetSettings()
         {

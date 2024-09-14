@@ -536,7 +536,77 @@ namespace PhishingPortal.Repositories
             await CentralDbContext.SaveChangesAsync();
             return newEntry.Entity;
         }
-        
+
+        public async Task<bool> UpsertLicenseInfo(List<TenantData> licenseData, string adminUser)
+        {
+            try
+            {
+                foreach (var tenantData in licenseData)
+                {
+                    var existing = CentralDbContext.TenantData.FirstOrDefault(o => o.Key == tenantData.Key);
+                    if (existing != null)
+                    {
+                        existing.ModifiedOn = DateTime.UtcNow;
+                        existing.ModifiedBy = adminUser;
+                        existing.Value = tenantData.Value;
+
+                        var updates = CentralDbContext.TenantData.Update(existing);
+                        await CentralDbContext.SaveChangesAsync();
+                    }
+
+                    tenantData.CreatedOn = DateTime.UtcNow;
+                    tenantData.CreatedBy = adminUser;
+
+                    var newEntry = CentralDbContext.TenantData.Add(tenantData);
+
+                    await CentralDbContext.SaveChangesAsync();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while saving license data");
+            }
+
+            return true;
+
+        }
+
+        public async Task<bool> UpsertTenantDbLicenseInfo(List<TenantSetting> licenseData, TenantDbContext tenantDbContext, string currentUser)
+        {
+            try
+            {
+                foreach (var tenantData in licenseData)
+                {
+                    var existing = tenantDbContext.Settings.FirstOrDefault(o => o.Key == tenantData.Key);
+                    if (existing != null)
+                    {
+                        existing.ModifiedOn = DateTime.UtcNow;
+                        existing.ModifiedBy = currentUser;
+                        existing.Value = tenantData.Value;
+
+                        var updates = tenantDbContext.Settings.Update(existing);
+                        await tenantDbContext.SaveChangesAsync();
+                    }
+
+                    tenantData.CreatedOn = DateTime.UtcNow;
+                    tenantData.CreatedBy = currentUser;
+
+                    var newEntry = tenantDbContext.Settings.Add(tenantData);
+
+                    await tenantDbContext.SaveChangesAsync();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while saving license data");
+            }
+
+            return true;
+
+        }
+
         public async Task<IQueryable<TenantData>> GetTenantData(string tenantIdentifier)
         {
             return await Task.FromResult(CentralDbContext.TenantData.AsQueryable<TenantData>());

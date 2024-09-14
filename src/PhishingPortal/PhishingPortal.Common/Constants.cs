@@ -2,6 +2,11 @@
 {
     public class Constants
     {
+
+        public class ClaimTypes
+        {
+            public const string Tenant = "tenant";
+        }
         public class EmailTemplate
         {
             public const string TRAINING_CAMPAIGN = "Training";

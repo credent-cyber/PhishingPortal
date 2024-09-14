@@ -12,8 +12,10 @@ using Microsoft.Graph;
 namespace PhishingPortal.Server.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
+    using Newtonsoft.Json;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
+    using PhishingPortal.Licensing;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -380,6 +382,27 @@ namespace PhishingPortal.Server.Controllers.Api
             var result = await _tenantRepository.GetSettings();
 
             return result;
+        }
+
+        [HttpGet]
+        [Route("subscription")]
+
+        public async Task<string> GetSubscriptionKey()
+        {
+            var result = await _tenantRepository.GetSettings();
+            try
+            {
+
+                var lic = result[Constants.Keys.LICENSE];
+                return await Task.FromResult(lic);
+
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return string.Empty;
         }
 
         [HttpPost]

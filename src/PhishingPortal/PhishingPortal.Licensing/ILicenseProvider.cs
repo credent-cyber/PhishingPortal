@@ -4,8 +4,8 @@ namespace PhishingPortal.Licensing
 {
     public interface ILicenseProvider
     {
-        LicenseInfo Generate(string passPhrase, SubscriptionInfo subscriptionInfo);
-        SubscriptionInfo? GetSubscriptionInfo(string licString, string publicKey);
-        (bool Valid, SubscriptionInfo? SubscriptionInfo) Validate(string licString, string publicKey);
+        (string PrivateKey, string PublicKey, string PassPhrase, string Content) Generate(string passPhrase, SubscriptionInfo subscriptionInfo);
+        SubscriptionInfo? GetSubscriptionInfo(string content, string publicKey);
+        (bool Valid, SubscriptionInfo? SubscriptionInfo) Validate(string content, string publicKey);
     }
 }

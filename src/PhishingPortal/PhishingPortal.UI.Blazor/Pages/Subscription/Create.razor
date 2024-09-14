@@ -10,10 +10,7 @@
 
 <h3>@(IsUpdate ? "Update" : "Create") Subscription</h3>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <span class="alert-danger">@errorMessage</span>
-}
+
 
 <EditForm Model="model" OnValidSubmit="OnSubmit">
 
@@ -21,6 +18,19 @@
 
     <div class="m-1 p-1">
 
+        <div class="row">
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <span class="alert-danger p-1 m-1 mb-2">@errorMessage</span>
+            }
+        </div>
+
+        <div class="row">
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <span class="alert-info p-1 m-1 mb-2">@message</span>
+            }
+        </div>
 
         <div class="row form-group">
             <label class="col-form-label col-md-2 bold-font" for="TenantIdentifier">@nameof(model.TenantIdentifier)</label>
@@ -110,6 +120,7 @@
 
     private SubscriptionInfo model = new SubscriptionInfo();
     private string errorMessage = string.Empty;
+    private string message = string.Empty;
     private bool Email = false;
     private bool WhatsApp = false;
     private bool Sms = false;
@@ -152,10 +163,15 @@
 
             }
         }
+        else
+        {
+            message = "No existing subscription found! Please create new.";
+        }
     }
 
     protected async Task OnSubmit()
     {
+        errorMessage = message = string.Empty;
         // create or update license
         // update tenant setting (admin) with private key phassphrase and license
         // update tenant db (license and public key)
@@ -164,13 +180,13 @@
 
         var result = await TenantAdminClient.CreateLicense(model);
 
-        if (result.IsSuccess)
+        if (result != null)
         {
             Navigation.NavigateTo("provision");
         }
         else
         {
-            errorMessage = result.Message;
+            errorMessage = "Couldn't retrive a valid license";
         }
     }
 
