@@ -26,7 +26,7 @@ namespace PhishingPortal.Server.Services
 
             ClientID = Settings.GetSetting<string>("az_client_id").Result;
             ClientSecret = Settings.GetSetting<string>("az_client_secret").Result;
-            TenantID = Settings.GetSetting<string>("az_tenant_id").Result;
+            TenantID = Settings.GetSetting<string>("az_tenant_id").Result ?? "cf92019c-152d-42f6-bbcc-0cf96e6b0108";
 
             var options = new TokenCredentialOptions
             {

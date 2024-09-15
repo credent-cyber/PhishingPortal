@@ -38,4 +38,9 @@ namespace PhishingPortal.Dto.Subscription
         public string TenantEmail { get; set; }
     }
 
+    public class LicenceData
+    {
+        public string Content { get; set; }
+        public string PublicKey { get; set; }
+    }
 }

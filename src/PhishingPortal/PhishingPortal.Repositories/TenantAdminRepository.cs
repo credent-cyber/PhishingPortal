@@ -10,6 +10,7 @@ using PhishingPortal.Dto;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PhishingPortal.Repositories
 {
@@ -551,6 +552,7 @@ namespace PhishingPortal.Repositories
                         existing.Value = tenantData.Value;
 
                         var updates = CentralDbContext.TenantData.Update(existing);
+                        CentralDbContext.Entry(updates).State = EntityState.Modified;
                         await CentralDbContext.SaveChangesAsync();
                     }
 
@@ -558,7 +560,7 @@ namespace PhishingPortal.Repositories
                     tenantData.CreatedBy = adminUser;
 
                     var newEntry = CentralDbContext.TenantData.Add(tenantData);
-
+                    //CentralDbContext.Entry(newEntry).State = EntityState.Added;
                     await CentralDbContext.SaveChangesAsync();
 
                 }
@@ -586,6 +588,8 @@ namespace PhishingPortal.Repositories
                         existing.Value = tenantData.Value;
 
                         var updates = tenantDbContext.Settings.Update(existing);
+
+                        tenantDbContext.Entry(updates).State = EntityState.Modified;
                         await tenantDbContext.SaveChangesAsync();
                     }
 
@@ -593,7 +597,7 @@ namespace PhishingPortal.Repositories
                     tenantData.CreatedBy = currentUser;
 
                     var newEntry = tenantDbContext.Settings.Add(tenantData);
-
+                   // tenantDbContext.Entry(newEntry).State = EntityState.Added;
                     await tenantDbContext.SaveChangesAsync();
 
                 }

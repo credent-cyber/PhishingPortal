@@ -44,7 +44,7 @@ namespace PhishingPortal.Server
         {
             if (context.User.IsAuthenticated())
             {
-                return context?.User?.Claims?.Any(c => c.Type == ClaimTypes.Role && c.Value == "superadmin") ?? false;
+                return context?.User?.Claims?.Any(c => c.Type == "role" && c.Value == "superadmin") ?? false;
             }
 
             return false;

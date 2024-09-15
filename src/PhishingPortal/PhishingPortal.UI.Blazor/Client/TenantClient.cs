@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using PhishingPortal.Dto.Subscription;
 using PhishingPortal.UI.Blazor.Pages;
 using System;
 using System.Net.Http.Json;
@@ -340,26 +341,25 @@ namespace PhishingPortal.UI.Blazor.Client
             return null;
         }
 
-        public async Task<Dictionary<string, string>> GetSubscription()
+        public async Task<SubscriptionInfo> GetSubscription()
         {
-            var response = new Dictionary<string, string>();
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/subscription");
+               
                 res.EnsureSuccessStatusCode();
 
-                var json = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                if (json != null)
-                    response = json;
+                var content = await res.Content.ReadFromJsonAsync<ApiResponse<SubscriptionInfo>>();
+                
+                return content.Result;
 
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, ex.Message);
-                throw;
             }
 
-            return response;
+            return null;
         }
 
         #region Settings
@@ -726,7 +726,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
-         {
+        {
             List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
@@ -1080,7 +1080,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 return await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
 
-                
+
             }
             catch (Exception ex)
             {

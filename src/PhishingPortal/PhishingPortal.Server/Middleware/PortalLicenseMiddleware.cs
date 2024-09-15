@@ -1,69 +1,58 @@
 ﻿using Duende.IdentityServer.Extensions;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using PhishingPortal.Common;
-using PhishingPortal.Dto;
-using PhishingPortal.Licensing;
-
-using PhishingPortal.Server;
-using PhishingPortal.UI.Blazor.Client;
-using PhishingPortal.UI.Blazor.Services;
-using System.Net.Mime;
-
+using PhishingPortal.Server.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using PhishingPortal.DataContext;
+using PhishingPortal.Domain;
+using PhishingPortal.Dto.Auth;
 namespace PhishingPortal.Server.Middleware
 {
     /// <summary>
     /// This middleware is meant for proper subscription / license for the tenant
     /// </summary>
-
     public class PortalLicenseMiddleware : IMiddleware
     {
-        private readonly ILicenseProvider licenseProvider;
-        private readonly TenantClient tenantClient;
-        private Dictionary<string, string> settings = new();
+        private readonly ILicenseService licenseServices;
+        private readonly SignInManager<PhishingPortalUser> signInManager;
 
-        public PortalLicenseMiddleware(ILicenseProvider licenseProvider, TenantClient tenantClient)
+        public PortalLicenseMiddleware(ILicenseService licenseServices, SignInManager<PhishingPortalUser> signInManager)
         {
-            this.licenseProvider = licenseProvider;
-            this.tenantClient = tenantClient;
+            this.licenseServices = licenseServices;
+            this.signInManager = signInManager;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var isvalidLicense = false;
+            //var isvalidLicense = false;
 
-            if (context.User.IsAuthenticated())
-            {
-               // settings = await tenantClient.GetSubscription();
-            }
+            ////if (context.Request.Path.Value.Contains("nosubscription"))
+            ////    await next(context);
 
-            //if (settings.Count <= 0 && context.User.IsAuthenticated() && !context.IsSuperAdmin())
-            //    settings = await tenantClient.GetSettings();
-
-            //// retrieve license and validate
-
-            //if (settings != null && settings.Count > 0)
+            //if (context.User.IsAuthenticated())
             //{
-            //    var licenseSetting = settings[Constants.Keys.LICENSE];
-
-            //    if (licenseSetting != null)
+            //    var isAdmin = context.IsSuperAdmin();
+            //    if (!isAdmin)
             //    {
-            //        LicenseInfo? lic = JsonConvert.DeserializeObject<LicenseInfo>(licenseSetting);
+            //        var tenantIdentifier = context.User.Claims.FirstOrDefault(o => o.Type == "tenant")?.Value ?? string.Empty;
 
-            //        if (lic != null)
+            //        if (!string.IsNullOrEmpty(tenantIdentifier))
             //        {
-            //            var result = this.licenseProvider.Validate(lic.Content, lic.PublicKey);
+            //            var valid = await licenseServices.HasValidLicense(tenantIdentifier);
 
-            //            isvalidLicense = result.Valid;
+            //            context.Response.StatusCode = 302;
+            //            context.Response.Redirect("/nosubscription");
+            //            return;
             //        }
-            //    }
 
+            //    }
+            //    // TODO: we may create an expiry page
+            //    // check if expiry is near send app notification or reflect somewher
             //}
 
-            //if (!isvalidLicense)
-            //    context.Response.Redirect("/Account/Login");
+            //await next(context);
 
-            await next(context);
+            throw new NotImplementedException();
         }
     }
 

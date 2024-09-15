@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.OutlookAddIn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Tests", "PhishingPortal.Common.Tests\PhishingPortal.Tests.csproj", "{C2A60209-98E4-4B65-AAC7-EC1CCE5F58D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhishingPortal.Licensing", "PhishingPortal.Licensing\PhishingPortal.Licensing.csproj", "{7075EB3B-9579-414B-8773-B243F6EFBBF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhishingPortal.Licensing", "PhishingPortal.Licensing\PhishingPortal.Licensing.csproj", "{7075EB3B-9579-414B-8773-B243F6EFBBF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

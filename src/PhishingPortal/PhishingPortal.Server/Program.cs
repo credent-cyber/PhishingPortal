@@ -206,6 +206,7 @@ builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
 builder.Services.AddScoped<ILicenseProvider, LicenseProvider>();
+builder.Services.AddScoped<ILicenseService, LicenseService>();
 
 builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri("https://localhost:7018"));
 
@@ -262,7 +263,7 @@ else
 
 app.UseAuthorization();
 
-app.UsePortalLicensing();
+//app.UsePortalLicensing();
 
 app.Use((context, next) => {
 
