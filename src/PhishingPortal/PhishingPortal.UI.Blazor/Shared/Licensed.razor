@@ -10,7 +10,7 @@
 }
 else
 {
-    @if (ShowLicenseWarning)
+    @if (ShowLicenseWarning && !ValidationInProgress)
     {
         <h2 style="margin-top:22%;margin-left:22%;">No Active Subscription</h2>
         <div class="row">
@@ -22,6 +22,7 @@ else
 @code {
 
     private bool IsValid = false;
+    private bool ValidationInProgress = true;
 
     [Parameter]
     public bool ShowLicenseWarning { get; set; } = true;
@@ -31,6 +32,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        ValidationInProgress = true;
         var subscriptionInfo = await client.GetSubscription();
 
         if (subscriptionInfo == null)
@@ -39,6 +41,8 @@ else
         {
             IsValid = true;
         }
+
+        ValidationInProgress = false;
 
         await base.OnInitializedAsync();
     }
