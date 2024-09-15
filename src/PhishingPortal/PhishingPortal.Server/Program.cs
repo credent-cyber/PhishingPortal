@@ -15,6 +15,9 @@ using PhishingPortal.Server;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.Security.Claims;
 using PhishingPortal.Server.Middleware;
+using PhishingPortal.Licensing;
+using PhishingPortal.UI.Blazor.Client;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -125,7 +128,6 @@ builder.Services.AddIdentityCore<PhishingPortalUser>()
    .AddSignInManager()
    .AddDefaultTokenProviders();
 
-
 if (!useWindowsAuthentication)
 {
 
@@ -203,7 +205,12 @@ builder.Services.AddSingleton<TenantAdminRepoConfig>();
 builder.Services.AddScoped<ITenantAdminRepository, TenantAdminRepository>();
 builder.Services.AddSingleton<INsLookupHelper, NsLookupHelper>();
 builder.Services.AddScoped<ITenantDbResolver, TenantDbResolver>();
+builder.Services.AddScoped<ILicenseProvider, LicenseProvider>();
+builder.Services.AddScoped<ILicenseService, LicenseService>();
 
+builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new Uri("https://localhost:7018"));
+
+builder.Services.AddScoped<PortalLicenseMiddleware>();
 
 var app = builder.Build();
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
@@ -256,6 +263,8 @@ else
 
 app.UseAuthorization();
 
+//app.UsePortalLicensing();
+
 app.Use((context, next) => {
 
     var cookie = context.Request.Cookies;
@@ -269,6 +278,5 @@ app.UseEndpoints(endpoints =>
 
     endpoints.MapFallbackToFile("index.html");
 });
-
 
 app.Run();

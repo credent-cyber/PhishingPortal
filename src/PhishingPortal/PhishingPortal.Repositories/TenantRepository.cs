@@ -938,9 +938,16 @@ namespace PhishingPortal.Repositories
         #region Settings
         public async Task<Dictionary<string, string>> GetSettings()
         {
-            var settings = await TenantDbCtx.Settings.ToListAsync();
+            var settings = await TenantDbCtx.Settings.Where(o => o.Key != TenantData.Keys.License && o.Key != TenantData.Keys.PublicKey).ToListAsync();
 
             return settings.ToDictionary(o => o.Key, v => v.Value);
+        }
+
+        public (string? LicenseKey, string? PublicKey) GetLicenseKeys() {
+
+            var publicKey = TenantDbCtx.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.PublicKey);
+            var licenseKey = TenantDbCtx.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+            return (licenseKey?.Value, publicKey?.Value);
         }
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings, string user)

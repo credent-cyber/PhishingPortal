@@ -12,8 +12,11 @@ using Microsoft.Graph;
 namespace PhishingPortal.Server.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
+    using Newtonsoft.Json;
     using PhishingPortal.Common;
     using PhishingPortal.Dto;
+    using PhishingPortal.Dto.Subscription;
+    using PhishingPortal.Licensing;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -28,9 +31,10 @@ namespace PhishingPortal.Server.Controllers.Api
         readonly IOnPremiseADService _onPromiseADService;
 
         public INsLookupHelper NsLookupHelper { get; }
+        public ILicenseProvider LicenseProvider { get; }
 
         public TenantController(ILogger<TenantController> logger, IConfiguration appConfig, ITenantAdminRepository adminRepository,
-            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver, INsLookupHelper nsLookupHelper) :
+            IHttpContextAccessor httpContextAccessor, ITenantDbResolver tenantDbResolver, INsLookupHelper nsLookupHelper, ILicenseProvider license) :
             base(logger, adminRepository, httpContextAccessor, tenantDbResolver)
         {
             _tenantRepository = new TenantRepository(logger, TenantDbCtx);
@@ -40,6 +44,7 @@ namespace PhishingPortal.Server.Controllers.Api
             _adImportClient = new AzActDirClientService(logger, _tenantRepository);
             TrainingRepository = new TrainingRepository(logger, TenantDbCtx);
             NsLookupHelper = nsLookupHelper;
+            LicenseProvider = license;
             _onPromiseADService = new OnPremiseADService(logger, TenantDbCtx);
         }
 
@@ -380,6 +385,31 @@ namespace PhishingPortal.Server.Controllers.Api
             var result = await _tenantRepository.GetSettings();
 
             return result;
+        }
+
+        [HttpGet]
+        [Route("subscription")]
+
+        public async Task<ApiResponse<SubscriptionInfo>> GetSubscriptionKey()
+        {
+            // returns current subscription.
+            var result = _tenantRepository.GetLicenseKeys();
+            var license = result.LicenseKey;
+            var publicKey = result.PublicKey;
+
+            if (license == null || string.IsNullOrEmpty(license)
+                || publicKey == null || string.IsNullOrEmpty(publicKey))
+            {
+                return await Task.FromResult(new ApiResponse<SubscriptionInfo>() { IsSuccess = false });
+            }
+
+            var subscriptionInfo = LicenseProvider.GetSubscriptionInfo(license, publicKey);
+
+            return await Task.FromResult(new ApiResponse<SubscriptionInfo>()
+            {
+                IsSuccess = subscriptionInfo != null,
+                Result = subscriptionInfo
+            });
         }
 
         [HttpPost]

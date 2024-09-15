@@ -1498,6 +1498,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Licensing\PhishingPortal.Licensing.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

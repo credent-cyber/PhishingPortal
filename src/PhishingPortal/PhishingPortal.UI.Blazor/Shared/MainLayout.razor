@@ -12,7 +12,9 @@
 
         <AuthorizeView Roles="tenantadmin">
             @* <Topbar /> *@
-            <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
+           <Licensed ShowLicenseWarning="false">
+                <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
+           </Licensed>
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantuser">
@@ -28,12 +30,26 @@
             </NotAuthorized>
 
         </AuthorizeView>
-        <AuthorizeView>
+        <AuthorizeView Roles="superadmin,tenantuser">
             <article class="content">
                 <CascadingValue TValue="AlertModel" Value="alerts">
                     <div class="pcoded-main-container mt-4" style="@($"margin-left: {(IsCollapsed ? "70px" : "235px")};")">
                         <div class="pcoded-content">
                             @Body
+                        </div>
+                    </div>
+                </CascadingValue>
+            </article>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="tenantadmin">
+            <article class="content">
+                <CascadingValue TValue="AlertModel" Value="alerts">
+                    <div class="pcoded-main-container mt-4" style="@($"margin-left: {(IsCollapsed ? "70px" : "235px")};")">
+                        <div class="pcoded-content">
+                           <Licensed ShowLicenseWarning="true">
+                                @Body
+                           </Licensed>
                         </div>
                     </div>
                 </CascadingValue>
