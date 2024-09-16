@@ -550,18 +550,18 @@ namespace PhishingPortal.Repositories
                         existing.ModifiedOn = DateTime.UtcNow;
                         existing.ModifiedBy = adminUser;
                         existing.Value = tenantData.Value;
-
-                        var updates = CentralDbContext.TenantData.Update(existing);
-                        CentralDbContext.Entry(updates).State = EntityState.Modified;
+                       
                         await CentralDbContext.SaveChangesAsync();
                     }
+                    else
+                    {
+                        tenantData.CreatedOn = DateTime.UtcNow;
+                        tenantData.CreatedBy = adminUser;
 
-                    tenantData.CreatedOn = DateTime.UtcNow;
-                    tenantData.CreatedBy = adminUser;
-
-                    var newEntry = CentralDbContext.TenantData.Add(tenantData);
-                    //CentralDbContext.Entry(newEntry).State = EntityState.Added;
-                    await CentralDbContext.SaveChangesAsync();
+                        var newEntry = CentralDbContext.Add(tenantData);
+                        //CentralDbContext.Entry(newEntry).State = EntityState.Added;
+                        await CentralDbContext.SaveChangesAsync();
+                    }
 
                 }
             }
@@ -587,19 +587,16 @@ namespace PhishingPortal.Repositories
                         existing.ModifiedBy = currentUser;
                         existing.Value = tenantData.Value;
 
-                        var updates = tenantDbContext.Settings.Update(existing);
-
-                        tenantDbContext.Entry(updates).State = EntityState.Modified;
                         await tenantDbContext.SaveChangesAsync();
                     }
+                    else
+                    {
+                        tenantData.CreatedOn = DateTime.UtcNow;
+                        tenantData.CreatedBy = currentUser;
 
-                    tenantData.CreatedOn = DateTime.UtcNow;
-                    tenantData.CreatedBy = currentUser;
-
-                    var newEntry = tenantDbContext.Settings.Add(tenantData);
-                   // tenantDbContext.Entry(newEntry).State = EntityState.Added;
-                    await tenantDbContext.SaveChangesAsync();
-
+                        var newEntry = tenantDbContext.Add(tenantData);
+                        await tenantDbContext.SaveChangesAsync();
+                    }
                 }
             }
             catch (Exception ex)

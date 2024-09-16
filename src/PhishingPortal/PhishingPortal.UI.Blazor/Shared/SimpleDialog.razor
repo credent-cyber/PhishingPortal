@@ -20,7 +20,7 @@
 
     <div class="dialog-container" style="width:100%; height:100vh; z-index: 9999;">
 
-        <div class="dialog" style="width:320px">
+        <div class="dialog" style="@(!FullScreen ? "width:320px" : "")">
             @*popup screen size*@
 
             <div class="card">
@@ -36,7 +36,7 @@
                         <div class="mt-2">
                             @ChildContent
                         </div>
-                    </div>                 
+                    </div>
                 </div>
             </div>
 
@@ -51,7 +51,7 @@
     [Parameter] public bool Show { get; set; }
     [Parameter] public string Title { get; set; }
     [Parameter] public EventCallback<bool> OnCloseDialog { get; set; }
-
+    [Parameter] public bool FullScreen { get; set; }
     private async Task onClose()
     {
         await OnCloseDialog.InvokeAsync(false);

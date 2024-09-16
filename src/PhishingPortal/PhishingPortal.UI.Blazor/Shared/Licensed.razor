@@ -4,19 +4,17 @@
 @inject CustomStateProvider StateProvider
 @inject NavigationManager Navigation
 
-@if (IsValid)
+
+@ChildContent
+
+@if (ShowLicenseWarning && !ValidationInProgress && !IsValid)
 {
-    @ChildContent
-}
-else
-{
-    @if (ShowLicenseWarning && !ValidationInProgress)
-    {
-        <h2 style="margin-top:22%;margin-left:22%;">No Active Subscription</h2>
+    <SimpleDialog Title="Subscription Information" Show="true" OnCloseDialog="BeginSignOut" FullScreen="true">
+        <h2 style="margin-left:33%;">No Active Subscription</h2>
         <div class="row">
-            <button type="button" class="btn btn-link" @onclick="BeginSignOut">Go back</button>
+            <button type="button" class="btn btn-link" @onclick="BeginSignOut">Go Back To Home Screen</button>
         </div>
-    }
+    </SimpleDialog>
 }
 
 @code {

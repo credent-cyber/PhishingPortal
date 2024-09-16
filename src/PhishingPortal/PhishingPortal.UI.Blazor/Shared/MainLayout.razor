@@ -12,9 +12,7 @@
 
         <AuthorizeView Roles="tenantadmin">
             @* <Topbar /> *@
-           <Licensed ShowLicenseWarning="false">
-                <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
-           </Licensed>
+            <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantuser">

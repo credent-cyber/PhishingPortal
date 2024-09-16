@@ -65,7 +65,9 @@ namespace PhishingPortal.Licensing
         {
             var result = Validate(licenseKey, publicKey);
 
-            return result.SubscriptionInfo;
+            if(result.Valid)
+                return result.SubscriptionInfo;
+            return default;
         }
 
         public (bool Valid, SubscriptionInfo? SubscriptionInfo) Validate(string licenseKey, string publicKey)
