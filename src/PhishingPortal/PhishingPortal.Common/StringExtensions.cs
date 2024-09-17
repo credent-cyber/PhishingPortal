@@ -5,6 +5,20 @@ namespace PhishingPortal.Common
 
     public static class StringExtensions
     {
+        public static byte[] ToByteArray(this string value)
+        {
+            return System.Text.Encoding.UTF8.GetBytes(value);  
+        }
+
+        public static string ToBase64String(this string value)
+        {
+            return Convert.ToBase64String(value.Replace("\r", "").Replace("\n", "").ToByteArray());
+        }
+
+        public static string FromBase64String(this string value)
+        {
+            return System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(value));
+        }
 
         /// <summary>
         /// Computes MD5 hash for the input string

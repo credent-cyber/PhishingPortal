@@ -2,6 +2,11 @@
 {
     public class Constants
     {
+
+        public class ClaimTypes
+        {
+            public const string Tenant = "tenant";
+        }
         public class EmailTemplate
         {
             public const string TRAINING_CAMPAIGN = "Training";
@@ -22,6 +27,7 @@
             public const string PHISHING_REPORT_REPOSITORY = "mailbox_reporting_source";
             public const string SRC_MSGRAPH = "AZURE";
             public const string SRC_EXCHANGE = "EXCHANGE";
+            public const string LICENSE = "LICENSE";
 
             public const string ClIENT_ID = "az_client_id";
             public const string CLIENT_SECRET = "az_client_secret";
