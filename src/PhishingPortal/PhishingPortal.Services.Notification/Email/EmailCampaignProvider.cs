@@ -24,12 +24,13 @@ namespace PhishingPortal.Services.Notification.Email
         private string BaseUrl = "http://localhost:7081/cmp";
 
         public EmailCampaignProvider(ILogger<EmailCampaignProvider> logger,
-            IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager)
+            IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, ILicenseEnforcementService licenseEnforcement)
         {
             Logger = logger;
             EmailSender = emailSender;
             Tenant = tenant;
             ConnManager = connManager;
+            LicenseEnforcement = licenseEnforcement;
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
@@ -48,6 +49,9 @@ namespace PhishingPortal.Services.Notification.Email
                 try
                 {
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
+
+                    if (!LicenseEnforcement.HasValidLicense(dbContext, Dto.Subscription.AppModules.EmailCampaign))
+                        return;
 
                     var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
                                             .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
@@ -231,5 +235,6 @@ namespace PhishingPortal.Services.Notification.Email
         public IEmailClient EmailSender { get; }
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
+        public ILicenseEnforcementService LicenseEnforcement { get; }
     }
 }
