@@ -29,14 +29,17 @@ namespace PhishingPortal.Services.Notification
             var licenseKey = licenseData.FirstOrDefault(o => o.Key == TenantData.Keys.License)?.Value ?? string.Empty;
             var publicKey = licenseData.FirstOrDefault(o => o.Key == TenantData.Keys.PublicKey)?.Value ?? string.Empty;
             var subscriptionInfo = LicenseProvider.GetSubscriptionInfo(licenseKey, publicKey);
+            var licenseDate = DateTime.Now;
 
             if (subscriptionInfo == null)
                 return false;
 
-            var campaignCounts = tenandDbCtx.Campaigns
-                .Where(o => o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.Completed || o.State == CampaignStateEnum.InProgress)
-                .GroupBy(o => o.Detail.Type).Select(o => new { Type = o.Key, Count = o.Count() });
+            var licenseSetting = licenseData.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+            licenseDate = licenseSetting?.ModifiedOn ?? licenseSetting?.CreatedOn ?? DateTime.MinValue;
 
+            var campaignCounts = tenandDbCtx.Campaigns
+                .Where(o => o.ModifiedOn > licenseDate && (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.Completed || o.State == CampaignStateEnum.InProgress))
+                .GroupBy(o => o.Detail.Type).Select(o => new { Type = o.Key, Count = o.Count() });
 
             var isValid = false;
 
@@ -69,7 +72,7 @@ namespace PhishingPortal.Services.Notification
                 case AppModules.TrainingCampaign:
 
                     var trainings = tenandDbCtx.Training
-                        .Count(o => (o.State == TrainingState.Published || o.State == TrainingState.Completed || o.State == TrainingState.InProgress));
+                        .Count(o => o.CreatedOn > licenseDate && (o.State == TrainingState.Published || o.State == TrainingState.Completed || o.State == TrainingState.InProgress));
 
                     if (subscriptionInfo.Modules.Any(o => (o == AppModules.TrainingCampaign && subscriptionInfo.TransactionCount > trainings)))
                         isValid = true;
