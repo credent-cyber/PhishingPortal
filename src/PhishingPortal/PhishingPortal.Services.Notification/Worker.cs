@@ -37,6 +37,7 @@ namespace PhishingPortal.Services.Notification
             IAppEventNotifier appEventNotifier,
             IUrlShortner urlShortner,
             IWeeklyReportExecutor weeklyReportExecutor,
+            ILicenseEnforcementService licenseEnforcement,
             ApplicationSettings applicationSettings
             )
 
@@ -64,6 +65,7 @@ namespace PhishingPortal.Services.Notification
             this.applicationSettings = applicationSettings;
             this.urlShortner = urlShortner;
             this._weeklyReportExecutor = weeklyReportExecutor;
+            this.licenseEnforcement = licenseEnforcement;
         }
 
         readonly ILogger<Worker> _logger;
@@ -80,6 +82,7 @@ namespace PhishingPortal.Services.Notification
         private readonly ISmsCampaignExecutor _smsExecutor;
         private readonly IWhatsappCampaignExecutor _whatsappCampaignExecutor;
         private readonly IWeeklyReportExecutor _weeklyReportExecutor;
+        private readonly ILicenseEnforcementService licenseEnforcement;
         bool _isprocessing = false;
         private readonly IDemoRequestHandler _demoRequestHandler;
         private readonly ITrainingExecutor _trainingExecutor;
@@ -149,7 +152,7 @@ namespace PhishingPortal.Services.Notification
                                     // run email campaing for each tenant
                                     if (_settings.EnableEmailCampaign)
                                     {
-                                        var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager);
+                                        var provider = new EmailCampaignProvider(providerLogger, _emailClient, _configuration, tenant, TenantDbConnManager, licenseEnforcement);
                                         provider.Subscribe(_campaignExecutor);
                                         await provider.CheckAndPublish(stoppingToken);
 
@@ -158,7 +161,7 @@ namespace PhishingPortal.Services.Notification
                                     //// sms campaign executor
                                     if (_settings.EnableSmsCampaign)
                                     {
-                                        var _smsProvider = new SmsCampaignProvider(smsProviderLogger, SmsClient, _configuration, tenant, TenantDbConnManager);
+                                        var _smsProvider = new SmsCampaignProvider(smsProviderLogger, SmsClient, _configuration, tenant, TenantDbConnManager, urlShortner, licenseEnforcement);
                                         _smsProvider.Subscribe(_smsExecutor);
                                         await _smsProvider.CheckAndPublish(stoppingToken);
                                     }
@@ -166,7 +169,7 @@ namespace PhishingPortal.Services.Notification
                                     // whatsapp provider 
                                     if (_settings.EnableWhatsappCampaign)
                                     {
-                                        var _waProvider = new WhatsappCampaignProvider(whatsappProviderLogger, WaClient, _configuration, tenant, TenantDbConnManager, urlShortner);
+                                        var _waProvider = new WhatsappCampaignProvider(whatsappProviderLogger, WaClient, _configuration, tenant, TenantDbConnManager, urlShortner, licenseEnforcement);
                                         _waProvider.Subscribe(_whatsappCampaignExecutor);
                                         await _waProvider.CheckAndPublish(stoppingToken);
                                     }
@@ -174,7 +177,7 @@ namespace PhishingPortal.Services.Notification
                                     //training provider
                                     if (_settings.EnableTrainingProvider)
                                     {
-                                        var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider);
+                                        var trainingProvider = new TrainingProvider(TrainingProviderLogger, _emailClient, _configuration, tenant, TenantDbConnManager, _emailTemplateProvider, licenseEnforcement);
                                         trainingProvider.Subscribe(_trainingExecutor);
                                         await trainingProvider.CheckAndPublish(stoppingToken);
                                     }
@@ -187,7 +190,7 @@ namespace PhishingPortal.Services.Notification
                                     }
 
                                     //Weekly Summary Report provider
-                                    if (_settings.EnableWeeklyReport && currentDayOfWeek == DayOfWeek.Saturday)
+                                    if (_settings.EnableWeeklyReport && currentDayOfWeek == DayOfWeek.Monday)
                                         if (_settings.EnableWeeklyReport)
                                         {
                                             var dbContext = TenantDbConnManager.GetContext(tenant.UniqueId);

@@ -1,4 +1,5 @@
-﻿using PhishingPortal.Dto;
+﻿using PhishingPortal.DataContext;
+using PhishingPortal.Dto;
 
 namespace PhishingPortal.Repositories
 {
@@ -21,10 +22,14 @@ namespace PhishingPortal.Repositories
 
         Task<Tenant> ConfirmDomainAsync(DomainVerificationRequest domain);
 
-        Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor);
+        Task<string> UpsertDemoRequestor(DemoRequestor demoRequestor);
         Task<TenantDomain> UpsertTenantDomain(TenantDomain domain);
         Task<IEnumerable<TenantDomain>> GetDomains(int tenantId);
         Task<TenantDomain> VerifyDomain(TenantDomain domain);
         Task<bool> DeleteDomain(int id);
+        Task<TenantData> UpsertTenantData(TenantData tenantData, string adminUser);
+        Task<IQueryable<TenantData>> GetTenantData(string tenantIdentifier);
+        Task<bool> UpsertLicenseInfo(List<TenantData> licenseData, string adminUser);
+        Task<bool> UpsertTenantDbLicenseInfo(List<TenantSetting> licenseData, TenantDbContext tenantDbContext, string currentUser);
     }
 }

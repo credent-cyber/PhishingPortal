@@ -1,6 +1,20 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @inject IJSRuntime JS
 
+<style>
+    @@media screen and (max-width: 450px) {
+        .menu-styler {
+            display: none !important;
+        }
+    }
+
+    @@media screen and (min-width: 450px) {
+        .menu-styler {
+            display: block !important;
+        }
+    }
+</style>
+
 <div>
     <nav class="pcoded-navbar menupos-fixed @(layout) @(IsSidebarCollapsed ? "navbar-collapsed" : "")">
         <div class="navbar-wrapper non-selectable">
@@ -10,7 +24,7 @@
                         <label>Phish</label>
                     </li>
                     <li class="nav-item">
-                        <a href="/" class="nav-link" @onclick="ToggleDashboard">
+                        <a href="/" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-home"></i>
                             </span><span class="pcoded-mtext">Dashboard</span>
@@ -18,7 +32,7 @@
                     </li>
 
                     <li class="nav-item pcoded-hasmenu @(IsTemplateExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link" @onclick="ToggleTemplate">
+                        <a class="nav-link" @onclick="ToggleTemplate"  style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-layout"></i>
                             </span>
@@ -31,7 +45,7 @@
                     </li>
 
                     <li class="nav-item pcoded-hasmenu @(IsCampaignExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleCampaign">
+                        <a class="nav-link " @onclick="ToggleCampaign" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-layers"></i>
                             </span><span class="pcoded-mtext">Campaigns</span>
@@ -47,7 +61,7 @@
                         <label>Learn</label>
                     </li>
                     <li class="nav-item pcoded-hasmenu @(IsTrainingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleTraining">
+                        <a class="nav-link " @onclick="ToggleTraining" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-box"></i>
                             </span><span class="pcoded-mtext">Training</span>
@@ -57,11 +71,12 @@
                             <li><a href="tenant-training-config">New Training</a></li>
                             <li><a href="training-video-upload">Training Video</a></li>
                             <li><a href="training-Quizzes">Training Quiz</a></li>
+                            <li><a href="training-quiz">New Training Quiz</a></li>
 
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining">
+                        <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-book"></i>
                             </span><span class="pcoded-mtext">My Training</span>
@@ -69,7 +84,7 @@
                     </li>
 
                     <li class="nav-item pcoded-hasmenu @(IsReportExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleReport">
+                        <a class="nav-link " @onclick="ToggleReport" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-pie-chart"></i>
                             </span><span class="pcoded-mtext">Report</span>
@@ -87,13 +102,14 @@
                         <label>Configuration</label>
                     </li>
                     <li class="nav-item pcoded-hasmenu @(IsSettingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleSetting">
+                        <a class="nav-link " @onclick="ToggleSetting" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-settings"></i>
                             </span><span class="pcoded-mtext">Settings</span>
                         </a>
                         <ul class="pcoded-submenu @(IsSettingExpanded ? "d-block" : "d-none")">
                             <li><a href="az-config">Azure App Configurations</a></li>
+                            <li><a href="google-config">Google App Configurations</a></li>
                             <li><a href="onprem-ad-config">AD Configurations</a></li>
                             <li><a href="tenant-domains">Domain Configurations</a></li>
                             <li><a href="redirect-urls">Return Url Configurations</a></li>
@@ -103,7 +119,7 @@
                         <label>Help Center</label>
                     </li>
                     <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq">
+                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-help-circle"></i>
                             </span><span class="pcoded-mtext">
@@ -111,45 +127,54 @@
                             </span>
                         </a>
                         <ul class="pcoded-submenu @(IsFaqExpanded ? "d-block" : "d-none")">
-                            <li class="nav-item pcoded-hasmenu">
-                                <a class="nav-link "><span class="pcoded-mtext">Get Started</span></a>
-                                <ul class="pcoded-submenu">
-                                    <li><a href="dt_ext_basic_buttons.html">What is PhishSims?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">Quick Start Guide</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How we support you?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">Allow Listing in Microsoft 365</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to create Campaign?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to create Campaign Template?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">Syncing with Azure</a></li>
+                            <li class="nav-item pcoded-hasmenu @(IsGetStartedExpand ? "pcoded-trigger" : "")">
+                                <a class="nav-link " @onclick="ToggleGetStarted">
+                                    @*<a class="nav-link" @onclick:preventDefault @onclick:stopPropagation="ToggleGetStarted">*@
+                                    <span class="pcoded-mtext">Get Started</span>
+                                </a>
+                                <ul class="pcoded-submenu @(IsGetStartedExpand ? "d-block" : "d-none")">
+                                    <li><a href="/get-started-content">What is PhishSims?</a></li>
+                                    <li><a href="/quick-start-content">Quick Start Guide</a></li>
+                                    <li><a href="/support-content">How we support you?</a></li>
+                                    <li><a href="/listing-content">Allow Listing in Microsoft 365</a></li>
+                                    <li><a href="/new-campaign-content">How to create Campaign?</a></li>
+                                    <li><a href="/template-content">How to create Campaign Template?</a></li>
+                                    <li><a href="/sync-with-azure">Syncing with Azure</a></li>
                                 </ul>
                             </li>
-                            <li class="nav-item pcoded-hasmenu">
-                                <a class="nav-link "><span class="pcoded-mtext">Report Hub</span></a>
-                                <ul class="pcoded-submenu">
-                                    <li><a href="dt_ext_basic_buttons.html">How to view Campaign Report?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to view Training Report?</a></li>
+                            <li class="nav-item pcoded-hasmenu @(IsReportHubExpand ? "pcoded-trigger" : "")">
+                                <a class="nav-link " @onclick="ToggleReportHub">
+                                    <span class="pcoded-mtext">Report Hub</span>
+                                </a>
+                                <ul class="pcoded-submenu @(IsReportHubExpand ? "d-block" : "d-none")">
+                                    <li><a href="/campaign-report">How to view Campaign Report?</a></li>
+                                    <li><a href="/training-report">How to view Training Report?</a></li>
 
                                 </ul>
                             </li>
-                            <li class="nav-item pcoded-hasmenu">
-                                <a class="nav-link "><span class="pcoded-mtext">PhishSims Trainings</span></a>
-                                <ul class="pcoded-submenu">
-                                    <li><a href="dt_ext_basic_buttons.html">How to create Training?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to create Quiz for Training?</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to upload Video for Training?</a></li>
+                            <li class="nav-item pcoded-hasmenu @(IsPhishTrainExpand ? "pcoded-trigger" : "")">
+                                <a class="nav-link " @onclick="TogglePhishTrain">
+                                    <span class="pcoded-mtext">PhishSims Trainings</span>
+                                </a>
+                                <ul class="pcoded-submenu @(IsPhishTrainExpand ? "d-block" : "d-none")">
+                                    <li><a href="/training-content">How to create Training?</a></li>
+                                    <li><a href="/quiz-content">How to create Quiz for Training?</a></li>
+                                    <li><a href="/training-video-content">How to upload Video for Training?</a></li>
 
                                 </ul>
                             </li>
-                            <li><a href="tbl_sizing.html">PhishSims Policy</a></li>
-                            <li class="nav-item pcoded-hasmenu">
-                                <a class="nav-link "><span class="pcoded-mtext">Risk Score</span></a>
-                                <ul class="pcoded-submenu">
-                                    <li><a href="dt_ext_basic_buttons.html">Overview of Risk Score</a></li>
-                                    <li><a href="dt_ext_export_buttons.html">How to check Risk Score?</a></li>
+                            <li><a href="/phishSims-policy">PhishSims Policy</a></li>
+                            <li class="nav-item pcoded-hasmenu @(IsRiskScoreExpand ? "pcoded-trigger" : "")">
+                                <a class="nav-link " @onclick="ToggleRiskScore">
+                                    <span class="pcoded-mtext">Risk Score</span>
+                                </a>
+                                <ul class="pcoded-submenu @(IsRiskScoreExpand ? "d-block" : "d-none")">
+                                    <li><a href="/risk-overview">Overview of Risk Score</a></li>
+                                    <li><a href="/risk-score-content">How to check Risk Score?</a></li>
 
                                 </ul>
                             </li>
-                            <li><a href="tbl_border.html">Account Setting</a></li>
+                            <li><a href="/profile-page">Account Setting</a></li>
 
                         </ul>
                     </li>
@@ -157,13 +182,13 @@
 
                 </ul>
                 @* <div class="card text-center @(RemoveHelpCard ? "d-none" : "d-block")">
-                    <div class="card-block">
-                        <button type="button" @onclick="()=>RemoveHelpCard = true" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <i class="feather icon-sunset f-40"></i>
-                        <h6 class="mt-3">Help?</h6>
-                        <p>Please contact us on our email for need any support</p>
-                        <a target="_blank" class="btn btn-primary btn-sm text-white m-0">Support</a>
-                    </div>
+                <div class="card-block">
+                <button type="button" @onclick="()=>RemoveHelpCard = true" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="feather icon-sunset f-40"></i>
+                <h6 class="mt-3">Help?</h6>
+                <p>Please contact us on our email for need any support</p>
+                <a target="_blank" class="btn btn-primary btn-sm text-white m-0">Support</a>
+                </div>
                 </div> *@
             </div>
         </div>
@@ -173,7 +198,7 @@
         <div class="m-header" style="cursor:pointer">
             <a @onclick="ToggleSidebar" class="mobile-menu" id="mobile-collapse"><span></span></a>
             <a class="b-brand" href="/">
-                <img src="assets/images/3d-logo-icon.png" alt="" class="logo" style="width:150px;height:46px;">
+                <img src="assets/images/logo.png" alt="" class="logo" style="width:150px;height:46px;">
             </a>
             <a class="mob-toggler" @onclick="()=>MobileToggle = !MobileToggle">
                 <i class="feather icon-more-vertical"></i>
@@ -205,7 +230,7 @@
                     </div>
                 </li>
                 <li>
-                    <LoginDisplay/>
+                    <LoginDisplay />
                 </li>
             </ul>
         </div>
@@ -252,6 +277,10 @@
     private bool IsReportExpanded = false;
     private bool IsSettingExpanded = false;
     private bool IsFaqExpanded = false;
+    private bool IsGetStartedExpand = false;
+    private bool IsReportHubExpand = false;
+    private bool IsPhishTrainExpand = false;
+    private bool IsRiskScoreExpand = false;
 
     private bool MobileToggle = false;
     private bool OpenChat = false;
@@ -265,6 +294,10 @@
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleTemplate(MouseEventArgs e)
     {
@@ -274,6 +307,8 @@
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+
     }
     private void ToggleCampaign(MouseEventArgs e)
     {
@@ -283,6 +318,10 @@
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleTraining(MouseEventArgs e)
     {
@@ -292,6 +331,10 @@
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleMyTraining(MouseEventArgs e)
     {
@@ -301,6 +344,10 @@
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleReport(MouseEventArgs e)
     {
@@ -310,6 +357,10 @@
         IsTrainingExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleSetting(MouseEventArgs e)
     {
@@ -319,6 +370,10 @@
         IsTrainingExpanded = false;
         IsReportExpanded = false;
         IsFaqExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
     private void ToggleFaq(MouseEventArgs e)
     {
@@ -328,7 +383,65 @@
         IsTrainingExpanded = false;
         IsReportExpanded = false;
         IsSettingExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
     }
+    private void ToggleGetStarted(MouseEventArgs e)
+    {
+        IsGetStartedExpand = !IsGetStartedExpand;
+
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
+    }
+    private void ToggleReportHub(MouseEventArgs e)
+    {
+        IsReportHubExpand = !IsReportHubExpand;
+
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsGetStartedExpand = false;
+
+        IsPhishTrainExpand = false;
+        IsRiskScoreExpand = false;
+    }
+    private void TogglePhishTrain(MouseEventArgs e)
+    {
+        IsPhishTrainExpand = !IsPhishTrainExpand;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+
+        IsRiskScoreExpand = false;
+    }
+    private void ToggleRiskScore(MouseEventArgs e)
+    {
+        IsRiskScoreExpand = !IsRiskScoreExpand;
+        IsTemplateExpanded = false;
+        IsCampaignExpanded = false;
+        IsTrainingExpanded = false;
+        IsReportExpanded = false;
+        IsSettingExpanded = false;
+        IsGetStartedExpand = false;
+        IsReportHubExpand = false;
+        IsPhishTrainExpand = false;
+
+    }
+
     protected override async Task OnInitializedAsync()
     {
         layout = await oLocalStore.GetItemAsync<string>("layout");

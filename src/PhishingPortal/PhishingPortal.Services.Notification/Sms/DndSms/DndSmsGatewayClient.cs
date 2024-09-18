@@ -28,6 +28,7 @@ namespace PhishingPortal.Services.Notification.Sms.DndSms
        
         public async Task<(bool,string)> Send(string to, string from, string message, string TemplateId)
         {
+
             to = to.Length == 10 ? "+91" + to : to;
             bool IsEnabled = bool.Parse(Configuration.GetSection("DndSmsGateway:IsEnabled").Value);
 
@@ -56,7 +57,7 @@ namespace PhishingPortal.Services.Notification.Sms.DndSms
             sbPostData.AppendFormat("&accusage={0}", "1");
             sbPostData.AppendFormat("&tempid={0}", TemplateId.Trim());
             sbPostData.AppendFormat("&entityid={0}", Configuration.GetSection("DndSmsGateway:EntityId").Value);
-            sbPostData.AppendFormat("&shorturl={0}", "1");
+            //sbPostData.AppendFormat("&shorturl={0}", "1");
 
             try
             {

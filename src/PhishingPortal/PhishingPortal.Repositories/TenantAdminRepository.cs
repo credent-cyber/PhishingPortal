@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Duende.IdentityServer.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,9 @@ using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PhishingPortal.Repositories
 {
@@ -44,7 +47,7 @@ namespace PhishingPortal.Repositories
                 response.IsSuccess = false;
                 response.Message = "Already registered for this domain!";
                 response.Result = t;
-                return response; 
+                return response;
 
             }
 
@@ -403,26 +406,38 @@ namespace PhishingPortal.Repositories
 
         }
 
-        public async Task<DemoRequestor> UpsertDemoRequestor(DemoRequestor demoRequestor)
+        public async Task<string> UpsertDemoRequestor(DemoRequestor demoRequestor)
         {
+            string message = string.Empty;
             try
             {
-
-                CentralDbContext.DemoRequestor.Add(demoRequestor);
-                CentralDbContext.SaveChanges();
+                var domain = demoRequestor.Email.Split('@').LastOrDefault(); // Get the domain part of the email
+                if (!string.IsNullOrEmpty(domain))
+                {
+                    var requestorExists = CentralDbContext.DemoRequestor.Any(x => x.Email.Contains(domain));
+                    if (requestorExists)
+                    {
+                        message = "Request already Submitted!";
+                    }
+                }
+                else
+                {
+                    CentralDbContext.DemoRequestor.Add(demoRequestor);
+                    CentralDbContext.SaveChanges();
+                    message = "Request Submitted";
+                }
             }
             catch (Exception ex)
             {
-
-                throw;
+                return ex.Message;
             }
-            return demoRequestor;
+            return message;
         }
 
         public async Task<IEnumerable<TenantDomain>> GetDomains(int tenantId)
         {
             return await CentralDbContext.TenantDomain.Where(o => o.TenantId == tenantId).ToListAsync();
-        } 
+        }
 
         public async Task<TenantDomain> UpsertTenantDomain(TenantDomain domain)
         {
@@ -435,10 +450,10 @@ namespace PhishingPortal.Repositories
                 throw new ArgumentException("Invalid Domain address or verification code");
 
             EntityEntry<TenantDomain>? result;
-            
+
             if (existing != null)
             {
-                if(existing.Domain != domain.Domain 
+                if (existing.Domain != domain.Domain
                     || existing.DomainVerificationCode != domain.DomainVerificationCode)
                 {
                     existing.IsDomainVerified = false;
@@ -486,7 +501,7 @@ namespace PhishingPortal.Repositories
 
         public async Task<bool> DeleteDomain(int id)
         {
-            
+
             var existing = CentralDbContext.TenantDomain.First(x => x.Id == id);
 
             if (CentralDbContext.TenantDomain.Count(o => o.TenantId == existing.TenantId) == 1)
@@ -498,6 +513,104 @@ namespace PhishingPortal.Repositories
             CentralDbContext.TenantDomain.Remove(existing);
             await CentralDbContext.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<TenantData> UpsertTenantData(TenantData tenantData, string adminUser)
+        {
+            var existing = CentralDbContext.TenantData.FirstOrDefault(o => o.Key == tenantData.Key);
+            if (existing != null)
+            {
+                existing.ModifiedOn = DateTime.UtcNow;
+                existing.ModifiedBy = adminUser;
+                existing.Value = tenantData.Value;
+
+                var updates = CentralDbContext.TenantData.Update(existing);
+                await CentralDbContext.SaveChangesAsync();
+                return updates.Entity;
+            }
+
+            tenantData.CreatedOn = DateTime.UtcNow;
+            tenantData.CreatedBy = adminUser;
+
+            var newEntry = CentralDbContext.TenantData.Add(tenantData);
+
+            await CentralDbContext.SaveChangesAsync();
+            return newEntry.Entity;
+        }
+
+        public async Task<bool> UpsertLicenseInfo(List<TenantData> licenseData, string adminUser)
+        {
+            try
+            {
+                foreach (var tenantData in licenseData)
+                {
+                    var existing = CentralDbContext.TenantData.FirstOrDefault(o => o.Key == tenantData.Key);
+                    if (existing != null)
+                    {
+                        existing.ModifiedOn = DateTime.UtcNow;
+                        existing.ModifiedBy = adminUser;
+                        existing.Value = tenantData.Value;
+                       
+                        await CentralDbContext.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        tenantData.CreatedOn = DateTime.UtcNow;
+                        tenantData.CreatedBy = adminUser;
+
+                        var newEntry = CentralDbContext.Add(tenantData);
+                        //CentralDbContext.Entry(newEntry).State = EntityState.Added;
+                        await CentralDbContext.SaveChangesAsync();
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while saving license data");
+            }
+
+            return true;
+
+        }
+
+        public async Task<bool> UpsertTenantDbLicenseInfo(List<TenantSetting> licenseData, TenantDbContext tenantDbContext, string currentUser)
+        {
+            try
+            {
+                foreach (var tenantData in licenseData)
+                {
+                    var existing = tenantDbContext.Settings.FirstOrDefault(o => o.Key == tenantData.Key);
+                    if (existing != null)
+                    {
+                        existing.ModifiedOn = DateTime.UtcNow;
+                        existing.ModifiedBy = currentUser;
+                        existing.Value = tenantData.Value;
+
+                        await tenantDbContext.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        tenantData.CreatedOn = DateTime.UtcNow;
+                        tenantData.CreatedBy = currentUser;
+
+                        var newEntry = tenantDbContext.Add(tenantData);
+                        await tenantDbContext.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, "Error while saving license data");
+            }
+
+            return true;
+
+        }
+
+        public async Task<IQueryable<TenantData>> GetTenantData(string tenantIdentifier)
+        {
+            return await Task.FromResult(CentralDbContext.TenantData.AsQueryable<TenantData>());
         }
     }
 }

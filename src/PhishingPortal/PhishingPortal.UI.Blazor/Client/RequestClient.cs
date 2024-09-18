@@ -9,26 +9,29 @@ namespace PhishingPortal.UI.Blazor.Client
         {
         }
 
-        public async Task<DemoRequestor> CreateDemoRequest(DemoRequestor demo)
+        public async Task<string> CreateDemoRequest(DemoRequestor demo)
         {
-            DemoRequestor? o;
             try
             {
                 var res = await HttpClient.PostAsJsonAsync("api/request/upsert_demorequestor", demo);
 
+                // Ensure that the request was successful
                 res.EnsureSuccessStatusCode();
 
-                o = await res.Content.ReadFromJsonAsync<DemoRequestor>();
+                // Read the response content as a string
+                var responseContent = await res.Content.ReadAsStringAsync();
 
+                // Return the response content
+                return responseContent;
             }
             catch (Exception ex)
             {
+                // Log any exceptions
                 Logger.LogCritical(ex, ex.Message);
-                throw;
+                throw; // Rethrow the exception to be handled elsewhere
             }
-
-            return o ?? demo;
-
         }
+
+
     }
 }

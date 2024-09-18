@@ -55,6 +55,46 @@ namespace PhishingPortal.Dto
         }
     }
 
+    public class GoogleRegistrationSettings
+    {
+        [Required]
+        public string GoogleClientID { get; set; }
+        [Required]
+        public string GoogleClientSecret { get; set; }
+
+        public GoogleRegistrationSettings()
+        {
+            GoogleClientID = string.Empty;
+            GoogleClientSecret = string.Empty;
+        }
+
+        public GoogleRegistrationSettings(string clientId, string clientSecret, string tenantID)
+        {
+            GoogleClientID = clientId;
+            GoogleClientSecret = clientSecret;
+        }
+
+        public GoogleRegistrationSettings(Dictionary<string, string> values)
+        {
+            GoogleClientID = values[Constants.Keys.GOOGLE_ClIENT_ID] ?? String.Empty;
+            GoogleClientSecret = values[Constants.Keys.GOOGLE_CLIENT_SECRET] ?? String.Empty;
+        }
+
+        public Dictionary<string, string> ToSettingsDictionary()
+        {
+            var result = new Dictionary<string, string>();
+
+            if (GoogleClientID != null)
+                result.Add(Constants.Keys.GOOGLE_ClIENT_ID, GoogleClientID);
+
+            if (GoogleClientSecret != null)
+                result[Constants.Keys.GOOGLE_CLIENT_SECRET] = GoogleClientSecret;
+
+            return result;
+
+        }
+    }
+
     public class OnPromiseADSettings
     {
         [Required]

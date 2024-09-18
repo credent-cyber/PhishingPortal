@@ -8,25 +8,27 @@ namespace SmsTestConsole
 {
     public class DndSMS
     {
-        string user = "demo08";
+        string user = "credent";
         //Your authentication key
-        string password = "6008b6a7edXX";
+        string password = "5dad0fc380XX";
         public void SendSMS()
         {
             //Multiple mobiles numbers separated by comma
 
-            string mobiles = "+917987163540";
+            string mobiles = "+919312249922";
 
             //Sender ID,While using route4 sender id should be 6 characters long.
 
-            string senderid = "RELABL";
+            string senderid = "CRDNTS";
 
             //Your message to send, Add URL encoding here.
-            string msg = $"RENEWAL REMINDER Products testProd Due Date :{DateTime.Now}  Amount : 500RS Helpline : https://phishsims.com/ RS";
+            string msg = $"Dear Customer, Get your a free Shopping coupon of Rs 100. To view your prize, please follow the link below: https://tinyurl.com/mr2kup2x \nCRDNTS";
             string sms = HttpUtility.UrlEncode(msg);
 
-            string tempid = "1707163211312635261";
-            string entityid = "1401529690000019209";
+            string tempid = "1707171499140906386";
+            string entityid = "1201159721649081087";
+
+
 
             //Prepare you post parameters
 
@@ -45,7 +47,7 @@ namespace SmsTestConsole
             sbPostData.AppendFormat("&accusage={0}", "1");
             sbPostData.AppendFormat("&tempid={0}", tempid);
             sbPostData.AppendFormat("&entityid={0}", entityid);
-            sbPostData.AppendFormat("&shorturl={0}", "1");
+            //sbPostData.AppendFormat("&shorturl={0}", "1");
 
 
 
@@ -114,7 +116,7 @@ namespace SmsTestConsole
 
         public void CheckDeliveryStatus()
         {
-            string messageid = "457274250";
+            string messageid = "286759898";
             string clientsmsid = "1953782904";
             //Prepare you post parameters
 

@@ -4,35 +4,45 @@
 @using PhishingPortal.UI.Blazor.Pages.GridButtons
 @using PhishingPortal.UI.Blazor.Pages.GridComponent
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        TrainingReport
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Training</a></li>
+                    <li class="breadcrumb-item"><a>TrainingReport</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-sm-12 p-0">
-        <div class="card">
-            <div class="card-header" style="padding:5px 8px 0px;">
-                <h5 style="color:coral; margin-top: 16px;">TrainingReport <i class="fa fa-bar-chart"></i> </h5>
-                <div style="float:right">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
-                        <li class="breadcrumb-item active"><a href="training">Training</a></li>
-                        <li class="breadcrumb-item active">TrainingReport</li>
-                    </ol>
-                </div>
-            </div>
-            <div class="card-body p-2 mt-n3">
-                <div class="col-sm-12 p-0">
-                    <div class="">
-                        @if(Id != 0)
-                        {
-                            <TraininglogsGrid Id="Id" Label="@Label"/>
-                        }
-                        else
-                        {
-                            <TraininglogsGrid />
-                        }
-                    </div>
+
+        <div class="card-body p-2 mt-n3">
+            <div class="col-sm-12 p-0">
+                <div class="">
+                    @if (Id != 0)
+                    {
+                        <TraininglogsGrid Id="Id" Label="@Label" />
+                    }
+                    else
+                    {
+                        <TraininglogsGrid />
+                    }
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 @code {

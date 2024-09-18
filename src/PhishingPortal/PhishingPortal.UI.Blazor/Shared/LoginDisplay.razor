@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right profile-notification">
                         <div class="pro-head">
-                            <img src="/assets/images/auth/no-profile.png" class="img-radius" alt="User-Profile-Image">
+                            <img src="/assets/images/auth/no-profile1.png" class="img-radius" alt="User-Profile-Image">
                             <span>@context.User.Identity.Name.Split('@')[0].ToUpper()</span>
                             <a @onclick="BeginSignOut" class="dud-logout" title="Logout" style="cursor:pointer">
                                 <i class="feather icon-log-out"></i>
@@ -30,7 +30,7 @@
                         </div>
                         <ul class="pro-body">
                             <li>
-                                <a href="authentication/profile" class="dropdown-item" style="cursor:pointer">
+                                <a href="/user-profile" class="dropdown-item" style="cursor:pointer">
                                     <i class="feather icon-user"></i>
                                     Profile
                                 </a>

@@ -1,12 +1,12 @@
 ﻿namespace PhishingPortal.Server.Intrastructure
 {
-
     using Microsoft.AspNetCore.OData;
     using Microsoft.OData.Edm;
     using Microsoft.OData.ModelBuilder;
     using PhishingPortal.Dto;
+    using PhishingPortal.Server.Intrastructure.ActionFilters;
 
-
+    [ODataAuthorize]
     public static class ODataHelper
     {
 
@@ -24,7 +24,7 @@
                 option.AddRouteComponents("Odata", GetModel());
             });
         }
-
+        
         private static IEdmModel GetModel()
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();

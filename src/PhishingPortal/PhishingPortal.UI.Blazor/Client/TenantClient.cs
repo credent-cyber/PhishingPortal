@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using NPOI.SS.Formula.Functions;
 using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
+using PhishingPortal.Dto.Subscription;
 using PhishingPortal.UI.Blazor.Pages;
 using System;
 using System.Net.Http.Json;
@@ -335,6 +336,27 @@ namespace PhishingPortal.UI.Blazor.Client
             {
                 Logger.LogCritical(ex, ex.Message);
                 throw;
+            }
+
+            return null;
+        }
+
+        public async Task<SubscriptionInfo> GetSubscription()
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/subscription");
+               
+                res.EnsureSuccessStatusCode();
+
+                var content = await res.Content.ReadFromJsonAsync<ApiResponse<SubscriptionInfo>>();
+                
+                return content.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
             }
 
             return null;
@@ -704,7 +726,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         public async Task<List<TrainingCampaignMapping>> GetTrainingCampaignIDs(int id)
-         {
+        {
             List<TrainingCampaignMapping> Trainingcampaign = null;
             try
             {
@@ -984,6 +1006,24 @@ namespace PhishingPortal.UI.Blazor.Client
             }
         }
 
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            var result = new ApiResponse<TrainingQuizQuestion>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteTrainingQuizQuestion/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingQuizQuestion>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #region #OnPremise AD
         public async Task<Dictionary<string, List<OnPremiseADUsers>>> GetAllOnPremiseADGroups()
         {
@@ -1040,7 +1080,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
                 return await res.Content.ReadFromJsonAsync<IEnumerable<CampaignLog>>();
 
-                
+
             }
             catch (Exception ex)
             {

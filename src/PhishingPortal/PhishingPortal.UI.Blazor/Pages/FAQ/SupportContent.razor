@@ -1,0 +1,143 @@
+﻿@page "/support-content"
+
+@code {
+
+}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        text-align: center;
+        margin-top: 20px;
+        position: sticky;
+        top: 0;
+        background-color: #f6f7fb;
+        z-index: 10;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        ol {
+            list-style-type: decimal;
+            counter-reset: step-counter;
+            padding-left: 20px;
+        }
+
+            ol li {
+                margin-bottom: 30px;
+            }
+
+                ol li h2:before {
+                    content: counter(step-counter);
+                    counter-increment: step-counter;
+                    background-color: #007bff;
+                    color: #fff;
+                    font-size: 16px;
+                    font-weight: bold;
+                    width: 30px;
+                    height: 30px;
+                    line-height: 30px;
+                    text-align: center;
+                    border-radius: 50%;
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+
+        /*img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }*/
+
+        a {
+            color: #007bff;
+            text-decoration: underline;
+        }
+    </style>
+
+    <div>
+        <h1>How We Support You</h1>
+
+        <ol>
+            <li>
+                <h2>Introduction</h2>
+                <p>At PhishSims, we are dedicated to providing exceptional support services to ensure that our users have a seamless and satisfying experience. Our support team is here to assist you with any questions, issues, or concerns you may encounter while using our products and services. This document outlines how we can help you and the various support channels available.</p>
+            </li>
+            <li>
+                <h2>Support Channels</h2>
+                <ol>
+                    <li>
+                        <h4>Knowledge Base</h4>
+                        <p>Our extensive knowledge base contains a wealth of articles, guides, tutorials, and FAQs covering a wide range of topics related to our products and services. You can access the knowledge base through our website's support section. Here are some key features of our knowledge base:</p>
+                        <ul>
+                            <li><strong>Search Functionality:</strong> Easily search for specific topics or keywords to find relevant articles.</li>
+                            <li><strong>Step-by-Step Guides:</strong> Detailed instructions and tutorials to help you navigate our platforms effectively.</li>
+                            <li><strong>FAQs:</strong> Answers to frequently asked questions to address common queries.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Email Support</h4>
+                    <p>You can reach out to our support team via email at <a href="mailto:support@phishsims.com">support@phishsims.com</a>. When contacting us via email, please provide detailed information about your issue or inquiry, including your account details (if applicable), screenshots (if relevant), and any error messages you encounter. Our support team will respond to your email promptly and provide assistance accordingly.</p>
+                    </li>
+                    <li>
+                        <h4>Live Chat</h4>
+                        <p>For real-time assistance, we offer a live chat feature on our website. Simply visit our support page and initiate a chat with one of our support representatives. Live chat is ideal for quick questions, troubleshooting, and general inquiries. Our team members are available during business hours to assist you promptly.</p>
+                    </li>
+                    <li>
+                        <h4>Phone Support</h4>
+                    <p>If you prefer speaking directly with a support agent, you can contact our support hotline at <a href="tel:+91-9761676240">+91-9761676240</a>. Our phone support is available during business hours and is suitable for complex issues, account-related queries, and urgent assistance. Please have your account information ready when calling for faster support.</p>
+                    </li>
+                </ol>
+            </li>
+            <li>
+                <h2>How We Can Help You</h2>
+                <p>Our support team is trained and equipped to assist you with the following:</p>
+                <ul>
+                    <li><strong>Technical Issues:</strong> Resolve technical issues related to our products or platforms.</li>
+                    <li><strong>Account Management:</strong> Assist with account setup, management, and troubleshooting.</li>
+                    <li><strong>Product Guidance:</strong> Provide guidance on using our products effectively and efficiently.</li>
+                    <li><strong>Troubleshooting:</strong> Diagnose and troubleshoot software or system errors.</li>
+                    <li><strong>Billing and Payments:</strong> Address billing inquiries, payment issues, and subscription management.</li>
+                    <li><strong>Feedback and Suggestions:</strong> Listen to your feedback, suggestions, and feature requests to improve our services.</li>
+                    <li><strong>Training and Resources:</strong> Offer training sessions, webinars, and resources to enhance your knowledge and skills.</li>
+                </ul>
+            </li>
+            <li>
+                <h2>Get in Touch</h2>
+                <p>We value your experience and are committed to providing exceptional support services. If you have any questions, require assistance, or want to provide feedback, please don't hesitate to reach out to us through one of the support channels mentioned above. Our team is here to support you every step of the way.</p>
+                <p>Thank you for choosing PhishSims. We look forward to serving you!</p>
+            </li>
+        </ol>
+    </div>

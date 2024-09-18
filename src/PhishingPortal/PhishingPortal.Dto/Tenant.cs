@@ -21,7 +21,7 @@ namespace PhishingPortal.Dto
         public ConfirmationStats ConfirmationState { get; set; } = ConfirmationStats.Registered;
         public DateTime ConfirmationExpiry { get; set; }
         public DbOptions DatabaseOption { get; set; } = DbOptions.SqlLite; // Sqlite || MySql || Postgre || MS Sql Server
-        public LicenseTypes LicenseType { get; set; } = LicenseTypes.Subscription;
+        public LicenseTypes LicenseType { get; set; } = LicenseTypes.Limited;
         public DateTime LicenseExpiry { get; set; }
         public string LicenseKey { get; set; }
         public bool IsActive { get; set; }
@@ -52,9 +52,9 @@ namespace PhishingPortal.Dto
 
     public enum LicenseTypes
     {
-        Subscription,
-        Users,
-        Feature
+        Limited,
+        Enterprise,
+        Trial
     }
 
     public enum ConfirmationStats

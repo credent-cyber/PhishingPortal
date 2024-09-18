@@ -37,13 +37,13 @@ namespace PhishingPortal.Server.Services
                 else
                 {
                     var tenantId = httpContextAccessor?.HttpContext?.Request.Query["t"];
-                    
+
                     if (tenantId.HasValue && !string.IsNullOrEmpty(tenantId))
                     {
                         var sanitizeId = tenantId.Value.ToString().Replace("()", "");
                         _tenant = adminRepository.GetByUniqueId(sanitizeId).Result;
                     }
-                        
+
                 }
 
                 if (Tenant == null)
@@ -64,7 +64,7 @@ namespace PhishingPortal.Server.Services
                 {
                     optionsBuilder.UseMySql(dbSetting.Value, ServerVersion.AutoDetect(dbSetting.Value));
                 }
-                else if(Tenant.DatabaseOption == DbOptions.MsSql)
+                else if (Tenant.DatabaseOption == DbOptions.MsSql)
                 {
                     optionsBuilder.UseSqlServer(dbSetting.Value, opts => { });
                 }
@@ -80,6 +80,38 @@ namespace PhishingPortal.Server.Services
                 Logger.LogCritical("Error initializing tenant base controller");
                 throw;
             }
+
+        }
+
+        public static TenantDbContext CreateTenantDbContext(Tenant tenant)
+        {
+            if (tenant == null) throw new InvalidOperationException("null");
+
+            var dbSetting = tenant.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.ConnString);
+
+            if (dbSetting == null)
+                throw new InvalidDataException("Db connection string not specified");
+
+            var optionsBuilder = new DbContextOptionsBuilder<TenantDbContext>();
+
+            if (tenant.DatabaseOption == DbOptions.SqlLite)
+            {
+                optionsBuilder.UseSqlite(dbSetting.Value);
+            }
+            else if (tenant.DatabaseOption == DbOptions.MySql)
+            {
+                optionsBuilder.UseMySql(dbSetting.Value, ServerVersion.AutoDetect(dbSetting.Value));
+            }
+            else if (tenant.DatabaseOption == DbOptions.MsSql)
+            {
+                optionsBuilder.UseSqlServer(dbSetting.Value, opts => { });
+            }
+            else
+            {
+                throw new NotImplementedException("Db provider not implement");
+            }
+
+            return new TenantDbContext(optionsBuilder.Options);
 
         }
 

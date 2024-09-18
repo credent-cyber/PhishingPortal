@@ -19,6 +19,7 @@ namespace PhishingPortal.Server
 
             return name.Value;
         }
+
         public  static string GetUserEmail(this HttpContext context)
         {
             if (context.User.IsAuthenticated())
@@ -28,5 +29,26 @@ namespace PhishingPortal.Server
 
             throw new InvalidOperationException("The use is not authentication");
         }
+
+        public static string GetTenantIdentifier(this HttpContext context)
+        {
+            if (context.User.IsAuthenticated())
+            {
+                return context?.User?.Claims?.FirstOrDefault(c => c.Type == "tenant")?.Value ?? string.Empty;
+            }
+
+            throw new InvalidOperationException("The use is not authentication");
+        }
+
+        public static bool IsSuperAdmin(this HttpContext context)
+        {
+            if (context.User.IsAuthenticated())
+            {
+                return context?.User?.Claims?.Any(c => c.Type == "role" && c.Value == "superadmin") ?? false;
+            }
+
+            return false;
+        }
+
     }
 }

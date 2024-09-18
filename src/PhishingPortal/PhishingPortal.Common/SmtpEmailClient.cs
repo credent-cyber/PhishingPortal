@@ -88,10 +88,10 @@
 
             msg.BodyEncoding = System.Text.Encoding.UTF8;
 
-            if(!_smtpConfig.IsSendingEnabled)
-               Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
-            else 
+            if(_smtpConfig.IsSendingEnabled)
                 await SendEmailAsync(msg);
+            else 
+               Logger.LogWarning("Email sending is not enabled in configuration, please refer to appsettings.json");
 
             await Task.CompletedTask;
         }
@@ -109,11 +109,11 @@
                 Logger.LogInformation($"Mail with correlation id : {correlationId} being send");
 
 #if DEBUG
-                _smtpConfig.IsSendingEnabled = false;
+                //_smtpConfig.IsSendingEnabled = true;
 #endif
 
-                if (_smtpConfig.IsSendingEnabled)
-                    await SmtpClient.SendMailAsync(message);
+                if (_smtpConfig.IsSendingEnabled) ;
+                // await SmtpClient.SendMailAsync(message);
                 else
                 {
                     Logger.LogWarning($"Sending emails is disabled at moment");

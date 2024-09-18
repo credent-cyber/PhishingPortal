@@ -16,6 +16,18 @@
 
 
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <WarningLevel>1</WarningLevel>
+	</PropertyGroup>
+
+
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <WarningLevel>1</WarningLevel>
+	</PropertyGroup>
+
+
+
 	<ItemGroup>
 	  <Compile Remove="TrainingVideo\**" />
 	  <Content Remove="TrainingVideo\**" />
@@ -25,9 +37,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="BlazingComponents.Summernote" Version="0.0.6" />
-		<PackageReference Include="Azure.Identity" Version="1.10.4" />
+		<PackageReference Include="Azure.Identity" Version="1.12.0" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.43" />
 		<PackageReference Include="Microsoft.AspNet.OData" Version="7.5.17" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.32" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.13" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="6.0.26" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(BlazorVersion)" />
@@ -71,6 +84,7 @@
 	  <ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Licensing\PhishingPortal.Licensing.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.Repositories\PhishingPortal.Repositories.csproj" />
 	  <ProjectReference Include="..\PhishingPortal.UI.Blazor\PhishingPortal.UI.Blazor.csproj" />
 	</ItemGroup>
@@ -82,6 +96,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="App_Data\TrainingVideo\" />
 	  <Folder Include="Extensions\" />

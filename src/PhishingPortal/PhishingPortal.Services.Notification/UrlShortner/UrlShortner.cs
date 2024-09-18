@@ -11,6 +11,13 @@ namespace PhishingPortal.Services.Notification.UrlShortner
 {
     public class UrlShortner : IUrlShortner
     {
+        private readonly string _apiUrl;
+
+        public UrlShortner(IConfiguration configuration)
+        {
+            _apiUrl = configuration["UrlShortenerApi:BaseUrl"];
+        }
+
         public async Task<string> CallApiAsync(string urlToShorten)
         {
             string apiUrl = "https://api.encurtador.dev/encurtamentos";
@@ -38,6 +45,18 @@ namespace PhishingPortal.Services.Notification.UrlShortner
                 }
             }
 
+        }
+
+        public async Task<string> GetTinyUrlAsync(string url)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromSeconds(5);
+                HttpResponseMessage response = await client.GetAsync(_apiUrl + url);
+                response.EnsureSuccessStatusCode();
+                string responseData = await response.Content.ReadAsStringAsync();
+                return responseData;
+            }
         }
     }
 

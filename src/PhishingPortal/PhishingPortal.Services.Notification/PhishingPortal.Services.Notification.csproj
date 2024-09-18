@@ -40,7 +40,7 @@
 		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
 		
 		<PackageReference Include="Microsoft.Graph" Version="4.36.0" />
-		<PackageReference Include="Azure.Identity" Version="1.10.4" />
+		<PackageReference Include="Azure.Identity" Version="1.12.0" />
 		
 	</ItemGroup>
 
@@ -60,6 +60,7 @@
 		<ProjectReference Include="..\PhishingPortal.DataContext\PhishingPortal.DataContext.csproj" />
 		<ProjectReference Include="..\PhishingPortal.Domain\PhishingPortal.Domain.csproj" />
 		<ProjectReference Include="..\PhishingPortal.Dto\PhishingPortal.Dto.csproj" />
+		<ProjectReference Include="..\PhishingPortal.Licensing\PhishingPortal.Licensing.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

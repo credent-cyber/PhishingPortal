@@ -938,9 +938,16 @@ namespace PhishingPortal.Repositories
         #region Settings
         public async Task<Dictionary<string, string>> GetSettings()
         {
-            var settings = await TenantDbCtx.Settings.ToListAsync();
+            var settings = await TenantDbCtx.Settings.Where(o => o.Key != TenantData.Keys.License && o.Key != TenantData.Keys.PublicKey).ToListAsync();
 
             return settings.ToDictionary(o => o.Key, v => v.Value);
+        }
+
+        public (string? LicenseKey, string? PublicKey) GetLicenseKeys() {
+
+            var publicKey = TenantDbCtx.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.PublicKey);
+            var licenseKey = TenantDbCtx.Settings.FirstOrDefault(o => o.Key == TenantData.Keys.License);
+            return (licenseKey?.Value, publicKey?.Value);
         }
 
         public async Task<Dictionary<string, string>> UpsertSettings(Dictionary<string, string> settings, string user)
@@ -1559,13 +1566,41 @@ namespace PhishingPortal.Repositories
             return result;
         }
 
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            var result = new ApiResponse<TrainingQuizQuestion>();
+            try
+            {
+                var existing = TenantDbCtx.TrainingQuizQuestion.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Produc tList not found!";
+                    return result;
+                }
+
+                TenantDbCtx.TrainingQuizQuestion.Remove(existing);
+                await TenantDbCtx.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         public async Task<ApiResponse<string>> CampaignSpamReport(string key)
         {
             var result = new ApiResponse<string>();
             var status = CampaignLogStatus.Sent.ToString();
             var campaignLog = TenantDbCtx.CampaignLogs
                 .FirstOrDefault(o => o.SecurityStamp == key
-                                    && o.IsReported == false && o.Status == status);
+                                    && o.IsReported == false);
 
             if (campaignLog == null)
             {

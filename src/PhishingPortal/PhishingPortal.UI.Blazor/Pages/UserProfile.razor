@@ -1,0 +1,208 @@
+﻿@page "/user-profile"
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.Dto.Auth
+@using System.ComponentModel.DataAnnotations
+@using PhishingPortal.UI.Blazor.Models
+@inject NavigationManager navigationManager
+@inject CustomStateProvider authStateProvider
+
+<div class="page-header mb-0 breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        User Profile
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>User Profile</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="light-style flex-grow-1 mt-4">
+    <div class="card overflow-hidden">
+        <div class="row no-gutters row-bordered row-border-light">
+            <div class="col-md-3 pt-0">
+                <div class="list-group list-group-flush account-settings-links">
+                    <a class="list-group-item list-group-item-action active" data-toggle="list"
+                       href="#account-general">General</a>
+                    <a class="list-group-item list-group-item-action" data-toggle="list"
+                       href="#account-change-password">Change password</a>
+                </div>
+            </div>
+            <div class="col-md-9" style="padding: 40px;">
+                <div class="tab-content">
+                    <div class="tab-pane fade active show" id="account-general">
+                        <AuthorizeView>
+                            <div class="user-profile user-card mb-4">
+                                <div class="card-header border-0 p-0 pb-0">
+                                    <div class="cover-img-block">
+                                        <img src="assets/images/profile/cover.jpg" alt="" class="img-fluid">
+                                        <div class="overlay"></div>
+                                        <div class="change-cover">
+                                            <div class="dropdown">
+                                                <a class="drp-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon feather icon-camera"></i></a>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
+                                                    <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body py-0">
+                                    <div class="user-about-block m-0">
+                                        <div class="row">
+                                            <div class="col-md-8 text-center mt-n5">
+                                                <div class="change-profile text-center">
+                                                    <div class="dropdown w-auto d-inline-block">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <div class="profile-dp">
+                                                                <div class="position-relative d-inline-block">
+                                                                    <img class="img-radius img-fluid wid-100" src="/assets/images/auth/no-profile1.png" alt="User image">
+                                                                </div>
+                                                                <div class="overlay">
+                                                                    <span>change</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="certificated-badge">
+                                                                <i class="fas fa-certificate text-c-blue bg-icon"></i>
+                                                                <i class="fas fa-check front-icon text-white"></i>
+                                                            </div>
+                                                        </a>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
+                                                            <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div style="text-align:left">
+                                                    <label class="form-label font-weight-bold">Name : </label>
+                                                    @context.User.Identity.Name.Split('@')[0].ToUpper() <br />
+                                                    <label class="form-label font-weight-bold">E-mail :</label>
+                                                    @context.User.Identity.Name <br />
+                                                    <label class="form-label font-weight-bold">Company : </label>
+                                                    @context.User.Identity.Name.Split('@')[1].Split('.')[0].ToUpper() <br />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </AuthorizeView>
+                    </div>
+                    <div class="tab-pane fade" id="account-change-password">
+                        <EditForm Model="Model" OnValidSubmit="OnSubmit">
+                            <DataAnnotationsValidator />
+                            @*<ValidationSummary/>*@
+
+                            @* <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <InputText id="Email" class="form-control" placeholder="Email" @bind-Value="Model.Email"></InputText>
+                            </div>
+                            <ValidationMessage style="text-align: left" For="() => Model.Email"></ValidationMessage>*@
+                            <UiAlerts Model="alerts"></UiAlerts>
+                            <div class="form-group"
+                                <label class="form-label">Current password</label>
+                                <InputText id="CurrentPassword" class="form-control" placeholder="Current Password" @bind-Value="Model.CurrentPassword" type="password"></InputText>
+                            </div>
+                            <ValidationMessage style="text-align: left" For="() => Model.CurrentPassword"></ValidationMessage>
+
+                            <div class="form-group">
+                                <label class="form-label">New password</label>
+                                <InputText id="NewPassword" class="form-control" placeholder="New Password" @bind-Value="Model.NewPassword" type="password"></InputText>
+                            </div>
+                            <ValidationMessage style="text-align: left" For="() => Model.NewPassword"></ValidationMessage>
+
+                            <div class="form-group">
+                                <label class="form-label">Repeat new password</label>
+                                <InputText id="ConfirmedPassword" class="form-control" placeholder="Confirm New Password" @bind-Value="Model.ConfirmedPassword" type="password"></InputText>
+                            </div>
+                            <ValidationMessage style="text-align: left" For="() => Model.ConfirmedPassword"></ValidationMessage>
+
+                            <div class="text-right mt-3">
+                                <button type="submit" class="btn btn-primary">Save changes</button>&nbsp;
+                                <button @onclick="Clear" class="btn btn-default">Clear</button>
+                            </div>
+                        </EditForm>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private AlertModel alerts { get; set; } = new();
+
+    private Timer _timer;
+    private int _delay = 4000;
+
+    private bool isError = false;
+    private bool isSuccess = false;
+    private string message = string.Empty;
+    private bool show = false;
+    private bool submit = false;
+
+    private ChangePassword Model { get; set; } = new ChangePassword();
+
+    protected override async Task OnInitializedAsync()
+    {
+        alerts ??= new AlertModel();
+    }
+
+    private async Task OnSubmit()
+    {
+        alerts?.Clear();
+        message = string.Empty;
+
+        var result = await authStateProvider.ChangePassword(Model);
+
+        if (result.Item1)
+        {
+            message = "Password changed successfully!";
+            alerts.SetSuccess(message);
+            Model = new();
+            isSuccess = true;
+            StateHasChanged();
+        }
+        else
+        {
+            message = "Current Password is Incorrect!, Please enter current password.";
+            alerts.SetError(message);
+            isError = true;
+            StateHasChanged();
+        }
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+
+    private void TimerCallback(Object o)
+    {
+        alerts?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void Clear()
+    {
+        Model = new();
+        alerts?.Clear();
+    }
+    
+}

@@ -9,5 +9,6 @@ namespace PhishingPortal.Services.Notification.UrlShortner
     public interface IUrlShortner
     {
         Task<string> CallApiAsync(string urlToShorten);
+        Task<string> GetTinyUrlAsync(string url);
     }
 }

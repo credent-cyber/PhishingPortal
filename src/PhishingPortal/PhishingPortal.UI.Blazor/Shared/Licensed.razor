@@ -1,0 +1,53 @@
+﻿@using PhishingPortal.UI.Blazor.Client;
+
+@inject TenantClient client
+@inject CustomStateProvider StateProvider
+@inject NavigationManager Navigation
+
+
+@ChildContent
+
+@if (ShowLicenseWarning && !ValidationInProgress && !IsValid)
+{
+    <SimpleDialog Title="Subscription Information" Show="true" OnCloseDialog="BeginSignOut" FullScreen="true">
+        <h2 style="margin-left:33%;">No Active Subscription</h2>
+        <div class="row">
+            <button type="button" class="btn btn-link" @onclick="BeginSignOut">Go Back To Home Screen</button>
+        </div>
+    </SimpleDialog>
+}
+
+@code {
+
+    private bool IsValid = false;
+    private bool ValidationInProgress = true;
+
+    [Parameter]
+    public bool ShowLicenseWarning { get; set; } = true;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ValidationInProgress = true;
+        var subscriptionInfo = await client.GetSubscription();
+
+        if (subscriptionInfo == null)
+            IsValid = false;
+        else
+        {
+            IsValid = true;
+        }
+
+        ValidationInProgress = false;
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task BeginSignOut()
+    {
+        await StateProvider.Logout();
+        Navigation.NavigateTo("/");
+    }
+}

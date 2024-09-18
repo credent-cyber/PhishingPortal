@@ -1,0 +1,148 @@
+﻿@page "/about-phishsims"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@layout NoLayout
+
+
+<style>
+    /* Resetting default margin and padding */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Setting up global styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #5ba7ff;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+
+    .section {
+        margin-bottom: 40px;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .section-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .card {
+        max-width: 300px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+    .card-text {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+    @@media (max-width: 768px) {
+        .card {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<header class="sticky-header">
+    <nav class="homenav">
+        <h2 class="homenav_logo">
+            <a href="/">
+                <img src="assets/images/logo.png" alt="PhishSims Logo" style="width: 100px;
+            position: relative; margin-left: 30px;">
+            </a>
+        </h2>
+
+        <ul class="homemenu_items" onclick="toggleMobileMenu()">
+            <img src="/img/times.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()" />
+            <li><a href="/" class="nav_link">Home</a></li>
+            <li><a href="/about-phishsims" class="nav_link">About</a></li>
+            <li><a href="login?ReturnUrl=@(Navigation.Uri)" class="nav_link">Login</a></li>
+        </ul>
+        <img src="/img/bars.svg" alt="timesicon" id="menu_toggle" onclick="toggleMobileMenu()" />
+    </nav>
+</header>
+<div class="container">
+    <div class="section">
+        <h2 class="section-header">About PhishSims</h2>
+        <p>
+            PhishSims is a cutting-edge phishing simulation platform designed to strengthen organizational cybersecurity defenses. Our mission is to empower businesses with the tools and knowledge necessary to combat evolving cyber threats effectively.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-header">Why Choose PhishSims?</h2>
+        <div class="section-content">
+            <div class="card">
+                <img src="/img/About1.jpg" alt="Comprehensive Phishing Simulation">
+                <div class="card-text">Comprehensive Simulations</div>
+            </div>
+            <div class="card">
+                <img src="/img/About2.jpg" alt="Risk Assessment">
+                <div class="card-text">Risk Assessment</div>
+            </div>
+            <div class="card">
+                <img src="/img/About3.svg" alt="Training Modules">
+                <div class="card-text">Interactive Training</div>
+            </div>
+            <div class="card">
+                <img src="/img/About4.gif" alt="Real-time Monitoring">
+                <div class="card-text">Real-time Monitoring</div>
+            </div>
+            <div class="card">
+                <img src="/img/About5.gif" alt="Policy Enforcement">
+                <div class="card-text">Policy Enforcement</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-header">Getting Started with PhishSims</h2>
+        <p>
+            Ready to elevate your cybersecurity strategy? Here's how to get started with PhishSims:
+        </p>
+        <ol>
+            <li>Sign Up: Visit the PhishSims website and create your account.</li>
+            <li>Configure Settings: Customize simulation parameters to fit your organization's needs.</li>
+            <li>Launch Campaigns: Run phishing simulations to assess your team's awareness.</li>
+            <li>Analyze Results: Utilize detailed reports to identify vulnerabilities and areas for improvement.</li>
+            <li>Educate and Train: Engage employees with interactive training modules to enhance security awareness.</li>
+        </ol>
+    </div>
+</div>

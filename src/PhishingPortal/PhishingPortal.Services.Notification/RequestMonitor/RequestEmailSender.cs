@@ -10,7 +10,7 @@ using Moq;
 using System.Net;
 using System.Net.Mail;
 using Castle.Core.Smtp;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+//using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace PhishingPortal.Services.Notification.RequestMonitor
 {
@@ -46,7 +46,7 @@ namespace PhishingPortal.Services.Notification.RequestMonitor
                         var db = ConnectionManager.GetContext();
                         var Name = db.FullName.ToString();
                         var ContactNo = db.ContactNumber.ToString();
-                        var RequestorMsg = db.Messages.ToString();
+                        var RequestorMsg = db.Messages;
                         await EmailSender.SendEmailAsync(EmailRecipient, EmailSubject, EmailContent, true, Guid.NewGuid().ToString(), EmailFrom);
 
                         Logger.LogInformation($"Requestor with Email: [{email}] Company: [{cmpny}] notified");

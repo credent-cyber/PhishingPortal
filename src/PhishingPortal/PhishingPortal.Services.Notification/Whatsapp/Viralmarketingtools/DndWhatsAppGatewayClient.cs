@@ -45,6 +45,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
 
             Logger.LogInformation($"Sending whatsapp message to:[{to}]");
             string formatedMessage = GetWhatsAppFormattedText(message);
+            //string formatedMessage = GetPlainTextFromHtml(message);
 
             if (!IsEnabled)
             {
@@ -93,12 +94,17 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html);
 
-            IEnumerable<HtmlNode> nodes = doc.DocumentNode.DescendantsAndSelf();
+            // Start with an empty string builder
+            var whatsappFormattedText = new System.Text.StringBuilder();
 
-            string whatsappFormattedText = string.Join(" ", nodes
-                .Select(node => EncodeNodeForWhatsApp(node)));
+            // Process the child nodes of the document root
+            foreach (var node in doc.DocumentNode.ChildNodes)
+            {
+                whatsappFormattedText.Append(EncodeNodeForWhatsApp(node));
+            }
 
-            return whatsappFormattedText;
+            // Return the trimmed result to remove any leading or trailing spaces or new lines
+            return whatsappFormattedText.ToString().Trim();
         }
 
         public string EncodeNodeForWhatsApp(HtmlNode node)
@@ -109,43 +115,50 @@ namespace PhishingPortal.Services.Notification.Whatsapp.Viralmarketingtools
             }
             else if (node.Name.Equals("b", StringComparison.OrdinalIgnoreCase))
             {
-                return "*" + string.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child))) + "*";
+                return "*" + ProcessChildNodes(node) + "*";
             }
             else if (node.Name.Equals("i", StringComparison.OrdinalIgnoreCase))
             {
-                return "_" + string.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child))) + "_";
+                return "_" + ProcessChildNodes(node) + "_";
             }
             else if (node.Name.Equals("u", StringComparison.OrdinalIgnoreCase))
             {
-                return "__" + string.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child))) + "__";
+                return "__" + ProcessChildNodes(node) + "__";
             }
             else if (node.Name.Equals("s", StringComparison.OrdinalIgnoreCase))
             {
-                return "~" + string.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child))) + "~";
+                return "~" + ProcessChildNodes(node) + "~";
             }
             else if (node.Name.Equals("ul", StringComparison.OrdinalIgnoreCase))
             {
-                return string.Join("%0A", node.ChildNodes
+                return String.Join("%0A", node.ChildNodes
                     .Where(child => child.Name.Equals("li", StringComparison.OrdinalIgnoreCase))
                     .Select(liNode => "• " + EncodeNodeForWhatsApp(liNode)));
             }
             else if (node.Name.Equals("p", StringComparison.OrdinalIgnoreCase))
             {
-                return "%0A" + string.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child))) + "%0A";
+                return "%0A" + ProcessChildNodes(node) + "%0A";
             }
             else if (node.Name.Equals("a", StringComparison.OrdinalIgnoreCase))
             {
-                // Handle hyperlinks, you may need to customize this based on your requirements
+                // Handle hyperlinks, customize as needed
                 string href = node.GetAttributeValue("href", "");
-                return $"[{EncodeNodeForWhatsApp(node)}]({HttpUtility.UrlEncode(href)})";
+                return $"[{ProcessChildNodes(node)}]({HttpUtility.UrlEncode(href)})";
             }
             else if (node.Name.Equals("br", StringComparison.OrdinalIgnoreCase))
             {
                 return "%0A"; // New line
             }
 
-
-            return string.Empty;
+            return ProcessChildNodes(node);
         }
+
+        private string ProcessChildNodes(HtmlNode node)
+        {
+            // Join child nodes with a space to ensure proper spacing between words
+            return String.Join(" ", node.ChildNodes.Select(child => EncodeNodeForWhatsApp(child)));
+        }
+
+
     }
 }

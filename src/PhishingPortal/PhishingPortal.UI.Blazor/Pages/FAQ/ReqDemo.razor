@@ -1,0 +1,69 @@
+﻿@page "/req-demo"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using PhishingPortal.UI.Blazor.Services
+
+@inject NavigationManager Navigation
+@inject CustomStateProvider StateProvider
+@inject IJSRuntime jsRuntime
+
+
+    
+    <div class="container" id="container">
+        <div class="slideshow">
+            <img class="slides" src="image1.jpg" alt="Slide 1">
+            <img class="slides" src="image2.jpg" alt="Slide 2">
+            <img class="slides" src="image3.jpg" alt="Slide 3">
+            <!-- Add more images as needed -->
+        </div>
+        
+        <div class="form-container sign-up">
+            <form>
+                <h1>Request Demo</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email for registeration</span>
+                <input type="text" placeholder="Your Name">
+                <input type="text" placeholder="Company Name">
+                <input type="email" placeholder="Email">
+                <input type="number" placeholder="Mobile No.">
+                <input type="password" placeholder="Password">
+                <button>Submit</button>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+
+            <img class="slides" src="images/Cyber-News-Rundown_PhishingEmail_800x4001.gif" alt="Slide 1">
+            <img class="slides" src="images/image_processing20190826-7904-38ozuq.gif" alt="Slide 1">
+            <img class="slides" src="images/Round6.gif" alt="Slide 1">
+            <img class="slides" src="images/website.gif" alt="Slide 1">
+            <img class="slides" src="images/image_processing20190826-7904-38ozuq.gif" alt="Slide 1">
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your personal details to use all of site features</p>
+                    <button class="hidden" id="login">Log In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Register with your personal details to use all of site features</p>
+                    <button class="hidden" id="register">Request Demo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await jsRuntime.InvokeVoidAsync("import", "/scripts/ReqDemo.js");
+    }
+}

@@ -12,6 +12,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\PhishingPortal.Common\PhishingPortal.Common.csproj" />
+	  <ProjectReference Include="..\PhishingPortal.Licensing\PhishingPortal.Licensing.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="mail.txt">

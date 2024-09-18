@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using PhishingPortal.Services.Notification.Email;
 using AutoMapper.Configuration.Annotations;
 using PhishingPortal.Services.Notification.EmailTemplate;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 
 namespace PhishingPortal.Services.Notification.Trainings
 {
@@ -28,16 +29,18 @@ namespace PhishingPortal.Services.Notification.Trainings
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
         public IEmailTemplateProvider EmailTemplateProvider { get; }
-
+        public ILicenseEnforcementService LicenseEnforcement { get; }
 
         public TrainingProvider(ILogger<TrainingProvider> logger,
-           IEmailClient emailSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IEmailTemplateProvider emailTemplateProvider)
+           IEmailClient emailSender, IConfiguration config, Tenant tenant, 
+           ITenantDbConnManager connManager, IEmailTemplateProvider emailTemplateProvider, ILicenseEnforcementService licenseEnforcement)
         {
             Logger = logger;
             EmailSender = emailSender;
             Tenant = tenant;
             ConnManager = connManager;
             EmailTemplateProvider = emailTemplateProvider;
+            LicenseEnforcement = licenseEnforcement;
             TrainingBaseUrl = config.GetValue<string>("TrainingBaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             CampaignTrainingHours = config.GetValue<long>("CampaignTrainingHours");
@@ -59,6 +62,8 @@ namespace PhishingPortal.Services.Notification.Trainings
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
+                    if (!LicenseEnforcement.HasValidLicense(dbContext, Dto.Subscription.AppModules.TrainingCampaign))
+                        return;
 
                     var training = dbContext.Training.Include(o => o.TrainingSchedule)
                                             .Where(o => (o.State == TrainingState.Published || o.State == TrainingState.InProgress) && o.IsActive && !o.TrainingTrigger).ToList();
