@@ -8,9 +8,15 @@
 @implements ICustomGridComponent<TrainingQuizQuestion>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+@* <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button> *@
+
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(AppModules.TrainingCampaign)" ReadOnly="true" IsButton="true">
+    <button class='btn btn-sm btn-primary @(licencedViewRef?.CurrentMode != AccessMode.ReadWrite ? "disabled-view" : "")' style="border-radius:15px" @onclick="(licencedViewRef?.CurrentMode == AccessMode.ReadWrite ? MyClickHandler : null)" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+</LicencedView>
 
 @code {
+
+    private LicencedView licencedViewRef;
     [Parameter]
     public TrainingQuizQuestion Item { get; set; }
 

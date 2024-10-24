@@ -4,6 +4,6 @@ namespace PhishingPortal.UI.Blazor.Services
 {
     public interface ILicenseService
     {
-        bool IsAccessible(AppModules module);
+        Task<(bool, AccessMode)> IsAccessible(AppModules module);
     }
 }

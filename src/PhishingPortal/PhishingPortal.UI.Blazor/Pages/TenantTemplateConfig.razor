@@ -67,15 +67,15 @@ else
 
                             @if (model.Type == CampaignType.Sms)
                             {
-                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
-                                    <label class="col-form-label col-md-2 bold-font required-field" style="padding-right: 0;">Name</label>
-                                    <div class="col-md-4">
+                                <div class="form-group row mb-2 mx-2">
+                                    <label class="col-form-label col-md-2 col-sm-4 bold-font required-field">Name</label>
+                                    <div class="col-md-4 col-sm-8">
                                         <InputText id="Name" @bind-Value="model.Name" class="form-control" />
                                         <ValidationMessage For="() => model.Name" />
                                     </div>
 
-                                    <label class="col-form-label col-md-1 bold-font required-field">Type</label>
-                                    <div class="col-md-3">
+                                    <label class="col-form-label col-md-1 col-sm-4 bold-font required-field">Type</label>
+                                    <div class="col-md-3 col-sm-8">
                                         <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                             {
@@ -85,15 +85,15 @@ else
                                         <ValidationMessage For="() => model.Type" />
                                     </div>
 
-                                    <div class="col-md-2">
+                                    <div class="col-md-2 col-sm-12 d-flex align-items-center">
                                         <label class="col-form-label bold-font">Is Active</label>
-                                        <input type="checkbox" @bind="@model.IsActive" class="ml-4" />
+                                        <input type="checkbox" @bind="@model.IsActive" class="ml-2" />
                                     </div>
                                 </div>
 
-                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
-                                    <label class="col-form-label col-md-2 bold-font required-field" style="padding-right: 0;">TemplateID</label>
-                                    <div class="col-md-4">
+                                <div class="form-group row mb-2 mx-2">
+                                    <label class="col-form-label col-md-2 col-sm-4 bold-font required-field">TemplateID</label>
+                                    <div class="col-md-4 col-sm-8">
                                         <InputText id="templid" @bind-Value="model.TemplateId" class="form-control" />
                                         <ValidationMessage For="@(() => model.TemplateId)" />
                                     </div>
@@ -101,36 +101,54 @@ else
                             }
                             else
                             {
-
-                                <div class="form-group row mb-2" style="width:98.2%;margin-left: 14px;padding: 4px;">
-                                    <label class="col-form-label col-md-1 bold-font required-field" style="padding-right: 0;">Name</label>
-                                    <div class="col-md-3">
+                                <div class="form-group row mb-2 mx-2">
+                                    <label class="col-form-label col-md-2 col-sm-4 bold-font required-field">Name</label>
+                                    <div class="col-md-3 col-sm-8">
                                         <InputText id="Name" @bind-Value="model.Name" class="form-control" />
                                         <ValidationMessage For="() => model.Name" />
                                     </div>
-                                    <label class="col-form-label col-md-1 bold-font required-field">Type</label>
-                                    <div class="col-md-2">
 
+                                    <label class="col-form-label col-md-1 col-sm-4 bold-font required-field">Type</label>
+                                    <div class="col-md-2 col-sm-8">
                                         <InputSelect @bind-Value="model.Type" class="form-control" id="Type">
                                             @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                             {
-                                                <option value="@val">@val</option>
+                                                var appModule = val switch
+                                                {
+                                                    CampaignType.Email => AppModules.EmailCampaign,
+                                                    CampaignType.Sms => AppModules.SmsCampaign,
+                                                    CampaignType.Whatsapp => AppModules.WhatsAppCampaign,
+                                                    _ => AppModules.EmailCampaign // Default case
+                                                };
+
+                                                <LicencedView ShowLicenseWarning="false" AppModule="@appModule" ReadOnly="true" IsButton="true">
+                                                    <option value="@val">@val</option>
+                                                </LicencedView>
                                             }
                                         </InputSelect>
                                         <ValidationMessage For="() => model.Type" />
                                     </div>
 
-                                    <div class="col-md-2">
-                                        <label class="col-form-label bold-font">Is HTML</label>
-                                        <input type="checkbox" @bind="@model.IsHtml" class="ml-4" />
-                                    </div>
+                                    <!-- Wrapping the checkboxes in a single column with Flexbox -->
+                                    <div class="col-md-4 col-sm-12 d-flex align-items-center">
+                                        <!-- First Checkbox: Is HTML -->
+                                        <div class="d-flex align-items-center me-5">
+                                            <!-- Added 'me-3' for spacing -->
+                                            <label class="col-form-label bold-font mb-0">Is HTML</label>
+                                            <input type="checkbox" @bind="@model.IsHtml" class="ml-2" />
+                                        </div>
 
-                                    <div class="col-md-2">
-                                        <label class="col-form-label bold-font">Is Active</label>
-                                        <input type="checkbox" @bind="@model.IsActive" class="ml-4" />
+                                        <!-- Second Checkbox: Is Active -->
+                                        <div class="d-flex align-items-center">
+                                            <label class="col-form-label bold-font mb-0">Is Active</label>
+                                            <input type="checkbox" @bind="@model.IsActive" class="ml-2" />
+                                        </div>
                                     </div>
                                 </div>
+
+
                             }
+
 
 
                             @*    <div class="form-group row">
@@ -218,9 +236,24 @@ else
                             {
                                 <BlazingComponents.Summernote.Editor />
                             }
-                            <div style="text-align:center; margin-top:5px; margin-left: 14px; width: 98.2%; padding: 6px;">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                                <button type="button" class="btn btn-danger" @onclick="onClose">Close</button>
+                            <div class="container" style="margin-top:5px; margin-left: 14px; width: 98.2%; padding: 6px;">
+                                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(model.Type == CampaignType.Email ? AppModules.EmailCampaign : (model.Type == CampaignType.Sms ? AppModules.SmsCampaign : AppModules.WhatsAppCampaign))" ReadOnly="true" IsButton="true">
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto mb-2">
+                                            @if (licencedViewRef?.CurrentMode == AccessMode.ReadWrite)
+                                            {
+                                                <button type="submit" class="btn btn-primary px-4">Save</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-primary px-4" disabled>Save</button>
+                                            }
+                                        </div>
+                                        <div class="col-auto mb-2">
+                                            <button type="button" class="btn btn-danger px-4" @onclick="onClose">Close</button>
+                                        </div>
+                                    </div>
+                                </LicencedView>
                             </div>
 
                             <br />
@@ -256,7 +289,7 @@ else
 
 
 @code {
-
+    private LicencedView licencedViewRef;
     [Parameter]
     public int Id { get; set; }
     private string contents;

@@ -59,7 +59,7 @@ else
                                 <DataAnnotationsValidator />
                                 @* <ValidationSummary /> *@
 
-                                <div class="card" style="height:140vh">
+                                <div class="card">
 
                                     <div class="card-body">
                                         <div class="form-group row">
@@ -75,9 +75,21 @@ else
                                                 <select @bind="CheckSelected" class="form-control" id="CampaignType" disabled="@(model.Id > 0)">
                                                     @foreach (var val in Enum.GetValues(typeof(CampaignType)))
                                                     {
-                                                        <option value="@val">@val</option>
+                                                        var appModule = val switch
+                                                        {
+                                                            CampaignType.Email => AppModules.EmailCampaign,
+                                                            CampaignType.Sms => AppModules.SmsCampaign,
+                                                            CampaignType.Whatsapp => AppModules.WhatsAppCampaign,
+                                                            _ => AppModules.EmailCampaign // Default case
+                                                        };
+
+                                                        <LicencedView ShowLicenseWarning="false" AppModule="@appModule" ReadOnly="true" IsButton="true">
+                                                            <option value="@val">@val</option>
+                                                        </LicencedView>
                                                     }
                                                 </select>
+
+
                                             </div>
                                         </div>
 
@@ -300,6 +312,7 @@ else
                                             </div>
                                         </div>
 
+                                        <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="false">
                                         <div class="form-group row">
                                             <label class="col-form-label col-md-4 bold-font" style="padding-right: 0;">Add Training</label>
                                             <div class="col-md-8">
@@ -317,7 +330,7 @@ else
                                                 @* <ValidationMessage For="() => model.ReturnUrl" /> *@
                                             </div>
                                         </div>
-
+                                        </LicencedView>
 
                                         <div class="form-group row">
                                             <label class="col-form-label col-md-4 bold-font">State</label>
@@ -342,28 +355,57 @@ else
                                                 }
                                             </div>
                                         </div>
-                                        <hr/>
-                                        <div style="text-align:center;">
-                                            <button type="submit" class="btn btn-primary col-md-2" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">Save</button>
-                                            <button type="button" class="btn btn-danger col-md-2 mr-1" @onclick="onClose">Close</button>
-                                            @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
-                                            {
-                                                <button type="button" class="btn btn-dark col-md-3 mr-1" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
-                                            }
-                                            else
-                                            {
-                                                <button type="button" class="btn btn-dark col-md-3 mr-1" @onclick="OnShowRecipientClickk">Recipients</button>
-                                            }
+                                        <hr />
+
+                                        <div class="row justify-content-center align-items-center">
+                                            <div class="col-sm-12 col-md-auto mb-2">
+                                                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(CheckSelected == CampaignType.Email ? AppModules.EmailCampaign : (CheckSelected == CampaignType.Sms ? AppModules.SmsCampaign : AppModules.WhatsAppCampaign))" ReadOnly="true" IsButton="true">
+                                                    @if (licencedViewRef?.CurrentMode == AccessMode.ReadWrite)
+                                                    {
+                                                        <button type="submit" class="btn btn-primary w-100 px-4" disabled="@((model.Id > 0 && model.State == CampaignStateEnum.Completed) ? true : false)">
+                                                            Save
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button class="btn btn-primary w-100 px-4" disabled">
+                                                            Save
+                                                        </button>
+                                                    }
+                                                </LicencedView>
+                                            </div>
+
+                                            <div class="col-sm-12 col-md-auto mb-2">
+                                                <button type="button" class="btn btn-danger w-100 px-4" @onclick="onClose">Close</button>
+                                            </div>
+
+                                            <div class="col-sm-12 col-md-auto mb-2">
+                                                @if ((model.Id == 0 && fileimport.Count() == 0) || (model.Id > 0 && fileimport.Count() == 0))
+                                                {
+                                                    <button type="button" class="btn btn-dark w-100 px-4" @onclick="OnShowRecipientClickk" hidden>Recipients</button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="btn btn-dark w-100 px-4" @onclick="OnShowRecipientClickk">Recipients</button>
+                                                }
+                                            </div>
+
                                             @if (model.State == CampaignStateEnum.Draft && model.Id > 0)
                                             {
-                                                <button @onclick="OnPublishClick" class="btn btn-warning col-md-3 mr-1" type="button">Publish </button>
+                                                <div class="col-sm-12 col-md-auto mb-2">
+                                                    <button @onclick="OnPublishClick" class="btn btn-warning w-100 px-4" type="button">Publish</button>
+                                                </div>
                                             }
 
                                             @if (model.State == CampaignStateEnum.Published)
                                             {
-                                                <button @onclick="OnUnpublish" class="btn btn-warning col-md-3" type="button">UnPublish </button>
+                                                <div class="col-sm-12 col-md-auto mb-2">
+                                                    <button @onclick="OnUnpublish" class="btn btn-warning w-100 px-4" type="button">UnPublish</button>
+                                                </div>
                                             }
                                         </div>
+
+
                                     </div>
                                 </div>
                             </EditForm>
@@ -371,7 +413,7 @@ else
                         </div>
 
                         <div class="col-md-6 p-1">
-                            <div class="card" style="margin-bottom: 0; height:140vh">
+                            <div class="card" style="margin-bottom: 0;">
                                 <div class="card-body" style="max-height: 765px; overflow-y: scroll;">
                                     @if (model.Detail.CampaignTemplateId.Equals(0))
                                     {
@@ -467,7 +509,7 @@ else
 }
 
 @code {
-
+    private LicencedView licencedViewRef;
     [Parameter]
     public int Id { get; set; }
     private bool show = false;

@@ -1,0 +1,131 @@
+﻿@using PhishingPortal.Dto.Subscription
+@using PhishingPortal.UI.Blazor.Client
+@using PhishingPortal.UI.Blazor.Services
+
+@inject TenantClient client
+@inject CustomStateProvider StateProvider
+@inject NavigationManager Navigation
+@inject LicenseService licenseService
+
+@if (ShouldShowContent || ReadOnly)
+{
+    @if (ReadOnly && !IsValid && Mode == AccessMode.ReadOnly)
+    {
+        <div @attributes="GetAttributes()">
+
+                @ChildContent
+           
+        </div>
+    }
+    @if (ReadOnly && IsValid && Mode == AccessMode.ReadWrite)
+    {
+        @ChildContent
+    }
+}
+
+@if (ShowLicenseWarning && !ValidationInProgress && !IsValid)
+{
+    <SimpleDialog Title="Subscription Information" Show="true" OnCloseDialog="BeginSignOut" FullScreen="true">
+        <h2 style="margin-left:33%;">No Active Subscription</h2>
+        <div class="row">
+            <button type="button" class="btn btn-link" @onclick="BeginSignOut">Go Back To Home Screen</button>
+        </div>
+    </SimpleDialog>
+}
+
+@code {
+    private bool IsValid = false;
+    private bool CheckValidation = false;
+    private AccessMode Mode;
+    private bool ValidationInProgress = true;
+
+    [Parameter]
+    public bool ShowLicenseWarning { get; set; } = true;
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool IsButton { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public AppModules AppModule { get; set; }
+
+    [Parameter]
+    public List<AppModules> AppModules { get; set; }
+
+    private List<AppModules> EffectiveModules => AppModules != null && AppModules.Count > 0
+        ? AppModules
+        : new List<AppModules> { AppModule };
+
+    public AccessMode CurrentMode => Mode;
+
+    private bool ShouldShowContent => !ShowLicenseWarning && IsValid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ValidationInProgress = true;
+
+        try
+        {
+            var subscriptionInfo = await client.GetSubscription();
+
+            if (subscriptionInfo == null)
+            {
+                IsValid = false;
+            }
+            else
+            {
+                foreach (var module in EffectiveModules)
+                {
+                    var info = await licenseService.IsAccessible(module);
+
+                    CheckValidation = info.Item1;
+                    Mode = info.Item2;
+                    if (info.Item1 && EffectiveModules.Count > 0)
+                        IsValid = CheckValidation;
+                    else
+                        IsValid = info.Item1;
+                    break;
+
+                    
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error retrieving subscription info: {ex.Message}");
+            IsValid = false;
+        }
+        finally
+        {
+            ValidationInProgress = false;
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task BeginSignOut()
+    {
+        await StateProvider.Logout();
+        Navigation.NavigateTo("/");
+    }
+
+    private IDictionary<string, object> GetAttributes()
+    {
+        var attributes = new Dictionary<string, object>();
+        if (ReadOnly && IsButton)
+        {
+            attributes["class"] = "disabled";
+            attributes["style"] = "pointer-events: none; opacity: 0.6;";
+        }
+        else if (ReadOnly && !IsButton)
+        {
+            attributes["style"] = "opacity: 0.6;";
+        }
+        return attributes;
+    }
+}

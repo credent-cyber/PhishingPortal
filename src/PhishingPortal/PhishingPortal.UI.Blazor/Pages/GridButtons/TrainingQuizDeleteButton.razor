@@ -8,7 +8,17 @@
 @inject TenantClient client
 @implements ICustomGridComponent<TrainingQuizQuestion>
 @inject NavigationManager NavigationManager
-<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
+
+
+@* <button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button> *@
+
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(AppModules.TrainingCampaign)" ReadOnly="true" IsButton="true">
+
+    <button class='btn btn-sm btn-danger @(licencedViewRef?.CurrentMode != AccessMode.ReadWrite ? "disabled-view" : "")' style="border-radius:15px" @onclick="(licencedViewRef?.CurrentMode == AccessMode.ReadWrite ? MyClickHandler : null)" title="Delete"><i class="fa fa-trash"></i></button>
+    
+</LicencedView>
+
+
 <SimpleDialog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
@@ -39,6 +49,8 @@
 </SimpleDialog>
 
 @code {
+
+    private LicencedView licencedViewRef;
     [Parameter]
     public TrainingQuizQuestion Item { get; set; }
 

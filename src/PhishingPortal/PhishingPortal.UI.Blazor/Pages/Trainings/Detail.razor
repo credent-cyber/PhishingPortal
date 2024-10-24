@@ -13,45 +13,47 @@
 @inject ILogger<Detail> logger
 @inject AuthenticationStateProvider authState
 
-<h5 class="align-items-center text-secondary">Training Details</h5>
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true">
+    <h5 class="align-items-center text-secondary">Training Details</h5>
 
-@if (!string.IsNullOrEmpty(errorMessage_))
-{
-    <div class="alert alert-danger">@errorMessage_</div>
-}
+    @if (!string.IsNullOrEmpty(errorMessage_))
+    {
+        <div class="alert alert-danger">@errorMessage_</div>
+    }
 
-@if (training_ != null)
-{
-    <div class="card">
-        <div class="card-header bg-info p-4 d-flex align-items-center" style="height: 8px;">
-            <h4 class="text-white mb-0">@training_.TrainingName</h4>
-        </div>
-
-        <div class="card-body-small p-4">
-            <p>@((MarkupString)training_.Content?.Substring(0, Math.Min(200, training_.Content?.Length ?? 0))) ...</p>
-        </div>
-
-        <div class="card-footer row">
-            <div class="col-4">
-                <label class="bold-font">Status: </label>
-                <label>@trainingLog_.Status</label>
+    @if (training_ != null)
+    {
+        <div class="card">
+            <div class="card-header bg-info p-4 d-flex align-items-center" style="height: 8px;">
+                <h4 class="text-white mb-0">@training_.TrainingName</h4>
             </div>
-            <div class="col-4 text-center">
-                <label class="bold-font">% Completed: </label>
-                <label>@trainingLog_.PercentCompleted.ToString("F2")</label>
+
+            <div class="card-body-small p-4">
+                <p>@((MarkupString)training_.Content?.Substring(0, Math.Min(200, training_.Content?.Length ?? 0))) ...</p>
             </div>
-            <div class="col-4 text-right">
-                @if (trainingLog_.PercentCompleted < 100)
-                {
-                    <a href="/training/launch/@trainingLog_.UniqueID" class="btn btn-primary" target="_blank">Start Training</a>
-                }
+
+            <div class="card-footer row">
+                <div class="col-4">
+                    <label class="bold-font">Status: </label>
+                    <label>@trainingLog_.Status</label>
+                </div>
+                <div class="col-4 text-center">
+                    <label class="bold-font">% Completed: </label>
+                    <label>@trainingLog_.PercentCompleted.ToString("F2")</label>
+                </div>
+                <div class="col-4 text-right">
+                    @if (trainingLog_.PercentCompleted < 100)
+                    {
+                        <a href="/training/launch/@trainingLog_.UniqueID" class="btn btn-primary" target="_blank">Start Training</a>
+                    }
+                </div>
             </div>
         </div>
-    </div>
-}
+    }
+</LicencedView>
 
 @code {
-
+    private LicencedView licencedViewRef;
     [Parameter]
     public string UniqueID { get; set; } = string.Empty;
 

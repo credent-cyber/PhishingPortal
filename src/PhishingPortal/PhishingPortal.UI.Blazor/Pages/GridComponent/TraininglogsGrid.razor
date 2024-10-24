@@ -10,11 +10,11 @@
 
 @if (_task.IsCompleted)
 {
-    <div class="row">
-        <div class="col-sm-12 mt-n3">
-            <GridComponent T="TrainingLog" Grid="@_grid"></GridComponent>
-        </div>
+
+    <div class="col-sm-12 mt-n3">
+        <GridComponent T="TrainingLog" Grid="@_grid"></GridComponent>
     </div>
+
 }
 else
 {
@@ -62,10 +62,10 @@ else
         string url = $"odata/Traininglog?t={authState.TenantIdentifier}";
         var query = new QueryDictionary<StringValues>();
 
-        if(Desc == true)
+        if (Desc == true)
             query.Add("grid-sorting", "Id__1__1");
 
-        if(Id > 0)
+        if (Id > 0)
         {
             var status = string.Empty;
             if (Label == "Training Assign")

@@ -3,49 +3,52 @@
 
 @using PhishingPortal.UI.Blazor.Pages.GridButtons
 @using PhishingPortal.UI.Blazor.Pages.GridComponent
-
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        TrainingReport
-                    </h5>
-                </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>Training</a></li>
-                    <li class="breadcrumb-item"><a>TrainingReport</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-
-        <div class="card-body p-2 mt-n3">
-            <div class="col-sm-12 p-0">
-                <div class="">
-                    @if (Id != 0)
-                    {
-                        <TraininglogsGrid Id="Id" Label="@Label" />
-                    }
-                    else
-                    {
-                        <TraininglogsGrid />
-                    }
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true">
+    <div class="page-header breadcumb-sticky">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">
+                            TrainingReport
+                        </h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/"><i class="feather icon-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a>Training</a></li>
+                        <li class="breadcrumb-item"><a>TrainingReport</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12 p-0">
 
-</div>
+            <div class="card-body p-2 mt-n3">
+                <div class="col-sm-12 p-0">
+                    <div class="">
+                        @if (Id != 0)
+                        {
+                            <TraininglogsGrid Id="Id" Label="@Label" />
+                        }
+                        else
+                        {
+                            <TraininglogsGrid />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</LicencedView>
 
 @code {
+    private LicencedView licencedViewRef;
+
     [Parameter]
     public int Id { get; set; }
 

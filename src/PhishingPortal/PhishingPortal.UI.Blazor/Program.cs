@@ -36,6 +36,8 @@ builder.Services.AddScoped<CustomStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<CustomStateProvider>());
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<TenantClient>();
+
 
 builder.Services.AddScoped<AuthState>();
 builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
@@ -44,5 +46,7 @@ builder.Services.AddHttpClient<TenantClient>(client => client.BaseAddress = new 
 builder.Services.AddHttpClient<RequestClient>(client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddHxServices();
+builder.Services.AddScoped<ILicenseService, LicenseService>();
+builder.Services.AddScoped<LicenseService>();
 
 await builder.Build().RunAsync();

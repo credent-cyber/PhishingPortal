@@ -14,151 +14,154 @@
 @inject NavigationManager navigation
 @inject ILogger<Detail> logger;
 
-@if (!string.IsNullOrEmpty(errorMessage_))
-{
-    <div class="alert alert-danger">@errorMessage_</div>
-}
-
-@if (training_ != null)
-{
-    if (mode_ == Mode.Start)
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true">
+    @if (!string.IsNullOrEmpty(errorMessage_))
     {
-        <Card>
-            <Header>
-                <h4>Training Instructions</h4>
-            </Header>
-            <Content>
-                <p>
-                    To complete the trainig you need to -
-                </p>
-                <ul>
-                    <li>Watch the training video</li>
-                    <li>Attempt quiz question and score 100% in it</li>
-                </ul>
-            </Content>
-            <Footer>
-                @if (trainingLog_.Status == "Completed" || trainingLog_.PercentCompleted >= 100)
-                {
-                    <p class="alert-info mb-2">You have already completed this training.</p>
-                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Retake</button>
-                }
-                else
-                {
-                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
-                }
-
-
-            </Footer>
-        </Card>
+        <div class="alert alert-danger">@errorMessage_</div>
     }
 
-    if (mode_ == Mode.Video)
+    @if (training_ != null)
     {
-        <Card>
-            <Header>
-                <h4>@training_.TrainingName</h4>
-            </Header>
-            <Content>
-                <div class="row">
-                    <div class="col-lg-6 col-md-12 col-sm-12">
-                        <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
-                               EventFired="OnEvent"
-                               VideoEventOptions="options"
-                                       class="w-100"
-                                       autoplay="autoplay"
-                                       controls="controls"
-                               @ref="video">
-                            <source src="trainingvideo/@training_.TrainingVideo" type="video/mp4" />
-                        </BlazoredVideo>
-                    </div>
-                    <div class="col-lg-6 col-md-12 col-sm-12">
-                        <h4 class="mb-2 bold-font">Transcripts</h4>
-                        <p class="mt-1 p-1">
-                            @((MarkupString)training_.Content)
-                        </p>
-                    </div>
-                </div>
-            </Content>
-        </Card>
-    }
-
-    if (mode_ == Mode.QuizInstruction)
-    {
-
-        <Card>
-            <Header>
-                <h4>Training Quiz</h4>
-            </Header>
-            <Content>
-                <p>
-                    To complete the trainig you need to answer the question in quiz-
-                </p>
-            </Content>
-            <Footer>
-                <div class="col">
-                    <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz</button>
-                    <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Video">Watch Again</button>
-                </div>
-            </Footer>
-        </Card>
-    }
-
-    if (mode_ == Mode.Quiz)
-    {
-
-        <Quiz Training="training_" TrainingLog="trainingLog_" OnSubmit="OnQuizSubmit">
-
-        </Quiz>
-
-    }
-
-    if (mode_ == Mode.End)
-    {
-
-        <Card>
-            <Header>
-                @if (hasQuiz_)
-                {
-                    <h3>Quiz Over!</h3>
-                }
-                else
-                {
-                    <h3>Training Completed!</h3>
-                }
-            </Header>
-            <Content>
-                @if (pass_)
-                {
-                    <h4>Your Score: @score_%</h4>
-                    <p>Well done! You successfully completed the training.</p>
-
-                }
-                else
-                {
-                    <h4>You score is @score_% and minimum pass percentage is 70% </h4>
-                    <p style="color:indianred;">Unfortunately, you didn't complete the training, please try again.</p>
-                }
-
-            </Content>
-            <Footer>
-                <div class="col">
-                    @if (pass_)
+        if (mode_ == Mode.Start)
+        {
+            <Card>
+                <Header>
+                    <h4>Training Instructions</h4>
+                </Header>
+                <Content>
+                    <p>
+                        To complete the trainig you need to -
+                    </p>
+                    <ul>
+                        <li>Watch the training video</li>
+                        <li>Attempt quiz question and score 100% in it</li>
+                    </ul>
+                </Content>
+                <Footer>
+                    @if (trainingLog_.Status == "Completed" || trainingLog_.PercentCompleted >= 100)
                     {
-                        <button class="btn btn-primary" @onclick="@(() => navigation.NavigateTo("/training/my-trainings"))">Back To My Trainings</button>
+                        <p class="alert-info mb-2">You have already completed this training.</p>
+                        <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Retake</button>
                     }
                     else
                     {
-                        <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz Again</button>
-                        <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Start">Start Over</button>
+                        <button class="btn btn-primary" @onclick="() => mode_ = Mode.Video">Start</button>
                     }
-                </div>
-            </Footer>
-        </Card>
 
+
+                </Footer>
+            </Card>
+        }
+
+        if (mode_ == Mode.Video)
+        {
+            <Card>
+                <Header>
+                    <h4>@training_.TrainingName</h4>
+                </Header>
+                <Content>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12 col-sm-12">
+                            <BlazoredVideo Play="OnPlay" TimeUpdate="OnProgress"
+                                           EventFired="OnEvent"
+                                           VideoEventOptions="options"
+                                           class="w-100"
+                                           autoplay="autoplay"
+                                           controls="controls"
+                                           @ref="video">
+                                <source src="trainingvideo/@training_.TrainingVideo" type="video/mp4" />
+                            </BlazoredVideo>
+                        </div>
+                        <div class="col-lg-6 col-md-12 col-sm-12">
+                            <h4 class="mb-2 bold-font">Transcripts</h4>
+                            <p class="mt-1 p-1">
+                                @((MarkupString)training_.Content)
+                            </p>
+                        </div>
+                    </div>
+                </Content>
+            </Card>
+        }
+
+        if (mode_ == Mode.QuizInstruction)
+        {
+
+            <Card>
+                <Header>
+                    <h4>Training Quiz</h4>
+                </Header>
+                <Content>
+                    <p>
+                        To complete the trainig you need to answer the question in quiz-
+                    </p>
+                </Content>
+                <Footer>
+                    <div class="col">
+                        <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz</button>
+                        <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Video">Watch Again</button>
+                    </div>
+                </Footer>
+            </Card>
+        }
+
+        if (mode_ == Mode.Quiz)
+        {
+
+            <Quiz Training="training_" TrainingLog="trainingLog_" OnSubmit="OnQuizSubmit">
+
+            </Quiz>
+
+        }
+
+        if (mode_ == Mode.End)
+        {
+
+            <Card>
+                <Header>
+                    @if (hasQuiz_)
+                    {
+                        <h3>Quiz Over!</h3>
+                    }
+                    else
+                    {
+                        <h3>Training Completed!</h3>
+                    }
+                </Header>
+                <Content>
+                    @if (pass_)
+                    {
+                        <h4>Your Score: @score_%</h4>
+                        <p>Well done! You successfully completed the training.</p>
+
+                    }
+                    else
+                    {
+                        <h4>You score is @score_% and minimum pass percentage is 70% </h4>
+                        <p style="color:indianred;">Unfortunately, you didn't complete the training, please try again.</p>
+                    }
+
+                </Content>
+                <Footer>
+                    <div class="col">
+                        @if (pass_)
+                        {
+                            <button class="btn btn-primary" @onclick="@(() => navigation.NavigateTo("/training/my-trainings"))">Back To My Trainings</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="() => mode_ = Mode.Quiz">Take Quiz Again</button>
+                            <button class="btn btn-secondary float-right" @onclick="() => mode_ = Mode.Start">Start Over</button>
+                        }
+                    </div>
+                </Footer>
+            </Card>
+
+        }
     }
-}
+</LicencedView>
 
 @code {
+    private LicencedView licencedViewRef;
 
     private enum Mode
     {

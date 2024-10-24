@@ -18,14 +18,24 @@
 @inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @attribute [Authorize]
 
+
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
         <div class="row align-items-center">
             <div class="col-md-12">
                 <div class="page-header-title">
-                    <h5 class="m-b-10">
+                    <h5 class="m-b-10 d-flex align-items-center">
                         Campaigns
-                        <a href="tenant-campaign-config"><i class="fa fa-plus-circle fa-lg" aria-hidden="true" title="Create Campaign"></i></a>
+                        <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModules="@AppModulesList" ReadOnly="true" IsButton="true">
+                            @if (licencedViewRef?.CurrentMode == AccessMode.ReadWrite)
+                            {
+                                <a href="tenant-campaign-config"><i class="fa fa-plus-circle fa-lg ml-1" aria-hidden="true" title="Create Campaign"></i></a>
+                            }
+                            else
+                            {
+                                <a><i class="fa fa-plus-circle fa-lg" aria-hidden="true" title="Create Campaign"></i></a> 
+                            }
+                        </LicencedView>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -39,132 +49,104 @@
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="col-sm-12 p-0">
-
         <div class="card-body p-2 mt-n3">
-            <div class="col-md-12" style="padding: 0;">
-                <div class="bt-wizard" id="tabswizard">
-                    <ul class="nav nav-pills">
-                        @if (CTab == 1)
-                        {
-                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 active" data-toggle="tab"><h6 class="m-0">Email</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab"><h6 class="m-0">SMS</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab"><h6 class="m-0">WhatsApp</h6></a></li>
-                        }
-                        @if (CTab == 2)
-                        {
-                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab"><h6 class="m-0">Email</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0 active" data-toggle="tab"><h6 class="m-0">SMS</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0" data-toggle="tab"><h6 class="m-0">WhatsApp</h6></a></li>
-                        }
-                        @if (CTab == 3)
-                        {
-                            <li class="nav-item"><a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 " data-toggle="tab"><h6 class="m-0">Email</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0" data-toggle="tab"><h6 class="m-0">SMS</h6></a></li>
-                            <li class="nav-item"><a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0 active" data-toggle="tab"><h6 class="m-0">WhatsApp</h6></a></li>
-                        }
+            <div class="bt-wizard" id="tabswizard">
+                <ul class="nav nav-pills">
+                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                        <li class="nav-item">
+                            <a href="#tabs-t-tab1" @onclick="Emailc" class="nav-link rounded-0 @(CTab == 1 ? "active" : "")" data-toggle="tab">
+                                <h6 class="m-0">Email</h6>
+                            </a>
+                        </li>
+                    </LicencedView>
+                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                        <li class="nav-item">
+                            <a href="#tabs-t-tab2" @onclick="Smsc" class="nav-link rounded-0 @(CTab == 2 ? "active" : "")" data-toggle="tab">
+                                <h6 class="m-0">SMS</h6>
+                            </a>
+                        </li>
+                    </LicencedView>
+                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                        <li class="nav-item">
+                            <a href="#tabs-t-tab3" @onclick="Whatsappc" class="nav-link rounded-0 @(CTab == 3 ? "active" : "")" data-toggle="tab">
+                                <h6 class="m-0">WhatsApp</h6>
+                            </a>
+                        </li>
+                    </LicencedView>
+                </ul>
 
-                    </ul>
-                    <div class="tab-content card">
-                        <div class="pt-1 bg-primary"></div>
-                        @if (CTab == 1)
-                        {
-                            <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab1">
-                                <div class="table-responsive">
+                <div class="tab-content card">
+                    <div class="pt-1 bg-primary"></div>
+
+                    <div class="tab-pane card-body pt-4 active show p-2" id="tabs-t-tab@CTab">
+                        <div class="table-responsive">
+                            @if (CTab == 1)
+                            {
+                                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true">
                                     <EmailCampaignGrid />
-                                </div>
-                            </div>
-                        }
-                        @if (CTab == 2)
-                        {
-                            <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab2">
-                                <div class="table-responsive">
+                                </LicencedView>
+                            }
+                            @if (CTab == 2)
+                            {
+                                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true">
                                     <SmsCampaignGrid />
-                                </div>
-                            </div>
-                        }
-                        @if (CTab == 3)
-                        {
-                            <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab3">
-                                <div class="table-responsive">
+                                </LicencedView>
+                            }
+                            @if (CTab == 3)
+                            {
+                                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true">
                                     <WhatsappCampaignGrid />
-                                </div>
-                            </div>
-                        }
+                                </LicencedView>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-
 @code {
-
-    string message = string.Empty;
-    int CTab = 1;
+    private LicencedView licencedViewRef;
+    public int CTab = 1;
 
     protected override async Task OnInitializedAsync()
     {
-        CTab = await oLocalStore.GetItemAsync<int>(LocalStorage.C_TAB);
-        CTab = CTab == 0 ? 1 : CTab;
+        CTab = await oLocalStore.GetItemAsync<int>("cTab");
+        if (CTab == 0)
+            CTab = 1;
     }
-    public async void SaveSession()
+
+    public async Task SaveCampaignSession()
     {
         await oLocalStore.SetItemAsync("cTab", CTab);
     }
 
-
-    public void Emailc() { CTab = 1; SaveSession(); }
-    public void Smsc() { CTab = 2; SaveSession(); }
-    public void Whatsappc() { CTab = 3; SaveSession(); }
-
-    private CGrid<Campaign> _grid;
-    private Task _task;
-    private GridComponent<Campaign> Component;
-
-    Action<IGridColumnCollection<Campaign>> columns = c =>
+    public async Task Emailc()
     {
-        // c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true).SortInitialDirection(GridSortDirection.Descending).ThenSortByDescending(o => o.Id);
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Sortable(true);
-        c.Add(o => o.Name).Css("table-bordered");
-        c.Add(o => o.Description).Css("table-bordered");
-        c.Add(o => o.Detail.Type).Titled("Type").SetWidth("50px").Css("table-bordered");
-        c.Add(o => o.Schedule.ScheduleType).Css("table-bordered").Titled("Schedule Type");
-        c.Add(o => o.Schedule.ScheduleInfo).Css("table-bordered").Titled("Schedule Info");
-        c.Add(o => o.State).Css("table-bordered").Titled("Status");
-        //c.Add(o => o.IsActive, true).SetWidth("50px").Css("table-bordered");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CampaignEditButton>();
-    };
-
-    protected override async Task OnParametersSetAsync()
-    {
-        string url = $"odata/campaign?t={authState.TenantIdentifier}";
-        var query = new QueryDictionary<StringValues>();
-        query.Add("grid-filter", "Detail.Type__1__Email");
-        //query.Add("grid-filter", "Id__1__12");
-
-        var client = new GridODataClient<Campaign>(HttpClient, url, query, false, "ordersGrid", columns, 10)
-            .Sortable(true)
-            .Filterable(true)
-            .SetRowCssClasses(x => (x.Id) % 2 == 1 ? "gridEcolor" : "gridOcolor")
-            .ClearFiltersButton(true)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            .SetExcelExport(true, "EmailCampaigns.xlsx")
-            .ChangePageSize(true)
-            .EmptyText("No Data Available!!")
-            .SetKeyboard(true)
-            .Searchable(true, false, false);
-        //.SetTableLayout(TableLayout.Fixed, "1200px", "400px");
-
-        _grid = client.Grid;
-        // Set new items to grid
-        _task = client.UpdateGrid();
-        await _task;
+        CTab = 1;
+        await SaveCampaignSession();
     }
 
+    public async Task Smsc()
+    {
+        CTab = 2;
+        await SaveCampaignSession();
+    }
+
+    public async Task Whatsappc()
+    {
+        CTab = 3;
+        await SaveCampaignSession();
+    }
+
+    private List<AppModules> AppModulesList => new List<AppModules>
+    {
+        AppModules.EmailCampaign,
+        AppModules.SmsCampaign,
+        AppModules.WhatsAppCampaign
+    };
 }
