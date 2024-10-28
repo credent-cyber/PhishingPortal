@@ -15,6 +15,7 @@ namespace PhishingPortal.Server.Controllers
     using DocumentFormat.OpenXml.Office2010.Drawing;
     using Microsoft.AspNetCore.Identity.UI.Services;
     using Newtonsoft.Json;
+    using PhishingPortal.Dto.Dashboard;
     using PhishingPortal.Dto.Subscription;
     using PhishingPortal.Licensing;
     using PhishingPortal.Server.Controllers.Api.Abstraction;
@@ -393,6 +394,32 @@ namespace PhishingPortal.Server.Controllers
             to = _config.TestEmailRecipient;
 #endif
             await EmailSender.SendEmailAsync(to, subject, mailContent);
+        }
+
+
+        [HttpGet]
+        [Route("get-admin-statistics")]
+        public async Task<ApiResponse<AdminDashboardDto>> GetUserDashBoardStats()
+        {
+            var result = new ApiResponse<AdminDashboardDto>();
+
+            try
+            {
+                var user = User.Identity.Name;
+                var data = await tenantAdminRepo.GetAdminDashBoardStats();
+
+                result.IsSuccess = true;
+                result.Message = "Success";
+                result.Result = data;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return result;
         }
 
 

@@ -791,12 +791,12 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
-                SmsBarChartData.Add(new ChartJsDataset
-                    {
-                        Label = "Reported",
-                        Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
-                    });
+                // SmsBarChartData.Add(new ChartJsDataset
+                //     {
+                //         Label = "Reported",
+                //         Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
+                //         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
+                //     });
 
                 SmsLineChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray();
                 SmsLineChartData.Add(new ChartJsDataset
@@ -855,12 +855,12 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
-                WhatsappBarChartData.Add(new ChartJsDataset
-                    {
-                        Label = "Reported",
-                        Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
-                    });
+                // WhatsappBarChartData.Add(new ChartJsDataset
+                //     {
+                //         Label = "Reported",
+                //         Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
+                //         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
+                //     });
                 WhatsappLineChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray();
                 WhatsappLineChartData.Add(new ChartJsDataset
                     {

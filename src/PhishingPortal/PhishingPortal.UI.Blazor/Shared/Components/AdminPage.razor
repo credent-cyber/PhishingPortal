@@ -1,0 +1,144 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
+@inject IJSRuntime JS
+
+<style>
+    @@media screen and (max-width: 450px) {
+        .menu-styler {
+            display: none !important;
+        }
+    }
+
+    @@media screen and (min-width: 450px) {
+        .menu-styler {
+            display: block !important;
+        }
+    }
+</style>
+
+<div>
+
+    
+    <nav class="pcoded-navbar menupos-fixed @(layout) @(IsSidebarCollapsed ? "navbar-collapsed" : "")">
+        <div class="navbar-wrapper non-selectable">
+            <div class="navbar-content scroll-div">
+                <ul class="nav pcoded-inner-navbar ">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Phish</label>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/" class="nav-link" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-home"></i>
+                            </span><span class="pcoded-mtext">Dashboard</span>
+                        </a>
+                    </li>
+
+
+
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Analysis</label>
+                    </li>
+
+
+                    @* <li class="nav-item">
+                        <a href="training/my-trainings" class="nav-link " style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-book"></i>
+                            </span><span class="pcoded-mtext">My Training</span>
+                        </a>
+                    </li> *@
+
+                    <li class="nav-item pcoded-hasmenu @(IsGetStartedExpand ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleGetStarted" style="cursor:pointer">
+                            @*<a class="nav-link" @onclick:preventDefault @onclick:stopPropagation="ToggleGetStarted">*@
+                            <span class="pcoded-micon">
+                            <i class="fa fa-users" aria-hidden="true"></i>
+                            </span>
+                            <span class="pcoded-mtext"> Tenants</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsGetStartedExpand ? "d-block" : "d-none")" style="cursor:pointer">
+                            <li><a href="provision">All Tenants </a></li>
+                            <li><a href="onboard">New Tenants</a></li>
+                            
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed @(headerColor)">
+        <div class="m-header" style="cursor:pointer">
+            <a @onclick="ToggleSidebar" class="mobile-menu" id="mobile-collapse"><span></span></a>
+            <a class="b-brand" href="/">
+                <img src="assets/images/logo.png" alt="" class="logo" style="width:150px;height:46px;">
+            </a>
+            <a class="mob-toggler" @onclick="()=>MobileToggle = !MobileToggle">
+                <i class="feather icon-more-vertical"></i>
+            </a>
+        </div>
+        <div class="collapse navbar-collapse @(MobileToggle ? "d-flex" : "")">
+            <ul class="navbar-nav mr-auto">
+
+                <li class="nav-item">
+                    <a class="full-screen" onclick="javascript:toggleFullScreen()" style="cursor:pointer">
+                        <i class="feather icon-maximize"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+               @* <li>
+                    <div class="dropdown">
+                        <a class="displayChatbox dropdown-toggle" @onclick="()=>OpenChat=true" style="cursor:pointer">
+                            <i class="icon feather icon-mail"></i><span class="badge bg-success"><span class="sr-only"></span></span>
+                        </a>
+                    </div>
+                </li>*@
+                <li>
+                    <AdminLoginDisplay />
+                </li>
+            </ul>
+        </div>
+    </header>
+
+</div>
+
+
+@code {
+    [Parameter]
+    public EventCallback<bool> IsCollapsedChanged { get; set; }
+    string layout = "menu-light";
+    string headerColor = "header-blue";
+
+
+    private bool IsGetStartedExpand = false;
+    private bool IsSidebarCollapsed = false;
+    private async void ToggleSidebar()
+    {
+        layout = await oLocalStore.GetItemAsync<string>("layout");
+        IsSidebarCollapsed = !IsSidebarCollapsed;
+        IsCollapsedChanged.InvokeAsync(IsSidebarCollapsed);
+    }
+
+
+
+    private bool MobileToggle = false;
+    private bool OpenChat = false;
+    private bool RemoveHelpCard = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        layout = await oLocalStore.GetItemAsync<string>("layout");
+        headerColor = await oLocalStore.GetItemAsync<string>("headerColor");
+        await JS.InvokeVoidAsync("setLayout", layout, headerColor);
+    }
+    private void ToggleGetStarted(MouseEventArgs e)
+    {
+        IsGetStartedExpand = !IsGetStartedExpand;
+    }
+
+       
+
+    
+}

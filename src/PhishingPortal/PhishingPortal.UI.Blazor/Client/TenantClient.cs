@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
@@ -10,16 +11,18 @@ using PhishingPortal.UI.Blazor.Pages;
 using PhishingPortal.UI.Blazor.Services;
 using System;
 using System.Net.Http.Json;
+using System.Text.Json;
+
 
 namespace PhishingPortal.UI.Blazor.Client
 {
     public class TenantClient : BaseHttpClient
     {
          private readonly LicenseService _licenseService;
-        public TenantClient(ILogger<TenantClient> logger, HttpClient httpClient, LicenseService licenseService)
+        public TenantClient(ILogger<TenantClient> logger, HttpClient httpClient)
             : base(logger, httpClient)
         {
-            _licenseService = licenseService;
+           // _licenseService = licenseService;
         }
         [Inject]
         CustomStateProvider StateProvider { get; }
@@ -31,8 +34,9 @@ namespace PhishingPortal.UI.Blazor.Client
         // Method to check if the required module is accessible
         private async Task<bool> IsModuleAccessible(AppModules module)
         {
-            var result = await _licenseService.IsAccessible(module);
-            return result.Item1; 
+            //var result = await _licenseService.IsAccessible(module);
+            //return result.Item1; 
+            return true;
         }
 
 
@@ -1243,6 +1247,76 @@ namespace PhishingPortal.UI.Blazor.Client
             return data;
         }
 
+        #endregion
+
+
+        #region UserProfile Pic Upload
+        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePicAsync(UserProfilePicUpld data)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/UpsertProfilePic", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+
+
+        public async Task<UserProfilePicUpld> GetProfilePicByEmail()
+        {
+            UserProfilePicUpld data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/tenant/GetProfilePicByEmail");
+                res.EnsureSuccessStatusCode();
+                var responseContent = await res.Content.ReadAsStringAsync();
+                if (!string.IsNullOrWhiteSpace(responseContent))
+                {
+                    // Deserialize the response content to UserProfilePicUpld object
+                    data = JsonSerializer.Deserialize<UserProfilePicUpld>(responseContent);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+
+        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld profilePic)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteProfBgPic", profilePic);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
         #endregion
     }
 }
