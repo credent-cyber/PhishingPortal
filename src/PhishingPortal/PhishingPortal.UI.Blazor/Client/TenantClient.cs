@@ -18,27 +18,15 @@ namespace PhishingPortal.UI.Blazor.Client
 {
     public class TenantClient : BaseHttpClient
     {
-         private readonly LicenseService _licenseService;
+
         public TenantClient(ILogger<TenantClient> logger, HttpClient httpClient)
             : base(logger, httpClient)
         {
-           // _licenseService = licenseService;
+
         }
         [Inject]
         CustomStateProvider StateProvider { get; }
         
-        //[Inject]
-        //LicenseService licenseService { get; }
-
-
-        // Method to check if the required module is accessible
-        private async Task<bool> IsModuleAccessible(AppModules module)
-        {
-            //var result = await _licenseService.IsAccessible(module);
-            //return result.Item1; 
-            return true;
-        }
-
 
         public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
@@ -64,12 +52,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<Campaign> GetCampaingById(int id)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.EmailCampaign)) 
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+           
             Campaign campaign = null;
             try
             {
@@ -90,12 +73,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<Campaign> GetCampaingByName(string name)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.EmailCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             Campaign campaign = null;
             try
             {
@@ -776,12 +754,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<IEnumerable<TrainingVideo>> GetTrainigVideo()
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+           
             IEnumerable<TrainingVideo> trainigVideo;
             try
             {
@@ -802,12 +775,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             TrainingVideo result;
 
             try
@@ -827,12 +795,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<Training>> GetAllTrainings()
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             List<Training> training;
             try
             {
@@ -853,12 +816,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuizAsync(List<TrainingQuizQuestion> trainingQuiz)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             List<TrainingQuizQuestion> result = null;
             try
             {
@@ -880,12 +838,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             TrainingQuizResult result;
 
             try
@@ -905,12 +858,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<MyTraining>> GetMyTrainings()
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             var myTrainings = new List<MyTraining>();
             try
             {
@@ -929,12 +877,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingDetails(string uniqueID)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return (null,null);
-            }
+           
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
@@ -956,12 +899,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             try
             {
                 var res = await HttpClient.PostAsJsonAsync<TrainingProgress>($"api/tenant/UpdateTrainingProgress", new TrainingProgress
@@ -984,12 +922,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             List<TrainingQuiz> result = null;
             try
             {
@@ -1010,12 +943,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuizTitles()
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             IEnumerable<TrainingQuiz> details = null;
             try
             {
@@ -1033,12 +961,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
         {
-            //Check licence before fetching data
-            if (!await IsModuleAccessible(AppModules.TrainingCampaign))
-            {
-                // throw new UnauthorizedAccessException("No valid license for Email Campaign.");
-                return null;
-            }
+            
             var result = new ApiResponse<TrainingQuizQuestion>();
             try
             {
