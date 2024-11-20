@@ -10,7 +10,6 @@ namespace PhishingPortal.DataContext
     using PhishingPortal.Domain;
     using PhishingPortal.Dto;
 
-   
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {
         static bool _recreateDb = false;

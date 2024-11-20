@@ -10,10 +10,8 @@
 
 @if (_task.IsCompleted)
 {
-    <div class="row">
-        <div class="col-sm-12">
-            <GridComponent T="CampaignTemplate" Grid="@_grid"></GridComponent>
-        </div>
+    <div class="col-sm-12">
+        <GridComponent T="CampaignTemplate" Grid="@_grid"></GridComponent>
     </div>
 }
 else
@@ -34,7 +32,7 @@ else
 
     Action<IGridColumnCollection<CampaignTemplate>> columns = c =>
     {
-        c.Add(o => o.Id).SetWidth("50px").Css("table-bordered").Filterable(true);
+        c.Add(o => o.Id).SetWidth("10px").Css("table-bordered").Filterable(true);
         c.Add(o => o.Name).Css("table-bordered").Titled("Template Name").Filterable(true);
         c.Add(o => o.IsActive).SetWidth("50px").Css("table-bordered").Filterable(true);
         c.Add(o => o.IsHtml).SetWidth("50px").Css("table-bordered").Filterable(true);

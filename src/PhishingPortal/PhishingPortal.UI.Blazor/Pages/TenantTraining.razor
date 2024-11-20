@@ -19,51 +19,51 @@
 @using GridShared
 @using GridShared.Utility
 
-
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        Trainings
-                        <a href="tenant-training-config"><i class="fa fa-plus-circle fa-lg" aria-hidden="true" title="Create training"></i></a>
-                    </h5>
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true">
+    <div class="page-header breadcumb-sticky">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">
+                            Trainings
+                            <a href="tenant-training-config"><i class="fa fa-plus-circle fa-lg" aria-hidden="true" title="Create training"></i></a>
+                        </h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/"><i class="feather icon-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a>Training</a></li>
+                        <li class="breadcrumb-item"><a>All-Trainings</a></li>
+                    </ul>
                 </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>Training</a></li>
-                    <li class="breadcrumb-item"><a>All-Trainings</a></li>
-                </ul>
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 p-0">
+    <div class="row">
+        <div class="col-sm-12 p-0">
 
-        <div class="card-body p-2 mt-n3">
-            <div class="bt-wizard" id="tabswizard">
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="#tabs-t-tab1" class="nav-link rounded-0 active" data-toggle="tab">Training Data</a></li>
-                </ul>
-                <div class="tab-content card">
-                    <div class="pt-1 bg-primary"></div>
-                    <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab1">
-                        <div class="table-responsive">
-                            <TrainingDataGrid />
+            <div class="card-body p-2 mt-n3">
+                <div class="bt-wizard" id="tabswizard">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a href="#tabs-t-tab1" class="nav-link rounded-0 active" data-toggle="tab">Training Data</a></li>
+                    </ul>
+                    <div class="tab-content card">
+                        <div class="pt-1 bg-primary"></div>
+                        <div class="tab-pane card-body p-2 pt-4 active show" id="tabs-t-tab1">
+                            <div class="table-responsive">
+                                <TrainingDataGrid />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
-
     </div>
-</div>
-
+</LicencedView>
 
 @code {
-
+    private LicencedView licencedViewRef;
 }

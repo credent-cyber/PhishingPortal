@@ -52,7 +52,7 @@ string message = "This+is *HTML* HTML text. %0A Second+line."; // Use HttpUtilit
 
 string to = "917987163540";
 to = to.Length == 10 ? "91" + to : to;
-string uri = $"https://wa.viralmarketingtools.in/api/send?number={to}&type=text&message={message}&instance_id=66644B39333FA&access_token=6576c7c6da78d";
+string uri = $"https://wa.viralmarketingtools.in/api/send?number={to}&type=text&message={message}&instance_id=6701340013049&access_token=6576c7c6da78d";
 var response = await httpClient.GetAsync(uri);
 response.EnsureSuccessStatusCode();
 var content = await response.Content.ReadAsStringAsync();

@@ -10,33 +10,36 @@
 @inject TenantClient tenantClient
 @inject HttpClient HttpClient
 
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        My Trainings
-                    </h5>
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true">
+    <div class="page-header breadcumb-sticky">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">
+                            My Trainings
+                        </h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/"><i class="feather icon-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a>My-Trainings</a></li>
+                    </ul>
                 </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>My-Trainings</a></li>
-                </ul>
             </div>
         </div>
     </div>
-</div>
-<div>
-    <div class="">
+    <div>
+        <div class="">
 
-        <GridComponent T="MyTraining" Grid="@_grid"></GridComponent>
+            <GridComponent T="MyTraining" Grid="@_grid"></GridComponent>
+        </div>
     </div>
-</div>
+</LicencedView>
 
 @code {
+    private LicencedView licencedViewRef;
 
     [Parameter]
     public int Id { get; set; }
@@ -100,7 +103,7 @@
             }
 
         }
-       
+
 
         var client = new GridODataClient<MyTraining>(HttpClient, url, query, false, "trainingGrid", columns, 20)
             .Filterable(true)
@@ -118,6 +121,6 @@
         await _task;
     }
 
-    
+
 
 }

@@ -30,15 +30,21 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.Total</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.Total</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.Total</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.Total</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.Total</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.Total</span></h6>
+                                    </LicencedView>
                                 }
                             </div>
                         </div>
@@ -61,15 +67,21 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.TotalHits</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Email.TotalHits</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.TotalHits</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Sms.TotalHits</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.TotalHits</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@stats.Whatsapp.TotalHits</span></h6>
+                                    </LicencedView>
                                 }
                             </div>
                         </div>
@@ -94,15 +106,21 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Email.Total - stats.Email.TotalHits)</span> </h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Email.Total - stats.Email.TotalHits)</span> </h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Sms.Total - stats.Sms.TotalHits)</span> </h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Sms.Total - stats.Sms.TotalHits)</span> </h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whtasapp Not Clicked" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;">@(stats.Whatsapp.Total - stats.Whatsapp.TotalHits)</span></h6>
+                                    </LicencedView>
                                 }
                             </div>
                         </div>
@@ -127,15 +145,21 @@
                             <div class="col">
                                 @if (Tab == 1)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Email.PronePercent %</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-envelope fa-2x text-c-blue" aria-hidden="true" title="Email Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Email.PronePercent %</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 2)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Sms.PronePercent %</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-comments-o fa-2x text-c-red" aria-hidden="true" title="Sms Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Sms.PronePercent %</span></h6>
+                                    </LicencedView>
                                 }
                                 @if (Tab == 3)
                                 {
-                                    <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Whatsapp.PronePercent %</span></h6>
+                                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                                        <h6 class="m-b-0"><i class="fa-lg fa fa-whatsapp fa-2x text-c-green" aria-hidden="true" title="Whatsapp Prone%" style="vertical-align: 0"></i> <span style="font-size: x-large;color:black;"> @stats.Whatsapp.PronePercent %</span></h6>
+                                    </LicencedView>
                                 }
                             </div>
                         </div>
@@ -147,193 +171,121 @@
 
         @if (Tab == 4)
         {
-            <div class="col-md-6 col-xl-3">
-                <div class="card bg-facebook order-card">
-                    <div class="card-body">
-                        <a href="#!">
-                            <div class="row align-items-center m-b-0">
-                                <div class="col" style="padding: 0">
-                                    <h6 class="m-b-5 text-white">Latest Assigned Training </h6>
+            <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="false">
+            <div class="row">
+                <div class="col-md-6 col-xl-3">
+                    <div class="card bg-facebook order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col" style="padding: 0">
+                                        <h6 class="m-b-5 text-white">Latest Assigned Training </h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black">@trainingStats.TotalTrainingAssign</h3>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <h3 style="color:black">@trainingStats.TotalTrainingAssign</h3>
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-                <div class="card bg-c-green order-card">
-                    <div class="card-body">
-                        <a href="#!">
-                            <div class="row align-items-center m-b-0">
-                                <div class="col" style="padding: 0">
-                                    <h6 class="m-b-5 text-white">Completed</h6>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card bg-c-green order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col" style="padding: 0">
+                                        <h6 class="m-b-5 text-white">Completed</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black">@trainingStats.TrainingCompleted</h3>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <h3 style="color:black">@trainingStats.TrainingCompleted</h3>
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-                <div class="card bg-danger order-card">
-                    <div class="card-body">
-                        <a href="#!">
-                            <div class="row align-items-center m-b-0">
-                                <div class="col" style="padding: 0">
-                                    <h6 class="m-b-5 text-white">Incomplete/Not Attempt</h6>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card bg-danger order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col" style="padding: 0">
+                                        <h6 class="m-b-5 text-white">Incomplete/Not Attempt</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black">@trainingStats.TrainingNotAttampt</h3>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <h3 style="color:black">@trainingStats.TrainingNotAttampt</h3>
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-xl-3">
-                <div class="card bg-c-purple order-card">
-                    <div class="card-body">
-                        <a href="#!">
-                            <div class="row align-items-center m-b-0">
-                                <div class="col" style="padding: 0">
-                                    <h6 class="m-b-5 text-white">Compromised after Training</h6>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card bg-c-purple order-card">
+                        <div class="card-body">
+                            <a href="#!">
+                                <div class="row align-items-center m-b-0">
+                                    <div class="col" style="padding: 0">
+                                        <h6 class="m-b-5 text-white">Compromised after Training</h6>
+                                    </div>
+                                    <div class="col-auto">
+                                        <h3 style="color:black">@trainingStats.TrainingCompromised%</h3>
+                                    </div>
                                 </div>
-                                <div class="col-auto">
-                                    <h3 style="color:black">@trainingStats.TrainingCompromised%</h3>
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+                </div>
+            </LicencedView>
+    
         }
-
 
         <div class="card-body" style="padding: 15px !important;">
             <ul class="nav nav-tabs mb-3" id="emailTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active text-uppercase" id="email-tab" data-toggle="tab" @onclick='() => { Tab=1; campignType="Email"; }'
-                       href="#email" role="tab" aria-controls="email" aria-selected="true"><h6 class="m-0">Email</h6></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="sms-tab" data-toggle="tab" @onclick='() => { Tab=2; campignType="Sms"; }'
-                       href="#sms" role="tab" aria-controls="sms"
-                       aria-selected="false"><h6 class="m-0">Sms</h6></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="whatsapp-tab" data-toggle="tab" @onclick='() => { Tab=3; campignType="WhatsApp"; }'
-                       href="#whatsapp" role="tab" aria-controls="whatsapp"
-                       aria-selected="false"><h6 class="m-0">Whatsapp</h6></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="training-tab" data-toggle="tab" @onclick='() => { Tab=4; campignType="Training"; }'
-                       href="#training" role="tab" aria-controls="training"
-                       aria-selected="false"><h6 class="m-0">Training</h6></a>
-                </li>
+                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase @(Tab == 1 ? "active" : "")" id="email-tab" data-toggle="tab" @onclick='() => { Tab=1; campignType="Email"; }'
+                           href="#email" role="tab" aria-controls="email" aria-selected="true"><h6 class="m-0">Email</h6></a>
+                    </li>
+                </LicencedView>
+                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="false">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase @(Tab == 2 ? "active" : "")" id="sms-tab" data-toggle="tab" @onclick='() => { Tab=2; campignType="Sms"; }'
+                           href="#sms" role="tab" aria-controls="sms"
+                           aria-selected="false"><h6 class="m-0">Sms</h6></a>
+                    </li>
+                </LicencedView>
+                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="false">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase @(Tab == 3 ? "active" : "")" id="whatsapp-tab" data-toggle="tab" @onclick='() => { Tab=3; campignType="WhatsApp"; }'
+                           href="#whatsapp" role="tab" aria-controls="whatsapp"
+                           aria-selected="false"><h6 class="m-0">Whatsapp</h6></a>
+                    </li>
+                </LicencedView>
+                <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="false">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase @(Tab == 4 ? "active" : "")" id="training-tab" data-toggle="tab" @onclick='() => { Tab=4; campignType="Training"; }'
+                           href="#training" role="tab" aria-controls="training"
+                           aria-selected="false"><h6 class="m-0">Training</h6></a>
+                    </li>
+                </LicencedView>
             </ul>
 
             <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" style="background:none" id="email" role="tabpanel" aria-labelledby="email-tab">
-                    <div class="row">
-                        <div class="col-xl-6 col-md-6">
-                            <div class="card">
-                                <div class="card-header text-center">
-                                    <h5>Recent five Email Campaigns </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div style="width: 100%;">
-                                        <Chart Id="bar3"  Type="@ChartType.bar" Datasets="@BarChart3Data" AspectRatio="false"
-                                               Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
-                                        </Chart>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-6 col-md-6">
-                            <div class="card">
-                                <div class="card-header text-center">
-                                    <h5>Trend of Clicks % on Email Campaigns</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div style="width: 100%;">
-                                        <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data" AspectRatio="false"
-                                               Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
-                                        </Chart>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-header" style="text-align:center">
-                                    <h5>Clicks % by Department </h5>
-                                </div>
-                                <div class="card-body">
-                                    <PieChart Id="donut1" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
-                                              Data="@(Donut1Data.ToArray())"
-                                              BackgroundColor="@(Donut1Background.ToArray())"
-                                              Labels="@(Donut1Labels.ToArray())">
-                                    </PieChart>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-header" style="text-align:center">
-                                    <h5>Category Wise Failure %</h5>
-                                </div>
-                                <div class="card-body">
-
-                                    <PieChart Id="pie1" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                              Data="@(PieChart1Data.ToArray())"
-                                              BackgroundColor="@(PieChart1Background.ToArray())"
-                                              Labels="@(PieChart1Labels.ToArray())">
-                                    </PieChart>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-header" style="text-align:center">
-                                    <h5>Most Clicked Email Templates</h5>
-                                </div>
-                                <div class="card-body">
-                                    <PieChart Id="TempPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                              Data="@(Polar1Data.ToArray())"
-                                              BackgroundColor="@(Polar1Background.ToArray())"
-                                              Labels="@(Polar1Labels.ToArray())"
-                                              Ids="@Polar1Ids.ToArray()">
-                                    </PieChart>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="tab-pane fade" style="background:none" id="sms" role="tabpanel" aria-labelledby="sms-tab">
-                    <p class="mb-0">
+                @* <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="true"> *@
+                    <div class="tab-pane fade show active" style="background:none" id="email" role="tabpanel" aria-labelledby="email-tab">
                         <div class="row">
                             <div class="col-xl-6 col-md-6">
                                 <div class="card">
                                     <div class="card-header text-center">
-                                        <h5>Recent five Sms Campaigns</h5>
+                                        <h5>Recent five Email Campaigns </h5>
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
-                                            <Chart Id="SmsBar" Type="@ChartType.bar" Datasets="@SmsBarChartData" AspectRatio="false"
-                                                   Labels="@SmsBarChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
+                                            <Chart Id="bar3" Type="@ChartType.bar" Datasets="@BarChart3Data" AspectRatio="false"
+                                                   Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
@@ -342,18 +294,19 @@
                             <div class="col-xl-6 col-md-6">
                                 <div class="card">
                                     <div class="card-header text-center">
-                                        <h5>Trend of Click % on Sms Campaigns </h5>
+                                        <h5>Trend of Clicks % on Email Campaigns</h5>
                                     </div>
                                     <div class="card-body">
                                         <div style="width: 100%;">
-                                            <Chart Id="SmsLine" Type="@ChartType.line" Datasets="@SmsLineChartData" AspectRatio="false"
-                                                   Labels="@SmsLineChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
+                                            <Chart Id="bar2" Type="@ChartType.line" Datasets="@BarChart2Data" AspectRatio="false"
+                                                   Labels="@BarChart3Labels" Ids="@BarChart3Ids" IsStacked="false">
                                             </Chart>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
 
                             <div class="col-xl-4 col-md-6">
@@ -362,24 +315,28 @@
                                         <h5>Clicks % by Department </h5>
                                     </div>
                                     <div class="card-body">
-                                        <PieChart Id="SmsDonut" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
-                                                  Data="@(SmsDonutData.ToArray())"
-                                                  BackgroundColor="@(SmsDonutBackground.ToArray())"
-                                                  Labels="@(SmsDonutLabels.ToArray())">
+                                        <PieChart Id="donut1" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
+                                                  Data="@(Donut1Data.ToArray())"
+                                                  BackgroundColor="@(Donut1Background.ToArray())"
+                                                  Labels="@(Donut1Labels.ToArray())">
                                         </PieChart>
                                     </div>
                                 </div>
                             </div>
+
+
+
                             <div class="col-xl-4 col-md-6">
                                 <div class="card">
                                     <div class="card-header" style="text-align:center">
                                         <h5>Category Wise Failure %</h5>
                                     </div>
                                     <div class="card-body">
-                                        <PieChart Id="SmsPie" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                                  Data="@(SmsPieChartData.ToArray())"
-                                                  BackgroundColor="@(SmsPieChartBackground.ToArray())"
-                                                  Labels="@(SmsPieChartLabels.ToArray())">
+
+                                        <PieChart Id="pie1" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                  Data="@(PieChart1Data.ToArray())"
+                                                  BackgroundColor="@(PieChart1Background.ToArray())"
+                                                  Labels="@(PieChart1Labels.ToArray())">
                                         </PieChart>
                                     </div>
                                 </div>
@@ -387,159 +344,247 @@
                             <div class="col-xl-4 col-md-6">
                                 <div class="card">
                                     <div class="card-header" style="text-align:center">
-                                        <h5>Most Clicked SMS Templates</h5>
+                                        <h5>Most Clicked Email Templates</h5>
                                     </div>
                                     <div class="card-body">
-                                        <PieChart Id="SmsPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                                  Data="@(SmsPolarData.ToArray())"
-                                                  BackgroundColor="@(SmsPolarBackground.ToArray())"
-                                                  Ids="@SmsPolarIds.ToArray()"
-                                                  Labels="@(SmsPolarLabels.ToArray())">
+                                        <PieChart Id="TempPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                  Data="@(Polar1Data.ToArray())"
+                                                  BackgroundColor="@(Polar1Background.ToArray())"
+                                                  Labels="@(Polar1Labels.ToArray())"
+                                                  Ids="@Polar1Ids.ToArray()">
                                         </PieChart>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                    </p>
-                </div>
-                <div class="tab-pane fade" id="whatsapp" style="background:none" role="tabpanel" aria-labelledby="whatsapp-tab">
-                    <p class="mb-0">
-                        <div class="row">
-                            <div class="col-xl-6 col-md-6">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h5>Recent five WhatsApp Campaigns</h5>
+                    </div>
+                @* </LicencedView> *@
+                @* <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.SmsCampaign" ReadOnly="true" IsButton="true"> *@
+                    <div class="tab-pane fade" style="background:none" id="sms" role="tabpanel" aria-labelledby="sms-tab">
+                        <p class="mb-0">
+                            <div class="row">
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Recent five Sms Campaigns</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="SmsBar" Type="@ChartType.bar" Datasets="@SmsBarChartData" AspectRatio="false"
+                                                       Labels="@SmsBarChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div style="width: 100%;">
-                                            <Chart Id="WhatsappBar" Type="@ChartType.bar" Datasets="@WhatsappBarChartData" AspectRatio="false"
-                                                   Labels="@WhatsappBarChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
-                                            </Chart>
+                                </div>
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Trend of Click % on Sms Campaigns </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="SmsLine" Type="@ChartType.line" Datasets="@SmsLineChartData" AspectRatio="false"
+                                                       Labels="@SmsLineChartLabels" Ids="@SmsBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-md-6">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h5>Trend of Click % on WhatsApp Campaigns</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div style="width: 100%;">
-                                            <Chart Id="WhatsappLine" Type="@ChartType.line" Datasets="@WhatsappLineChartData" AspectRatio="false"
-                                                   Labels="@WhatsappLineChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
-                                            </Chart>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
+                            <div class="row">
 
-                            <div class="col-xl-4 col-md-6">
-                                <div class="card">
-                                    <div class="card-header" style="text-align:center">
-                                        <h5>Clicks % by Department </h5>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Clicks % by Department </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="SmsDonut" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
+                                                      Data="@(SmsDonutData.ToArray())"
+                                                      BackgroundColor="@(SmsDonutBackground.ToArray())"
+                                                      Labels="@(SmsDonutLabels.ToArray())">
+                                            </PieChart>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <PieChart Id="WhatsappDonut" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
-                                                  Data="@(WhatsappDonutData.ToArray())"
-                                                  BackgroundColor="@(WhatsappDonutBackground.ToArray())"
-                                                  Labels="@(WhatsappDonutLabels.ToArray())">
-                                        </PieChart>
+                                </div>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Category Wise Failure %</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="SmsPie" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                      Data="@(SmsPieChartData.ToArray())"
+                                                      BackgroundColor="@(SmsPieChartBackground.ToArray())"
+                                                      Labels="@(SmsPieChartLabels.ToArray())">
+                                            </PieChart>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Most Clicked SMS Templates</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="SmsPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                      Data="@(SmsPolarData.ToArray())"
+                                                      BackgroundColor="@(SmsPolarBackground.ToArray())"
+                                                      Ids="@SmsPolarIds.ToArray()"
+                                                      Labels="@(SmsPolarLabels.ToArray())">
+                                            </PieChart>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="card">
-                                    <div class="card-header" style="text-align:center">
-                                        <h5>Category Wise Failure %</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <PieChart Id="WhatsappPie" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                                  Data="@(WhatsappPieChartData.ToArray())"
-                                                  BackgroundColor="@(WhatsappPieChartBackground.ToArray())"
-                                                  Labels="@(WhatsappPieChartLabels.ToArray())">
-                                        </PieChart>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="card">
-                                    <div class="card-header" style="text-align:center">
-                                        <h5>Most Clicked WhatsApp Templates</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <PieChart Id="WhatsappPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
-                                                  Data="@(WhatsappPolarData.ToArray())"
-                                                  BackgroundColor="@(WhatsappPolarBackground.ToArray())"
-                                                  Ids="@WhatsappPolarIds.ToArray()"
-                                                  Labels="@(WhatsappPolarLabels.ToArray())">
-                                        </PieChart>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </p>
-                </div>
-                <div class="tab-pane fade" id="training" style="background:none" role="tabpanel" aria-labelledby="training-tab">
-                    <p class="mb-0">
-                        <div class="row">
-                            <div class="col-xl-6 col-md-6">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h5>Month wise Training Report</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div style="width: 100%;">
 
-                                            <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
-                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
-                                            </Chart>
+                        </p>
+                    </div>
+                @* </LicencedView> *@
+                @* <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.WhatsAppCampaign" ReadOnly="true" IsButton="true"> *@
+                    <div class="tab-pane fade" id="whatsapp" style="background:none" role="tabpanel" aria-labelledby="whatsapp-tab">
+                        <p class="mb-0">
+                            <div class="row">
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Recent five WhatsApp Campaigns</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="WhatsappBar" Type="@ChartType.bar" Datasets="@WhatsappBarChartData" AspectRatio="false"
+                                                       Labels="@WhatsappBarChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Trend of Click % on WhatsApp Campaigns</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                <Chart Id="WhatsappLine" Type="@ChartType.line" Datasets="@WhatsappLineChartData" AspectRatio="false"
+                                                       Labels="@WhatsappLineChartLabels" Ids="@WhatsappBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-md-6">
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h5>Trend of Training Completion Percentage</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div style="width: 100%;">
+                            <div class="row">
 
-                                            <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
-                                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
-                                            </Chart>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Clicks % by Department </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="WhatsappDonut" Type="@ChartType.doughnut" Responsive="true" AspectRatio="false"
+                                                      Data="@(WhatsappDonutData.ToArray())"
+                                                      BackgroundColor="@(WhatsappDonutBackground.ToArray())"
+                                                      Labels="@(WhatsappDonutLabels.ToArray())">
+                                            </PieChart>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Category Wise Failure %</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="WhatsappPie" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                      Data="@(WhatsappPieChartData.ToArray())"
+                                                      BackgroundColor="@(WhatsappPieChartBackground.ToArray())"
+                                                      Labels="@(WhatsappPieChartLabels.ToArray())">
+                                            </PieChart>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header" style="text-align:center">
+                                            <h5>Most Clicked WhatsApp Templates</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <PieChart Id="WhatsappPolar" Type="@ChartType.pie" Responsive="true" AspectRatio="false"
+                                                      Data="@(WhatsappPolarData.ToArray())"
+                                                      BackgroundColor="@(WhatsappPolarBackground.ToArray())"
+                                                      Ids="@WhatsappPolarIds.ToArray()"
+                                                      Labels="@(WhatsappPolarLabels.ToArray())">
+                                            </PieChart>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xl-12 col-md-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 style="color:coral;">Recent TrainingLogs <i class="fa fa-database" aria-hidden="true"></i></h5>
+                        </p>
+                    </div>
+                @* </LicencedView> *@
+                @* <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="true"> *@
+                    <div class="tab-pane fade" id="training" style="background:none" role="tabpanel" aria-labelledby="training-tab">
+                        <p class="mb-0">
+                            <div class="row">
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Month wise Training Report</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+
+                                                <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
+                                                       Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <div style="width: 100%;">
-                                            @*<DummyTable />*@
-                                            <TraininglogsGrid Desc="true" />
+                                </div>
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="card">
+                                        <div class="card-header text-center">
+                                            <h5>Trend of Training Completion Percentage</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+
+                                                <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
+                                                       Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                                                </Chart>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </p>
-                </div>
+                            <div class="row">
+                                <div class="col-xl-12 col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 style="color:coral;">Recent TrainingLogs <i class="fa fa-database" aria-hidden="true"></i></h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div style="width: 100%;">
+                                                @*<DummyTable />*@
+                                                <TraininglogsGrid Desc="true" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                @* </LicencedView> *@
             </div>
         </div>
     </div>
 </div>
 
 @code {
+    private LicencedView licencedViewRef;
 
     public int TotalPhishingTests { get; set; }
     public int TotalClicks { get; set; }
@@ -746,12 +791,12 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
-                SmsBarChartData.Add(new ChartJsDataset
-                    {
-                        Label = "Reported",
-                        Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
-                    });
+                // SmsBarChartData.Add(new ChartJsDataset
+                //     {
+                //         Label = "Reported",
+                //         Data = data2.SmsEntries.Select(o => o.Reported.ToString()).ToArray(),
+                //         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
+                //     });
 
                 SmsLineChartLabels = data2.SmsEntries.Select(o => o.Campaign.Name).ToArray();
                 SmsLineChartData.Add(new ChartJsDataset
@@ -810,12 +855,12 @@
                         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Red, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
                     });
 
-                WhatsappBarChartData.Add(new ChartJsDataset
-                    {
-                        Label = "Reported",
-                        Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
-                        BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
-                    });
+                // WhatsappBarChartData.Add(new ChartJsDataset
+                //     {
+                //         Label = "Reported",
+                //         Data = data2.WhatsappEntries.Select(o => o.Reported.ToString()).ToArray(),
+                //         BackgroundColor = ColorHelper.GetBackgroundColors(Color.Orange, data2.Entries.Count > 0 ? data2.Entries.Count : 5),
+                //     });
                 WhatsappLineChartLabels = data2.WhatsappEntries.Select(o => o.Campaign.Name).ToArray();
                 WhatsappLineChartData.Add(new ChartJsDataset
                     {

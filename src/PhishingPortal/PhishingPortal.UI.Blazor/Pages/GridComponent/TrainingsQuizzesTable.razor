@@ -10,10 +10,8 @@
 
 @if (_task.IsCompleted)
 {
-    <div class="row">
-        <div class="col-sm-12">
-            <GridComponent T="TrainingQuizQuestion" @ref="Component"  Grid="@_grid"></GridComponent>
-        </div>
+    <div class="col-sm-12">
+        <GridComponent T="TrainingQuizQuestion" @ref="Component" Grid="@_grid"></GridComponent>
     </div>
 }
 else

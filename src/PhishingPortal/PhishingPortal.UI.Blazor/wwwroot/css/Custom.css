@@ -527,3 +527,9 @@ imgs {
 #TrainingLine {
     height: 200px !important;
 }
+
+/*.disabled-view {
+    pointer-events: none;*/ /* Prevent clicking */
+    /*opacity: 0.6;*/ /* Reduce visibility */
+    /*cursor: not-allowed;*/ /* Change the cursor to indicate disabled state */
+/*}*/

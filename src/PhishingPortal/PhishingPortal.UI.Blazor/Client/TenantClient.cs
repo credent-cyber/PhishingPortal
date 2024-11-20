@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Components;
@@ -7,13 +8,17 @@ using PhishingPortal.Dto;
 using PhishingPortal.Dto.Dashboard;
 using PhishingPortal.Dto.Subscription;
 using PhishingPortal.UI.Blazor.Pages;
+using PhishingPortal.UI.Blazor.Services;
 using System;
 using System.Net.Http.Json;
+using System.Text.Json;
+
 
 namespace PhishingPortal.UI.Blazor.Client
 {
     public class TenantClient : BaseHttpClient
     {
+
         public TenantClient(ILogger<TenantClient> logger, HttpClient httpClient)
             : base(logger, httpClient)
         {
@@ -21,9 +26,11 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         [Inject]
         CustomStateProvider StateProvider { get; }
+        
 
         public async Task<IEnumerable<Campaign>> GetCampaignsAsync(int pageIndex, int pageSize)
         {
+           
             IEnumerable<Campaign> campaigns;
             try
             {
@@ -45,6 +52,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<Campaign> GetCampaingById(int id)
         {
+           
             Campaign campaign = null;
             try
             {
@@ -65,6 +73,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<Campaign> GetCampaingByName(string name)
         {
+            
             Campaign campaign = null;
             try
             {
@@ -702,8 +711,6 @@ namespace PhishingPortal.UI.Blazor.Client
 
         }
 
-
-
         public async Task<TrainingCampaignMapping> GetTrainingByCampaignId(int id)
         {
             TrainingCampaignMapping trainingCampaign = null;
@@ -747,6 +754,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<IEnumerable<TrainingVideo>> GetTrainigVideo()
         {
+           
             IEnumerable<TrainingVideo> trainigVideo;
             try
             {
@@ -767,6 +775,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<TrainingVideo> UpsertTrainingVideo(TrainingVideo trainingVideo)
         {
+            
             TrainingVideo result;
 
             try
@@ -786,6 +795,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<Training>> GetAllTrainings()
         {
+            
             List<Training> training;
             try
             {
@@ -806,6 +816,7 @@ namespace PhishingPortal.UI.Blazor.Client
         }
         public async Task<List<TrainingQuizQuestion>> UpsertTrainingQuizAsync(List<TrainingQuizQuestion> trainingQuiz)
         {
+            
             List<TrainingQuizQuestion> result = null;
             try
             {
@@ -827,6 +838,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<TrainingQuizResult> GetTrainingQuizById(int id)
         {
+            
             TrainingQuizResult result;
 
             try
@@ -846,6 +858,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<MyTraining>> GetMyTrainings()
         {
+            
             var myTrainings = new List<MyTraining>();
             try
             {
@@ -864,6 +877,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<(Training Training, TrainingLog TrainingLog)> GetTrainingDetails(string uniqueID)
         {
+           
             try
             {
                 var res = await HttpClient.GetAsync($"api/tenant/GetTrainingByUniqueId?uniqueID={uniqueID}");
@@ -885,6 +899,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<TrainingLog> UpdateTrainingProgress(string uniqueID, decimal percentage, string checkpoint)
         {
+            
             try
             {
                 var res = await HttpClient.PostAsJsonAsync<TrainingProgress>($"api/tenant/UpdateTrainingProgress", new TrainingProgress
@@ -907,6 +922,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<List<TrainingQuiz>> UpsertTrainingQuizTitle(List<TrainingQuiz> data)
         {
+            
             List<TrainingQuiz> result = null;
             try
             {
@@ -927,6 +943,7 @@ namespace PhishingPortal.UI.Blazor.Client
 
         public async Task<IEnumerable<TrainingQuiz>> GetAllTrainingQuizTitles()
         {
+            
             IEnumerable<TrainingQuiz> details = null;
             try
             {
@@ -940,6 +957,25 @@ namespace PhishingPortal.UI.Blazor.Client
                 throw;
             }
             return details;
+        }
+
+        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
+        {
+            
+            var result = new ApiResponse<TrainingQuizQuestion>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteTrainingQuizQuestion/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingQuizQuestion>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
         }
 
         public async Task<IEnumerable<TenantDomain>> GetDomains()
@@ -1006,23 +1042,6 @@ namespace PhishingPortal.UI.Blazor.Client
             }
         }
 
-        public async Task<ApiResponse<TrainingQuizQuestion>> DeleteTrainingQuizQuestion(int id)
-        {
-            var result = new ApiResponse<TrainingQuizQuestion>();
-            try
-            {
-                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteTrainingQuizQuestion/{id}", new { });
-                res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TrainingQuizQuestion>>();
-                return json;
-            }
-            catch (Exception ex)
-            {
-                result.IsSuccess = false;
-                result.Message = ex.Message;
-                return result;
-            }
-        }
 
         #region UserDashBoard
         public async Task<TrainingStatics> GetUserDashBoardStats()
@@ -1152,5 +1171,6 @@ namespace PhishingPortal.UI.Blazor.Client
         }
 
         #endregion
+
     }
 }

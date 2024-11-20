@@ -7,9 +7,18 @@
 @implements ICustomGridComponent<CampaignTemplate>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(Item.Type==CampaignType.Email ? AppModules.EmailCampaign : (Item.Type==CampaignType.Sms ? AppModules.SmsCampaign : AppModules.WhatsAppCampaign))" ReadOnly="true" IsButton="true">
+    <button style="border-radius:15px"  class='btn btn-sm btn-primary @(licencedViewRef?.CurrentMode != AccessMode.ReadWrite ? "disabled-view" : "")'
+            @onclick="(licencedViewRef?.CurrentMode == AccessMode.ReadWrite ? MyClickHandler : null)" title="Edit">
+            <i class="fa fa-pencil-square-o"></i>
+    </button>
+</LicencedView>
+@* <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button> *@
 
 @code {
+
+    private LicencedView licencedViewRef;
+
     [Parameter]
     public CampaignTemplate Item { get; set; }
 

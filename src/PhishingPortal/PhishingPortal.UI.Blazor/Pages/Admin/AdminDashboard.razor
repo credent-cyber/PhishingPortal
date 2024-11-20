@@ -1,7 +1,22 @@
-﻿<div class="row">
+﻿@using PhishingPortal.Dto.Dashboard
+@using PhishingPortal.UI.Blazor.Helpers
+@using PhishingPortal.UI.Blazor.Pages.GridComponent
+@using PhishingPortal.UI.Blazor.Shared.ChartJs;
+@using PhishingPortal.Dto;
+
+@using PhishingPortal.UI.Blazor.Client;
+@using System.Drawing
+@inject TenantAdminClient client;
+@inject ILogger<UserDashboard> logger;
+@inject IJSRuntime JSRuntime;
+@attribute [Authorize]
+
+<div class="row">
     <h3>AdminDashboard</h3>
 </div>
 
+
 @code {
 
+    
 }

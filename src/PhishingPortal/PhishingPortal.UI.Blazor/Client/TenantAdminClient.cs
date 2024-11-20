@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Newtonsoft.Json;
 using PhishingPortal.Common;
+using PhishingPortal.Dto.Dashboard;
 
 namespace PhishingPortal.UI.Blazor.Client
 {
@@ -213,6 +214,5 @@ namespace PhishingPortal.UI.Blazor.Client
             content = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
             return (content?.Result ?? false, content.Message);
         }
-
     }
 }

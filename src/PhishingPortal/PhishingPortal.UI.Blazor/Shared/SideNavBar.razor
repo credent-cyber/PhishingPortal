@@ -31,57 +31,60 @@
                         </a>
                     </li>
 
-                    <li class="nav-item pcoded-hasmenu @(IsTemplateExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link" @onclick="ToggleTemplate"  style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-layout"></i>
-                            </span>
-                            <span class="pcoded-mtext">Templates</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsTemplateExpanded ? "d-block" : "d-none")">
-                            <li><a href="tenant-templates">All Templates</a></li>
-                            <li><a href="tenant-templates-config">Add Templates</a></li>
-                        </ul>
-                    </li>
+                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModules="@AppModulesList" ReadOnly="true" IsButton="false">
+                        <li class="nav-item pcoded-hasmenu @(IsTemplateExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link" @onclick="ToggleTemplate" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="feather icon-layout"></i>
+                                </span>
+                                <span class="pcoded-mtext">Templates</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsTemplateExpanded ? "d-block" : "d-none")">
+                                <li><a href="tenant-templates">All Templates</a></li>
+                                <li><a href="tenant-templates-config">Add Templates</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item pcoded-hasmenu @(IsCampaignExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="ToggleCampaign" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="feather icon-layers"></i>
+                                </span><span class="pcoded-mtext">Campaigns</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsCampaignExpanded ? "d-block" : "d-none")">
+                                <li><a href="tenant-campaigns">All Campaigns</a></li>
+                                <li><a href="tenant-campaign-config">New Campaign</a></li>
 
-                    <li class="nav-item pcoded-hasmenu @(IsCampaignExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleCampaign" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
-                            </span><span class="pcoded-mtext">Campaigns</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsCampaignExpanded ? "d-block" : "d-none")">
-                            <li><a href="tenant-campaigns">All Campaigns</a></li>
-                            <li><a href="tenant-campaign-config">New Campaign</a></li>
-
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    </LicencedView>
 
                     <li class="nav-item pcoded-menu-caption">
                         <label>Learn</label>
                     </li>
-                    <li class="nav-item pcoded-hasmenu @(IsTrainingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleTraining" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-box"></i>
-                            </span><span class="pcoded-mtext">Training</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsTrainingExpanded ? "d-block" : "d-none")">
-                            <li><a href="training">All Training</a></li>
-                            <li><a href="tenant-training-config">New Training</a></li>
-                            <li><a href="training-video-upload">Training Video</a></li>
-                            <li><a href="training-Quizzes">Training Quiz</a></li>
-                            <li><a href="training-quiz">New Training Quiz</a></li>
+                    <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="false">
+                        <li class="nav-item pcoded-hasmenu @(IsTrainingExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="ToggleTraining" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="feather icon-box"></i>
+                                </span><span class="pcoded-mtext">Training</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsTrainingExpanded ? "d-block" : "d-none")">
+                                <li><a href="training">All Training</a></li>
+                                <li><a href="tenant-training-config">New Training</a></li>
+                                <li><a href="training-video-upload">Training Video</a></li>
+                                <li><a href="training-Quizzes">Training Quiz</a></li>
+                                <li><a href="training-quiz">New Training Quiz</a></li>
 
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-book"></i>
-                            </span><span class="pcoded-mtext">My Training</span>
-                        </a>
-                    </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="feather icon-book"></i>
+                                </span><span class="pcoded-mtext">My Training</span>
+                            </a>
+                        </li>
+                    </LicencedView>
 
                     <li class="nav-item pcoded-hasmenu @(IsReportExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="ToggleReport" style="cursor:pointer">
@@ -90,10 +93,13 @@
                             </span><span class="pcoded-mtext">Report</span>
                         </a>
                         <ul class="pcoded-submenu @(IsReportExpanded ? "d-block" : "d-none")">
-                            <li><a href="report">Campaign Report</a></li>
-                            <li><a href="tenant-training-report">Training Report</a></li>
+                            <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModules="@AppModulesList" ReadOnly="true" IsButton="false">
+                                <li><a href="report">Campaign Report</a></li>
+                            </LicencedView>
 
-
+                            <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.TrainingCampaign" ReadOnly="true" IsButton="false">
+                                <li><a href="tenant-training-report">Training Report</a></li>
+                            </LicencedView>
                         </ul>
                     </li>
 
@@ -112,7 +118,9 @@
                             <li><a href="google-config">Google App Configurations</a></li>
                             <li><a href="onprem-ad-config">AD Configurations</a></li>
                             <li><a href="tenant-domains">Domain Configurations</a></li>
-                            <li><a href="redirect-urls">Return Url Configurations</a></li>
+                            <LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="AppModules.EmailCampaign" ReadOnly="true" IsButton="false">
+                                <li><a href="redirect-urls">Return Url Configurations</a></li>
+                            </LicencedView>
                         </ul>
                     </li>
                     <li class="nav-item pcoded-menu-caption">
@@ -252,12 +260,13 @@
                 </a>
             </li>
         </ul>
-        <PhishingPortal.UI.Blazor.Pages.TenantSetting/>
+        <PhishingPortal.UI.Blazor.Pages.TenantSetting />
     </section>
 </div>
 
 
 @code {
+    private LicencedView licencedViewRef;
     [Parameter]
     public EventCallback<bool> IsCollapsedChanged { get; set; }
     string layout = "menu-light";
@@ -449,4 +458,10 @@
         await JS.InvokeVoidAsync("setLayout", layout, headerColor);
     }
 
+    private List<AppModules> AppModulesList => new List<AppModules>
+    {
+        AppModules.EmailCampaign,
+        AppModules.SmsCampaign,
+        AppModules.WhatsAppCampaign
+    };
 }

@@ -14,8 +14,10 @@ namespace PhishingPortal.Services.Notification.Sms
         private string BaseUrl = "http://localhost:7081/cmp";
         private string _sqlLiteDbPath { get; } = "D:/Credent/Git/PhishingPortal/src/PhishingPortal/PhishingPortal.Server/App_Data";
         public IUrlShortner urlShortner { get; }
+        public ILicenseEnforcementService LicenseEnforcement { get; }
+
         public SmsCampaignProvider(ILogger logger,
-            ISmsGatewayClient smsSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner)
+            ISmsGatewayClient smsSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner, ILicenseEnforcementService licenseEnforcement)
         {
             Logger = logger;
             SmsSender = smsSender;
@@ -23,7 +25,7 @@ namespace PhishingPortal.Services.Notification.Sms
             Tenant = tenant;
             ConnManager = connManager;
             urlShortner = UrlShortner;
-
+            LicenseEnforcement = licenseEnforcement;
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
@@ -40,35 +42,40 @@ namespace PhishingPortal.Services.Notification.Sms
             //await Task.Run(async () =>
             //{
 
-                try
-                {
+            try
+            {
 
-                    var dbContext = ConnManager.GetContext(Tenant.UniqueId);
-                    dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+                var dbContext = ConnManager.GetContext(Tenant.UniqueId);
 
-                    var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
-                                            .Where(o => ( o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress)&& o.IsActive
+                dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+
+                if (!LicenseEnforcement.HasValidLicense(dbContext, Dto.Subscription.AppModules.SmsCampaign))
+                    return;
+
+                var allActiveCampaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
+                                            .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive
                                                 && o.Detail.Type == CampaignType.Sms).ToList();
 
-                    MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
+                MarkExpiredOrCompleted(dbContext, allActiveCampaigns);
 
-                    allActiveCampaigns = allActiveCampaigns.Where(o => o.Schedule.IsScheduledNow() &&
-                                o.State == CampaignStateEnum.Published).ToList();
+                allActiveCampaigns = allActiveCampaigns.Where(o => o.Schedule.IsScheduledNow() &&
+                            o.State == CampaignStateEnum.Published).ToList();
 
-                    foreach (var campaign in allActiveCampaigns)
-                    {
-                        campaign.State = CampaignStateEnum.InProgress;
-                        dbContext.Update(campaign);
-                        dbContext.SaveChanges();
-
-                        await QueueSms(campaign, dbContext, Tenant.UniqueId);
-                    }
-
-                }
-                catch (Exception ex)
+                foreach (var campaign in allActiveCampaigns)
                 {
-                    Logger.LogCritical(ex, ex.Message);
+                    campaign.State = CampaignStateEnum.InProgress;
+                    dbContext.Update(campaign);
+                    dbContext.SaveChanges();
+
+                    await QueueSms(campaign, dbContext, Tenant.UniqueId);
                 }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
 
             //});
         }
@@ -99,7 +106,7 @@ namespace PhishingPortal.Services.Notification.Sms
                 if (template == null)
                     throw new Exception("Template not found");
 
-                
+
 
                 var recipients = dbContext.CampaignRecipients
                     .Include(o => o.Recipient).Where(o => o.CampaignId == campaign.Id);
@@ -173,7 +180,7 @@ namespace PhishingPortal.Services.Notification.Sms
                 var allCount = dbContext.CampaignRecipients.Count(r => r.CampaignId == c.Id);
                 var allLogs = dbContext.CampaignLogs.Where(acl => acl.CampaignId == c.Id);
                 var allSent = allLogs.Count(o => o.Status == CampaignLogStatus.Sent.ToString());
-             
+
 
                 if (allCount > 0)
                 {
@@ -199,7 +206,7 @@ namespace PhishingPortal.Services.Notification.Sms
                         && c.Schedule.ToActualScheduleType()?.GetElapsedTimeInMinutes() > 15)
                     {
                         c.State = CampaignStateEnum.InComplete;
-                    }                  
+                    }
 
                     dbContext.Update(c);
                     dbContext.SaveChanges();

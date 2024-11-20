@@ -15,6 +15,7 @@ namespace PhishingPortal.Server.Controllers
     using DocumentFormat.OpenXml.Office2010.Drawing;
     using Microsoft.AspNetCore.Identity.UI.Services;
     using Newtonsoft.Json;
+    using PhishingPortal.Dto.Dashboard;
     using PhishingPortal.Dto.Subscription;
     using PhishingPortal.Licensing;
     using PhishingPortal.Server.Controllers.Api.Abstraction;
@@ -394,7 +395,6 @@ namespace PhishingPortal.Server.Controllers
 #endif
             await EmailSender.SendEmailAsync(to, subject, mailContent);
         }
-
 
     }
 }

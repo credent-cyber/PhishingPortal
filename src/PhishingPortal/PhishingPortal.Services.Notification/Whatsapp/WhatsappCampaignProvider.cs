@@ -20,9 +20,11 @@ namespace PhishingPortal.Services.Notification.Whatsapp
         public Tenant Tenant { get; }
         public ITenantDbConnManager ConnManager { get; }
         public IUrlShortner urlShortner { get; }
+        public ILicenseEnforcementService LicenseEnforcement { get; }
 
         public WhatsappCampaignProvider(ILogger logger,
-            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, ITenantDbConnManager connManager, IUrlShortner UrlShortner)
+            IWhatsappGatewayClient waSender, IConfiguration config, Tenant tenant, 
+            ITenantDbConnManager connManager, IUrlShortner UrlShortner, ILicenseEnforcementService licenseEnforcement)
         {
             Logger = logger;
             WaSender = waSender;
@@ -30,7 +32,7 @@ namespace PhishingPortal.Services.Notification.Whatsapp
             Tenant = tenant;
             ConnManager = connManager;
             urlShortner = UrlShortner;
-
+            LicenseEnforcement = licenseEnforcement;
             BaseUrl = config.GetValue<string>("BaseUrl");
             _sqlLiteDbPath = config.GetValue<string>("SqlLiteDbPath");
             observers = new();
@@ -47,6 +49,9 @@ namespace PhishingPortal.Services.Notification.Whatsapp
 
                     var dbContext = ConnManager.GetContext(Tenant.UniqueId);
                     dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+                    if (!LicenseEnforcement.HasValidLicense(dbContext, Dto.Subscription.AppModules.WhatsAppCampaign))
+                        return;
 
                     var campaigns = dbContext.Campaigns.Include(o => o.Detail).Include(o => o.Schedule)
                                             .Where(o => (o.State == CampaignStateEnum.Published || o.State == CampaignStateEnum.InProgress) && o.IsActive

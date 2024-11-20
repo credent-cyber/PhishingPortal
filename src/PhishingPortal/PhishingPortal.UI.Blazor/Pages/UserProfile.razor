@@ -45,14 +45,14 @@
                             <div class="user-profile user-card mb-4">
                                 <div class="card-header border-0 p-0 pb-0">
                                     <div class="cover-img-block">
-                                        <img src="assets/images/profile/cover.jpg" alt="" class="img-fluid">
-                                        <div class="overlay"></div>
+                                        <img src="assets/images/profile/cover.jpg" alt="" class="img-fluid">                                        <div class="overlay"></div>
                                         <div class="change-cover">
                                             <div class="dropdown">
                                                 <a class="drp-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon feather icon-camera"></i></a>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
                                                     <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -81,6 +81,7 @@
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
                                                             <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -146,10 +147,8 @@
 </div>
 
 @code {
-
     [CascadingParameter]
     private AlertModel alerts { get; set; } = new();
-
     private Timer _timer;
     private int _delay = 4000;
 
@@ -164,6 +163,7 @@
     protected override async Task OnInitializedAsync()
     {
         alerts ??= new AlertModel();
+
     }
 
     private async Task OnSubmit()
@@ -191,7 +191,6 @@
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 
-
     private void TimerCallback(Object o)
     {
         alerts?.Clear();
@@ -204,5 +203,5 @@
         Model = new();
         alerts?.Clear();
     }
-    
+
 }

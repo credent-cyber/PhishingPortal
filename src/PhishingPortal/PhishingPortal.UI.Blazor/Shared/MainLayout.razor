@@ -7,7 +7,8 @@
 <div class="">
     <main>
         <AuthorizeView Roles="superadmin">
-            <Admin_topnav />
+            <AdminPage IsCollapsedChanged="HandleIsCollapsedChanged" />
+            @* <Admin_topnav /> *@
         </AuthorizeView>
 
         <AuthorizeView Roles="tenantadmin">

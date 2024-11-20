@@ -4200,7 +4200,7 @@ input[type=submit].btn-block, input[type=reset].btn-block, input[type=button].bt
 
         .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
             color: #495057;
-            background-color: #fff;
+            background-color: #4099ff;
             border-color: #dee2e6 #dee2e6 #fff
         }
 

@@ -4,12 +4,19 @@
 @implements ICustomGridComponent<MyTraining>
 @inject NavigationManager NavigationManager
 
-@if (Item.TrainingLog.Status != "Completed"){
+@* @if (Item.TrainingLog.Status != "Completed"){
     <button class='btn btn-sm btn-outline-secondary' style="border-radius:15px" @onclick="MyClickHandler" title="Launch Training"><i class="fa fa-rocket"></i></button>
-}
+} *@
+
+<LicencedView @ref="licencedViewRef" ShowLicenseWarning="false" AppModule="@(AppModules.TrainingCampaign)" ReadOnly="true" IsButton="true">
+    @if (Item.TrainingLog.Status != "Completed")
+    {
+        <button class='btn btn-sm btn-outline-secondary @(licencedViewRef?.CurrentMode != AccessMode.ReadWrite ? "disabled-view" : "")' style="border-radius:15px" @onclick="(licencedViewRef?.CurrentMode == AccessMode.ReadWrite ? MyClickHandler : null)" title="Launch Training"><i class="fa fa-rocket"></i></button>
+    }
+</LicencedView>
 
 @code {
-
+    private LicencedView licencedViewRef;
     [Parameter]
     public MyTraining Item { get; set; }
 

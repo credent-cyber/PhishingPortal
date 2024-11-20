@@ -433,7 +433,7 @@ namespace PhishingPortal.Repositories
             }
             return message;
         }
-
+        public PhishingPortalDbContext PortalDbCtx { get; }
         public async Task<IEnumerable<TenantDomain>> GetDomains(int tenantId)
         {
             return await CentralDbContext.TenantDomain.Where(o => o.TenantId == tenantId).ToListAsync();
@@ -612,5 +612,8 @@ namespace PhishingPortal.Repositories
         {
             return await Task.FromResult(CentralDbContext.TenantData.AsQueryable<TenantData>());
         }
+
+
+            
     }
 }

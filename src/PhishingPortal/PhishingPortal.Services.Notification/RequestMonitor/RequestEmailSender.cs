@@ -10,7 +10,7 @@ using Moq;
 using System.Net;
 using System.Net.Mail;
 using Castle.Core.Smtp;
-using static Org.BouncyCastle.Math.EC.ECCurve;
+//using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace PhishingPortal.Services.Notification.RequestMonitor
 {
