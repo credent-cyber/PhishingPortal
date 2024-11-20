@@ -7,7 +7,6 @@ using PhishingPortal.Common;
 using PhishingPortal.DataContext;
 using PhishingPortal.Domain;
 using PhishingPortal.Dto;
-using PhishingPortal.Dto.Dashboard;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -615,18 +614,6 @@ namespace PhishingPortal.Repositories
         }
 
 
-        public async Task<AdminDashboardDto> GetAdminDashBoardStats()
-        {
-            var outcome = new AdminDashboardDto
-            {
-                TotalTenants = await CentralDbContext.Tenants.CountAsync(),
-                ActiveTenants = await CentralDbContext.Tenants.CountAsync(x => x.IsActive == true),
-                InActiveTenants = await CentralDbContext.Tenants.CountAsync(x => x.IsActive == false)
-            };
-
-            return outcome;
-        }
-
-       
+            
     }
 }

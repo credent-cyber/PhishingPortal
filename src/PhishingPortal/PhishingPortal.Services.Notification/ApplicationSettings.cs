@@ -11,7 +11,6 @@ namespace PhishingPortal.Services.Notification
         public bool EnableDemoRequestHandler { get; set; } = true;
         public bool EnableTrainingProvider { get; set; } = true;
         public bool EnableWeeklyReport { get; set; } = true;
-        public bool EnableTrainingReminder { get; set; } = true;
         public int WaitIntervalInMinutes { get; set; }
         public ApplicationSettings(IConfiguration config)
         {

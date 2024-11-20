@@ -5,9 +5,6 @@
 @using PhishingPortal.Dto.Auth
 @using System.ComponentModel.DataAnnotations
 @using PhishingPortal.UI.Blazor.Models
-@using PhishingPortal.Dto
-@using PhishingPortal.UI.Blazor.Client
-@inject TenantClient client
 @inject NavigationManager navigationManager
 @inject CustomStateProvider authStateProvider
 
@@ -48,17 +45,14 @@
                             <div class="user-profile user-card mb-4">
                                 <div class="card-header border-0 p-0 pb-0">
                                     <div class="cover-img-block">
-                                        <img src="@BgimageDataUrl" alt="User bkg Image" class="img-fluid">
-                                        <div class="overlay"></div>
+                                        <img src="assets/images/profile/cover.jpg" alt="" class="img-fluid">                                        <div class="overlay"></div>
                                         <div class="change-cover">
                                             <div class="dropdown">
                                                 <a class="drp-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="icon feather icon-camera"></i></a>
                                                 <div class="dropdown-menu">
-                                                    <label class="dropdown-item" style="cursor: pointer;">
-                                                        <i class="feather icon-upload-cloud mr-2"></i>upload new
-                                                        <InputFile OnChange="BgHandleFileSelected" class="d-none" />
-                                                    </label>
-                                                    <a class="dropdown-item" @onclick="RemoveBgImage"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                    <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
+                                                    <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -73,7 +67,7 @@
                                                         <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <div class="profile-dp">
                                                                 <div class="position-relative d-inline-block">
-                                                                    <img id="imgPreview" class="img-radius img-fluid wid-100" src="@imageDataUrl" alt="User image" style="height:15vh;" />
+                                                                    <img class="img-radius img-fluid wid-100" src="/assets/images/auth/no-profile1.png" alt="User image">
                                                                 </div>
                                                                 <div class="overlay">
                                                                     <span>change</span>
@@ -85,11 +79,9 @@
                                                             </div>
                                                         </a>
                                                         <div class="dropdown-menu">
-                                                            <label class="dropdown-item" style="cursor: pointer;">
-                                                                <i class="feather icon-upload-cloud mr-2"></i>upload new
-                                                                <InputFile OnChange="HandleFileSelected" class="d-none" />
-                                                            </label>
-                                                            <a class="dropdown-item" @onclick="RemoveImage"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+                                                            <a class="dropdown-item" href="#"><i class="feather icon-upload-cloud mr-2"></i>upload new</a>
+                                                            <a class="dropdown-item" href="#"><i class="feather icon-trash-2 mr-2"></i>remove</a>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -157,10 +149,6 @@
 @code {
     [CascadingParameter]
     private AlertModel alerts { get; set; } = new();
-
-    private string imageDataUrl;
-    private string BgimageDataUrl;
-    private UserProfilePicUpld profilePic { get; set; } = new UserProfilePicUpld();
     private Timer _timer;
     private int _delay = 4000;
 
@@ -175,29 +163,6 @@
     protected override async Task OnInitializedAsync()
     {
         alerts ??= new AlertModel();
-
-        profilePic = await client.GetProfilePicByEmail();
-
-        if (profilePic != null)
-        {
-
-            if (profilePic.ProfileImage != null && profilePic.ProfileImage.Length > 0)
-            {
-                imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(profilePic.ProfileImage)}";
-            }
-            else
-            {
-                imageDataUrl = "/assets/images/auth/no-profile.png";
-            }
-            if (profilePic.BackgroundImage != null && profilePic.BackgroundImage.Length > 0)
-            {
-                BgimageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(profilePic.BackgroundImage)}";
-            }
-            else
-            {
-                BgimageDataUrl = "assets/images/profile/cover.jpg";
-            }
-        }
 
     }
 
@@ -239,96 +204,4 @@
         alerts?.Clear();
     }
 
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            var buffer = new byte[file.Size];
-            await file.OpenReadStream().ReadAsync(buffer);
-
-
-            // Store the image data in the model
-            profilePic.ProfileImage = buffer;
-
-
-
-            // Convert the image to a data URL for preview
-            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
-
-
-            var response = await client.UpsertProfilePicAsync(profilePic);
-
-            if (response.IsSuccess)
-            {
-                alerts.SetSuccess("Profile Pic Updated Successfully");
-            }
-            else
-            {
-                // Handle error, e.g., show an alert to the user
-                alerts.SetError("Failed to update profile image.");
-            }
-
-            StateHasChanged(); // Ensure the UI is updated
-        }
-    }
-
-    private async Task BgHandleFileSelected(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            var buffer = new byte[file.Size];
-            await file.OpenReadStream().ReadAsync(buffer);
-
-
-            // Convert the image to a data URL for preview
-
-            profilePic.BackgroundImage = buffer;
-
-            // Convert the image to a data URL for preview
-            BgimageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
-
-
-            var response = await client.UpsertProfilePicAsync(profilePic);
-
-            if (response.IsSuccess)
-            {
-                alerts.SetSuccess("Background Pic Updated Successfully");
-            }
-            else
-            {
-                // Handle error, e.g., show an alert to the user
-                alerts.SetError("Failed to update Background image.");
-            }
-
-            StateHasChanged(); // Ensure the UI is updated
-        }
-
-    }
-
-    private async void RemoveImage()
-    {
-        imageDataUrl = "/assets/images/auth/no-profile.png";
-        profilePic.removePp = true;
-        profilePic.removebg = false;
-        profilePic.ProfileImage = null;
-        var responce = await client.DeleteProfBgPic(profilePic);
-        
-
-        StateHasChanged(); 
-    }
-
-    private async void RemoveBgImage()
-    {
-        BgimageDataUrl = "assets/images/profile/cover.jpg";
-        profilePic.removePp = false;
-        profilePic.removebg = true;
-        profilePic.BackgroundImage = null;
-
-        var responce = await client.DeleteProfBgPic(profilePic);
-
-
-        StateHasChanged();
-    }
 }

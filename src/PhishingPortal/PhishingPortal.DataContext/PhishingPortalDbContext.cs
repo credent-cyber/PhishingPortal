@@ -9,7 +9,6 @@ namespace PhishingPortal.DataContext
     using Microsoft.Extensions.Options;
     using PhishingPortal.Domain;
     using PhishingPortal.Dto;
-    using PhishingPortal.Dto.Dashboard;
 
     public class PhishingPortalDbContext : ApiAuthorizationDbContext<PhishingPortalUser>
     {

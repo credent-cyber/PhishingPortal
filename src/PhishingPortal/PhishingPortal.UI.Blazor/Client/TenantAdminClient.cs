@@ -214,34 +214,5 @@ namespace PhishingPortal.UI.Blazor.Client
             content = await res.Content.ReadFromJsonAsync<ApiResponse<bool>>();
             return (content?.Result ?? false, content.Message);
         }
-
-
-        //Admin DashBoard
-
-        public async Task<AdminDashboardDto> GetAdminDashBoardStats()
-        {
-            var result = new AdminDashboardDto();
-            try
-            {
-                var res = await HttpClient.GetAsync($"api/onboarding/get-admin-statistics");
-                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                    return result;
-                res.EnsureSuccessStatusCode();
-
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AdminDashboardDto>>();
-
-                if (json != null)
-                    result = json.Result;
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return result;
-        }
-
     }
 }

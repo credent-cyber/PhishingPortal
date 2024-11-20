@@ -951,33 +951,5 @@ namespace PhishingPortal.Server.Controllers.Api
         }
         #endregion
 
-        #region Update Profilr images
-
-        [HttpPost]
-        [Route("UpsertProfilePic")]
-        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePic(UserProfilePicUpld data)
-        {
-       
-            data.Email = User.Identity.Name;
-            return await _tenantRepository.UpsertProfilePic(data);
-        }
-
-        [HttpGet]
-        [Route("GetProfilePicByEmail")]
-        public async Task<UserProfilePicUpld> GetProfilePicByEmail()
-        {
-            var userEmail = User.Identity.Name;
-
-            return await _tenantRepository.GetProfilePicByEmail(userEmail);
-        }
-
-        [HttpPost]
-        [Route("DeleteProfBgPic")]
-        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld userProfilePicUpld)
-        {
-            userProfilePicUpld.Email = User.Identity.Name;
-            return await _tenantRepository.DeleteProfBgPic(userProfilePicUpld);
-        }
-        #endregion
     }
 }
